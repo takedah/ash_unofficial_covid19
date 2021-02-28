@@ -141,7 +141,7 @@ class ScrapedHTMLData:
                     table_values.append(row)
             return table_values
 
-    def _format_date(self, date_string) -> Optional[date]:
+    def _format_date(self, date_string: str) -> Optional[date]:
         """元データに年のデータがないためこれを加えてdatetime.dateに変換
 
         Returns:
@@ -153,7 +153,7 @@ class ScrapedHTMLData:
             month = int(matched_texts[0])
             day = int(matched_texts[1])
             return date(self.target_year, month, day)
-        except (AttributeError, TypeError):
+        except (AttributeError, TypeError, ValueError):
             return None
 
     def _extract_patients_data(self, row: list) -> Optional[dict]:
