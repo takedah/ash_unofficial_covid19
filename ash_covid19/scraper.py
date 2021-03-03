@@ -144,6 +144,9 @@ class ScrapedHTMLData:
     def _format_date(self, date_string: str) -> Optional[date]:
         """元データに年のデータがないためこれを加えてdatetime.dateに変換
 
+        Args:
+            date_string (str): 元データの日付表記
+
         Returns:
             formatted_date (date): datetime.dateに変換した日付データ
 
@@ -155,6 +158,33 @@ class ScrapedHTMLData:
             return date(self.target_year, month, day)
         except (AttributeError, TypeError, ValueError):
             return None
+
+    @staticmethod
+    def _format_age(age_string: str) -> str:
+        """患者の年代表記をオープンデータ定義書の仕様に合わせる。
+
+        Args:
+            age_string (str): 元データの患者の年代表記
+
+        Returns:
+            formatted_age (str): 修正後の患者の年代表記
+
+        """
+        if age_string == "非公表" or age_string == "調査中":
+            return ""
+        elif age_string == "10代未満" or age_string == "10歳未満":
+            return "10歳未満"
+        elif age_string == "90代":
+            return "90歳以上"
+
+        matched_text = re.match("([0-9]+)", age_string).group(1)
+        if matched_text is None:
+            return ""
+        age = int(matched_text)
+        if 90 < age:
+            return "90歳以上"
+        else:
+            return str(age) + "代"
 
     def _extract_patients_data(self, row: list) -> Optional[dict]:
         """新型コロナウイルス感染症患者データへの変換
@@ -196,7 +226,7 @@ class ScrapedHTMLData:
                 "publication_date": self._format_date(row[2]),
                 "onset_date": "",  # 元データにないため空とする
                 "residence": row[5],
-                "age": row[3],
+                "age": self._format_age(row[3]),
                 "sex": row[4],
                 "status": "",  # 元データにないため空とする
                 "symptom": "",  # 元データにないため空とする
