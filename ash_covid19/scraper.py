@@ -192,6 +192,27 @@ class ScrapedHTMLData:
         else:
             return str(age) + "代"
 
+    @staticmethod
+    def format_sex(sex_string: str) -> str:
+        """患者の性別表記をオープンデータ定義書の仕様に合わせる。
+
+        Args:
+            sex_string (str): 元データの患者の性別表記
+
+        Returns:
+            formatted_sex (str): 修正後の患者の性別表記
+
+        """
+        if sex_string == "非公表" or sex_string == "調査中":
+            return ""
+        if sex_string == "その他":
+            return "その他"
+        matched_text = re.match("(男|女)", sex_string)
+        if matched_text is None:
+            return ""
+        sex = matched_text.group(1)
+        return sex + "性"
+
     def _extract_patients_data(self, row: list) -> Optional[dict]:
         """新型コロナウイルス感染症患者データへの変換
 
@@ -235,7 +256,7 @@ class ScrapedHTMLData:
                 "onset_date": "",  # 元データにないため空とする
                 "residence": row[5],
                 "age": self.format_age(row[3]),
-                "sex": row[4],
+                "sex": self.format_sex(row[4]),
                 "status": "",  # 元データにないため空とする
                 "symptom": "",  # 元データにないため空とする
                 "overseas_travel_history": "",  # 元データにないため空とする

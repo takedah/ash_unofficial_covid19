@@ -185,6 +185,12 @@ class TestScrapedHTMLData(unittest.TestCase):
         # 半角数字が含まれていない場合空文字を返す
         self.assertEqual(ScrapedHTMLData.format_age("２０代"), "")
 
+    def test_format_sex(self):
+        self.assertEqual(ScrapedHTMLData.format_sex("男性"), "男性")
+        self.assertEqual(ScrapedHTMLData.format_sex("非公表"), "")
+        self.assertEqual(ScrapedHTMLData.format_sex("その他"), "その他")
+        self.assertEqual(ScrapedHTMLData.format_sex("women"), "")
+
     @patch("ash_covid19.scraper.requests")
     def test_data_list(self, mock_requests):
         mock_requests.get.return_value = Mock(
@@ -239,7 +245,7 @@ class TestScrapedHTMLData(unittest.TestCase):
                 "onset_date": "",
                 "residence": "旭川市",
                 "age": "",
-                "sex": "非公表",
+                "sex": "",
                 "status": "",
                 "symptom": "",
                 "overseas_travel_history": "",
