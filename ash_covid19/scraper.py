@@ -96,10 +96,10 @@ class ScrapedHTMLData:
             target_year (int): 元データに年が表記されていないため直接指定する
 
         """
-        if target_year == 2020 or target_year == 2021:
+        if 2020 <= target_year:
             self.__target_year = target_year
         else:
-            raise TypeError
+            raise TypeError("対象年の指定が正しくありません。")
         self.__patients_data = list()
         for row in self._get_table_values(downloaded_html):
             extracted_data = self._extract_patients_data(row)
@@ -139,28 +139,34 @@ class ScrapedHTMLData:
                         val = td.text.strip().replace("\n", " ")
                         row.append(val)
                     table_values.append(row)
-            return table_values
 
-    def _format_date(self, date_string: str) -> Optional[date]:
+        return table_values
+
+    @staticmethod
+    def format_date(date_string: str, target_year: int) -> Optional[date]:
         """元データに年のデータがないためこれを加えてdatetime.dateに変換
 
         Args:
             date_string (str): 元データの日付表記
+            target_year (int): 対象年
 
         Returns:
             formatted_date (date): datetime.dateに変換した日付データ
 
         """
         try:
-            matched_texts = re.match("([0-9]+)月([0-9]+)日", date_string).groups()
-            month = int(matched_texts[0])
-            day = int(matched_texts[1])
-            return date(self.target_year, month, day)
-        except (AttributeError, TypeError, ValueError):
+            matched_texts = re.match("([0-9]+)月([0-9]+)日", date_string)
+            if matched_texts is None:
+                return None
+            month_and_day = matched_texts.groups()
+            month = int(month_and_day[0])
+            day = int(month_and_day[1])
+            return date(target_year, month, day)
+        except (TypeError, ValueError):
             return None
 
     @staticmethod
-    def _format_age(age_string: str) -> str:
+    def format_age(age_string: str) -> str:
         """患者の年代表記をオープンデータ定義書の仕様に合わせる。
 
         Args:
@@ -177,10 +183,10 @@ class ScrapedHTMLData:
         elif age_string == "90代":
             return "90歳以上"
 
-        matched_text = re.match("([0-9]+)", age_string).group(1)
+        matched_text = re.match("([0-9]+)", age_string)
         if matched_text is None:
             return ""
-        age = int(matched_text)
+        age = int(matched_text.group(1))
         if 90 < age:
             return "90歳以上"
         else:
@@ -223,10 +229,12 @@ class ScrapedHTMLData:
                 "city_code": "012041",  # 旭川市の総務省の全国地方公共団体コード
                 "prefecture": "北海道",
                 "city_name": "旭川市",
-                "publication_date": self._format_date(row[2]),
+                "publication_date": self.format_date(
+                    date_string=row[2], target_year=self.target_year
+                ),
                 "onset_date": "",  # 元データにないため空とする
                 "residence": row[5],
-                "age": self._format_age(row[3]),
+                "age": self.format_age(row[3]),
                 "sex": row[4],
                 "status": "",  # 元データにないため空とする
                 "symptom": "",  # 元データにないため空とする

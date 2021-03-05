@@ -8,7 +8,7 @@ from ash_covid19.errors import HTMLDownloadError
 from ash_covid19.scraper import DownloadedHTML, ScrapedHTMLData
 
 
-def html_content1():
+def html_content():
     return """
 <table cellspacing="1" cellpadding="1" style="width: 660px;">
     <caption>新型コロナウイルス感染症の市内発生状況</caption>
@@ -87,16 +87,6 @@ def html_content1():
             <td>調査中</td>
             <td>8人</td>
         </tr>
-    </tbody>
-</table>
-    """
-
-
-def html_content2():
-    return """
-<table cellspacing="1" cellpadding="1" style="width: 660px;">
-    <caption>新型コロナウイルス感染症の市内発生状況</caption>
-    <tbody>
         <tr>
             <th nowrap="nowrap">NO.</th>
             <th nowrap="nowrap">
@@ -129,7 +119,7 @@ def html_content2():
 
 class TestDownloadedHTML(unittest.TestCase):
     def setUp(self):
-        self.html_content1 = html_content1()
+        self.html_content = html_content()
 
     def tearDown(self):
         pass
@@ -137,11 +127,11 @@ class TestDownloadedHTML(unittest.TestCase):
     @patch("ash_covid19.scraper.requests")
     def test_content(self, mock_requests):
         mock_requests.get.return_value = Mock(
-            status_code=200, content=self.html_content1
+            status_code=200, content=self.html_content
         )
         schedule_html = DownloadedHTML("http://dummy.local")
         result = schedule_html.content
-        expect = self.html_content1
+        expect = self.html_content
         self.assertEqual(result, expect)
 
         mock_requests.get.side_effect = Timeout("Dummy Error.")
@@ -163,20 +153,50 @@ class TestDownloadedHTML(unittest.TestCase):
 
 class TestScrapedHTMLData(unittest.TestCase):
     def setUp(self):
-        self.html_content1 = html_content1()
-        self.html_content2 = html_content2()
+        self.html_content = html_content()
 
     def tearDown(self):
         pass
 
+    def test_format_date(self):
+        self.assertEqual(
+            ScrapedHTMLData.format_date(date_string="3月6日", target_year=2021),
+            date(2021, 3, 6),
+        )
+
+        # 半角数字が含まれていない場合Noneを返す
+        self.assertEqual(
+            ScrapedHTMLData.format_date(date_string="３月６日", target_year=2021),
+            None,
+        )
+
+        # 日付ではない数字の場合Noneを返す
+        self.assertEqual(
+            ScrapedHTMLData.format_date(date_string="13月6日", target_year=2021),
+            None,
+        )
+
+    def test_format_age(self):
+        self.assertEqual(ScrapedHTMLData.format_age("20代"), "20代")
+        self.assertEqual(ScrapedHTMLData.format_age("調査中"), "")
+        self.assertEqual(ScrapedHTMLData.format_age("10代未満"), "10歳未満")
+        self.assertEqual(ScrapedHTMLData.format_age("100代"), "90歳以上")
+
+        # 半角数字が含まれていない場合空文字を返す
+        self.assertEqual(ScrapedHTMLData.format_age("２０代"), "")
+
     @patch("ash_covid19.scraper.requests")
     def test_data_list(self, mock_requests):
         mock_requests.get.return_value = Mock(
-            status_code=200, content=self.html_content1
+            status_code=200, content=self.html_content
         )
         downloaded_html = DownloadedHTML("http://dummy.local")
+        # 年指定が正しくない場合エラーを返す
+        with self.assertRaises(TypeError):
+            ScrapedHTMLData(downloaded_html=downloaded_html, target_year=2019)
+
         scraper = ScrapedHTMLData(downloaded_html=downloaded_html, target_year=2021)
-        expect1 = [
+        expect = [
             {
                 "patient_number": 1121,
                 "city_code": "012041",
@@ -259,21 +279,12 @@ class TestScrapedHTMLData(unittest.TestCase):
                 "be_discharged": "",
                 "note": "北海道発表NO.: 17511 周囲の患者の発生: 調査中 濃厚接触者の状況: 8人",
             },
-        ]
-        self.assertEqual(scraper.patients_data, expect1)
-
-        mock_requests.get.return_value = Mock(
-            status_code=200, content=self.html_content2
-        )
-        downloaded_html = DownloadedHTML("http://dummy.local")
-        scraper = ScrapedHTMLData(downloaded_html=downloaded_html, target_year=2020)
-        expect2 = [
             {
                 "patient_number": 715,
                 "city_code": "012041",
                 "prefecture": "北海道",
                 "city_name": "旭川市",
-                "publication_date": date(2020, 12, 9),
+                "publication_date": date(2021, 12, 9),
                 "onset_date": "",
                 "residence": "旭川市",
                 "age": "90歳以上",
@@ -285,7 +296,7 @@ class TestScrapedHTMLData(unittest.TestCase):
                 "note": "北海道発表NO.: 10716 周囲の患者の発生: あり 濃厚接触者の状況: 調査中",
             },
         ]
-        self.assertEqual(scraper.patients_data, expect2)
+        self.assertEqual(scraper.patients_data, expect)
 
         # 想定外のテーブル要素があった場合は空リストを返す。
         dummy_table = """
