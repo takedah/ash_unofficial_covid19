@@ -1,8 +1,8 @@
 import psycopg2
 from psycopg2.extras import DictCursor
 
-from ash_covid19.config import Config
-from ash_covid19.errors import DatabaseError
+from ash_unofficial_covid19.config import Config
+from ash_unofficial_covid19.errors import DatabaseError
 
 
 class DB:

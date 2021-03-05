@@ -6,8 +6,8 @@ import requests
 from bs4 import BeautifulSoup
 from requests import HTTPError, Timeout
 
-from ash_covid19.errors import HTMLDownloadError
-from ash_covid19.logs import AppLog
+from ash_unofficial_covid19.errors import HTMLDownloadError
+from ash_unofficial_covid19.logs import AppLog
 
 
 class DownloadedHTML:

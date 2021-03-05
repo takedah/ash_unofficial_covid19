@@ -4,8 +4,8 @@ from unittest.mock import Mock, patch
 
 from requests import HTTPError, Timeout
 
-from ash_covid19.errors import HTMLDownloadError
-from ash_covid19.scraper import DownloadedHTML, ScrapedHTMLData
+from ash_unofficial_covid19.errors import HTMLDownloadError
+from ash_unofficial_covid19.scraper import DownloadedHTML, ScrapedHTMLData
 
 
 def html_content():
@@ -124,7 +124,7 @@ class TestDownloadedHTML(unittest.TestCase):
     def tearDown(self):
         pass
 
-    @patch("ash_covid19.scraper.requests")
+    @patch("ash_unofficial_covid19.scraper.requests")
     def test_content(self, mock_requests):
         mock_requests.get.return_value = Mock(
             status_code=200, content=self.html_content
@@ -191,7 +191,7 @@ class TestScrapedHTMLData(unittest.TestCase):
         self.assertEqual(ScrapedHTMLData.format_sex("その他"), "その他")
         self.assertEqual(ScrapedHTMLData.format_sex("women"), "")
 
-    @patch("ash_covid19.scraper.requests")
+    @patch("ash_unofficial_covid19.scraper.requests")
     def test_data_list(self, mock_requests):
         mock_requests.get.return_value = Mock(
             status_code=200, content=self.html_content
