@@ -1,6 +1,8 @@
+import csv
+import io
 import os
 
-from flask import Flask, g, render_template, url_for
+from flask import Flask, g, make_response, render_template, url_for
 
 from ash_unofficial_covid19.db import DB
 from ash_unofficial_covid19.services import PatientService
@@ -70,13 +72,17 @@ def index():
 @app.route("/012041_asahikawa_covid19_patients.csv")
 def patients_csv():
     patient_service = PatientService(get_db())
-    title = "旭川市コロナウイルス感染症非公式オープンデータ"
-    last_updated = patient_service.get_last_updated()
-    return render_template(
-        "index.html",
-        title=title,
-        last_updated=last_updated.strftime("%Y/%m/%d %H:%M"),
+    patients_rows = patient_service.get_patients_rows()
+    f = io.StringIO()
+    writer = csv.writer(f, quoting=csv.QUOTE_ALL, lineterminator="\n")
+    writer.writerows(patients_rows)
+    res = make_response()
+    res.data = f.getvalue()
+    res.headers["Content-Type"] = "text/csv"
+    res.headers["Content-Disposition"] = (
+        "attachment: filename=" + "012041_asahikawa_covid19_patients.csv"
     )
+    return res
 
 
 @app.errorhandler(404)
