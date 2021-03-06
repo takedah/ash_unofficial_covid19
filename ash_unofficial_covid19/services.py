@@ -208,3 +208,56 @@ class PatientService:
             return None
         else:
             return row["max"]
+
+    def get_patients_rows(self) -> list:
+        """陽性患者属性CSVファイルをFlaskのResponseオブジェクトで返す
+
+        Returns:
+            patients_rows (list of list): 陽性患者属性CSVファイルのReponseオブジェクト
+
+        """
+        patients = self.find()
+        rows = list()
+        for patient in patients:
+            patient_number = str(patient.patient_number)
+
+            if patient.publication_date is None:
+                publication_date = ""
+            else:
+                publication_date = patient.publication_date.strftime("%Y-%m-%d")
+
+            if patient.onset_date is None:
+                onset_date = ""
+            else:
+                onset_date = patient.onset_date.strftime("%Y-%m-%d")
+
+            if patient.overseas_travel_history is None:
+                overseas_travel_history = ""
+            else:
+                overseas_travel_history = str(int(patient.overseas_travel_history))
+
+            if patient.be_discharged is None:
+                be_discharged = ""
+            else:
+                be_discharged = str(int(patient.be_discharged))
+
+            rows.append(
+                [
+                    patient_number,
+                    patient.city_code,
+                    patient.prefecture,
+                    patient.city_name,
+                    publication_date,
+                    onset_date,
+                    patient.residence,
+                    patient.age,
+                    patient.sex,
+                    patient.occupation,
+                    patient.status,
+                    patient.symptom,
+                    overseas_travel_history,
+                    be_discharged,
+                    patient.note,
+                ]
+            )
+        return rows

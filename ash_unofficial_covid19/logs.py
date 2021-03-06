@@ -5,7 +5,7 @@ class AppLog:
     """ログをコンソールへ出力する"""
 
     def __init__(self):
-        logger = logging.getLogger("ash_covid19_log")
+        logger = logging.getLogger("ash_unofficial_covid19_log")
         logger.setLevel(logging.DEBUG)
         if not logger.handlers == []:
             for exist_handler in logger.handlers:
