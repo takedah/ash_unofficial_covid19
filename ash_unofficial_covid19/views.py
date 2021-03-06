@@ -19,7 +19,8 @@ def add_security_headers(response):
                 script-src 'self' code.jquery.com cdnjs.cloudflare.com \
                 stackpath.bootstrapcdn.com kit.fontawesome.com; \
                 connect-src ka-f.fontawesome.com; \
-                font-src ka-f.fontawesome.com;",
+                font-src ka-f.fontawesome.com; \
+                img-src i.creativecommons.org licensebuttons.net;",
     )
     response.headers.add("X-Content-Type-Options", "nosniff")
     response.headers.add("X-Frame-Options", "DENY")
