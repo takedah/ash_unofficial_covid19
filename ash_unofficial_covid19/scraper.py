@@ -102,7 +102,7 @@ class ScrapedHTMLData:
             raise TypeError("対象年の指定が正しくありません。")
         self.__patients_data = list()
         for row in self._get_table_values(downloaded_html):
-            extracted_data = self._extract_patients_data(row)
+            extracted_data = self._extract_patient_data(row)
             if extracted_data is not None:
                 self.__patients_data.append(extracted_data)
 
@@ -213,7 +213,7 @@ class ScrapedHTMLData:
         sex = matched_text.group(1)
         return sex + "性"
 
-    def _extract_patients_data(self, row: list) -> Optional[dict]:
+    def _extract_patient_data(self, row: list) -> Optional[dict]:
         """新型コロナウイルス感染症患者データへの変換
 
         新型コロナウイルス感染症の市内発生状況HTMLのtable要素から抽出した行データの
@@ -225,7 +225,7 @@ class ScrapedHTMLData:
             row (list): table要素から抽出した行データのリスト
 
         Returns:
-            patients_data (dict): 新型コロナウイルス感染症患者データを表すハッシュ
+            patient_data (dict): 新型コロナウイルス感染症患者データを表すハッシュ
 
         """
         try:
@@ -245,7 +245,7 @@ class ScrapedHTMLData:
                 + " "
                 + row[7]
             )
-            patients_data = {
+            patient_data = {
                 "patient_number": patient_number,
                 "city_code": "012041",  # 旭川市の総務省の全国地方公共団体コード
                 "prefecture": "北海道",
@@ -253,16 +253,17 @@ class ScrapedHTMLData:
                 "publication_date": self.format_date(
                     date_string=row[2], target_year=self.target_year
                 ),
-                "onset_date": "",  # 元データにないため空とする
+                "onset_date": None,  # 元データにないため空とする
                 "residence": row[5],
                 "age": self.format_age(row[3]),
                 "sex": self.format_sex(row[4]),
+                "occupation": "",  # 元データにないため空とする
                 "status": "",  # 元データにないため空とする
                 "symptom": "",  # 元データにないため空とする
-                "overseas_travel_history": "",  # 元データにないため空とする
-                "be_discharged": "",  # 元データにないため空とする
+                "overseas_travel_history": None,  # 元データにないため空とする
+                "be_discharged": None,  # 元データにないため空とする
                 "note": note,
             }
-            return patients_data
+            return patient_data
         except (ValueError, IndexError):
             return None

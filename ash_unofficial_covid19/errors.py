@@ -48,3 +48,15 @@ class HTMLDownloadError(Error):
 
     def __init__(self, message):
         Error.__init__(self, message)
+
+
+class DataModelError(Error):
+    """データモデルの生成に関するエラー
+
+    Attributes:
+        message (str): エラーメッセージ
+
+    """
+
+    def __init__(self, message):
+        Error.__init__(self, message)
