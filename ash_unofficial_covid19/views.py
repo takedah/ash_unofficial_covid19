@@ -5,7 +5,7 @@ import os
 from flask import Flask, g, make_response, render_template, url_for
 
 from ash_unofficial_covid19.db import DB
-from ash_unofficial_covid19.services import PatientService
+from ash_unofficial_covid19.services import AsahikawaPatientService
 
 app = Flask(__name__)
 
@@ -60,7 +60,7 @@ def close_db(error):
 
 @app.route("/")
 def index():
-    patient_service = PatientService(get_db())
+    patient_service = AsahikawaPatientService(get_db())
     title = "旭川市コロナウイルス感染症非公式オープンデータ"
     last_updated = patient_service.get_last_updated()
     return render_template(
@@ -72,7 +72,7 @@ def index():
 
 @app.route("/012041_asahikawa_covid19_patients.csv")
 def patients_csv():
-    patient_service = PatientService(get_db())
+    patient_service = AsahikawaPatientService(get_db())
     patients_rows = patient_service.get_patients_rows()
     f = io.StringIO()
     writer = csv.writer(f, quoting=csv.QUOTE_ALL, lineterminator="\n")

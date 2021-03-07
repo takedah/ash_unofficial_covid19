@@ -2,8 +2,14 @@ import unittest
 from datetime import date
 
 from ash_unofficial_covid19.db import DB
-from ash_unofficial_covid19.models import PatientFactory
-from ash_unofficial_covid19.services import PatientService
+from ash_unofficial_covid19.models import (
+    AsahikawaPatientFactory,
+    HokkaidoPatientFactory
+)
+from ash_unofficial_covid19.services import (
+    AsahikawaPatientService,
+    HokkaidoPatientService
+)
 
 test_data = [
     {
@@ -129,16 +135,69 @@ test_data = [
         "close_contact": "調査中",
     },
 ]
+test_hokkaido_data = [
+    {
+        "patient_number": 1,
+        "city_code": "10006",
+        "prefecture": "北海道",
+        "city_name": "",
+        "publication_date": date(2020, 1, 28),
+        "onset_date": date(2020, 1, 21),
+        "residence": "中国武漢市",
+        "age": "40代",
+        "sex": "女性",
+        "occupation": "－",
+        "status": "－",
+        "symptom": "発熱",
+        "overseas_travel_history": True,
+        "be_discharged": None,
+        "note": "海外渡航先：中国武漢",
+    },
+    {
+        "patient_number": 2,
+        "city_code": "10006",
+        "prefecture": "北海道",
+        "city_name": "",
+        "publication_date": date(2020, 2, 14),
+        "onset_date": date(2020, 1, 31),
+        "residence": "石狩振興局管内",
+        "age": "50代",
+        "sex": "男性",
+        "occupation": "自営業",
+        "status": "－",
+        "symptom": "発熱;咳;倦怠感",
+        "overseas_travel_history": False,
+        "be_discharged": None,
+        "note": "",
+    },
+    {
+        "patient_number": 3,
+        "city_code": "10006",
+        "prefecture": "北海道",
+        "city_name": "",
+        "publication_date": date(2020, 2, 19),
+        "onset_date": date(2020, 2, 8),
+        "residence": "石狩振興局管内",
+        "age": "40代",
+        "sex": "男性",
+        "occupation": "会社員",
+        "status": "－",
+        "symptom": "倦怠感;筋肉痛;関節痛;発熱;咳",
+        "overseas_travel_history": False,
+        "be_discharged": None,
+        "note": "",
+    },
+]
 
 
-class TestPatientService(unittest.TestCase):
+class TestAsahikawaPatientService(unittest.TestCase):
     @classmethod
     def setUpClass(self):
-        self.factory = PatientFactory()
+        self.factory = AsahikawaPatientFactory()
         for row in test_data:
             self.factory.create(**row)
         self.db = DB()
-        self.service = PatientService(self.db)
+        self.service = AsahikawaPatientService(self.db)
 
     @classmethod
     def tearDownClass(self):
@@ -267,6 +326,26 @@ class TestPatientService(unittest.TestCase):
             ],
         ]
         self.assertEqual(results, expect)
+
+
+class TestHokkaidoPatientService(unittest.TestCase):
+    @classmethod
+    def setUpClass(self):
+        self.factory = HokkaidoPatientFactory()
+        for row in test_hokkaido_data:
+            self.factory.create(**row)
+        self.db = DB()
+        self.service = HokkaidoPatientService(self.db)
+
+    @classmethod
+    def tearDownClass(self):
+        self.db.close()
+
+    def test_create(self):
+        self.service.truncate()
+        for item in self.factory.items:
+            self.assertTrue(self.service.create(item))
+        self.db.commit()
 
 
 if __name__ == "__main__":

@@ -7,9 +7,9 @@ from ash_unofficial_covid19.errors import (
     HTTPDownloadError
 )
 from ash_unofficial_covid19.logs import AppLog
-from ash_unofficial_covid19.models import PatientFactory
+from ash_unofficial_covid19.models import AsahikawaPatientFactory
 from ash_unofficial_covid19.scraper import DownloadedHTML, ScrapedHTMLData
-from ash_unofficial_covid19.services import PatientService
+from ash_unofficial_covid19.services import AsahikawaPatientService
 
 
 def import_asahikawa_data(url: str, target_year: int):
@@ -33,13 +33,13 @@ def import_asahikawa_data(url: str, target_year: int):
         return False
 
     scraped_data = ScrapedHTMLData(downloaded_html=html_data, target_year=target_year)
-    patients_data = PatientFactory()
+    patients_data = AsahikawaPatientFactory()
     for row in scraped_data.patients_data:
         patients_data.create(**row)
 
     try:
         conn = DB()
-        service = PatientService(conn)
+        service = AsahikawaPatientService(conn)
         for patient in patients_data.items:
             service.create(patient)
         conn.commit()

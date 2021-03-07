@@ -2,7 +2,12 @@ import unittest
 from datetime import date
 
 from ash_unofficial_covid19.errors import DataModelError
-from ash_unofficial_covid19.models import Patient, PatientFactory
+from ash_unofficial_covid19.models import (
+    AsahikawaPatient,
+    AsahikawaPatientFactory,
+    HokkaidoPatient,
+    HokkaidoPatientFactory
+)
 
 test_data = {
     "patient_number": 1120,
@@ -64,14 +69,31 @@ invalid_date_data = {
     "surrounding_status": "調査中",
     "close_contact": "2人",
 }
+test_hokkaido_data = {
+    "patient_number": 2,
+    "city_code": "10006",
+    "prefecture": "北海道",
+    "city_name": "",
+    "publication_date": date(2020, 2, 14),
+    "onset_date": date(2020, 1, 31),
+    "residence": "石狩振興局管内",
+    "age": "50代",
+    "sex": "男性",
+    "occupation": "自営業",
+    "status": "－",
+    "symptom": "発熱;咳;倦怠感",
+    "overseas_travel_history": False,
+    "be_discharged": None,
+    "note": "",
+}
 
 
-class TestPatientFactory(unittest.TestCase):
+class TestAsahikawaPatientFactory(unittest.TestCase):
     def test_create(self):
-        factory = PatientFactory()
-        # Patientクラスのオブジェクトが生成できるか確認する。
+        factory = AsahikawaPatientFactory()
+        # AsahikawaPatientクラスのオブジェクトが生成できるか確認する。
         patient = factory.create(**test_data)
-        self.assertTrue(isinstance(patient, Patient))
+        self.assertTrue(isinstance(patient, AsahikawaPatient))
 
         # 識別番号が数値にできない値の場合エラーを返す
         with self.assertRaises(DataModelError):
@@ -80,6 +102,14 @@ class TestPatientFactory(unittest.TestCase):
         # 情報公開日が正しくない場合エラーを返す
         with self.assertRaises(DataModelError):
             factory.create(**invalid_date_data)
+
+
+class TestHokkaidoPatientFactory(unittest.TestCase):
+    def test_create(self):
+        factory = HokkaidoPatientFactory()
+        # HokkaidoPatientクラスのオブジェクトが生成できるか確認する。
+        patient = factory.create(**test_hokkaido_data)
+        self.assertTrue(isinstance(patient, HokkaidoPatient))
 
 
 if __name__ == "__main__":
