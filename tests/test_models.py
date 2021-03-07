@@ -20,6 +20,9 @@ test_data = {
     "overseas_travel_history": None,
     "be_discharged": None,
     "note": "北海道発表NO.: 19050 周囲の患者の発生: 調査中 濃厚接触者の状況: 2人",
+    "hokkaido_patient_number": 19050,
+    "surrounding_status": "調査中",
+    "close_contact": "2人",
 }
 invalid_number_data = {
     "patient_number": "千百二十",
@@ -37,6 +40,9 @@ invalid_number_data = {
     "overseas_travel_history": None,
     "be_discharged": None,
     "note": "北海道発表NO.: 19050 周囲の患者の発生: 調査中 濃厚接触者の状況: 2人",
+    "hokkaido_patient_number": 19050,
+    "surrounding_status": "調査中",
+    "close_contact": "2人",
 }
 invalid_date_data = {
     "patient_number": 1120,
@@ -54,6 +60,9 @@ invalid_date_data = {
     "overseas_travel_history": None,
     "be_discharged": None,
     "note": "北海道発表NO.: 19050 周囲の患者の発生: 調査中 濃厚接触者の状況: 2人",
+    "hokkaido_patient_number": 19050,
+    "surrounding_status": "調査中",
+    "close_contact": "2人",
 }
 
 

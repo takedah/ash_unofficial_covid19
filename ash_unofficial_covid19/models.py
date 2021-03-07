@@ -24,6 +24,9 @@ class Patient:
         overseas_travel_history (bool): 患者の海外渡航歴の有無
         be_discharged (bool): 患者退院済みフラグ
         note (str): 備考
+        hokkaido_patient_number (int): 北海道発表番号
+        surrounding_status (str): 周囲の状況
+        close_contact (str): 濃厚接触者の状況
 
     """
 
@@ -44,6 +47,9 @@ class Patient:
         overseas_travel_history,
         be_discharged,
         note,
+        hokkaido_patient_number,
+        surrounding_status,
+        close_contact,
     ):
         """
         Args:
@@ -62,6 +68,9 @@ class Patient:
             overseas_travel_history (bool): 患者の海外渡航歴の有無
             be_discharged (bool): 患者退院済みフラグ
             note (str): 備考
+            hokkaido_patient_number (int): 北海道発表番号
+            surrounding_status (str): 周囲の状況
+            close_contact (str): 濃厚接触者の状況
 
         """
         try:
@@ -101,6 +110,14 @@ class Patient:
             raise DataModelError("退院済みフラグが正しくありません。")
 
         self.__note = note
+
+        try:
+            self.__hokkaido_patient_number = int(hokkaido_patient_number)
+        except ValueError as e:
+            raise DataModelError("北海道発表番号が正しくありません。: " + e.args[0])
+
+        self.__surrounding_status = surrounding_status
+        self.__close_contact = close_contact
 
     @property
     def patient_number(self) -> int:
@@ -161,6 +178,18 @@ class Patient:
     @property
     def note(self) -> str:
         return self.__note
+
+    @property
+    def hokkaido_patient_number(self) -> int:
+        return self.__hokkaido_patient_number
+
+    @property
+    def surrounding_status(self) -> str:
+        return self.__surrounding_status
+
+    @property
+    def close_contact(self) -> str:
+        return self.__close_contact
 
 
 class PatientFactory(Factory):

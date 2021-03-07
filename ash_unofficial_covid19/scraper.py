@@ -232,6 +232,7 @@ class ScrapedHTMLData:
         """
         try:
             patient_number = int(row[0])
+            hokkaido_patient_number = int(row[1])
             # 旭川市公式サイトにあるがオープンデータ定義書にない項目は半角スペース区切りで
             # 全て備考に入れる。
             note = (
@@ -265,6 +266,9 @@ class ScrapedHTMLData:
                 "overseas_travel_history": None,  # 元データにないため空とする
                 "be_discharged": None,  # 元データにないため空とする
                 "note": note,
+                "hokkaido_patient_number": hokkaido_patient_number,
+                "surrounding_status": row[6],
+                "close_contact": row[7],
             }
             return patient_data
         except (ValueError, IndexError):

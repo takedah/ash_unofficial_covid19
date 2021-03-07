@@ -1,5 +1,5 @@
-from ash_unofficial_covid19.db import DB
 from ash_unofficial_covid19.config import Config
+from ash_unofficial_covid19.db import DB
 from ash_unofficial_covid19.errors import (
     DatabaseError,
     DataError,

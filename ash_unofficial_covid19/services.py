@@ -112,6 +112,9 @@ class PatientService:
             "overseas_travel_history",
             "be_discharged",
             "note",
+            "hokkaido_patient_number",
+            "surrounding_status",
+            "close_contact",
             "updated_at",
         ]
 
@@ -159,6 +162,9 @@ class PatientService:
             patient.overseas_travel_history,
             patient.be_discharged,
             patient.note,
+            patient.hokkaido_patient_number,
+            patient.surrounding_status,
+            patient.close_contact,
             datetime.now(timezone(timedelta(hours=+9))),
         ]
         # UPDATE句用にリストを重複させる。
@@ -183,7 +189,8 @@ class PatientService:
             + " "
             + "patient_number,city_code,prefecture,city_name,publication_date,"
             + "onset_date,residence,age,sex,occupation,status,symptom,"
-            + "overseas_travel_history,be_discharged,note"
+            + "overseas_travel_history,be_discharged,note,"
+            + "hokkaido_patient_number,surrounding_status,close_contact"
             + " "
             + "FROM"
             + " "

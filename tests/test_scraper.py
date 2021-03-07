@@ -220,6 +220,9 @@ class TestScrapedHTMLData(unittest.TestCase):
                 "be_discharged": None,
                 "note": "北海道発表NO.: 19080 周囲の患者の発生: "
                 + "No.1072 No.1094 No.1107 No.1108 濃厚接触者の状況: 0人",
+                "hokkaido_patient_number": 19080,
+                "surrounding_status": "No.1072 No.1094 No.1107 No.1108",
+                "close_contact": "0人",
             },
             {
                 "patient_number": 1120,
@@ -237,6 +240,9 @@ class TestScrapedHTMLData(unittest.TestCase):
                 "overseas_travel_history": None,
                 "be_discharged": None,
                 "note": "北海道発表NO.: 19050 周囲の患者の発生: 調査中 濃厚接触者の状況: 2人",
+                "hokkaido_patient_number": 19050,
+                "surrounding_status": "調査中",
+                "close_contact": "2人",
             },
             {
                 "patient_number": 1119,
@@ -255,6 +261,9 @@ class TestScrapedHTMLData(unittest.TestCase):
                 "be_discharged": None,
                 "note": "北海道発表NO.: 19004 周囲の患者の発生: No.1092             "
                 + "No.1093 濃厚接触者の状況: 1人",
+                "hokkaido_patient_number": 19004,
+                "surrounding_status": "No.1092             No.1093",
+                "close_contact": "1人",
             },
             {
                 "patient_number": 1112,
@@ -272,6 +281,9 @@ class TestScrapedHTMLData(unittest.TestCase):
                 "overseas_travel_history": None,
                 "be_discharged": None,
                 "note": "北海道発表NO.: 18891 周囲の患者の発生: No.1074 濃厚接触者の状況: 0人",
+                "hokkaido_patient_number": 18891,
+                "surrounding_status": "No.1074",
+                "close_contact": "0人",
             },
             {
                 "patient_number": 1032,
@@ -289,6 +301,9 @@ class TestScrapedHTMLData(unittest.TestCase):
                 "overseas_travel_history": None,
                 "be_discharged": None,
                 "note": "北海道発表NO.: 17511 周囲の患者の発生: 調査中 濃厚接触者の状況: 8人",
+                "hokkaido_patient_number": 17511,
+                "surrounding_status": "調査中",
+                "close_contact": "8人",
             },
             {
                 "patient_number": 715,
@@ -306,6 +321,9 @@ class TestScrapedHTMLData(unittest.TestCase):
                 "overseas_travel_history": None,
                 "be_discharged": None,
                 "note": "北海道発表NO.: 10716 周囲の患者の発生: あり 濃厚接触者の状況: 調査中",
+                "hokkaido_patient_number": 10716,
+                "surrounding_status": "あり",
+                "close_contact": "調査中",
             },
         ]
         self.assertEqual(scraper.patients_data, expect)

@@ -16,5 +16,8 @@ CREATE TABLE patients(
     overseas_travel_history BOOLEAN,
     be_discharged BOOLEAN,
     note TEXT,
+    hokkaido_patient_number INTEGER,
+    surrounding_status TEXT,
+    close_contact TEXT,
     updated_at TIMESTAMPTZ NOT NULL
 );
