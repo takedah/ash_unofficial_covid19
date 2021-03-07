@@ -62,6 +62,8 @@ class DownloadedHTML:
 
         """
         try:
+            # 旭川市ホームページのTLS証明書のDH鍵長に問題があるためセキュリティを下げて回避する
+            requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += "HIGH:!DH"
             response = requests.get(url)
             self._info_log("HTMLファイルのダウンロードに成功しました。")
         except (ConnectionError, Timeout, HTTPError):
