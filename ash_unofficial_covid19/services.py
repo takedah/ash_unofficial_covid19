@@ -205,16 +205,23 @@ class AsahikawaPatientService(PatientService):
         self.execute(
             "SELECT"
             + " "
-            + "patient_number,city_code,prefecture,city_name,publication_date,"
-            + "onset_date,residence,age,sex,occupation,status,symptom,"
-            + "overseas_travel_history,be_discharged,note,"
-            + "hokkaido_patient_number,surrounding_status,close_contact"
+            + "a.patient_number,a.city_code,a.prefecture,a.city_name,"
+            + "a.publication_date,"
+            + "a.onset_date,a.residence,a.age,a.sex,h.occupation,h.status,h.symptom,"
+            + "h.overseas_travel_history,h.be_discharged,a.note,"
+            + "a.hokkaido_patient_number,a.surrounding_status,a.close_contact"
             + " "
             + "FROM"
             + " "
             + self.__table_name
             + " "
-            + "ORDER BY patient_number DESC;",
+            + "AS a"
+            + " "
+            + "LEFT JOIN hokkaido_patients AS h"
+            + " "
+            + "ON a.hokkaido_patient_number = h.patient_number"
+            + " "
+            + "ORDER BY a.patient_number DESC;",
         )
         factory = AsahikawaPatientFactory()
         for row in self.fetchall():
@@ -268,21 +275,24 @@ class AsahikawaPatientService(PatientService):
 
             rows.append(
                 [
-                    patient_number,
-                    patient.city_code,
-                    patient.prefecture,
-                    patient.city_name,
-                    publication_date,
-                    onset_date,
-                    patient.residence,
-                    patient.age,
-                    patient.sex,
-                    patient.occupation,
-                    patient.status,
-                    patient.symptom,
-                    overseas_travel_history,
-                    be_discharged,
-                    patient.note,
+                    "" if v is None else v
+                    for v in [
+                        patient_number,
+                        patient.city_code,
+                        patient.prefecture,
+                        patient.city_name,
+                        publication_date,
+                        onset_date,
+                        patient.residence,
+                        patient.age,
+                        patient.sex,
+                        patient.occupation,
+                        patient.status,
+                        patient.symptom,
+                        overseas_travel_history,
+                        be_discharged,
+                        patient.note,
+                    ]
                 ]
             )
         return rows
