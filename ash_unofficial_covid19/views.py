@@ -1,6 +1,7 @@
 import csv
 import io
 import os
+from datetime import timedelta, timezone
 
 from flask import Flask, g, make_response, render_template, url_for
 
@@ -63,6 +64,7 @@ def index():
     patient_service = AsahikawaPatientService(get_db())
     title = "旭川市コロナウイルス感染症非公式オープンデータ"
     last_updated = patient_service.get_last_updated()
+    last_updated.astimezone(timezone(timedelta(hours=+9)))
     return render_template(
         "index.html",
         title=title,
