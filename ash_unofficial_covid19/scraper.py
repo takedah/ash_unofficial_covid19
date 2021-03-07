@@ -1,12 +1,14 @@
+import csv
 import re
-from datetime import date
+from datetime import date, datetime
+from io import StringIO
 from typing import Optional
 
 import requests
 from bs4 import BeautifulSoup
 from requests import HTTPError, Timeout
 
-from ash_unofficial_covid19.errors import HTMLDownloadError
+from ash_unofficial_covid19.errors import HTTPDownloadError
 from ash_unofficial_covid19.logs import AppLog
 
 
@@ -51,7 +53,7 @@ class DownloadedHTML:
         """
         self.__logger.error(message)
 
-    def _get_html_content(self, url) -> bytes:
+    def _get_html_content(self, url: str) -> bytes:
         """WebサイトからHTMLファイルのbytesデータを取得
 
         Args:
@@ -69,11 +71,11 @@ class DownloadedHTML:
         except (ConnectionError, Timeout, HTTPError):
             message = "cannot connect to web server."
             self._error_log(message)
-            raise HTMLDownloadError(message)
+            raise HTTPDownloadError(message)
         if response.status_code != 200:
             message = "cannot get HTML contents."
             self._error_log(message)
-            raise HTMLDownloadError(message)
+            raise HTTPDownloadError(message)
         return response.content
 
 
@@ -269,6 +271,177 @@ class ScrapedHTMLData:
                 "hokkaido_patient_number": hokkaido_patient_number,
                 "surrounding_status": row[6],
                 "close_contact": row[7],
+            }
+            return patient_data
+        except (ValueError, IndexError):
+            return None
+
+
+class ScrapedCSVData:
+    """北海道新型コロナウイルス感染症患者データの抽出
+
+    北海道オープンデータポータルからダウンロードした陽性患者属性CSVファイルから、
+    新型コロナウイルス感染症患者データを抽出し、リストに変換する。
+
+    Attributes:
+        patients_data (list of dict): 患者データを表す辞書のリスト
+
+    """
+
+    def __init__(self, url: str):
+        """
+        Args:
+            encoding (str): CSVファイルの文字コード
+
+        """
+        self.__logger = AppLog()
+        self.__patients_data = list()
+        csv_io = self._get_csv_io(url=url, encoding="cp932")
+        for row in self._get_table_values(csv_io):
+            extracted_data = self._extract_patient_data(row)
+            if extracted_data is not None:
+                self.__patients_data.append(extracted_data)
+
+    @property
+    def patients_data(self) -> list:
+        return self.__patients_data
+
+    def _info_log(self, message: str) -> None:
+        """AppLog.infoのラッパー
+
+        Args:
+            message (str): 通常のログメッセージ
+
+        """
+        self.__logger.info(message)
+
+    def _error_log(self, message: str) -> None:
+        """AppLog.errorのラッパー
+
+        Args:
+            message (str): エラーログメッセージ
+
+        """
+        self.__logger.error(message)
+
+    def _get_csv_io(self, url: str, encoding: str = "utf-8") -> StringIO:
+        """WebサイトからCSVファイルのStringIOデータを取得
+
+        Args:
+            url (str): CSVファイルのURL
+
+        Returns:
+            content (:obj:`StringIO`): ダウンロードしたCSVファイルのStringIOデータ
+
+        """
+        try:
+            response = requests.get(url)
+            csv_io = StringIO(response.content.decode(encoding))
+            self._info_log("CSVファイルのダウンロードに成功しました。")
+        except (ConnectionError, Timeout, HTTPError):
+            message = "cannot connect to web server."
+            self._error_log(message)
+            raise HTTPDownloadError(message)
+        if response.status_code != 200:
+            message = "cannot get CSV contents."
+            self._error_log(message)
+            raise HTTPDownloadError(message)
+        return csv_io
+
+    def _get_table_values(self, csv_io: StringIO) -> list:
+        """CSVから内容を抽出してリストに格納
+
+        Args:
+            csv_io (:obj:`StringIO`): ダウンロードしたCSVファイルのStringIOデータ
+
+        Returns:
+            table_values (list of list): CSVの内容で構成される二次元配列
+
+        """
+        table_values = list()
+        reader = csv.reader(csv_io)
+        for row in reader:
+            table_values.append(row)
+
+        return table_values
+
+    @staticmethod
+    def _format_date(date_string: str) -> Optional[datetime]:
+        """文字列の日付をdatetime.dateに変換する
+
+        Args:
+            date_string (str): 日付文字列
+
+        Returns:
+            formatted_date (obj:`date`): 日付データ
+
+        """
+        try:
+            if date_string == "":
+                return None
+            else:
+                formatted_datetime = datetime.strptime(date_string, "%Y-%m-%d")
+        except (TypeError, ValueError):
+            return None
+
+        return date(
+            formatted_datetime.year, formatted_datetime.month, formatted_datetime.day
+        )
+
+    @staticmethod
+    def _format_bool(bool_string: str) -> Optional[bool]:
+        """文字列の真偽値をboolに変換する
+
+        Args:
+            date_string (str): 文字列真偽値
+
+        Returns:
+            formatted_bool (bool): 真偽値データ
+
+        """
+        try:
+            if bool_string == "":
+                return None
+            elif bool_string == "0" or bool_string == "1":
+                return bool(int(bool_string))
+            else:
+                return None
+        except (TypeError, ValueError):
+            return None
+
+    def _extract_patient_data(self, row: list) -> Optional[dict]:
+        """新型コロナウイルス感染症患者データへの変換
+
+        北海道オープンデータポータルの陽性患者属性CSVから抽出した行データの
+        リストを、Code for Japan (https://www.code4japan.org/activity/stopcovid19) の
+        オープンデータ定義書に沿った新型コロナウイルス感染症患者データを表すハッシュに
+        変換する。
+
+        Args:
+            row (list): table要素から抽出した行データのリスト
+
+        Returns:
+            patient_data (dict): 新型コロナウイルス感染症患者データを表すハッシュ
+
+        """
+        try:
+            patient_number = int(row[0])
+            patient_data = {
+                "patient_number": patient_number,
+                "city_code": row[1],
+                "prefecture": row[2],
+                "city_name": row[3],
+                "publication_date": self._format_date(row[4]),
+                "onset_date": self._format_date(row[5]),
+                "residence": row[6],
+                "age": row[7],
+                "sex": row[8],
+                "occupation": row[9],
+                "status": row[10],
+                "symptom": row[11],
+                "overseas_travel_history": self._format_bool(row[12]),
+                "be_discharged": self._format_bool(row[14]),
+                "note": row[15],
             }
             return patient_data
         except (ValueError, IndexError):

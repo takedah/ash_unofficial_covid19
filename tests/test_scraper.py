@@ -4,8 +4,12 @@ from unittest.mock import Mock, patch
 
 from requests import HTTPError, Timeout
 
-from ash_unofficial_covid19.errors import HTMLDownloadError
-from ash_unofficial_covid19.scraper import DownloadedHTML, ScrapedHTMLData
+from ash_unofficial_covid19.errors import HTTPDownloadError
+from ash_unofficial_covid19.scraper import (
+    DownloadedHTML,
+    ScrapedCSVData,
+    ScrapedHTMLData
+)
 
 
 def html_content():
@@ -117,6 +121,16 @@ def html_content():
     """
 
 
+def csv_content():
+    csv_data = """
+No,全国地方公共団体コード,都道府県名,市区町村名,公表_年月日,発症_年月日,患者_居住地,患者_年代,患者_性別,患者_職業,患者_状態,患者_症状,患者_渡航歴の有無フラグ,患者_再陽性フラグ,患者_退院済フラグ,備考
+1,10006,北海道,,2020-01-28,2020-01-21,中国武漢市,40代,女性,−,−,発熱,1,0,,海外渡航先：中国武漢
+2,10006,北海道,,2020-02-14,2020-01-31,石狩振興局管内,50代,男性,自営業,−,発熱;咳;倦怠感,0,0,,
+3,10006,北海道,,2020-02-19,2020-02-08,石狩振興局管内,40代,男性,会社員,−,倦怠感;筋肉痛;関節痛;発熱;咳,0,0,,
+"""
+    return csv_data.encode("cp932")
+
+
 class TestDownloadedHTML(unittest.TestCase):
     def setUp(self):
         self.html_content = html_content()
@@ -129,25 +143,25 @@ class TestDownloadedHTML(unittest.TestCase):
         mock_requests.get.return_value = Mock(
             status_code=200, content=self.html_content
         )
-        schedule_html = DownloadedHTML("http://dummy.local")
-        result = schedule_html.content
+        html_data = DownloadedHTML("http://dummy.local")
+        result = html_data.content
         expect = self.html_content
         self.assertEqual(result, expect)
 
         mock_requests.get.side_effect = Timeout("Dummy Error.")
-        with self.assertRaises(HTMLDownloadError):
+        with self.assertRaises(HTTPDownloadError):
             DownloadedHTML("http://dummy.local")
 
         mock_requests.get.side_effect = HTTPError("Dummy Error.")
-        with self.assertRaises(HTMLDownloadError):
+        with self.assertRaises(HTTPDownloadError):
             DownloadedHTML("http://dummy.local")
 
         mock_requests.get.side_effect = ConnectionError("Dummy Error.")
-        with self.assertRaises(HTMLDownloadError):
+        with self.assertRaises(HTTPDownloadError):
             DownloadedHTML("http://dummy.local")
 
         mock_requests.get.return_value = Mock(status_code=404)
-        with self.assertRaises(HTMLDownloadError):
+        with self.assertRaises(HTTPDownloadError):
             DownloadedHTML("http://dummy.local")
 
 
@@ -342,6 +356,94 @@ class TestScrapedHTMLData(unittest.TestCase):
         downloaded_html = DownloadedHTML("http://dummy.local")
         scraper = ScrapedHTMLData(downloaded_html=downloaded_html, target_year=2021)
         self.assertEqual(scraper.patients_data, [])
+
+
+class TestScrapedCSVData(unittest.TestCase):
+    def setUp(self):
+        self.csv_content = csv_content()
+
+    def tearDown(self):
+        pass
+
+    @patch("ash_unofficial_covid19.scraper.requests")
+    def test_content(self, mock_requests):
+        mock_requests.get.return_value = Mock(
+            status_code=200,
+            content=self.csv_content,
+            headers={"content-type": "text/csv"},
+        )
+        csv_data = ScrapedCSVData(url="http://dummy.local")
+        result = csv_data.patients_data
+        expect = [
+            {
+                "patient_number": 1,
+                "city_code": "10006",
+                "prefecture": "北海道",
+                "city_name": "",
+                "publication_date": date(2020, 1, 28),
+                "onset_date": date(2020, 1, 21),
+                "residence": "中国武漢市",
+                "age": "40代",
+                "sex": "女性",
+                "occupation": "－",
+                "status": "－",
+                "symptom": "発熱",
+                "overseas_travel_history": True,
+                "be_discharged": None,
+                "note": "海外渡航先：中国武漢",
+            },
+            {
+                "patient_number": 2,
+                "city_code": "10006",
+                "prefecture": "北海道",
+                "city_name": "",
+                "publication_date": date(2020, 2, 14),
+                "onset_date": date(2020, 1, 31),
+                "residence": "石狩振興局管内",
+                "age": "50代",
+                "sex": "男性",
+                "occupation": "自営業",
+                "status": "－",
+                "symptom": "発熱;咳;倦怠感",
+                "overseas_travel_history": False,
+                "be_discharged": None,
+                "note": "",
+            },
+            {
+                "patient_number": 3,
+                "city_code": "10006",
+                "prefecture": "北海道",
+                "city_name": "",
+                "publication_date": date(2020, 2, 19),
+                "onset_date": date(2020, 2, 8),
+                "residence": "石狩振興局管内",
+                "age": "40代",
+                "sex": "男性",
+                "occupation": "会社員",
+                "status": "－",
+                "symptom": "倦怠感;筋肉痛;関節痛;発熱;咳",
+                "overseas_travel_history": False,
+                "be_discharged": None,
+                "note": "",
+            },
+        ]
+        self.assertEqual(result, expect)
+
+        mock_requests.get.side_effect = Timeout("Dummy Error.")
+        with self.assertRaises(HTTPDownloadError):
+            ScrapedCSVData("http://dummy.local")
+
+        mock_requests.get.side_effect = HTTPError("Dummy Error.")
+        with self.assertRaises(HTTPDownloadError):
+            ScrapedCSVData("http://dummy.local")
+
+        mock_requests.get.side_effect = ConnectionError("Dummy Error.")
+        with self.assertRaises(HTTPDownloadError):
+            ScrapedCSVData("http://dummy.local")
+
+        mock_requests.get.return_value = Mock(status_code=404)
+        with self.assertRaises(HTTPDownloadError):
+            ScrapedCSVData("http://dummy.local")
 
 
 if __name__ == "__main__":

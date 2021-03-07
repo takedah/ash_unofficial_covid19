@@ -38,7 +38,7 @@ class DataError(Error):
         Error.__init__(self, message)
 
 
-class HTMLDownloadError(Error):
+class HTTPDownloadError(Error):
     """Webページのスクレイピングに関するエラー
 
     Attributes:
