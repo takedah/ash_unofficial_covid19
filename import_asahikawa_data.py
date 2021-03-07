@@ -4,7 +4,7 @@ from ash_unofficial_covid19.errors import (
     DatabaseError,
     DataError,
     DataModelError,
-    HTMLDownloadError
+    HTTPDownloadError
 )
 from ash_unofficial_covid19.logs import AppLog
 from ash_unofficial_covid19.models import PatientFactory
@@ -28,7 +28,7 @@ def import_asahikawa_data(url: str, target_year: int):
     logger = AppLog()
     try:
         html_data = DownloadedHTML(url)
-    except HTMLDownloadError as e:
+    except HTTPDownloadError as e:
         logger.warning(e.message)
         return False
 

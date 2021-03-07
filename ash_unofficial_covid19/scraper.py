@@ -366,7 +366,7 @@ class ScrapedCSVData:
         return table_values
 
     @staticmethod
-    def _format_date(date_string: str) -> Optional[datetime]:
+    def _format_date(date_string: str) -> Optional[date]:
         """文字列の日付をdatetime.dateに変換する
 
         Args:
