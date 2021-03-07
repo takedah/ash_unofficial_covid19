@@ -207,7 +207,7 @@ class AsahikawaPatientService(PatientService):
             + " "
             + "a.patient_number,a.city_code,a.prefecture,a.city_name,"
             + "a.publication_date,"
-            + "a.onset_date,a.residence,a.age,a.sex,h.occupation,h.status,h.symptom,"
+            + "h.onset_date,a.residence,a.age,a.sex,h.occupation,h.status,h.symptom,"
             + "h.overseas_travel_history,h.be_discharged,a.note,"
             + "a.hokkaido_patient_number,a.surrounding_status,a.close_contact"
             + " "
@@ -221,7 +221,7 @@ class AsahikawaPatientService(PatientService):
             + " "
             + "ON a.hokkaido_patient_number = h.patient_number"
             + " "
-            + "ORDER BY a.patient_number DESC;",
+            + "ORDER BY a.patient_number ASC;",
         )
         factory = AsahikawaPatientFactory()
         for row in self.fetchall():
@@ -250,6 +250,25 @@ class AsahikawaPatientService(PatientService):
         """
         patients = self.find()
         rows = list()
+        rows.append(
+            [
+                "No",
+                "全国地方公共団体コード",
+                "都道府県名",
+                "市区町村名",
+                "公表_年月日",
+                "発症_年月日",
+                "患者_居住地",
+                "患者_年代",
+                "患者_性別",
+                "患者_職業",
+                "患者_状態",
+                "患者_症状",
+                "患者_渡航歴の有無フラグ",
+                "患者_退院済フラグ",
+                "備考",
+            ]
+        )
         for patient in patients:
             patient_number = str(patient.patient_number)
 

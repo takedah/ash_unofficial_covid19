@@ -35,8 +35,46 @@
                     <h2 class="h5 card-title">このサイトについて</h2>
                     <p class="card-text">北海道全体の新型コロナウイルス感染症の情報について、<a href="https://stopcovid19.hokkaido.dev/" title="北海道新型コロナウイルスまとめサイト">北海道新型コロナウイルスまとめサイト</a>や<a href="https://www.harp.lg.jp/opendata/" title="北海道オープンデータポータル">北海道オープンデータポータル</a>でCSV形式のテキストファイルやJSON形式のWeb APIといった再利用しやすい形式で取得できます。</p>
                     <p class="card-text">旭川市単独のデータは<a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ">旭川市公式ホームページ</a>に掲載はあるものの、再利用しやすい形式とはなっていないため、旭川市公式ホームページからスクレイピングして新型コロナウイルス感染症の情報を取得し、<a href="https://www.code4japan.org/activity/stopcovid19#doc" title="新型コロナウイルス感染症対策のためのデータ公開支援 - Code for Japan">新型コロナウイルス感染症対策に関するオープンデータ項目定義書</a>のうち、陽性患者属性データセットに基づいたCSV形式のテキストファイルを、非公式のオープンデータとしてダウンロードできるようにしたものです。</p>
-                    <p><a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="クリエイティブ・コモンズ・ライセンス" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />この サイトのデータ は <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ 表示 4.0 国際 ライセンス</a>の下に提供されています。</p>
+                    <p class="card-text">ただし、以下のデータ項目は旭川市公式ホームページからスクレイピングで取得することが困難だったため、北海道オープンデータポータルの陽性患者属性CSVから値を逆輸入？して取得しています。</p>
                 </section>
+                <section class="m-3">
+                    <table class="table table-striped table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <th>No.6</th>
+                                <td>発症_年月日</td>
+                            </tr>
+                            <tr>
+                                <th>No.10</th>
+                                <td>患者_職業</td>
+                            </tr>
+                            <tr>
+                                <th>No.11</th>
+                                <td>患者_状態</td>
+                            </tr>
+                            <tr>
+                                <th>No.12</th>
+                                <td>患者_症状</td>
+                            </tr>
+                            <tr>
+                                <th>No.13</th>
+                                <td>患者_渡航歴の有無フラグ</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+        </div>
+        <div class="card mt-3">
+            <div class="card-body">
+                <section>
+                    <h2 class="h5 card-title">データのライセンス</h2>
+                    <p class="card-text"><a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="クリエイティブ・コモンズ・ライセンス" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />この サイトのデータ は <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ 表示 4.0 国際 ライセンス</a>の下に提供されています。</p>
+                </section>
+            </div>
+        </div>
+        <div class="card mt-3">
+            <div class="card-body">
                 <section>
                     <h2 class="h5 card-title">免責事項</h2>
                     <p class="card-text">当サイトは個人が開発・運用しているものであり、旭川市とは一切関係ありません。内容の正確性も保証できませんので、利用の際はご注意ください。また、当サイトの開発・運用者は、利用者がこのサイトのデータを用いて行う一切の行為について責任を負うものではありません。</p>
@@ -54,6 +92,7 @@
                     </div>
             </div>
         </div>
+    </div>
 </article>
 <script charset="utf-8" src="{{ url_for('static', filename='js/select_input.js') }}"></script>
 {% endblock %}

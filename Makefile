@@ -1,6 +1,8 @@
 .PHONY: init
 init:
 	pip install -r requirements.txt
+	python init_db.py
+	python import_data.py
 
 formatter:
 	isort --force-single-line-imports .
