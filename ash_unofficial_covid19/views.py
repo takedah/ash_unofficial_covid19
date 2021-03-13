@@ -61,7 +61,7 @@ def close_db(error):
 @app.route("/")
 def index():
     patient_service = AsahikawaPatientService(get_db())
-    title = "旭川市コロナウイルス感染症非公式オープンデータ"
+    title = "旭川市新型コロナウイルス感染症非公式オープンデータ"
     last_updated = patient_service.get_last_updated()
     return render_template(
         "index.html",
