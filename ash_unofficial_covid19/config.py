@@ -2,7 +2,7 @@ import os
 
 
 class Config:
-    DATABASE_URL = os.environ.get("ASH_COVID19_DB_URL")
+    DATABASE_URL = os.environ.get("DATABASE_URL")
     BASE_URL = "https://www.city.asahikawa.hokkaido.jp/"
     LATEST_DATA_URL = BASE_URL + "kurashi/135/136/150/d068529.html"
     FEB2021_DATA_URL = BASE_URL + "kurashi/135/136/150/d072703.html"
