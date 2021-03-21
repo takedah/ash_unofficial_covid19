@@ -12,7 +12,7 @@
                 </div>
                 <div class="col-md-4">
                     <section>
-                        <p><a href="/012041_asahikawa_covid19_patients.csv" title="旭川市陽性患者属性CSVをダウンロード" class="btn btn-lg btn-primary">陽性患者属性CSVをダウンロード</a></p>
+                        <p><a href="/012041_asahikawa_covid19_patients.csv" title="旭川市陽性患者属性CSVをダウンロード" class="btn btn-lg btn-info">陽性患者属性CSVをダウンロード</a></p>
                     </section>
                 </div>
             </div>
@@ -29,6 +29,24 @@
         </section>
     </div>
     <div class="container">
+        <div class="card-group">
+            <div class="card mt-3">
+                <div class="card-header">
+                    新規陽性患者数（週別）
+                </div>
+                <div class="card-body">
+                    <p><img src="./week_per_patients.png" title="週次陽性患者数の推移" class="img-fluid"></p>
+                </div>
+            </div>
+            <div class="card mt-3">
+                <div class="card-header">
+                    陽性患者数累計（月別）
+                </div>
+                <div class="card-body">
+                    <p><img src="./month_total_patients.png" title="月次累計陽性患者数の推移" class="img-fluid"></p>
+                </div>
+            </div>
+        </div>
         <div class="card mt-3">
             <div class="card-body">
                 <section>
@@ -88,8 +106,8 @@
                     <h3 class="h5 card-title">陽性患者属性CSVファイルのURL</h3>
                     <div class="input-group">
                         <input id="csv-url" type="text" class="form-control" value="https://ash-unofficial-covid19.herokuapp.com/012041_asahikawa_covid19_patients.csv">
-                </section>
                     </div>
+                </section>
             </div>
         </div>
     </div>

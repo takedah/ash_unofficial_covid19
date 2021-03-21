@@ -1,8 +1,15 @@
 import csv
 import io
 import os
+from datetime import date, datetime, timedelta, timezone
+from io import BytesIO
 
+import matplotlib.pyplot as plt
+import numpy as np
+from dateutil.relativedelta import relativedelta
 from flask import Flask, g, make_response, render_template, url_for
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+from matplotlib.font_manager import FontProperties
 
 from ash_unofficial_covid19.db import DB
 from ash_unofficial_covid19.services import AsahikawaPatientService
@@ -20,7 +27,7 @@ def add_security_headers(response):
                 stackpath.bootstrapcdn.com kit.fontawesome.com; \
                 connect-src ka-f.fontawesome.com; \
                 font-src ka-f.fontawesome.com; \
-                img-src i.creativecommons.org licensebuttons.net;",
+                img-src 'self' i.creativecommons.org licensebuttons.net;",
     )
     response.headers.add("X-Content-Type-Options", "nosniff")
     response.headers.add("X-Frame-Options", "DENY")
@@ -82,6 +89,84 @@ def patients_csv():
     res.headers["Content-Type"] = "text/csv"
     res.headers["Content-Disposition"] = (
         "attachment: filename=" + "012041_asahikawa_covid19_patients.csv"
+    )
+    return res
+
+
+@app.route("/week_per_patients.png")
+def get_week_graph():
+    patient_service = AsahikawaPatientService(get_db())
+    today = datetime.now(timezone(timedelta(hours=+9), "JST")).date()
+    one_month_ago = today - relativedelta(months=3)
+    week_data = patient_service.get_aggregate_by_weeks(
+        from_date=one_month_ago, to_date=today
+    )
+    font = FontProperties(
+        fname="./ash_unofficial_covid19/static/fonts/NotoSansCJKjp-Light.otf", size=12
+    )
+    fig = plt.figure()
+    ax = fig.add_subplot()
+    week_x = week_data.keys()
+    week_y = week_data.values()
+    ax.plot(week_x, week_y, color="salmon")
+    ax.yaxis.set_ticks(np.arange(0, max(week_y), 5))
+    ax.grid(axis="y", color="lightgray")
+    ax.set_title("旭川市陽性患者数の推移（週別）", font_properties=font)
+    ax.set_ylabel("陽性患者数（人）", font_properties=font)
+    ax.tick_params(labelsize=8)
+    ax.tick_params(axis="x", rotation=45)
+    fig.tight_layout()
+    canvas = FigureCanvasAgg(fig)
+    im = BytesIO()
+    canvas.print_png(im)
+    plt.cla()
+    plt.clf()
+    plt.close()
+    graph_image = im.getvalue()
+    res = make_response()
+    res.data = graph_image
+    res.headers["Content-Type"] = "img/png"
+    res.headers["Content-Disposition"] = (
+        "attachment: filename=" + "week_per_patients.png"
+    )
+    return res
+
+
+@app.route("/month_total_patients.png")
+def get_month_total_graph():
+    patient_service = AsahikawaPatientService(get_db())
+    today = datetime.now(timezone(timedelta(hours=+9), "JST")).date()
+    first_month = date(2020, 1, 1)
+    month_total_data = patient_service.get_total_by_months(
+        from_date=first_month, to_date=today
+    )
+    font = FontProperties(
+        fname="./ash_unofficial_covid19/static/fonts/NotoSansCJKjp-Light.otf", size=12
+    )
+    fig = plt.figure()
+    ax = fig.add_subplot()
+    month_total_x = month_total_data.keys()
+    month_total_y = month_total_data.values()
+    ax.bar(month_total_x, month_total_y, facecolor="salmon")
+    ax.yaxis.set_ticks(np.arange(min(month_total_y), max(month_total_y), 100))
+    ax.grid(axis="y", color="lightgray")
+    ax.set_title("旭川市陽性患者数の推移（月別累計）", font_properties=font)
+    ax.set_ylabel("陽性患者数（延べ人数）", font_properties=font)
+    ax.tick_params(labelsize=8)
+    ax.tick_params(axis="x", rotation=45)
+    fig.tight_layout()
+    canvas = FigureCanvasAgg(fig)
+    im = BytesIO()
+    canvas.print_png(im)
+    plt.cla()
+    plt.clf()
+    plt.close()
+    graph_image = im.getvalue()
+    res = make_response()
+    res.data = graph_image
+    res.headers["Content-Type"] = "img/png"
+    res.headers["Content-Disposition"] = (
+        "attachment: filename=" + "month_total_patients.png"
     )
     return res
 

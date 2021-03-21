@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from typing import Optional
 
 import psycopg2
@@ -242,10 +242,10 @@ class AsahikawaPatientService(PatientService):
             return row["max"]
 
     def get_patients_rows(self) -> list:
-        """陽性患者属性CSVファイルをFlaskのResponseオブジェクトで返す
+        """陽性患者属性CSVファイルを出力するためのリストを返す
 
         Returns:
-            patients_rows (list of list): 陽性患者属性CSVファイルのReponseオブジェクト
+            patients_rows (list of list): 陽性患者属性CSVファイルの元となる二次元配列
 
         """
         patients = self.find()
@@ -315,6 +315,77 @@ class AsahikawaPatientService(PatientService):
                 ]
             )
         return rows
+
+    def get_aggregate_by_weeks(self, from_date: date, to_date: date) -> dict:
+        """指定した期間の1週間ごとの陽性患者数の集計結果を返す
+
+        Args:
+            from_date (obj:`date`): 集計の始期
+            to_date (obj:`date`): 集計の終期
+
+        Returns:
+            aggregate_by_weeks (dict): 1週間ごとの日付をキー、その週の陽性患者数を
+                値とした辞書
+
+        """
+        state = (
+            "SELECT to_char(from_week, 'MM-DD') AS weeks, "
+            + "COUNT(DISTINCT patient_number) AS patients FROM "
+            + "(SELECT generate_series AS from_week, "
+            + "generate_series + '7 days'::interval AS to_week FROM "
+            + "generate_series('"
+            + from_date.strftime("%Y-%m-%d")
+            + "'::DATE, '"
+            + to_date.strftime("%Y-%m-%d")
+            + "'::DATE, '7 days')) "
+            + "AS week_ranges LEFT JOIN asahikawa_patients ON "
+            + "from_week <= asahikawa_patients.publication_date AND "
+            + "asahikawa_patients.publication_date < to_week GROUP BY from_week;"
+        )
+        self.execute(state)
+        aggregate_by_weeks = dict()
+        for row in self.fetchall():
+            aggregate_by_weeks[row[0]] = row[1]
+
+        return aggregate_by_weeks
+
+    def get_total_by_months(self, from_date: date, to_date: date) -> dict:
+        """指定した期間の1か月ごとの陽性患者数の累計結果を返す
+
+        Args:
+            from_date (obj:`date`): 累計の始期
+            to_date (obj:`date`): 累計の終期
+
+        Returns:
+            total_by_months (dict): 1か月ごとの年月をキー、その週までの
+                陽性患者累計数を値とした辞書
+
+        """
+        state = (
+            "SELECT to_char(aggregate_patients.from_month, 'YYYY-MM'), "
+            + "SUM(aggregate_patients.patients) OVER("
+            + "ORDER BY aggregate_patients.from_month) AS total_patients FROM "
+            + "("
+            + "SELECT from_month, COUNT(DISTINCT patient_number) as patients FROM "
+            + "("
+            + "SELECT generate_series AS from_month, generate_series + "
+            + "'1 months'::interval AS to_month FROM generate_series('"
+            + from_date.strftime("%Y-%m-%d")
+            + "'::DATE, '"
+            + to_date.strftime("%Y-%m-%d")
+            + "'::DATE, '1 months')"
+            + ") AS month_ranges "
+            + "LEFT JOIN asahikawa_patients "
+            + "ON from_month <= asahikawa_patients.publication_date AND "
+            + "asahikawa_patients.publication_date < to_month GROUP BY from_month"
+            + ") AS aggregate_patients;"
+        )
+        self.execute(state)
+        total_by_months = dict()
+        for row in self.fetchall():
+            total_by_months[row[0]] = row[1]
+
+        return total_by_months
 
 
 class HokkaidoPatientService(PatientService):
