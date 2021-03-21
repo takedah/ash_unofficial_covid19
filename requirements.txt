@@ -4,4 +4,3 @@ gunicorn
 psycopg2
 requests
 matplotlib
-numpy

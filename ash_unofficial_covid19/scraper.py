@@ -168,9 +168,9 @@ class ScrapedHTMLData:
                 "９": "9",
             }
         )
-        try:
+        if type(zenkaku_string) is str:
             return zenkaku_string.translate(z2h_table)
-        except SyntaxError:
+        else:
             return None
 
     @staticmethod
