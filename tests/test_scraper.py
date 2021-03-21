@@ -60,7 +60,7 @@ def html_content():
         <tr>
             <td nowrap="nowrap">1119</td>
             <td>19004</td>
-            <td nowrap="nowrap">2月25日</td>
+            <td nowrap="nowrap">２月２５日</td>
             <td nowrap="nowrap">非公表</td>
             <td nowrap="nowrap">非公表</td>
             <td>旭川市</td>
@@ -178,10 +178,10 @@ class TestScrapedHTMLData(unittest.TestCase):
             date(2021, 3, 6),
         )
 
-        # 半角数字が含まれていない場合Noneを返す
+        # 全角数字が含まれている場合でも正しく変換する
         self.assertEqual(
             ScrapedHTMLData.format_date(date_string="３月６日", target_year=2021),
-            None,
+            date(2021, 3, 6),
         )
 
         # 日付ではない数字の場合Noneを返す
@@ -196,8 +196,8 @@ class TestScrapedHTMLData(unittest.TestCase):
         self.assertEqual(ScrapedHTMLData.format_age("10代未満"), "10歳未満")
         self.assertEqual(ScrapedHTMLData.format_age("100代"), "90歳以上")
 
-        # 半角数字が含まれていない場合空文字を返す
-        self.assertEqual(ScrapedHTMLData.format_age("２０代"), "")
+        # 全角数字が含まれている場合でも正しく変換する
+        self.assertEqual(ScrapedHTMLData.format_age("２０代"), "20代")
 
     def test_format_sex(self):
         self.assertEqual(ScrapedHTMLData.format_sex("男性"), "男性")

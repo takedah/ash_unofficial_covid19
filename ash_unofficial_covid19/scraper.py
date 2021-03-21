@@ -147,6 +147,33 @@ class ScrapedHTMLData:
         return table_values
 
     @staticmethod
+    def _z2h(zenkaku_string: str) -> Optional[str]:
+        """全角数字が含まれている文字列の全角数字を全て半角数字に変換する
+
+        Args:
+            zenkaku_string (str): 全角数字が含まれている文字列
+
+        """
+        z2h_table = str.maketrans(
+            {
+                "０": "0",
+                "１": "1",
+                "２": "2",
+                "３": "3",
+                "４": "4",
+                "５": "5",
+                "６": "6",
+                "７": "7",
+                "８": "8",
+                "９": "9",
+            }
+        )
+        try:
+            return zenkaku_string.translate(z2h_table)
+        except SyntaxError:
+            return None
+
+    @staticmethod
     def format_date(date_string: str, target_year: int) -> Optional[date]:
         """元データに年のデータがないためこれを加えてdatetime.dateに変換
 
@@ -159,6 +186,9 @@ class ScrapedHTMLData:
 
         """
         try:
+            date_string = ScrapedHTMLData._z2h(date_string)
+            if date_string is None:
+                return None
             matched_texts = re.match("([0-9]+)月([0-9]+)日", date_string)
             if matched_texts is None:
                 return None
@@ -180,6 +210,9 @@ class ScrapedHTMLData:
             formatted_age (str): 修正後の患者の年代表記
 
         """
+        age_string = ScrapedHTMLData._z2h(age_string)
+        if age_string is None:
+            return ""
         if age_string == "非公表" or age_string == "調査中":
             return ""
         elif age_string == "10代未満" or age_string == "10歳未満":
