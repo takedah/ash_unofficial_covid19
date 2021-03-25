@@ -1,7 +1,8 @@
 import csv
 import io
 import os
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
+from decimal import ROUND_HALF_UP, Decimal
 from io import BytesIO
 
 import matplotlib.pyplot as plt
@@ -83,22 +84,43 @@ def get_month_total_data():
 def index():
     patient_service = AsahikawaPatientService(get_db())
     today = datetime.now(timezone(timedelta(hours=+9), "JST")).date()
-    # 週次新規陽性患者数データをグローバル変数に格納しておく
-    one_month_ago = today - relativedelta(months=3)
+
+    # 週次新規陽性患者数データをグラフ描画処理でも使うためグローバル変数に格納しておく
     g.week_data = patient_service.get_aggregate_by_weeks(
-        from_date=one_month_ago, to_date=today
+        from_date=today - relativedelta(months=3), to_date=today
     )
     week_graph_alt = ", ".join(
-        ["%s=%s" % (key, value) for (key, value) in g.week_data.items()]
+        ["{0}={1}".format(row[0], row[1]) for row in g.week_data]
     )
-    # 年次累計陽性患者数データをグローバル変数に格納しておく
-    one_year_ago = today - relativedelta(months=12)
+    this_seven_days_patients_number = g.week_data[-1][1]
+    this_seven_days_average = float(
+        Decimal(str(this_seven_days_patients_number / 7)).quantize(
+            Decimal("0.01"), rounding=ROUND_HALF_UP
+        )
+    )
+    last_seven_days_patients_number = g.week_data[-2][1]
+    last_seven_days_average = float(
+        Decimal(str(last_seven_days_patients_number / 7)).quantize(
+            Decimal("0.01"), rounding=ROUND_HALF_UP
+        )
+    )
+    increase_of_average = float(
+        Decimal(str(this_seven_days_average - last_seven_days_average)).quantize(
+            Decimal("0.01"), rounding=ROUND_HALF_UP
+        )
+    )
+
+    # 月次累計陽性患者数データをグラフ描画処理でも使うためグローバル変数に格納しておく
     g.month_total_data = patient_service.get_total_by_months(
-        from_date=one_year_ago, to_date=today
+        from_date=date(2020, 1, 1), to_date=today
     )
     month_total_graph_alt = ", ".join(
-        ["%s=%s" % (key, value) for (key, value) in g.month_total_data.items()]
+        ["{0}={1}".format(row[0], row[1]) for row in g.month_total_data]
     )
+    total_patients_number = g.month_total_data[-1][1]
+    last_month_total_patients_number = g.month_total_data[-2][1]
+    increase_of_total = total_patients_number - last_month_total_patients_number
+
     title = "旭川市新型コロナウイルス感染症非公式オープンデータ"
     last_updated = patient_service.get_last_updated()
     return render_template(
@@ -107,6 +129,11 @@ def index():
         last_updated=last_updated.strftime("%Y/%m/%d %H:%M"),
         week_graph_alt=week_graph_alt,
         month_total_graph_alt=month_total_graph_alt,
+        today=today.strftime("%m月%d日"),
+        this_seven_days_average=this_seven_days_average,
+        increase_of_average="{:+}".format(increase_of_average),
+        total_patients_number="{:,}".format(total_patients_number),
+        increase_of_total="{:+,}".format(increase_of_total),
     )
 
 
@@ -132,17 +159,16 @@ def get_week_graph():
     if week_data is None:
         patient_service = AsahikawaPatientService(get_db())
         today = datetime.now(timezone(timedelta(hours=+9), "JST")).date()
-        one_month_ago = today - relativedelta(months=3)
         week_data = patient_service.get_aggregate_by_weeks(
-            from_date=one_month_ago, to_date=today
+            from_date=today - relativedelta(months=3), to_date=today
         )
     font = FontProperties(
         fname="./ash_unofficial_covid19/static/fonts/NotoSansCJKjp-Light.otf", size=12
     )
     fig = plt.figure()
     ax = fig.add_subplot()
-    week_x = week_data.keys()
-    week_y = week_data.values()
+    week_x = [row[0] for row in week_data]
+    week_y = [row[1] for row in week_data]
     ax.plot(week_x, week_y, color="salmon")
     ax.yaxis.set_major_locator(MultipleLocator(5))
     ax.grid(axis="y", color="lightgray")
@@ -173,17 +199,18 @@ def get_month_total_graph():
     if month_total_data is None:
         patient_service = AsahikawaPatientService(get_db())
         today = datetime.now(timezone(timedelta(hours=+9), "JST")).date()
-        one_year_ago = today - relativedelta(months=12)
         month_total_data = patient_service.get_total_by_months(
-            from_date=one_year_ago, to_date=today
+            from_date=date(2020, 1, 1), to_date=today
         )
+    # グラフの描画は直近12か月分のみとする
+    month_total_data = month_total_data[-12:]
     font = FontProperties(
         fname="./ash_unofficial_covid19/static/fonts/NotoSansCJKjp-Light.otf", size=12
     )
     fig = plt.figure()
     ax = fig.add_subplot()
-    month_total_x = month_total_data.keys()
-    month_total_y = month_total_data.values()
+    month_total_x = [row[0] for row in month_total_data]
+    month_total_y = [row[1] for row in month_total_data]
     ax.bar(month_total_x, month_total_y, facecolor="salmon")
     ax.yaxis.set_major_locator(MultipleLocator(100))
     ax.grid(axis="y", color="lightgray")

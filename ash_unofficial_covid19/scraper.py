@@ -147,7 +147,7 @@ class ScrapedHTMLData:
         return table_values
 
     @staticmethod
-    def _z2h(zenkaku_string: str) -> Optional[str]:
+    def _z2h(zenkaku_string: str) -> str:
         """全角数字が含まれている文字列の全角数字を全て半角数字に変換する
 
         Args:
@@ -171,7 +171,7 @@ class ScrapedHTMLData:
         if type(zenkaku_string) is str:
             return zenkaku_string.translate(z2h_table)
         else:
-            return None
+            return ""
 
     @staticmethod
     def format_date(date_string: str, target_year: int) -> Optional[date]:
@@ -186,9 +186,9 @@ class ScrapedHTMLData:
 
         """
         try:
-            date_string = ScrapedHTMLData._z2h(date_string)
-            if date_string is None:
-                return None
+            date_string = ScrapedHTMLData._z2h(
+                date_string.replace(" ", "").replace("　", "")
+            )
             matched_texts = re.match("([0-9]+)月([0-9]+)日", date_string)
             if matched_texts is None:
                 return None

@@ -316,7 +316,7 @@ class AsahikawaPatientService(PatientService):
             )
         return rows
 
-    def get_aggregate_by_weeks(self, from_date: date, to_date: date) -> dict:
+    def get_aggregate_by_weeks(self, from_date: date, to_date: date) -> list:
         """指定した期間の1週間ごとの陽性患者数の集計結果を返す
 
         Args:
@@ -324,8 +324,8 @@ class AsahikawaPatientService(PatientService):
             to_date (obj:`date`): 集計の終期
 
         Returns:
-            aggregate_by_weeks (dict): 1週間ごとの日付をキー、その週の陽性患者数を
-                値とした辞書
+            aggregate_by_weeks (list of tuple): 1週間ごとの日付とその週の
+                新規陽性患者数を要素とするタプル
 
         """
         state = (
@@ -343,13 +343,13 @@ class AsahikawaPatientService(PatientService):
             + "asahikawa_patients.publication_date < to_week GROUP BY from_week;"
         )
         self.execute(state)
-        aggregate_by_weeks = dict()
+        aggregate_by_weeks = list()
         for row in self.fetchall():
-            aggregate_by_weeks[row[0]] = row[1]
+            aggregate_by_weeks.append((row[0], row[1]))
 
         return aggregate_by_weeks
 
-    def get_total_by_months(self, from_date: date, to_date: date) -> dict:
+    def get_total_by_months(self, from_date: date, to_date: date) -> list:
         """指定した期間の1か月ごとの陽性患者数の累計結果を返す
 
         Args:
@@ -357,8 +357,8 @@ class AsahikawaPatientService(PatientService):
             to_date (obj:`date`): 累計の終期
 
         Returns:
-            total_by_months (dict): 1か月ごとの年月をキー、その週までの
-                陽性患者累計数を値とした辞書
+            total_by_months (list of tuple): 1か月ごとの年月とその週までの
+                累計陽性患者数を要素とするタプル
 
         """
         state = (
@@ -381,9 +381,9 @@ class AsahikawaPatientService(PatientService):
             + ") AS aggregate_patients;"
         )
         self.execute(state)
-        total_by_months = dict()
+        total_by_months = list()
         for row in self.fetchall():
-            total_by_months[row[0]] = row[1]
+            total_by_months.append((row[0], row[1]))
 
         return total_by_months
 

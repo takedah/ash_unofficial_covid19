@@ -348,23 +348,23 @@ class TestAsahikawaPatientService(unittest.TestCase):
         result = self.service.get_aggregate_by_weeks(
             from_date=from_date, to_date=to_date
         )
-        expect = {
-            "01-25": 1,
-            "02-01": 0,
-            "02-08": 0,
-            "02-15": 0,
-            "02-22": 4,
-        }
+        expect = [
+            ("01-25", 1),
+            ("02-01", 0),
+            ("02-08", 0),
+            ("02-15", 0),
+            ("02-22", 4),
+        ]
         self.assertEqual(result, expect)
 
     def test_get_total_by_months(self):
         from_date = date(2021, 1, 1)
         to_date = date(2021, 2, 28)
         result = self.service.get_total_by_months(from_date=from_date, to_date=to_date)
-        expect = {
-            "2021-01": 1,
-            "2021-02": 5,
-        }
+        expect = [
+            ("2021-01", 1),
+            ("2021-02", 5),
+        ]
         self.assertEqual(result, expect)
 
 

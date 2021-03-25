@@ -30,6 +30,8 @@
                 </div>
                 <div class="card-body">
                     <p><img src="./week_per_patients.png" alt="{{ week_graph_alt }}" title="新規陽性患者数（週別）の推移" class="img-fluid"></p>
+                    <p class="text-right">{{ today }}までの7日間平均 <strong class="display-4">{{ this_seven_days_average }}</strong>人</p>
+                    <p class="text-right text-secondary">（先週 {{ increase_of_average }}人）</p>
                 </div>
             </div>
             <div class="card mt-3">
@@ -39,6 +41,8 @@
                 <div class="card-body">
                     <p><img src="./month_total_patients.png" alt="{{ month_total_graph_alt }}" title="累計陽性患者数（月別）の推移" class="img-fluid"></p>
                     <p></p>
+                    <p class="text-right">{{ today }}までの累計 <strong class="display-4">{{ total_patients_number }}</strong>人</p>
+                    <p class="text-right text-secondary">（先月 {{ increase_of_total }}人）</p>
                 </div>
             </div>
         </div>

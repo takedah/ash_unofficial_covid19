@@ -50,7 +50,7 @@ def html_content():
         <tr>
             <td nowrap="nowrap">1120</td>
             <td>19050</td>
-            <td nowrap="nowrap">2月26日</td>
+            <td nowrap="nowrap">2 月26日</td>
             <td nowrap="nowrap">50代</td>
             <td nowrap="nowrap">女性</td>
             <td>旭川市</td>
