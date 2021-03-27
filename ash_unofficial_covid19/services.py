@@ -66,6 +66,15 @@ class PatientService:
         """
         return self.__cursor.fetchall()
 
+    def statusmessage(self) -> str:
+        """クエリ実行後のメッセージを返す
+
+        Returns:
+            status_message (str): クエリ実行後メッセージ
+
+        """
+        return self.__cursor.statusmessage
+
     def info_log(self, message) -> None:
         """AppLogオブジェクトのinfoメソッドのラッパー。
 
@@ -195,6 +204,29 @@ class AsahikawaPatientService(PatientService):
             self.error_log(e.message)
             return False
 
+    def delete(self, patient_number: int) -> bool:
+        """指定した識別番号の陽性患者データを削除する
+
+        Args:
+            patient_number (int): 削除する陽性患者データの識別番号
+
+        Returns:
+            bool: データ削除に成功したら真を返す
+
+        """
+        state = "DELETE from asahikawa_patients WHERE patient_number = %s;"
+        values = (patient_number,)
+        try:
+            self.execute(state, values)
+            result = self.statusmessage()
+            if result == "DELETE 1":
+                return True
+            else:
+                return False
+        except (DatabaseError, DataError) as e:
+            self.error_log(e.message)
+            return False
+
     def find(self) -> list:
         """新型コロナウイルス感染症患者オブジェクトのリストを返す
 
@@ -240,6 +272,40 @@ class AsahikawaPatientService(PatientService):
             return None
         else:
             return row["max"]
+
+    def get_duplicate_patient_numbers(self) -> list:
+        """
+        旭川市の公表した陽性患者情報の中に重複があるが、旭川市公式ホームページは
+        重複分も表示されたままなので、北海道の公表するオープンデータで重複削除と
+        されているデータに該当する識別番号をリストで返す。
+
+        Returns:
+            res (list): 重複削除とされているデータの識別番号
+
+        """
+        self.execute(
+            "SELECT"
+            + " "
+            + "a.patient_number"
+            + " "
+            + "FROM"
+            + " "
+            + self.__table_name
+            + " "
+            + "AS a"
+            + " "
+            + "LEFT JOIN hokkaido_patients AS h"
+            + " "
+            + "ON a.hokkaido_patient_number = h.patient_number"
+            + " "
+            + "WHERE h.residence = '重複削除'"
+            + " "
+            + "ORDER BY a.patient_number ASC;",
+        )
+        duplicate_patient_numbers = list()
+        for row in self.fetchall():
+            duplicate_patient_numbers.append(row["patient_number"])
+        return duplicate_patient_numbers
 
     def get_patients_rows(self) -> list:
         """陽性患者属性CSVファイルを出力するためのリストを返す

@@ -102,6 +102,32 @@ def import_asahikawa_data(url: str, target_year: int) -> bool:
     return True
 
 
+def delete_duplicate_data() -> bool:
+    """
+    旭川市公式ホームページから取得した新型コロナウイルス感染症の感染者情報には、
+    重複した事例が掲載されたままのため、当該データを削除する。
+
+    Returns:
+        bool: 削除が成功したら真を返す
+
+    """
+    logger = AppLog()
+    try:
+        conn = DB()
+        service = AsahikawaPatientService(conn)
+        for duplicate_patient_number in service.get_duplicate_patient_numbers():
+            service.delete(patient_number=duplicate_patient_number)
+        conn.commit()
+        conn.close()
+    except (DataError, DatabaseError) as e:
+        conn.close()
+        logger.warning(e.message)
+        return False
+
+    logger.info("重複事例のデータ削除処理が完了しました。")
+    return True
+
+
 if __name__ == "__main__":
     import_hokkaido_data(Config.HOKKAIDO_URL)
     import_asahikawa_data(Config.LATEST_DATA_URL, 2021)
@@ -109,3 +135,4 @@ if __name__ == "__main__":
     import_asahikawa_data(Config.JAN2021_DATA_URL, 2021)
     import_asahikawa_data(Config.DEC2020_DATA_URL, 2020)
     import_asahikawa_data(Config.NOV2020_OR_EARLIER_URL, 2020)
+    delete_duplicate_data()

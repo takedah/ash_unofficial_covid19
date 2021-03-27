@@ -159,7 +159,7 @@ test_hokkaido_data = [
         "city_name": "",
         "publication_date": date(2020, 2, 14),
         "onset_date": date(2020, 1, 31),
-        "residence": "石狩振興局管内",
+        "residence": "重複削除",
         "age": "50代",
         "sex": "男性",
         "occupation": "自営業",
@@ -202,11 +202,21 @@ class TestAsahikawaPatientService(unittest.TestCase):
     def tearDownClass(self):
         self.db.close()
 
-    def test_create(self):
+    def setUp(self):
         self.service.truncate()
         for item in self.factory.items:
-            self.assertTrue(self.service.create(item))
+            self.service.create(item)
         self.db.commit()
+
+    def teaDown(self):
+        pass
+
+    def test_create(self):
+        for item in self.factory.items:
+            self.assertTrue(self.service.create(item))
+
+    def test_delete(self):
+        self.assertTrue(self.service.delete(patient_number=1121))
 
     def test_find(self):
         results = self.service.find()
@@ -341,6 +351,15 @@ class TestAsahikawaPatientService(unittest.TestCase):
             ],
         ]
         self.assertEqual(results, expect)
+
+    def test_get_duplicate_patient_numbers(self):
+        result = self.service.get_duplicate_patient_numbers()
+        self.assertEqual(
+            result,
+            [
+                1120,
+            ],
+        )
 
     def test_get_aggregate_by_weeks(self):
         from_date = date(2021, 1, 25)
