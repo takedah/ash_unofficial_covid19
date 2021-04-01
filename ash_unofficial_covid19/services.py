@@ -307,7 +307,7 @@ class AsahikawaPatientService(PatientService):
             duplicate_patient_numbers.append(row["patient_number"])
         return duplicate_patient_numbers
 
-    def get_patients_rows(self) -> list:
+    def get_patients_csv_rows(self) -> list:
         """陽性患者属性CSVファイルを出力するためのリストを返す
 
         Returns:

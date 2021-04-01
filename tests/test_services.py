@@ -226,8 +226,8 @@ class TestAsahikawaPatientService(unittest.TestCase):
         self.assertEqual(patient.age, "90歳以上")
         self.assertEqual(patient.sex, "女性")
 
-    def test_get_patients_rows(self):
-        results = self.service.get_patients_rows()
+    def test_get_patients_csv_rows(self):
+        results = self.service.get_patients_csv_rows()
         expect = [
             [
                 "No",

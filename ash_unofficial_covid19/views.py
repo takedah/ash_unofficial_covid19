@@ -140,7 +140,7 @@ def index():
 @app.route("/012041_asahikawa_covid19_patients.csv")
 def patients_csv():
     patient_service = AsahikawaPatientService(get_db())
-    patients_rows = patient_service.get_patients_rows()
+    patients_rows = patient_service.get_patients_csv_rows()
     f = io.StringIO()
     writer = csv.writer(f, quoting=csv.QUOTE_ALL, lineterminator="\n")
     writer.writerows(patients_rows)
