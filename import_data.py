@@ -131,6 +131,7 @@ def delete_duplicate_data() -> bool:
 if __name__ == "__main__":
     import_hokkaido_data(Config.HOKKAIDO_URL)
     import_asahikawa_data(Config.LATEST_DATA_URL, 2021)
+    import_asahikawa_data(Config.MAR2021_DATA_URL, 2021)
     import_asahikawa_data(Config.FEB2021_DATA_URL, 2021)
     import_asahikawa_data(Config.JAN2021_DATA_URL, 2021)
     import_asahikawa_data(Config.DEC2020_DATA_URL, 2020)
