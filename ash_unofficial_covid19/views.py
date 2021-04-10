@@ -92,6 +92,9 @@ def index():
     week_graph_alt = ", ".join(
         ["{0}={1}".format(row[0], row[1]) for row in g.week_data]
     )
+    this_seven_days_start_date = (
+        g.week_data[-1][0][:2] + "月" + g.week_data[-1][0][-2:] + "日"
+    )
     this_seven_days_patients_number = g.week_data[-1][1]
     this_seven_days_average = float(
         Decimal(str(this_seven_days_patients_number / 7)).quantize(
@@ -103,6 +106,9 @@ def index():
         Decimal(str(last_seven_days_patients_number / 7)).quantize(
             Decimal("0.01"), rounding=ROUND_HALF_UP
         )
+    )
+    increase_of_last_week = (
+        this_seven_days_patients_number - last_seven_days_patients_number
     )
     increase_of_average = float(
         Decimal(str(this_seven_days_average - last_seven_days_average)).quantize(
@@ -130,10 +136,13 @@ def index():
         week_graph_alt=week_graph_alt,
         month_total_graph_alt=month_total_graph_alt,
         today=today.strftime("%m月%d日"),
+        this_seven_days_start_date=this_seven_days_start_date,
+        this_seven_days_patients_number=this_seven_days_patients_number,
         this_seven_days_average=this_seven_days_average,
-        increase_of_average="{:+}".format(increase_of_average),
         total_patients_number="{:,}".format(total_patients_number),
+        increase_of_last_week="{:+,}".format(increase_of_last_week),
         increase_of_total="{:+,}".format(increase_of_total),
+        increase_of_average="{:+}".format(increase_of_average),
     )
 
 
