@@ -140,7 +140,6 @@ def index():
         this_seven_days_patients_number=this_seven_days_patients_number,
         this_seven_days_average=this_seven_days_average,
         total_patients_number="{:,}".format(total_patients_number),
-        increase_of_last_week="{:+,}".format(increase_of_last_week),
         increase_of_total="{:+,}".format(increase_of_total),
         increase_of_average="{:+}".format(increase_of_average),
     )
