@@ -5,4 +5,4 @@ psycopg2
 requests
 matplotlib
 pandas
-tabula
+tabula-py
