@@ -13,7 +13,10 @@ from matplotlib.font_manager import FontProperties
 from matplotlib.ticker import MultipleLocator
 
 from ash_unofficial_covid19.db import DB
-from ash_unofficial_covid19.services import AsahikawaPatientService
+from ash_unofficial_covid19.services import (
+    AsahikawaPatientService,
+    MedicalInstitutionService
+)
 
 app = Flask(__name__)
 
@@ -107,9 +110,6 @@ def index():
             Decimal("0.01"), rounding=ROUND_HALF_UP
         )
     )
-    increase_of_last_week = (
-        this_seven_days_patients_number - last_seven_days_patients_number
-    )
     increase_of_average = float(
         Decimal(str(this_seven_days_average - last_seven_days_average)).quantize(
             Decimal("0.01"), rounding=ROUND_HALF_UP
@@ -157,6 +157,22 @@ def patients_csv():
     res.headers["Content-Type"] = "text/csv"
     res.headers["Content-Disposition"] = (
         "attachment: filename=" + "012041_asahikawa_covid19_patients.csv"
+    )
+    return res
+
+
+@app.route("/012041_asahikawa_covid19_medical_institations.csv")
+def medical_institutions_csv():
+    medical_institution_service = MedicalInstitutionService(get_db())
+    medical_institutions_rows = medical_institution_service.get_csv_rows()
+    f = io.StringIO()
+    writer = csv.writer(f, quoting=csv.QUOTE_ALL, lineterminator="\n")
+    writer.writerows(medical_institutions_rows)
+    res = make_response()
+    res.data = f.getvalue()
+    res.headers["Content-Type"] = "text/csv"
+    res.headers["Content-Disposition"] = (
+        "attachment: filename=" + "012041_asahikawa_covid19_medical_institutions.csv"
     )
     return res
 

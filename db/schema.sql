@@ -41,3 +41,14 @@ CREATE TABLE hokkaido_patients(
     note TEXT,
     updated_at TIMESTAMPTZ NOT NULL
 );
+DROP TABLE IF EXISTS medical_institutions;
+CREATE TABLE medical_institutions(
+    id SERIAL PRIMARY KEY NOT NULL,
+    name VARCHAR(128) UNIQUE NOT NULL,
+    address TEXT,
+    phone_number VARCHAR(16),
+    book_at_medical_institution BOOLEAN,
+    book_at_call_center BOOLEAN,
+    area TEXT,
+    updated_at TIMESTAMPTZ NOT NULL
+);

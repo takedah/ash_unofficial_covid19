@@ -4,11 +4,13 @@ from datetime import date
 from ash_unofficial_covid19.db import DB
 from ash_unofficial_covid19.models import (
     AsahikawaPatientFactory,
-    HokkaidoPatientFactory
+    HokkaidoPatientFactory,
+    MedicalInstitutionFactory
 )
 from ash_unofficial_covid19.services import (
     AsahikawaPatientService,
-    HokkaidoPatientService
+    HokkaidoPatientService,
+    MedicalInstitutionService
 )
 
 test_data = [
@@ -186,6 +188,16 @@ test_hokkaido_data = [
         "be_discharged": None,
         "note": "",
     },
+]
+test_medical_institution_data = [
+    {
+        "name": "市立旭川病院",
+        "address": "金星町1",
+        "phone_number": "0166-29-0202",
+        "book_at_medical_institution": True,
+        "book_at_call_center": False,
+        "area": "",
+    }
 ]
 
 
@@ -405,6 +417,62 @@ class TestHokkaidoPatientService(unittest.TestCase):
         for item in self.factory.items:
             self.assertTrue(self.service.create(item))
         self.db.commit()
+
+
+class TestMedicalInstitutionService(unittest.TestCase):
+    @classmethod
+    def setUpClass(self):
+        self.factory = MedicalInstitutionFactory()
+        for row in test_medical_institution_data:
+            self.factory.create(**row)
+        self.db = DB()
+        self.service = MedicalInstitutionService(self.db)
+
+    @classmethod
+    def tearDownClass(self):
+        self.db.close()
+
+    def setUp(self):
+        self.service.truncate()
+        for item in self.factory.items:
+            self.service.create(item)
+        self.db.commit()
+
+    def teaDown(self):
+        pass
+
+    def test_create(self):
+        for item in self.factory.items:
+            self.assertTrue(self.service.create(item))
+
+    def test_find(self):
+        results = self.service.find()
+        medical_institution = results[0]
+        self.assertEqual(medical_institution.name, "市立旭川病院")
+        self.assertEqual(medical_institution.book_at_medical_institution, True)
+        self.assertEqual(medical_institution.book_at_call_center, False)
+
+    def test_get_csv_rows(self):
+        results = self.service.get_csv_rows()
+        expect = [
+            [
+                "医療機関名",
+                "住所",
+                "電話",
+                "かかりつけの医療機関で予約ができます",
+                "コールセンターやインターネットで予約ができます",
+                "地区",
+            ],
+            [
+                "市立旭川病院",
+                "金星町1",
+                "0166-29-0202",
+                "1",
+                "0",
+                "",
+            ],
+        ]
+        self.assertEqual(results, expect)
 
 
 if __name__ == "__main__":

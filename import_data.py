@@ -9,16 +9,19 @@ from ash_unofficial_covid19.errors import (
 from ash_unofficial_covid19.logs import AppLog
 from ash_unofficial_covid19.models import (
     AsahikawaPatientFactory,
-    HokkaidoPatientFactory
+    HokkaidoPatientFactory,
+    MedicalInstitutionFactory
 )
 from ash_unofficial_covid19.scraper import (
     DownloadedHTML,
     ScrapedCSVData,
-    ScrapedHTMLData
+    ScrapedHTMLData,
+    ScrapedPDFData
 )
 from ash_unofficial_covid19.services import (
     AsahikawaPatientService,
-    HokkaidoPatientService
+    HokkaidoPatientService,
+    MedicalInstitutionService
 )
 
 
@@ -128,6 +131,45 @@ def delete_duplicate_data() -> bool:
     return True
 
 
+def import_medical_institutions_data(url: str) -> bool:
+    """
+    旭川市公式ホームページから新型コロナワクチン接種医療機関一覧を取得し、
+    データベースへ格納する。
+
+    Args:
+        url (str): 旭川市公式ホームページのURL
+
+    Returns:
+        bool: データベースへ格納が成功したら真を返す
+
+    """
+    logger = AppLog()
+    try:
+        scraped_data = ScrapedPDFData(url)
+    except HTTPDownloadError as e:
+        logger.warning(e.message)
+        return False
+
+    medical_institutions_data = MedicalInstitutionFactory()
+    for row in scraped_data.medical_institutions_data:
+        medical_institutions_data.create(**row)
+
+    try:
+        conn = DB()
+        service = MedicalInstitutionService(conn)
+        for medical_institution in medical_institutions_data.items:
+            service.create(medical_institution)
+        conn.commit()
+        conn.close()
+    except (DataError, DatabaseError, DataModelError) as e:
+        conn.close()
+        logger.warning(e.message)
+        return False
+
+    logger.info("医療機関のデータ登録処理が完了しました。")
+    return True
+
+
 if __name__ == "__main__":
     import_hokkaido_data(Config.HOKKAIDO_URL)
     import_asahikawa_data(Config.LATEST_DATA_URL, 2021)
@@ -138,3 +180,4 @@ if __name__ == "__main__":
     import_asahikawa_data(Config.DEC2020_DATA_URL, 2020)
     import_asahikawa_data(Config.NOV2020_OR_EARLIER_URL, 2020)
     delete_duplicate_data()
+    import_medical_institutions_data(Config.PDF_URL)

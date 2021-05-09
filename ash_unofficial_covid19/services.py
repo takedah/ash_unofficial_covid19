@@ -10,7 +10,9 @@ from ash_unofficial_covid19.logs import AppLog
 from ash_unofficial_covid19.models import (
     AsahikawaPatient,
     AsahikawaPatientFactory,
-    HokkaidoPatient
+    HokkaidoPatient,
+    MedicalInstitution,
+    MedicalInstitutionFactory
 )
 
 
@@ -558,3 +560,241 @@ class HokkaidoPatientService(PatientService):
         except (DatabaseError, DataError) as e:
             self.error_log(e.message)
             return False
+
+
+class MedicalInstitutionService:
+    """旭川市新型コロナ接種医療機関データを扱うサービスの基底クラス"""
+
+    def __init__(self, db: DB):
+        """
+        Args:
+            db (:obj:`DB`): データベース操作をラップしたオブジェクト
+
+        """
+
+        self.__table_name = "medical_institutions"
+        self.__cursor = db.cursor()
+        self.__logger = AppLog()
+
+    def execute(self, sql: str, parameters: tuple = None) -> bool:
+        """DictCursorオブジェクトのexecuteメソッドのラッパー
+
+        Args:
+            sql (str): SQL文
+            parameters (tuple): SQLにプレースホルダを使用する場合の値を格納したリスト
+
+        """
+        try:
+            if parameters:
+                self.__cursor.execute(sql, parameters)
+            else:
+                self.__cursor.execute(sql)
+            return True
+        except (
+            psycopg2.DataError,
+            psycopg2.IntegrityError,
+            psycopg2.InternalError,
+        ) as e:
+            raise DataError(e.args[0])
+
+    def fetchone(self) -> DictCursor:
+        """DictCursorオブジェクトのfetchoneメソッドのラッパー
+
+        Returns:
+            results (:obj:`DictCursor`): 検索結果のイテレータ
+
+        """
+        return self.__cursor.fetchone()
+
+    def fetchall(self) -> list:
+        """DictCursorオブジェクトのfetchallメソッドのラッパー
+
+        Returns:
+            results (list of :obj:`DictCursor`): 検索結果のイテレータのリスト
+
+        """
+        return self.__cursor.fetchall()
+
+    def statusmessage(self) -> str:
+        """クエリ実行後のメッセージを返す
+
+        Returns:
+            status_message (str): クエリ実行後メッセージ
+
+        """
+        return self.__cursor.statusmessage
+
+    def info_log(self, message) -> None:
+        """AppLogオブジェクトのinfoメソッドのラッパー。
+
+        Args:
+            message (str): 通常のログメッセージ
+        """
+        self.__logger.info(message)
+
+    def error_log(self, message) -> None:
+        """AppLogオブジェクトのerrorメソッドのラッパー。
+
+        Args:
+            message (str): エラーログメッセージ
+
+        """
+        self.__logger.error(message)
+
+    def truncate(self) -> None:
+        """医療機関テーブルのデータを全削除"""
+
+        state = "TRUNCATE TABLE " + self.__table_name + " RESTART IDENTITY;"
+        self.execute(state)
+        self.info_log(self.__table_name + "テーブルを初期化しました。")
+
+    def create(self, medical_institution: MedicalInstitution) -> bool:
+        """データベースへ新型コロナワクチン接種医療機関データを保存
+
+        Args:
+            medical_institution (:obj:`MedicalInstitution`): 医療機関データのオブジェクト
+
+        Returns:
+            bool: データの登録が成功したらTrueを返す
+
+        """
+        items = [
+            "name",
+            "address",
+            "phone_number",
+            "book_at_medical_institution",
+            "book_at_call_center",
+            "area",
+            "updated_at",
+        ]
+
+        column_names = ""
+        place_holders = ""
+        upsert = ""
+        for item in items:
+            column_names += "," + item
+            place_holders += ",%s"
+            upsert += "," + item + "=%s"
+
+        state = (
+            "INSERT INTO"
+            + " "
+            + self.__table_name
+            + " "
+            + "("
+            + column_names[1:]
+            + ")"
+            + " "
+            + "VALUES ("
+            + place_holders[1:]
+            + ")"
+            + " "
+            + "ON CONFLICT(name)"
+            + " "
+            + "DO UPDATE SET"
+            + " "
+            + upsert[1:]
+        )
+
+        temp_values = [
+            medical_institution.name,
+            medical_institution.address,
+            medical_institution.phone_number,
+            medical_institution.book_at_medical_institution,
+            medical_institution.book_at_call_center,
+            medical_institution.area,
+            datetime.now(timezone(timedelta(hours=+9))),
+        ]
+        # UPDATE句用にリストを重複させる。
+        values = tuple(temp_values + temp_values)
+
+        try:
+            self.execute(state, values)
+            return True
+        except (DatabaseError, DataError) as e:
+            self.error_log(e.message)
+            return False
+
+    def find(self) -> list:
+        """新型コロナワクチン接種医療機関オブジェクトのリストを返す
+
+        Returns:
+            res (list of :obj:`MedicalInstitution`): 新型コロナウイルス感染症患者オブジェクトのリスト
+
+        """
+        self.execute(
+            "SELECT"
+            + " "
+            + "name,address,phone_number,book_at_medical_institution,"
+            + "book_at_call_center,area"
+            + " "
+            + "FROM"
+            + " "
+            + self.__table_name
+            + ";",
+        )
+        factory = MedicalInstitutionFactory()
+        for row in self.fetchall():
+            factory.create(**row)
+        return factory.items
+
+    def get_last_updated(self) -> Optional[datetime]:
+        """テーブルの最終更新日を返す。
+
+        Returns:
+            last_updated (:obj:`datetime.datetime'): medical_institutionsテーブルの
+                updatedカラムで一番最新の値を返す。
+
+        """
+        self.execute("SELECT max(updated_at) FROM " + self.__table_name + ";")
+        row = self.fetchone()
+        if row["max"] is None:
+            return None
+        else:
+            return row["max"]
+
+    def get_csv_rows(self) -> list:
+        """新型コロナワクチン接種医療機関一覧CSVファイルを出力するためのリストを返す
+
+        Returns:
+            rows (list of list): CSVファイルの元となる二次元配列
+
+        """
+        medical_institutions = self.find()
+        rows = list()
+        rows.append(
+            [
+                "医療機関名",
+                "住所",
+                "電話",
+                "かかりつけの医療機関で予約ができます",
+                "コールセンターやインターネットで予約ができます",
+                "地区",
+            ]
+        )
+        for medical_institution in medical_institutions:
+            if medical_institution.book_at_medical_institution is None:
+                book_at_medical_institution = ""
+            else:
+                book_at_medical_institution = str(
+                    int(medical_institution.book_at_medical_institution)
+                )
+            if medical_institution.book_at_call_center is None:
+                book_at_call_center = ""
+            else:
+                book_at_call_center = str(int(medical_institution.book_at_call_center))
+
+            rows.append(
+                [
+                    "" if v is None else v
+                    for v in [
+                        medical_institution.name,
+                        medical_institution.address,
+                        medical_institution.phone_number,
+                        book_at_medical_institution,
+                        book_at_call_center,
+                        medical_institution.area,
+                    ]
+                ]
+            )
+        return rows

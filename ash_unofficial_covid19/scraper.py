@@ -1,10 +1,12 @@
 import csv
 import re
 from datetime import date, datetime
-from io import StringIO
+from io import BytesIO, StringIO
 from typing import Optional
 
+import pandas as pd
 import requests
+import tabula
 from bs4 import BeautifulSoup
 from requests import HTTPError, Timeout
 
@@ -324,7 +326,7 @@ class ScrapedCSVData:
     def __init__(self, url: str):
         """
         Args:
-            encoding (str): CSVファイルの文字コード
+            url (str): CSVファイルのURL
 
         """
         self.__logger = AppLog()
@@ -362,6 +364,7 @@ class ScrapedCSVData:
 
         Args:
             url (str): CSVファイルのURL
+            encoding (str): CSVファイルの文字コード
 
         Returns:
             content (:obj:`StringIO`): ダウンロードしたCSVファイルのStringIOデータ
@@ -479,3 +482,145 @@ class ScrapedCSVData:
             return patient_data
         except (ValueError, IndexError):
             return None
+
+
+class ScrapedPDFData:
+    """旭川市新型コロナワクチン接種医療機関一覧
+
+    旭川市公式ホームページからダウンロードしたPDFファイルから、
+    新型コロナワクチン接種医療機関一覧データを抽出し、リストに変換する。
+
+    Attributes:
+        medical_institution_data (list of dict): ワクチン接種医療機関データを表す
+            辞書のリスト
+
+    """
+
+    def __init__(self, pdf_url: str):
+        """
+        Args:
+            pdf_url (str): PDFファイルのURL
+
+        """
+        self.__logger = AppLog()
+        self.__medical_institutions_data = self.extract_from_pdf(pdf_url)
+
+    @property
+    def medical_institutions_data(self) -> list:
+        return self.__medical_institutions_data
+
+    def _info_log(self, message: str) -> None:
+        """AppLog.infoのラッパー
+
+        Args:
+            message (str): 通常のログメッセージ
+
+        """
+        self.__logger.info(message)
+
+    def _error_log(self, message: str) -> None:
+        """AppLog.errorのラッパー
+
+        Args:
+            message (str): エラーログメッセージ
+
+        """
+        self.__logger.error(message)
+
+    def extract_from_pdf(self, pdf_url: str) -> list:
+        """
+        Args:
+            pdf_url (str): PDFファイルのURL
+
+        Returns:
+            pdf_data (list of dict): ワクチン接種医療機関データを表す辞書のリスト
+
+        """
+        try:
+            # 旭川市ホームページのTLS証明書のDH鍵長に問題があるためセキュリティを下げて回避する
+            requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += "HIGH:!DH"
+            response = requests.get(pdf_url)
+            self._info_log("CSVファイルのダウンロードに成功しました。")
+        except (ConnectionError, Timeout, HTTPError):
+            message = "cannot connect to web server."
+            self._error_log(message)
+            raise HTTPDownloadError(message)
+
+        if response.status_code != 200:
+            message = "cannot get PDF contents."
+            self._error_log(message)
+            raise HTTPDownloadError(message)
+
+        dfs = tabula.read_pdf(
+            BytesIO(response.content), multiple_tables=True, lattice=True, pages="all"
+        )
+        df = dfs[0]
+        df.columns = [
+            "name1",
+            "address1",
+            "phone_number1",
+            "book_at_medical_institution1",
+            "book_at_call_center1",
+            "name2",
+            "address2",
+            "phone_number2",
+            "book_at_medical_institution2",
+            "book_at_call_center2",
+            "null",
+        ]
+        # 見出し行を削除し、最終行が注釈なのでこれも削除
+        df.drop(df.index[[0, -1]], inplace=True)
+        # 最終列がNaNのみの列なので削除
+        df.drop(columns="null", inplace=True)
+        df.replace("\r", "", regex=True, inplace=True)
+        # 表が2段組なので左側の列のみを取り出す
+        left_df = df[
+            [
+                "name1",
+                "address1",
+                "phone_number1",
+                "book_at_medical_institution1",
+                "book_at_call_center1",
+            ]
+        ]
+        # 右側の列のみを取り出す
+        right_df = df[
+            [
+                "name2",
+                "address2",
+                "phone_number2",
+                "book_at_medical_institution2",
+                "book_at_call_center2",
+            ]
+        ]
+        left_df.columns = [
+            "name",
+            "address",
+            "phone_number",
+            "book_at_medical_institution",
+            "book_at_call_center",
+        ]
+        right_df.columns = [
+            "name",
+            "address",
+            "phone_number",
+            "book_at_medical_institution",
+            "book_at_call_center",
+        ]
+        formatted_df = pd.concat([left_df, right_df])
+        formatted_df.dropna(how="any", inplace=True)
+        formatted_df["address"] = formatted_df["address"].apply(lambda x: "旭川市" + x)
+        formatted_df["phone_number"] = formatted_df["phone_number"].apply(
+            lambda x: "0166-" + x
+        )
+        formatted_df["book_at_medical_institution"] = formatted_df[
+            "book_at_medical_institution"
+        ].apply(lambda x: x == "○")
+        formatted_df["book_at_call_center"] = formatted_df["book_at_call_center"].apply(
+            lambda x: x == "○"
+        )
+
+        # TODO: 地域区分を取得する
+        formatted_df["area"] = ""
+
+        return formatted_df.to_dict(orient="records")

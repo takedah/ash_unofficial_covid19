@@ -6,7 +6,9 @@ from ash_unofficial_covid19.models import (
     AsahikawaPatient,
     AsahikawaPatientFactory,
     HokkaidoPatient,
-    HokkaidoPatientFactory
+    HokkaidoPatientFactory,
+    MedicalInstitution,
+    MedicalInstitutionFactory
 )
 
 test_data = {
@@ -86,6 +88,14 @@ test_hokkaido_data = {
     "be_discharged": None,
     "note": "",
 }
+test_medical_institution_data = {
+    "name": "市立旭川病院",
+    "address": "金星町1",
+    "phone_number": "0166-29-0202",
+    "book_at_medical_institution": True,
+    "book_at_call_center": False,
+    "area": "",
+}
 
 
 class TestAsahikawaPatientFactory(unittest.TestCase):
@@ -110,6 +120,14 @@ class TestHokkaidoPatientFactory(unittest.TestCase):
         # HokkaidoPatientクラスのオブジェクトが生成できるか確認する。
         patient = factory.create(**test_hokkaido_data)
         self.assertTrue(isinstance(patient, HokkaidoPatient))
+
+
+class TestMedicalInstitutionFactory(unittest.TestCase):
+    def test_create(self):
+        factory = MedicalInstitutionFactory()
+        # MedicalInstitutionクラスのオブジェクトが生成できるか確認する。
+        patient = factory.create(**test_medical_institution_data)
+        self.assertTrue(isinstance(patient, MedicalInstitution))
 
 
 if __name__ == "__main__":

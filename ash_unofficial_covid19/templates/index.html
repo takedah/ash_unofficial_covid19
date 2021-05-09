@@ -9,7 +9,7 @@
                     <p class="lead">旭川市公式ホームページから新型コロナウイルス感染症の市内発生状況のデータから、<a href="https://www.code4japan.org/" title="Code for Japan" class="text-white-50">Code for Japan</a>の陽性患者属性データセットに基づいたCSV形式のテキストファイルを作成し、非公式のオープンデータとしてダウンロードできるようにしました。</p>
                 </div>
                 <div class="col-md-4">
-                    <p><a href="/012041_asahikawa_covid19_patients.csv" tabindex="1" accesskey="g" title="旭川市陽性患者属性CSVをダウンロード" class="btn btn-lg btn-info">陽性患者属性CSVをダウンロード</a></p>
+                    <p><a href="/012041_asahikawa_covid19_patients.csv" tabindex="1" accesskey="g" title="旭川市新型コロナ陽性患者属性CSVをダウンロード" class="btn btn-lg btn-info">陽性患者属性CSVをダウンロード</a></p>
                 </div>
             </div>
         </div>
@@ -18,6 +18,13 @@
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <p class="mb-0">{{ last_updated }}にダウンロードしたデータを元に表示しています。正確な情報は必ず<a class="alert-link" href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ">旭川市公式ホームページ</a>を確認してください。</p>
             <button type="button" tabindex="2" accesskey="x" class="close" data-dismiss="alert" aria-label="close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+          <p class="mb-0">試験的に<a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/146/149/d072466.html" title="旭川市公式ホームページ" class="alert-link">旭川市公式ホームページ</a>に掲載されている新型コロナワクチン接種医療機関一覧PDFファイルからデータを抽出し、<a href="/012041_asahikawa_covid19_medical_institations.csv" title="旭川市新型コロナワクチン接種医療機関CSVをダウンロード" class="alert-link">CSVファイルをダウンロード</a>できるようにしてみました。</p>
+          <p>「かかりつけの医療機関で予約ができます」「コールセンターやインターネットで予約ができます」カラムは「1」が「True」を、「0」が「False」を表しています。「地区」カラムは現在全て空です。（今後対応したいと思っています。）</p>
+            <button type="button" tabindex="2" accesskey="c" class="close" data-dismiss="alert" aria-label="close">
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>

@@ -7,7 +7,8 @@ from ash_unofficial_covid19.errors import (
 from ash_unofficial_covid19.logs import AppLog
 from ash_unofficial_covid19.services import (
     AsahikawaPatientService,
-    HokkaidoPatientService
+    HokkaidoPatientService,
+    MedicalInstitutionService
 )
 
 
@@ -55,6 +56,29 @@ def truncate_asahikawa_table() -> bool:
     return True
 
 
+def truncate_medical_institutions_table() -> bool:
+    """旭川市新型コロナワクチン接種医療機関データベースの初期化
+
+    Returns:
+        bool: データベースの初期化が成功したら真を返す
+
+    """
+    logger = AppLog()
+    try:
+        conn = DB()
+        service = MedicalInstitutionService(conn)
+        service.truncate()
+        conn.commit()
+        conn.close()
+    except (DataError, DatabaseError, DataModelError) as e:
+        conn.close()
+        logger.warning(e.message)
+        return False
+
+    return True
+
+
 if __name__ == "__main__":
     truncate_hokkaido_table()
     truncate_asahikawa_table()
+    truncate_medical_institutions_table()
