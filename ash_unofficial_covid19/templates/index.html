@@ -23,7 +23,6 @@
         </div>
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
           <p class="mb-0">試験的に<a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/146/149/d072466.html" title="旭川市公式ホームページ" class="alert-link">旭川市公式ホームページ</a>に掲載されている新型コロナワクチン接種医療機関一覧PDFファイルからデータを抽出し、<a href="/012041_asahikawa_covid19_medical_institations.csv" title="旭川市新型コロナワクチン接種医療機関CSVをダウンロード" class="alert-link">CSVファイルをダウンロード</a>できるようにしてみました。</p>
-          <p>「かかりつけの医療機関で予約ができます」「コールセンターやインターネットで予約ができます」カラムは「1」が「True」を、「0」が「False」を表しています。「地区」カラムは現在全て空です。（今後対応したいと思っています。）</p>
             <button type="button" tabindex="2" accesskey="c" class="close" data-dismiss="alert" aria-label="close">
                 <span aria-hidden="true">&times;</span>
             </button>
@@ -33,18 +32,17 @@
         <div class="card-group">
             <div class="card mt-3">
                 <div class="card-header">
-                    直近3か月間の新規陽性患者数（週別）
+                    新規陽性患者数（週別）
                 </div>
                 <div class="card-body">
                     <p><img src="./week_per_patients.png" alt="{{ week_graph_alt }}" title="新規陽性患者数（週別）の推移" class="img-fluid"></p>
-                    <p class="text-right mb-0">{{ this_seven_days_start_date }}からの新規患者数 <strong class="display-4">{{ this_seven_days_patients_number }}</strong>人</p>
-                    <p class="text-right mb-0">{{ today }}までの7日間移動平均 <strong class="display-4">{{ this_seven_days_average }}</strong>人</p>
-                    <p class="text-right text-secondary">（先週 {{ increase_of_average }}人）</p>
+                    <p class="text-right mb-0">直近1週間の新規患者数 <strong class="display-4">{{ this_seven_days_patients_number }}</strong>人</p>
+                    <p class="text-right text-secondary">（{{ today }}までの7日間移動平均 先週 {{ increase_of_average }}人）</p>
                 </div>
             </div>
             <div class="card mt-3">
                 <div class="card-header">
-                    直近1年間の累計陽性患者数（月別）
+                    累計陽性患者数（月別）
                 </div>
                 <div class="card-body">
                     <p><img src="./month_total_patients.png" alt="{{ month_total_graph_alt }}" title="累計陽性患者数（月別）の推移" class="img-fluid"></p>

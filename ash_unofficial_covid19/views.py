@@ -69,42 +69,46 @@ def close_db(error):
         g.postgres_db.close()
 
 
+def get_today():
+    return datetime.now(timezone(timedelta(hours=+9), "JST")).date()
+
+
 def get_week_data():
-    if hasattr(g, "week_data"):
-        return g.week_data
-    else:
-        return None
+    # 週次新規陽性患者数データをグラフ描画処理でも使うためグローバル変数に格納しておく
+    if not hasattr(g, "week_data"):
+        today = get_today()
+        patient_service = AsahikawaPatientService(get_db())
+        g.week_data = patient_service.get_aggregate_by_weeks(
+            from_date=today - relativedelta(months=3, days=1), to_date=today
+        )
+    return g.week_data
 
 
 def get_month_total_data():
-    if hasattr(g, "month_total_data"):
-        return g.month_total_data
-    else:
-        return None
+    # 月次累計陽性患者数データをグラフ描画処理でも使うためグローバル変数に格納しておく
+    if not hasattr(g, "month_total_data"):
+        today = get_today()
+        patient_service = AsahikawaPatientService(get_db())
+        g.month_total_data = patient_service.get_total_by_months(
+            from_date=date(2020, 1, 1), to_date=today
+        )
+    return g.month_total_data
 
 
 @app.route("/")
 def index():
     patient_service = AsahikawaPatientService(get_db())
-    today = datetime.now(timezone(timedelta(hours=+9), "JST")).date()
+    today = get_today()
 
-    # 週次新規陽性患者数データをグラフ描画処理でも使うためグローバル変数に格納しておく
-    g.week_data = patient_service.get_aggregate_by_weeks(
-        from_date=today - relativedelta(months=3), to_date=today
-    )
-    week_graph_alt = ", ".join(
-        ["{0}={1}".format(row[0], row[1]) for row in g.week_data]
-    )
-    this_seven_days_start_date = (
-        g.week_data[-1][0][:2] + "月" + g.week_data[-1][0][-2:] + "日"
-    )
-    this_seven_days_patients_number = g.week_data[-1][1]
+    week_data = get_week_data()
+    week_graph_alt = ", ".join(["{0}={1}".format(row[0], row[1]) for row in week_data])
+    this_seven_days_patients_number = week_data[-1][1]
     this_seven_days_average = float(
         Decimal(str(this_seven_days_patients_number / 7)).quantize(
             Decimal("0.01"), rounding=ROUND_HALF_UP
         )
     )
-    last_seven_days_patients_number = g.week_data[-2][1]
+    last_seven_days_patients_number = week_data[-2][1]
     last_seven_days_average = float(
         Decimal(str(last_seven_days_patients_number / 7)).quantize(
             Decimal("0.01"), rounding=ROUND_HALF_UP
@@ -116,15 +120,12 @@ def index():
         )
     )
 
-    # 月次累計陽性患者数データをグラフ描画処理でも使うためグローバル変数に格納しておく
-    g.month_total_data = patient_service.get_total_by_months(
-        from_date=date(2020, 1, 1), to_date=today
-    )
+    month_total_data = get_month_total_data()
     month_total_graph_alt = ", ".join(
-        ["{0}={1}".format(row[0], row[1]) for row in g.month_total_data]
+        ["{0}={1}".format(row[0], row[1]) for row in month_total_data]
     )
-    total_patients_number = g.month_total_data[-1][1]
-    last_month_total_patients_number = g.month_total_data[-2][1]
+    total_patients_number = month_total_data[-1][1]
+    last_month_total_patients_number = month_total_data[-2][1]
     increase_of_total = total_patients_number - last_month_total_patients_number
 
     title = "旭川市新型コロナウイルス感染症非公式オープンデータ"
@@ -136,9 +137,7 @@ def index():
         week_graph_alt=week_graph_alt,
         month_total_graph_alt=month_total_graph_alt,
         today=today.strftime("%m月%d日"),
-        this_seven_days_start_date=this_seven_days_start_date,
         this_seven_days_patients_number=this_seven_days_patients_number,
-        this_seven_days_average=this_seven_days_average,
         total_patients_number="{:,}".format(total_patients_number),
         increase_of_total="{:+,}".format(increase_of_total),
         increase_of_average="{:+}".format(increase_of_average),
@@ -180,12 +179,6 @@ def medical_institutions_csv():
 @app.route("/week_per_patients.png")
 def get_week_graph():
     week_data = get_week_data()
-    if week_data is None:
-        patient_service = AsahikawaPatientService(get_db())
-        today = datetime.now(timezone(timedelta(hours=+9), "JST")).date()
-        week_data = patient_service.get_aggregate_by_weeks(
-            from_date=today - relativedelta(months=3), to_date=today
-        )
     font = FontProperties(
         fname="./ash_unofficial_covid19/static/fonts/NotoSansCJKjp-Light.otf", size=12
     )
@@ -196,8 +189,8 @@ def get_week_graph():
     ax.plot(week_x, week_y, color="salmon")
     ax.yaxis.set_major_locator(MultipleLocator(5))
     ax.grid(axis="y", color="lightgray")
-    ax.set_title("旭川市陽性患者数の推移（週別）", font_properties=font)
-    ax.set_ylabel("陽性患者数（人）", font_properties=font)
+    ax.set_title("旭川市新規陽性患者数の推移（週次）", font_properties=font)
+    ax.set_ylabel("新規陽性患者数（人）", font_properties=font)
     ax.tick_params(labelsize=8)
     ax.tick_params(axis="x", rotation=45)
     fig.tight_layout()
@@ -220,12 +213,6 @@ def get_week_graph():
 @app.route("/month_total_patients.png")
 def get_month_total_graph():
     month_total_data = get_month_total_data()
-    if month_total_data is None:
-        patient_service = AsahikawaPatientService(get_db())
-        today = datetime.now(timezone(timedelta(hours=+9), "JST")).date()
-        month_total_data = patient_service.get_total_by_months(
-            from_date=date(2020, 1, 1), to_date=today
-        )
     # グラフの描画は直近12か月分のみとする
     month_total_data = month_total_data[-12:]
     font = FontProperties(
@@ -238,8 +225,8 @@ def get_month_total_graph():
     ax.bar(month_total_x, month_total_y, facecolor="salmon")
     ax.yaxis.set_major_locator(MultipleLocator(100))
     ax.grid(axis="y", color="lightgray")
-    ax.set_title("旭川市陽性患者数の推移（月別累計）", font_properties=font)
-    ax.set_ylabel("陽性患者数（延べ人数）", font_properties=font)
+    ax.set_title("旭川市累計陽性患者数の推移（月次）", font_properties=font)
+    ax.set_ylabel("累計陽性患者数（人）", font_properties=font)
     ax.tick_params(labelsize=8)
     ax.tick_params(axis="x", rotation=45)
     fig.tight_layout()
