@@ -4,7 +4,7 @@ import os
 class Config:
     DATABASE_URL = os.environ.get("DATABASE_URL")
     BASE_URL = "https://www.city.asahikawa.hokkaido.jp/"
-    LATEST_DATA_URL = BASE_URL + "kurashi/135/136/150/d068529.html"
+    LATEST_DATA_URL = BASE_URL + "kurashi/135/136/150/d073196.html"
     APR2021_DATA_URL = BASE_URL + "kurashi/135/136/150/d073132.html"
     MAR2021_DATA_URL = BASE_URL + "kurashi/135/136/150/d072959.html"
     FEB2021_DATA_URL = BASE_URL + "kurashi/135/136/150/d072703.html"
