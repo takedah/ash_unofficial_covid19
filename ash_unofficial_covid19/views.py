@@ -184,7 +184,7 @@ def get_week_graph():
     )
     fig = plt.figure()
     ax = fig.add_subplot()
-    week_x = [row[0] + "~" for row in week_data]
+    week_x = ["~" + row[0] for row in week_data]
     week_y = [row[1] for row in week_data]
     ax.plot(week_x, week_y, color="salmon")
     ax.yaxis.set_major_locator(MultipleLocator(5))

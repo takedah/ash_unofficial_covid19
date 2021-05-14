@@ -397,7 +397,7 @@ class AsahikawaPatientService(PatientService):
 
         """
         state = (
-            "SELECT to_char(from_week, 'MM-DD') AS weeks, "
+            "SELECT to_char(to_week, 'MM-DD') AS weeks, "
             + "COUNT(DISTINCT patient_number) AS patients FROM "
             + "(SELECT generate_series AS from_week, "
             + "generate_series + '7 days'::interval AS to_week FROM "
@@ -408,7 +408,7 @@ class AsahikawaPatientService(PatientService):
             + "'::DATE, '7 days')) "
             + "AS week_ranges LEFT JOIN asahikawa_patients ON "
             + "from_week <= asahikawa_patients.publication_date AND "
-            + "asahikawa_patients.publication_date < to_week GROUP BY from_week;"
+            + "asahikawa_patients.publication_date < to_week GROUP BY to_week;"
         )
         self.execute(state)
         aggregate_by_weeks = list()
