@@ -518,7 +518,6 @@ class TestScrapedPDFData(unittest.TestCase):
         )
         mock_pdf_content = Mock()
         mock_pdf_content.extracted_data = pdf_content
-        print(mock_pdf_content.extracted_data)
         scraper = ScrapedPDFData(pdf_content=mock_pdf_content)
         expect = [
             {

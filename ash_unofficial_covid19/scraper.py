@@ -649,7 +649,54 @@ class ScrapedPDFData:
             "book_at_call_center",
         ]
         formatted_df = pd.concat([left_df, right_df])
+        # 後で行番号で更新するときのために行番号を振り直す
+        formatted_df.reset_index(inplace=True, drop=True)
+
+        # 地区名を追加する処理
+        formatted_df["area"] = ""
+        area = ""
+        for index, row in formatted_df.iterrows():
+            # 「かかりつけの医療機関で〜」、「コールセンターやインターネットで〜」列が
+            # np.NaNの場合、地区名の見出しなので、文字列を抽出して地区データを追記する
+            if row[3] == row[3] and row[4] == row[4]:
+                formatted_df.at[index, "area"] = area
+            else:
+                cols = row.fillna("")
+                area = cols[0] + cols[1] + cols[2]
+                # 地区名が欠損しているので修正
+                if area == "中央地":
+                    area = "中央地区"
+                elif area == "西地":
+                    area = "西地区"
+                elif area == "大成地":
+                    area = "大成地区"
+                elif area == "豊岡":
+                    area = "豊岡"
+                elif area == "東光・神":
+                    area = "東光・旭神"
+                elif area == "東旭":
+                    area = "東旭川"
+                elif area == "本・旭町・大町錦町・緑町":
+                    area = "本町・旭町・大町・錦町・緑町"
+                elif area == "各17~26丁・宮前・南":
+                    area = "各条17~26丁目・宮前・南"
+                elif area == "新富・東・星町":
+                    area = "新富・東・金星町"
+                elif area == "住吉・春光春光台":
+                    area = "住吉・春光・春光台"
+                elif area == "花町・末広・末東・東鷹栖":
+                    area = "花咲町・末広・末広東・東鷹栖"
+                elif area == "永山":
+                    area = "永山"
+                elif area == "神楽岡・が丘":
+                    area = "神楽岡・緑が丘"
+                elif area == "神居・和":
+                    area = "神居・忠和"
+                else:
+                    area = ""
+        # 元データから地区名の列を削除
         formatted_df.dropna(how="any", inplace=True)
+
         formatted_df["address"] = formatted_df["address"].apply(lambda x: "旭川市" + x)
         formatted_df["phone_number"] = formatted_df["phone_number"].apply(
             lambda x: "0166-" + x
@@ -660,8 +707,5 @@ class ScrapedPDFData:
         formatted_df["book_at_call_center"] = formatted_df["book_at_call_center"].apply(
             lambda x: x == "○"
         )
-
-        # TODO: 地域区分を取得する
-        formatted_df["area"] = ""
 
         return formatted_df.to_dict(orient="records")
