@@ -196,7 +196,7 @@ test_medical_institution_data = [
         "phone_number": "0166-29-0202",
         "book_at_medical_institution": True,
         "book_at_call_center": False,
-        "area": "",
+        "area": "新富・東・金星町",
     }
 ]
 
@@ -380,11 +380,11 @@ class TestAsahikawaPatientService(unittest.TestCase):
             from_date=from_date, to_date=to_date
         )
         expect = [
-            ("01-25", 1),
-            ("02-01", 0),
+            ("02-01", 1),
             ("02-08", 0),
             ("02-15", 0),
-            ("02-22", 4),
+            ("02-22", 0),
+            ("03-01", 4),
         ]
         self.assertEqual(result, expect)
 
@@ -456,20 +456,20 @@ class TestMedicalInstitutionService(unittest.TestCase):
         results = self.service.get_csv_rows()
         expect = [
             [
+                "地区",
                 "医療機関名",
                 "住所",
                 "電話",
                 "かかりつけの医療機関で予約ができます",
                 "コールセンターやインターネットで予約ができます",
-                "地区",
             ],
             [
+                "新富・東・金星町",
                 "市立旭川病院",
                 "金星町1",
                 "0166-29-0202",
                 "1",
                 "0",
-                "",
             ],
         ]
         self.assertEqual(results, expect)

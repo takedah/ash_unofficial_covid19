@@ -766,12 +766,12 @@ class MedicalInstitutionService:
         rows = list()
         rows.append(
             [
+                "地区",
                 "医療機関名",
                 "住所",
                 "電話",
                 "かかりつけの医療機関で予約ができます",
                 "コールセンターやインターネットで予約ができます",
-                "地区",
             ]
         )
         for medical_institution in medical_institutions:
@@ -790,12 +790,12 @@ class MedicalInstitutionService:
                 [
                     "" if v is None else v
                     for v in [
+                        medical_institution.area,
                         medical_institution.name,
                         medical_institution.address,
                         medical_institution.phone_number,
                         book_at_medical_institution,
                         book_at_call_center,
-                        medical_institution.area,
                     ]
                 ]
             )

@@ -31,7 +31,8 @@ def add_security_headers(response):
                 stackpath.bootstrapcdn.com kit.fontawesome.com; \
                 connect-src ka-f.fontawesome.com; \
                 font-src ka-f.fontawesome.com; \
-                img-src 'self' i.creativecommons.org licensebuttons.net;",
+                img-src 'self' i.creativecommons.org licensebuttons.net \
+                data: https:;",
     )
     response.headers.add("X-Content-Type-Options", "nosniff")
     response.headers.add("X-Frame-Options", "DENY")
@@ -93,6 +94,21 @@ def get_month_total_data():
             from_date=date(2020, 1, 1), to_date=today
         )
     return g.month_total_data
+
+
+@app.route("/medical_institutions")
+def medical_institutions():
+    medical_institution_service = MedicalInstitutionService(get_db())
+    medical_institutions_rows = medical_institution_service.get_csv_rows()
+    medical_institutions_rows.pop(0)
+    title = "旭川市新型コロナワクチン接種医療機関一覧"
+    last_updated = medical_institution_service.get_last_updated()
+    return render_template(
+        "medical_institutions.html",
+        title=title,
+        last_updated=last_updated.strftime("%Y/%m/%d %H:%M"),
+        medical_institutions=medical_institutions_rows,
+    )
 
 
 @app.route("/")
@@ -160,7 +176,7 @@ def patients_csv():
     return res
 
 
-@app.route("/012041_asahikawa_covid19_medical_institations.csv")
+@app.route("/012041_asahikawa_covid19_medical_institutions.csv")
 def medical_institutions_csv():
     medical_institution_service = MedicalInstitutionService(get_db())
     medical_institutions_rows = medical_institution_service.get_csv_rows()
