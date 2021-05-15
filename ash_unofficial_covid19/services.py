@@ -731,6 +731,8 @@ class MedicalInstitutionService:
             + "FROM"
             + " "
             + self.__table_name
+            + " "
+            + "ORDER BY id"
             + ";",
         )
         factory = MedicalInstitutionFactory()

@@ -484,15 +484,15 @@ class ScrapedCSVData:
             return None
 
 
-class ScrapedPDFData:
-    """旭川市新型コロナワクチン接種医療機関一覧
+class DownloadedPDF:
+    """旭川市新型コロナワクチン接種医療機関一覧PDFファイルのスクレイピング
 
     旭川市公式ホームページからダウンロードしたPDFファイルから、
-    新型コロナワクチン接種医療機関一覧データを抽出し、リストに変換する。
+    新型コロナワクチン接種医療機関一覧データをpandasのDataFrameで抽出する。
 
     Attributes:
-        medical_institution_data (list of dict): ワクチン接種医療機関データを表す
-            辞書のリスト
+        extraced_data (obj:`pd.DataFrame`): ワクチン接種医療機関一覧PDFから
+            抽出したデータ
 
     """
 
@@ -503,11 +503,11 @@ class ScrapedPDFData:
 
         """
         self.__logger = AppLog()
-        self.__medical_institutions_data = self.extract_from_pdf(pdf_url)
+        self.__extracted_data = self._get_pdf_content(pdf_url)
 
     @property
-    def medical_institutions_data(self) -> list:
-        return self.__medical_institutions_data
+    def extracted_data(self) -> list:
+        return self.__extracted_data
 
     def _info_log(self, message: str) -> None:
         """AppLog.infoのラッパー
@@ -527,20 +527,21 @@ class ScrapedPDFData:
         """
         self.__logger.error(message)
 
-    def extract_from_pdf(self, pdf_url: str) -> list:
+    def _get_pdf_content(self, pdf_url: str) -> pd.DataFrame:
         """
         Args:
             pdf_url (str): PDFファイルのURL
 
         Returns:
-            pdf_data (list of dict): ワクチン接種医療機関データを表す辞書のリスト
+            pdf_content (obj:`pd.DataFrame`): ワクチン接種医療機関一覧PDFデータから
+                抽出したデータ
 
         """
         try:
             # 旭川市ホームページのTLS証明書のDH鍵長に問題があるためセキュリティを下げて回避する
             requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += "HIGH:!DH"
             response = requests.get(pdf_url)
-            self._info_log("CSVファイルのダウンロードに成功しました。")
+            self._info_log("PDFファイルのダウンロードに成功しました。")
         except (ConnectionError, Timeout, HTTPError):
             message = "cannot connect to web server."
             self._error_log(message)
@@ -568,6 +569,46 @@ class ScrapedPDFData:
             "book_at_call_center2",
             "null",
         ]
+        return df
+
+
+class ScrapedPDFData:
+    """旭川市新型コロナワクチン接種医療機関一覧データの抽出
+
+    旭川市公式ホームページからダウンロードしたPDFファイルのデータから、
+    新型コロナワクチン接種医療機関一覧データを抽出し、リストに変換する。
+
+    Attributes:
+        medical_institution_data (list of dict): ワクチン接種医療機関データを表す
+            辞書のリスト
+
+    """
+
+    def __init__(self, pdf_content: DownloadedPDF):
+        """
+        Args:
+            pdf_content (obj:`DownloadedPDF`): PDFファイルのデータをpandasのDataFrameに
+                抽出したデータを持つオブジェクト
+
+        """
+        self.__logger = AppLog()
+        self.__medical_institutions_data = self.extract_from_pdf(pdf_content)
+
+    @property
+    def medical_institutions_data(self) -> list:
+        return self.__medical_institutions_data
+
+    def extract_from_pdf(self, pdf_content: DownloadedPDF) -> list:
+        """
+        Args:
+            pdf_content (obj:`DownloadedPDF`): PDFファイルのデータをpandasのDataFrameに
+                抽出したデータを持つオブジェクト
+
+        Returns:
+            pdf_data (list of dict): ワクチン接種医療機関データを表す辞書のリスト
+
+        """
+        df = pdf_content.extracted_data
         # 見出し行を削除し、最終行が注釈なのでこれも削除
         df.drop(df.index[[0, -1]], inplace=True)
         # 最終列がNaNのみの列なので削除

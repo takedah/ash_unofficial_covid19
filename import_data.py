@@ -14,6 +14,7 @@ from ash_unofficial_covid19.models import (
 )
 from ash_unofficial_covid19.scraper import (
     DownloadedHTML,
+    DownloadedPDF,
     ScrapedCSVData,
     ScrapedHTMLData,
     ScrapedPDFData
@@ -145,11 +146,12 @@ def import_medical_institutions_data(url: str) -> bool:
     """
     logger = AppLog()
     try:
-        scraped_data = ScrapedPDFData(url)
+        pdf_content = DownloadedPDF(url)
     except HTTPDownloadError as e:
         logger.warning(e.message)
         return False
 
+    scraped_data = ScrapedPDFData(pdf_content)
     medical_institutions_data = MedicalInstitutionFactory()
     for row in scraped_data.medical_institutions_data:
         medical_institutions_data.create(**row)

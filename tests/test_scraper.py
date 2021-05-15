@@ -2,13 +2,16 @@ import unittest
 from datetime import date
 from unittest.mock import Mock, patch
 
+import pandas as pd
 from requests import HTTPError, Timeout
 
 from ash_unofficial_covid19.errors import HTTPDownloadError
 from ash_unofficial_covid19.scraper import (
     DownloadedHTML,
+    DownloadedPDF,
     ScrapedCSVData,
-    ScrapedHTMLData
+    ScrapedHTMLData,
+    ScrapedPDFData
 )
 
 
@@ -444,6 +447,114 @@ class TestScrapedCSVData(unittest.TestCase):
         mock_requests.get.return_value = Mock(status_code=404)
         with self.assertRaises(HTTPDownloadError):
             ScrapedCSVData("http://dummy.local")
+
+
+class TestDownloadedPDF(unittest.TestCase):
+    @patch("ash_unofficial_covid19.scraper.requests")
+    def test_content(self, mock_requests):
+        mock_requests.get.side_effect = Timeout("Dummy Error.")
+        with self.assertRaises(HTTPDownloadError):
+            DownloadedPDF("http://dummy.local")
+
+        mock_requests.get.side_effect = HTTPError("Dummy Error.")
+        with self.assertRaises(HTTPDownloadError):
+            DownloadedPDF("http://dummy.local")
+
+        mock_requests.get.side_effect = ConnectionError("Dummy Error.")
+        with self.assertRaises(HTTPDownloadError):
+            DownloadedPDF("http://dummy.local")
+
+        mock_requests.get.return_value = Mock(status_code=404)
+        with self.assertRaises(HTTPDownloadError):
+            DownloadedPDF("http://dummy.local")
+
+
+class TestScrapedPDFData(unittest.TestCase):
+    def test_medical_institutions_data(self):
+        pdf_content = pd.DataFrame(
+            [
+                [],
+                [
+                    "市立旭川病院",
+                    "金星町1",
+                    "29-0202",
+                    "○",
+                    "-",
+                    "旭川医療センター",
+                    "花咲町7",
+                    "59-3910",
+                    "○",
+                    "○",
+                    None,
+                ],
+                [
+                    "旭川赤十字病院",
+                    "曙町1の1",
+                    "22-8111",
+                    "○",
+                    "○",
+                    "旭川厚生病院",
+                    "1の24",
+                    "33-7171",
+                    "○",
+                    "-",
+                    None,
+                ],
+                [],
+            ],
+            columns=[
+                "name1",
+                "address1",
+                "phone_number1",
+                "book_at_medical_institution1",
+                "book_at_call_center1",
+                "name2",
+                "address2",
+                "phone_number2",
+                "book_at_medical_institution2",
+                "book_at_call_center2",
+                "null",
+            ],
+        )
+        mock_pdf_content = Mock()
+        mock_pdf_content.extracted_data = pdf_content
+        print(mock_pdf_content.extracted_data)
+        scraper = ScrapedPDFData(pdf_content=mock_pdf_content)
+        expect = [
+            {
+                "name": "市立旭川病院",
+                "address": "旭川市金星町1",
+                "phone_number": "0166-29-0202",
+                "book_at_medical_institution": True,
+                "book_at_call_center": False,
+                "area": "",
+            },
+            {
+                "name": "旭川赤十字病院",
+                "address": "旭川市曙町1の1",
+                "phone_number": "0166-22-8111",
+                "book_at_medical_institution": True,
+                "book_at_call_center": True,
+                "area": "",
+            },
+            {
+                "name": "旭川医療センター",
+                "address": "旭川市花咲町7",
+                "phone_number": "0166-59-3910",
+                "book_at_medical_institution": True,
+                "book_at_call_center": True,
+                "area": "",
+            },
+            {
+                "name": "旭川厚生病院",
+                "address": "旭川市1の24",
+                "phone_number": "0166-33-7171",
+                "book_at_medical_institution": True,
+                "book_at_call_center": False,
+                "area": "",
+            },
+        ]
+        self.assertEqual(scraper.medical_institutions_data, expect)
 
 
 if __name__ == "__main__":
