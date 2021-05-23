@@ -1,10 +1,9 @@
 from ash_unofficial_covid19.config import Config
-from ash_unofficial_covid19.db import DB
 from ash_unofficial_covid19.errors import (
-    DatabaseError,
-    DataError,
+    DatabaseConnectionError,
     DataModelError,
-    HTTPDownloadError
+    HTTPDownloadError,
+    ServiceError
 )
 from ash_unofficial_covid19.logs import AppLog
 from ash_unofficial_covid19.models import (
@@ -50,14 +49,9 @@ def import_hokkaido_data(url: str) -> bool:
         patients_data.create(**row)
 
     try:
-        conn = DB()
-        service = HokkaidoPatientService(conn)
-        for patient in patients_data.items:
-            service.create(patient)
-        conn.commit()
-        conn.close()
-    except (DataError, DatabaseError, DataModelError) as e:
-        conn.close()
+        service = HokkaidoPatientService()
+        service.create(patients_data)
+    except (DatabaseConnectionError, ServiceError, DataModelError) as e:
         logger.warning(e.message)
         return False
 
@@ -91,14 +85,9 @@ def import_asahikawa_data(url: str, target_year: int) -> bool:
         patients_data.create(**row)
 
     try:
-        conn = DB()
-        service = AsahikawaPatientService(conn)
-        for patient in patients_data.items:
-            service.create(patient)
-        conn.commit()
-        conn.close()
-    except (DataError, DatabaseError, DataModelError) as e:
-        conn.close()
+        service = AsahikawaPatientService()
+        service.create(patients_data)
+    except (DatabaseConnectionError, ServiceError, DataModelError) as e:
         logger.warning(e.message)
         return False
 
@@ -117,14 +106,10 @@ def delete_duplicate_data() -> bool:
     """
     logger = AppLog()
     try:
-        conn = DB()
-        service = AsahikawaPatientService(conn)
+        service = AsahikawaPatientService()
         for duplicate_patient_number in service.get_duplicate_patient_numbers():
             service.delete(patient_number=duplicate_patient_number)
-        conn.commit()
-        conn.close()
-    except (DataError, DatabaseError) as e:
-        conn.close()
+    except (DatabaseConnectionError, ServiceError) as e:
         logger.warning(e.message)
         return False
 
@@ -157,14 +142,9 @@ def import_medical_institutions_data(url: str) -> bool:
         medical_institutions_data.create(**row)
 
     try:
-        conn = DB()
-        service = MedicalInstitutionService(conn)
-        for medical_institution in medical_institutions_data.items:
-            service.create(medical_institution)
-        conn.commit()
-        conn.close()
-    except (DataError, DatabaseError, DataModelError) as e:
-        conn.close()
+        service = MedicalInstitutionService()
+        service.create(medical_institutions_data)
+    except (DatabaseConnectionError, ServiceError, DataModelError) as e:
         logger.warning(e.message)
         return False
 

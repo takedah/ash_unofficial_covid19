@@ -1,8 +1,23 @@
+from abc import ABCMeta, abstractmethod
 from datetime import date
 from typing import Optional
 
 from ash_unofficial_covid19.errors import DataModelError
-from ash_unofficial_covid19.factory import Factory
+
+
+class Factory(metaclass=ABCMeta):
+    def create(self, **row):
+        item = self._create_item(**row)
+        self._register_item(item)
+        return item
+
+    @abstractmethod
+    def _create_item(self, **row):
+        pass
+
+    @abstractmethod
+    def _register_item(self, item):
+        pass
 
 
 class Patient:
@@ -475,11 +490,11 @@ class MedicalInstitution(Patient):
         return self.__phone_number
 
     @property
-    def book_at_medical_institution(self) -> str:
+    def book_at_medical_institution(self) -> bool:
         return self.__book_at_medical_institution
 
     @property
-    def book_at_call_center(self) -> str:
+    def book_at_call_center(self) -> bool:
         return self.__book_at_call_center
 
     @property

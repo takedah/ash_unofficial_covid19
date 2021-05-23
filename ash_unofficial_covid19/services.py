@@ -4,78 +4,138 @@ from typing import Optional
 import psycopg2
 from psycopg2.extras import DictCursor
 
-from ash_unofficial_covid19.db import DB
-from ash_unofficial_covid19.errors import DatabaseError, DataError
+from ash_unofficial_covid19.config import Config
+from ash_unofficial_covid19.errors import DatabaseConnectionError, ServiceError
 from ash_unofficial_covid19.logs import AppLog
 from ash_unofficial_covid19.models import (
-    AsahikawaPatient,
     AsahikawaPatientFactory,
-    HokkaidoPatient,
-    MedicalInstitution,
+    HokkaidoPatientFactory,
     MedicalInstitutionFactory
 )
 
 
-class PatientService:
-    """新型コロナウイルス感染症患者データを扱うサービスの基底クラス"""
+class Service:
+    """新型コロナウイルス関連データを扱うサービスクラス"""
 
-    def __init__(self, db: DB):
+    def __init__(self, table_name: str):
         """
         Args:
-            db (:obj:`DB`): データベース操作をラップしたオブジェクト
+            table_name (str): テーブル名
 
         """
-
-        self.__cursor = db.cursor()
+        self.__table_name = table_name
+        self.__dsn = Config.DATABASE_URL
         self.__logger = AppLog()
 
-    def execute(self, sql: str, parameters: tuple = None) -> bool:
-        """DictCursorオブジェクトのexecuteメソッドのラッパー
+    @property
+    def table_name(self):
+        return self.__table_name
 
-        Args:
-            sql (str): SQL文
-            parameters (tuple): SQLにプレースホルダを使用する場合の値を格納したリスト
+    def get_connection(self):
+        """データベース接続オブジェクトを返す
+
+        Returns:
+            conn (:obj:`psycopg2.connection`): psycopg2.connectionオブジェクト
 
         """
         try:
-            if parameters:
-                self.__cursor.execute(sql, parameters)
-            else:
-                self.__cursor.execute(sql)
-            return True
-        except (
-            psycopg2.DataError,
-            psycopg2.IntegrityError,
-            psycopg2.InternalError,
-        ) as e:
-            raise DataError(e.args[0])
+            conn = psycopg2.connect(self.__dsn)
+        except (psycopg2.DatabaseError, psycopg2.OperationalError) as e:
+            self.error_log("データベースに接続できませんでした。")
+            raise DatabaseConnectionError(e.args[0])
+        return conn
 
-    def fetchone(self) -> DictCursor:
-        """DictCursorオブジェクトのfetchoneメソッドのラッパー
+    def delete_all(self) -> None:
+        """テーブルのデータを全削除する。"""
+        state = "TRUNCATE TABLE " + self.table_name + " RESTART IDENTITY;"
+        with self.get_connection() as conn:
+            try:
+                with conn.cursor(cursor_factory=DictCursor) as cur:
+                    cur.execute(state)
+                conn.commit()
+                self.info_log(self.table_name + "テーブルを初期化しました。")
+            except (
+                psycopg2.DataError,
+                psycopg2.IntegrityError,
+                psycopg2.InternalError,
+            ) as e:
+                self.error_log(self.table_name + "テーブルを初期化できませんでした。")
+                raise ServiceError(e.args[0])
 
-        Returns:
-            results (:obj:`DictCursor`): 検索結果のイテレータ
+    def upsert(self, items: tuple, primary_key: str, data_lists: list) -> None:
+        """データベースのテーブルへデータをバルクインサートでUPSERT登録する。
 
-        """
-        return self.__cursor.fetchone()
-
-    def fetchall(self) -> list:
-        """DictCursorオブジェクトのfetchallメソッドのラッパー
-
-        Returns:
-            results (list of :obj:`DictCursor`): 検索結果のイテレータのリスト
-
-        """
-        return self.__cursor.fetchall()
-
-    def statusmessage(self) -> str:
-        """クエリ実行後のメッセージを返す
-
-        Returns:
-            status_message (str): クエリ実行後メッセージ
+        Args:
+            items (tuple): カラム名のタプル
+            primary_key (str): UPSERTを判断するキー名
+            data_lists (list of list): 登録データの二次元配列リスト
 
         """
-        return self.__cursor.statusmessage
+        column_names = ""
+        place_holders = ""
+        upsert = ""
+        for item in items:
+            column_names += "," + item
+            place_holders += ",%s"
+            upsert += "," + item + "=%s"
+
+        state = (
+            "INSERT INTO"
+            + " "
+            + self.table_name
+            + " "
+            + "("
+            + column_names[1:]
+            + ")"
+            + " "
+            + "VALUES ("
+            + place_holders[1:]
+            + ")"
+            + " "
+            + "ON CONFLICT("
+            + primary_key
+            + ")"
+            + " "
+            + "DO UPDATE SET"
+            + " "
+            + upsert[1:]
+        )
+
+        insert_lists = list()
+        for data in data_lists:
+            # UPSERT句用にリストを重複させる。
+            values = tuple(data + data)
+            insert_lists.append(values)
+
+        with self.get_connection() as conn:
+            try:
+                with conn.cursor(cursor_factory=DictCursor) as cur:
+                    cur.executemany(state, insert_lists)
+                conn.commit()
+            except (
+                psycopg2.DataError,
+                psycopg2.IntegrityError,
+                psycopg2.InternalError,
+            ) as e:
+                self.error_log(self.table_name + "テーブルへデータを登録できませんでした。")
+                raise ServiceError(e.args[0])
+
+    def get_last_updated(self) -> Optional[datetime]:
+        """テーブルの最終更新日を返す。
+
+        Returns:
+            last_updated (:obj:`datetime.datetime'): 対象テーブルのupdatedカラムで一番最新の値を返す。
+
+        """
+        state = "SELECT max(updated_at) FROM " + self.table_name + ";"
+        with self.get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(state)
+                result = cur.fetchone()
+        if result["max"] is None:
+            return None
+        else:
+            return result["max"]
 
     def info_log(self, message) -> None:
         """AppLogオブジェクトのinfoメソッドのラッパー。
@@ -95,37 +155,20 @@ class PatientService:
         self.__logger.error(message)
 
 
-class AsahikawaPatientService(PatientService):
+class AsahikawaPatientService(Service):
     """旭川市の公表する新型コロナウイルス感染症患者データを扱うサービス"""
 
-    def __init__(self, db: DB):
-        """
-        Args:
-            db (:obj:`DB`): データベース操作をラップしたオブジェクト
+    def __init__(self):
+        Service.__init__(self, "asahikawa_patients")
 
-        """
-
-        PatientService.__init__(self, db)
-        self.__table_name = "asahikawa_patients"
-
-    def truncate(self) -> None:
-        """患者テーブルのデータを全削除"""
-
-        state = "TRUNCATE TABLE " + self.__table_name + " RESTART IDENTITY;"
-        self.execute(state)
-        self.info_log(self.__table_name + "テーブルを初期化しました。")
-
-    def create(self, patient: AsahikawaPatient) -> bool:
-        """データベースへ新型コロナウイルス感染症患者データを保存
+    def create(self, patients: AsahikawaPatientFactory) -> None:
+        """データベースへ新型コロナウイルス感染症患者データを一括登録する
 
         Args:
-            patient (:obj:`AsahikawaPatient`): 患者データのオブジェクト
-
-        Returns:
-            bool: データの登録が成功したらTrueを返す
+            patients (:obj:`AsahikawaPatientFactory`): 患者データのオブジェクトのリストを要素に持つオブジェクト
 
         """
-        items = [
+        items = (
             "patient_number",
             "city_code",
             "prefecture",
@@ -145,66 +188,38 @@ class AsahikawaPatientService(PatientService):
             "surrounding_status",
             "close_contact",
             "updated_at",
-        ]
-
-        column_names = ""
-        place_holders = ""
-        upsert = ""
-        for item in items:
-            column_names += "," + item
-            place_holders += ",%s"
-            upsert += "," + item + "=%s"
-
-        state = (
-            "INSERT INTO"
-            + " "
-            + self.__table_name
-            + " "
-            + "("
-            + column_names[1:]
-            + ")"
-            + " "
-            + "VALUES ("
-            + place_holders[1:]
-            + ")"
-            + " "
-            + "ON CONFLICT(patient_number)"
-            + " "
-            + "DO UPDATE SET"
-            + " "
-            + upsert[1:]
         )
-
-        temp_values = [
-            patient.patient_number,
-            patient.city_code,
-            patient.prefecture,
-            patient.city_name,
-            patient.publication_date,
-            patient.onset_date,
-            patient.residence,
-            patient.age,
-            patient.sex,
-            patient.occupation,
-            patient.status,
-            patient.symptom,
-            patient.overseas_travel_history,
-            patient.be_discharged,
-            patient.note,
-            patient.hokkaido_patient_number,
-            patient.surrounding_status,
-            patient.close_contact,
-            datetime.now(timezone(timedelta(hours=+9))),
-        ]
-        # UPDATE句用にリストを重複させる。
-        values = tuple(temp_values + temp_values)
-
-        try:
-            self.execute(state, values)
-            return True
-        except (DatabaseError, DataError) as e:
-            self.error_log(e.message)
-            return False
+        # バルクインサートするデータのリストを作成
+        data_lists = list()
+        for patient in patients.items:
+            data_lists.append(
+                [
+                    patient.patient_number,
+                    patient.city_code,
+                    patient.prefecture,
+                    patient.city_name,
+                    patient.publication_date,
+                    patient.onset_date,
+                    patient.residence,
+                    patient.age,
+                    patient.sex,
+                    patient.occupation,
+                    patient.status,
+                    patient.symptom,
+                    patient.overseas_travel_history,
+                    patient.be_discharged,
+                    patient.note,
+                    patient.hokkaido_patient_number,
+                    patient.surrounding_status,
+                    patient.close_contact,
+                    datetime.now(timezone(timedelta(hours=+9))),
+                ]
+            )
+            self.upsert(
+                items=items,
+                primary_key="patient_number",
+                data_lists=data_lists,
+            )
 
     def delete(self, patient_number: int) -> bool:
         """指定した識別番号の陽性患者データを削除する
@@ -218,25 +233,30 @@ class AsahikawaPatientService(PatientService):
         """
         state = "DELETE from asahikawa_patients WHERE patient_number = %s;"
         values = (patient_number,)
-        try:
-            self.execute(state, values)
-            result = self.statusmessage()
-            if result == "DELETE 1":
-                return True
-            else:
-                return False
-        except (DatabaseError, DataError) as e:
-            self.error_log(e.message)
-            return False
+        result = False
+        with self.get_connection() as conn:
+            try:
+                with conn.cursor(cursor_factory=DictCursor) as cur:
+                    cur.execute(state, values)
+                    if cur.statusmessage == "DELETE 1":
+                        result = True
+                conn.commit()
+            except (
+                psycopg2.DataError,
+                psycopg2.IntegrityError,
+                psycopg2.InternalError,
+            ) as e:
+                self.error_log(e.args[0])
+        return result
 
-    def find(self) -> list:
-        """新型コロナウイルス感染症患者オブジェクトのリストを返す
+    def find_all(self) -> AsahikawaPatientFactory:
+        """新型コロナウイルス感染症患者の全件を返す
 
         Returns:
-            res (list of :obj:`AsahikawaPatient`): 新型コロナウイルス感染症患者オブジェクトのリスト
+            res (:obj:`AsahikawaPatientFactory`): 新型コロナウイルス感染症患者オブジェクトの全件リストを要素に持つリスト
 
         """
-        self.execute(
+        state = (
             "SELECT"
             + " "
             + "a.patient_number,a.city_code,a.prefecture,a.city_name,"
@@ -247,7 +267,7 @@ class AsahikawaPatientService(PatientService):
             + " "
             + "FROM"
             + " "
-            + self.__table_name
+            + self.table_name
             + " "
             + "AS a"
             + " "
@@ -255,44 +275,33 @@ class AsahikawaPatientService(PatientService):
             + " "
             + "ON a.hokkaido_patient_number = h.patient_number"
             + " "
-            + "ORDER BY a.patient_number ASC;",
+            + "ORDER BY a.patient_number ASC;"
         )
         factory = AsahikawaPatientFactory()
-        for row in self.fetchall():
-            factory.create(**row)
-        return factory.items
-
-    def get_last_updated(self) -> Optional[datetime]:
-        """テーブルの最終更新日を返す。
-
-        Returns:
-            last_updated (:obj:`datetime.datetime'): patientテーブルのupdatedカラムで一番最新の値を返す。
-        """
-        self.execute("SELECT max(updated_at) FROM " + self.__table_name + ";")
-        row = self.fetchone()
-        if row["max"] is None:
-            return None
-        else:
-            return row["max"]
+        with self.get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(state)
+                for row in cur.fetchall():
+                    factory.create(**row)
+        return factory
 
     def get_duplicate_patient_numbers(self) -> list:
         """
-        旭川市の公表した陽性患者情報の中に重複があるが、旭川市公式ホームページは
-        重複分も表示されたままなので、北海道の公表するオープンデータで重複削除と
-        されているデータに該当する識別番号をリストで返す。
+        旭川市の公表した陽性患者情報の中に重複があるが、旭川市公式ホームページは重複分も表示されたままなので、
+        北海道の公表するオープンデータで重複削除とされているデータに該当する識別番号をリストで返す。
 
         Returns:
             res (list): 重複削除とされているデータの識別番号
 
         """
-        self.execute(
+        state = (
             "SELECT"
             + " "
             + "a.patient_number"
             + " "
             + "FROM"
             + " "
-            + self.__table_name
+            + self.table_name
             + " "
             + "AS a"
             + " "
@@ -302,21 +311,24 @@ class AsahikawaPatientService(PatientService):
             + " "
             + "WHERE h.residence = '重複削除'"
             + " "
-            + "ORDER BY a.patient_number ASC;",
+            + "ORDER BY a.patient_number ASC;"
         )
         duplicate_patient_numbers = list()
-        for row in self.fetchall():
-            duplicate_patient_numbers.append(row["patient_number"])
+        with self.get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(state)
+                for row in cur.fetchall():
+                    duplicate_patient_numbers.append(row["patient_number"])
         return duplicate_patient_numbers
 
-    def get_patients_csv_rows(self) -> list:
+    def get_csv_rows(self) -> list:
         """陽性患者属性CSVファイルを出力するためのリストを返す
 
         Returns:
             patients_rows (list of list): 陽性患者属性CSVファイルの元となる二次元配列
 
         """
-        patients = self.find()
+        patients = self.find_all()
         rows = list()
         rows.append(
             [
@@ -337,7 +349,7 @@ class AsahikawaPatientService(PatientService):
                 "備考",
             ]
         )
-        for patient in patients:
+        for patient in patients.items:
             patient_number = str(patient.patient_number)
 
             if patient.publication_date is None:
@@ -392,8 +404,7 @@ class AsahikawaPatientService(PatientService):
             to_date (obj:`date`): 集計の終期
 
         Returns:
-            aggregate_by_weeks (list of tuple): 1週間ごとの日付とその週の
-                新規陽性患者数を要素とするタプル
+            aggregate_by_weeks (list of tuple): 1週間ごとの日付とその週の新規陽性患者数を要素とするタプル
 
         """
         state = (
@@ -410,11 +421,12 @@ class AsahikawaPatientService(PatientService):
             + "from_week <= asahikawa_patients.publication_date AND "
             + "asahikawa_patients.publication_date < to_week GROUP BY to_week;"
         )
-        self.execute(state)
         aggregate_by_weeks = list()
-        for row in self.fetchall():
-            aggregate_by_weeks.append((row[0], row[1]))
-
+        with self.get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(state)
+                for row in cur.fetchall():
+                    aggregate_by_weeks.append((row[0], row[1]))
         return aggregate_by_weeks
 
     def get_total_by_months(self, from_date: date, to_date: date) -> list:
@@ -425,8 +437,7 @@ class AsahikawaPatientService(PatientService):
             to_date (obj:`date`): 累計の終期
 
         Returns:
-            total_by_months (list of tuple): 1か月ごとの年月とその週までの
-                累計陽性患者数を要素とするタプル
+            total_by_months (list of tuple): 1か月ごとの年月とその週までの累計陽性患者数を要素とするタプル
 
         """
         state = (
@@ -448,45 +459,29 @@ class AsahikawaPatientService(PatientService):
             + "asahikawa_patients.publication_date < to_month GROUP BY from_month"
             + ") AS aggregate_patients;"
         )
-        self.execute(state)
         total_by_months = list()
-        for row in self.fetchall():
-            total_by_months.append((row[0], row[1]))
-
+        with self.get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(state)
+                for row in cur.fetchall():
+                    total_by_months.append((row[0], row[1]))
         return total_by_months
 
 
-class HokkaidoPatientService(PatientService):
+class HokkaidoPatientService(Service):
     """北海道の公表する新型コロナウイルス感染症患者データを扱うサービス"""
 
-    def __init__(self, db: DB):
-        """
-        Args:
-            db (:obj:`DB`): データベース操作をラップしたオブジェクト
+    def __init__(self):
+        Service.__init__(self, "hokkaido_patients")
 
-        """
-
-        PatientService.__init__(self, db)
-        self.__table_name = "hokkaido_patients"
-
-    def truncate(self) -> None:
-        """患者テーブルのデータを全削除"""
-
-        state = "TRUNCATE TABLE " + self.__table_name + " RESTART IDENTITY;"
-        self.execute(state)
-        self.info_log(self.__table_name + "テーブルを初期化しました。")
-
-    def create(self, patient: HokkaidoPatient) -> bool:
+    def create(self, patients: HokkaidoPatientFactory) -> None:
         """データベースへ新型コロナウイルス感染症患者データを保存
 
         Args:
-            patient (:obj:`HokkaidoPatient`): 患者データのオブジェクト
-
-        Returns:
-            bool: データの登録が成功したらTrueを返す
+            patient (:obj:`HokkaidoPatientFactory`): 患者データのオブジェクトのリストを要素に持つオブジェクト
 
         """
-        items = [
+        items = (
             "patient_number",
             "city_code",
             "prefecture",
@@ -503,162 +498,52 @@ class HokkaidoPatientService(PatientService):
             "be_discharged",
             "note",
             "updated_at",
-        ]
-
-        column_names = ""
-        place_holders = ""
-        upsert = ""
-        for item in items:
-            column_names += "," + item
-            place_holders += ",%s"
-            upsert += "," + item + "=%s"
-
-        state = (
-            "INSERT INTO"
-            + " "
-            + self.__table_name
-            + " "
-            + "("
-            + column_names[1:]
-            + ")"
-            + " "
-            + "VALUES ("
-            + place_holders[1:]
-            + ")"
-            + " "
-            + "ON CONFLICT(patient_number)"
-            + " "
-            + "DO UPDATE SET"
-            + " "
-            + upsert[1:]
         )
 
-        temp_values = [
-            patient.patient_number,
-            patient.city_code,
-            patient.prefecture,
-            patient.city_name,
-            patient.publication_date,
-            patient.onset_date,
-            patient.residence,
-            patient.age,
-            patient.sex,
-            patient.occupation,
-            patient.status,
-            patient.symptom,
-            patient.overseas_travel_history,
-            patient.be_discharged,
-            patient.note,
-            datetime.now(timezone(timedelta(hours=+9))),
-        ]
-        # UPDATE句用にリストを重複させる。
-        values = tuple(temp_values + temp_values)
+        data_lists = list()
+        for patient in patients.items:
+            data_lists.append(
+                [
+                    patient.patient_number,
+                    patient.city_code,
+                    patient.prefecture,
+                    patient.city_name,
+                    patient.publication_date,
+                    patient.onset_date,
+                    patient.residence,
+                    patient.age,
+                    patient.sex,
+                    patient.occupation,
+                    patient.status,
+                    patient.symptom,
+                    patient.overseas_travel_history,
+                    patient.be_discharged,
+                    patient.note,
+                    datetime.now(timezone(timedelta(hours=+9))),
+                ]
+            )
+        self.upsert(
+            items=items,
+            primary_key="patient_number",
+            data_lists=data_lists,
+        )
 
-        try:
-            self.execute(state, values)
-            return True
-        except (DatabaseError, DataError) as e:
-            self.error_log(e.message)
-            return False
 
+class MedicalInstitutionService(Service):
+    """旭川市新型コロナ接種医療機関データを扱うサービス"""
 
-class MedicalInstitutionService:
-    """旭川市新型コロナ接種医療機関データを扱うサービスの基底クラス"""
+    def __init__(self):
+        Service.__init__(self, "medical_institutions")
 
-    def __init__(self, db: DB):
-        """
-        Args:
-            db (:obj:`DB`): データベース操作をラップしたオブジェクト
-
-        """
-
-        self.__table_name = "medical_institutions"
-        self.__cursor = db.cursor()
-        self.__logger = AppLog()
-
-    def execute(self, sql: str, parameters: tuple = None) -> bool:
-        """DictCursorオブジェクトのexecuteメソッドのラッパー
-
-        Args:
-            sql (str): SQL文
-            parameters (tuple): SQLにプレースホルダを使用する場合の値を格納したリスト
-
-        """
-        try:
-            if parameters:
-                self.__cursor.execute(sql, parameters)
-            else:
-                self.__cursor.execute(sql)
-            return True
-        except (
-            psycopg2.DataError,
-            psycopg2.IntegrityError,
-            psycopg2.InternalError,
-        ) as e:
-            raise DataError(e.args[0])
-
-    def fetchone(self) -> DictCursor:
-        """DictCursorオブジェクトのfetchoneメソッドのラッパー
-
-        Returns:
-            results (:obj:`DictCursor`): 検索結果のイテレータ
-
-        """
-        return self.__cursor.fetchone()
-
-    def fetchall(self) -> list:
-        """DictCursorオブジェクトのfetchallメソッドのラッパー
-
-        Returns:
-            results (list of :obj:`DictCursor`): 検索結果のイテレータのリスト
-
-        """
-        return self.__cursor.fetchall()
-
-    def statusmessage(self) -> str:
-        """クエリ実行後のメッセージを返す
-
-        Returns:
-            status_message (str): クエリ実行後メッセージ
-
-        """
-        return self.__cursor.statusmessage
-
-    def info_log(self, message) -> None:
-        """AppLogオブジェクトのinfoメソッドのラッパー。
-
-        Args:
-            message (str): 通常のログメッセージ
-        """
-        self.__logger.info(message)
-
-    def error_log(self, message) -> None:
-        """AppLogオブジェクトのerrorメソッドのラッパー。
-
-        Args:
-            message (str): エラーログメッセージ
-
-        """
-        self.__logger.error(message)
-
-    def truncate(self) -> None:
-        """医療機関テーブルのデータを全削除"""
-
-        state = "TRUNCATE TABLE " + self.__table_name + " RESTART IDENTITY;"
-        self.execute(state)
-        self.info_log(self.__table_name + "テーブルを初期化しました。")
-
-    def create(self, medical_institution: MedicalInstitution) -> bool:
+    def create(self, medical_institutions: MedicalInstitutionFactory) -> None:
         """データベースへ新型コロナワクチン接種医療機関データを保存
 
         Args:
-            medical_institution (:obj:`MedicalInstitution`): 医療機関データのオブジェクト
-
-        Returns:
-            bool: データの登録が成功したらTrueを返す
+            medical_institutions (:obj:`MedicalInstitutionFactory`):
+                医療機関データのオブジェクトのリストを要素に持つオブジェクト
 
         """
-        items = [
+        items = (
             "name",
             "address",
             "phone_number",
@@ -666,63 +551,35 @@ class MedicalInstitutionService:
             "book_at_call_center",
             "area",
             "updated_at",
-        ]
-
-        column_names = ""
-        place_holders = ""
-        upsert = ""
-        for item in items:
-            column_names += "," + item
-            place_holders += ",%s"
-            upsert += "," + item + "=%s"
-
-        state = (
-            "INSERT INTO"
-            + " "
-            + self.__table_name
-            + " "
-            + "("
-            + column_names[1:]
-            + ")"
-            + " "
-            + "VALUES ("
-            + place_holders[1:]
-            + ")"
-            + " "
-            + "ON CONFLICT(name)"
-            + " "
-            + "DO UPDATE SET"
-            + " "
-            + upsert[1:]
         )
 
-        temp_values = [
-            medical_institution.name,
-            medical_institution.address,
-            medical_institution.phone_number,
-            medical_institution.book_at_medical_institution,
-            medical_institution.book_at_call_center,
-            medical_institution.area,
-            datetime.now(timezone(timedelta(hours=+9))),
-        ]
-        # UPDATE句用にリストを重複させる。
-        values = tuple(temp_values + temp_values)
+        data_lists = list()
+        for medical_institution in medical_institutions.items:
+            data_lists.append(
+                [
+                    medical_institution.name,
+                    medical_institution.address,
+                    medical_institution.phone_number,
+                    medical_institution.book_at_medical_institution,
+                    medical_institution.book_at_call_center,
+                    medical_institution.area,
+                    datetime.now(timezone(timedelta(hours=+9))),
+                ]
+            )
+        self.upsert(
+            items=items,
+            primary_key="name",
+            data_lists=data_lists,
+        )
 
-        try:
-            self.execute(state, values)
-            return True
-        except (DatabaseError, DataError) as e:
-            self.error_log(e.message)
-            return False
-
-    def find(self) -> list:
-        """新型コロナワクチン接種医療機関オブジェクトのリストを返す
+    def find_all(self) -> MedicalInstitutionFactory:
+        """新型コロナワクチン接種医療機関の全件リストを返す
 
         Returns:
-            res (list of :obj:`MedicalInstitution`): 新型コロナウイルス感染症患者オブジェクトのリスト
+            res (:obj:`MedicalInstitutionFactory`): 新型コロナウイルス感染症患者オブジェクトのリストを要素に持つオブジェクト
 
         """
-        self.execute(
+        state = (
             "SELECT"
             + " "
             + "name,address,phone_number,book_at_medical_institution,"
@@ -730,30 +587,18 @@ class MedicalInstitutionService:
             + " "
             + "FROM"
             + " "
-            + self.__table_name
+            + self.table_name
             + " "
             + "ORDER BY id"
-            + ";",
+            + ";"
         )
         factory = MedicalInstitutionFactory()
-        for row in self.fetchall():
-            factory.create(**row)
-        return factory.items
-
-    def get_last_updated(self) -> Optional[datetime]:
-        """テーブルの最終更新日を返す。
-
-        Returns:
-            last_updated (:obj:`datetime.datetime'): medical_institutionsテーブルの
-                updatedカラムで一番最新の値を返す。
-
-        """
-        self.execute("SELECT max(updated_at) FROM " + self.__table_name + ";")
-        row = self.fetchone()
-        if row["max"] is None:
-            return None
-        else:
-            return row["max"]
+        with self.get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(state)
+                for row in cur.fetchall():
+                    factory.create(**row)
+        return factory
 
     def get_csv_rows(self) -> list:
         """新型コロナワクチン接種医療機関一覧CSVファイルを出力するためのリストを返す
@@ -762,7 +607,7 @@ class MedicalInstitutionService:
             rows (list of list): CSVファイルの元となる二次元配列
 
         """
-        medical_institutions = self.find()
+        medical_institutions = self.find_all()
         rows = list()
         rows.append(
             [
@@ -774,7 +619,7 @@ class MedicalInstitutionService:
                 "コールセンターやインターネットで予約ができます",
             ]
         )
-        for medical_institution in medical_institutions:
+        for medical_institution in medical_institutions.items:
             if medical_institution.book_at_medical_institution is None:
                 book_at_medical_institution = ""
             else:

@@ -1,7 +1,6 @@
 import unittest
 from datetime import date
 
-from ash_unofficial_covid19.db import DB
 from ash_unofficial_covid19.models import (
     AsahikawaPatientFactory,
     HokkaidoPatientFactory,
@@ -13,233 +12,215 @@ from ash_unofficial_covid19.services import (
     MedicalInstitutionService
 )
 
-test_data = [
-    {
-        "patient_number": 1121,
-        "city_code": "012041",
-        "prefecture": "北海道",
-        "city_name": "旭川市",
-        "publication_date": date(2021, 2, 27),
-        "onset_date": None,
-        "residence": "旭川市",
-        "age": "30代",
-        "sex": "男性",
-        "occupation": "",
-        "status": "",
-        "symptom": "",
-        "overseas_travel_history": None,
-        "be_discharged": None,
-        "note": "北海道発表NO.: 1 周囲の患者の発生: "
-        + "No.1072 No.1094 No.1107 No.1108 濃厚接触者の状況: 0人",
-        "hokkaido_patient_number": 1,
-        "surrounding_status": "No.1072 No.1094 No.1107 No.1108",
-        "close_contact": "0人",
-    },
-    {
-        "patient_number": 1120,
-        "city_code": "012041",
-        "prefecture": "北海道",
-        "city_name": "旭川市",
-        "publication_date": date(2021, 2, 26),
-        "onset_date": None,
-        "residence": "旭川市",
-        "age": "50代",
-        "sex": "女性",
-        "occupation": "",
-        "status": "",
-        "symptom": "",
-        "overseas_travel_history": None,
-        "be_discharged": None,
-        "note": "北海道発表NO.: 2 周囲の患者の発生: 調査中 濃厚接触者の状況: 2人",
-        "hokkaido_patient_number": 2,
-        "surrounding_status": "調査中",
-        "close_contact": "2人",
-    },
-    {
-        "patient_number": 1119,
-        "city_code": "012041",
-        "prefecture": "北海道",
-        "city_name": "旭川市",
-        "publication_date": date(2021, 2, 25),
-        "onset_date": None,
-        "residence": "旭川市",
-        "age": "",
-        "sex": "",
-        "occupation": "",
-        "status": "",
-        "symptom": "",
-        "overseas_travel_history": None,
-        "be_discharged": None,
-        "note": "北海道発表NO.: 3 周囲の患者の発生: No.1092             " + "No.1093 濃厚接触者の状況: 1人",
-        "hokkaido_patient_number": 3,
-        "surrounding_status": "No.1092             No.1093",
-        "close_contact": "1人",
-    },
-    {
-        "patient_number": 1112,
-        "city_code": "012041",
-        "prefecture": "北海道",
-        "city_name": "旭川市",
-        "publication_date": date(2021, 2, 22),
-        "onset_date": None,
-        "residence": "旭川市",
-        "age": "10歳未満",
-        "sex": "女性",
-        "occupation": "",
-        "status": "",
-        "symptom": "",
-        "overseas_travel_history": None,
-        "be_discharged": None,
-        "note": "北海道発表NO.: 18891 周囲の患者の発生: No.1074 濃厚接触者の状況: 0人",
-        "hokkaido_patient_number": 18891,
-        "surrounding_status": "No.1074",
-        "close_contact": "0人",
-    },
-    {
-        "patient_number": 1032,
-        "city_code": "012041",
-        "prefecture": "北海道",
-        "city_name": "旭川市",
-        "publication_date": date(2021, 1, 31),
-        "onset_date": None,
-        "residence": "旭川市",
-        "age": "90歳以上",
-        "sex": "男性",
-        "occupation": "",
-        "status": "",
-        "symptom": "",
-        "overseas_travel_history": None,
-        "be_discharged": None,
-        "note": "北海道発表NO.: 17511 周囲の患者の発生: 調査中 濃厚接触者の状況: 8人",
-        "hokkaido_patient_number": 17511,
-        "surrounding_status": "調査中",
-        "close_contact": "8人",
-    },
-    {
-        "patient_number": 715,
-        "city_code": "012041",
-        "prefecture": "北海道",
-        "city_name": "旭川市",
-        "publication_date": date(2021, 12, 9),
-        "onset_date": None,
-        "residence": "旭川市",
-        "age": "90歳以上",
-        "sex": "女性",
-        "occupation": "",
-        "status": "",
-        "symptom": "",
-        "overseas_travel_history": None,
-        "be_discharged": None,
-        "note": "北海道発表NO.: 10716 周囲の患者の発生: あり 濃厚接触者の状況: 調査中",
-        "hokkaido_patient_number": 10716,
-        "surrounding_status": "あり",
-        "close_contact": "調査中",
-    },
-]
-test_hokkaido_data = [
-    {
-        "patient_number": 1,
-        "city_code": "10006",
-        "prefecture": "北海道",
-        "city_name": "",
-        "publication_date": date(2020, 1, 28),
-        "onset_date": date(2020, 1, 21),
-        "residence": "中国武漢市",
-        "age": "40代",
-        "sex": "女性",
-        "occupation": "－",
-        "status": "－",
-        "symptom": "発熱",
-        "overseas_travel_history": True,
-        "be_discharged": None,
-        "note": "海外渡航先：中国武漢",
-    },
-    {
-        "patient_number": 2,
-        "city_code": "10006",
-        "prefecture": "北海道",
-        "city_name": "",
-        "publication_date": date(2020, 2, 14),
-        "onset_date": date(2020, 1, 31),
-        "residence": "重複削除",
-        "age": "50代",
-        "sex": "男性",
-        "occupation": "自営業",
-        "status": "－",
-        "symptom": "発熱;咳;倦怠感",
-        "overseas_travel_history": False,
-        "be_discharged": None,
-        "note": "",
-    },
-    {
-        "patient_number": 3,
-        "city_code": "10006",
-        "prefecture": "北海道",
-        "city_name": "",
-        "publication_date": date(2020, 2, 19),
-        "onset_date": date(2020, 2, 8),
-        "residence": "石狩振興局管内",
-        "age": "40代",
-        "sex": "男性",
-        "occupation": "会社員",
-        "status": "－",
-        "symptom": "倦怠感;筋肉痛;関節痛;発熱;咳",
-        "overseas_travel_history": False,
-        "be_discharged": None,
-        "note": "",
-    },
-]
-test_medical_institution_data = [
-    {
-        "name": "市立旭川病院",
-        "address": "金星町1",
-        "phone_number": "0166-29-0202",
-        "book_at_medical_institution": True,
-        "book_at_call_center": False,
-        "area": "新富・東・金星町",
-    }
-]
-
 
 class TestAsahikawaPatientService(unittest.TestCase):
     @classmethod
-    def setUpClass(self):
+    def setUp(self):
+        test_data = [
+            {
+                "patient_number": 1121,
+                "city_code": "012041",
+                "prefecture": "北海道",
+                "city_name": "旭川市",
+                "publication_date": date(2021, 2, 27),
+                "onset_date": None,
+                "residence": "旭川市",
+                "age": "30代",
+                "sex": "男性",
+                "occupation": "",
+                "status": "",
+                "symptom": "",
+                "overseas_travel_history": None,
+                "be_discharged": None,
+                "note": "北海道発表NO.: 1 周囲の患者の発生: "
+                + "No.1072 No.1094 No.1107 No.1108 濃厚接触者の状況: 0人",
+                "hokkaido_patient_number": 1,
+                "surrounding_status": "No.1072 No.1094 No.1107 No.1108",
+                "close_contact": "0人",
+            },
+            {
+                "patient_number": 1120,
+                "city_code": "012041",
+                "prefecture": "北海道",
+                "city_name": "旭川市",
+                "publication_date": date(2021, 2, 26),
+                "onset_date": None,
+                "residence": "旭川市",
+                "age": "50代",
+                "sex": "女性",
+                "occupation": "",
+                "status": "",
+                "symptom": "",
+                "overseas_travel_history": None,
+                "be_discharged": None,
+                "note": "北海道発表NO.: 2 周囲の患者の発生: 調査中 濃厚接触者の状況: 2人",
+                "hokkaido_patient_number": 2,
+                "surrounding_status": "調査中",
+                "close_contact": "2人",
+            },
+            {
+                "patient_number": 1119,
+                "city_code": "012041",
+                "prefecture": "北海道",
+                "city_name": "旭川市",
+                "publication_date": date(2021, 2, 25),
+                "onset_date": None,
+                "residence": "旭川市",
+                "age": "",
+                "sex": "",
+                "occupation": "",
+                "status": "",
+                "symptom": "",
+                "overseas_travel_history": None,
+                "be_discharged": None,
+                "note": "北海道発表NO.: 3 周囲の患者の発生: No.1092             "
+                + "No.1093 濃厚接触者の状況: 1人",
+                "hokkaido_patient_number": 3,
+                "surrounding_status": "No.1092             No.1093",
+                "close_contact": "1人",
+            },
+            {
+                "patient_number": 1112,
+                "city_code": "012041",
+                "prefecture": "北海道",
+                "city_name": "旭川市",
+                "publication_date": date(2021, 2, 22),
+                "onset_date": None,
+                "residence": "旭川市",
+                "age": "10歳未満",
+                "sex": "女性",
+                "occupation": "",
+                "status": "",
+                "symptom": "",
+                "overseas_travel_history": None,
+                "be_discharged": None,
+                "note": "北海道発表NO.: 18891 周囲の患者の発生: No.1074 濃厚接触者の状況: 0人",
+                "hokkaido_patient_number": 18891,
+                "surrounding_status": "No.1074",
+                "close_contact": "0人",
+            },
+            {
+                "patient_number": 1032,
+                "city_code": "012041",
+                "prefecture": "北海道",
+                "city_name": "旭川市",
+                "publication_date": date(2021, 1, 31),
+                "onset_date": None,
+                "residence": "旭川市",
+                "age": "90歳以上",
+                "sex": "男性",
+                "occupation": "",
+                "status": "",
+                "symptom": "",
+                "overseas_travel_history": None,
+                "be_discharged": None,
+                "note": "北海道発表NO.: 17511 周囲の患者の発生: 調査中 濃厚接触者の状況: 8人",
+                "hokkaido_patient_number": 17511,
+                "surrounding_status": "調査中",
+                "close_contact": "8人",
+            },
+            {
+                "patient_number": 715,
+                "city_code": "012041",
+                "prefecture": "北海道",
+                "city_name": "旭川市",
+                "publication_date": date(2021, 12, 9),
+                "onset_date": None,
+                "residence": "旭川市",
+                "age": "90歳以上",
+                "sex": "女性",
+                "occupation": "",
+                "status": "",
+                "symptom": "",
+                "overseas_travel_history": None,
+                "be_discharged": None,
+                "note": "北海道発表NO.: 10716 周囲の患者の発生: あり 濃厚接触者の状況: 調査中",
+                "hokkaido_patient_number": 10716,
+                "surrounding_status": "あり",
+                "close_contact": "調査中",
+            },
+        ]
         self.factory = AsahikawaPatientFactory()
         for row in test_data:
             self.factory.create(**row)
-        self.db = DB()
-        self.service = AsahikawaPatientService(self.db)
+        self.service = AsahikawaPatientService()
+        self.service.delete_all()
+        self.service.create(self.factory)
 
-    @classmethod
-    def tearDownClass(self):
-        self.db.close()
-
-    def setUp(self):
-        self.service.truncate()
-        for item in self.factory.items:
-            self.service.create(item)
-        self.db.commit()
-
-    def teaDown(self):
-        pass
-
-    def test_create(self):
-        for item in self.factory.items:
-            self.assertTrue(self.service.create(item))
+        # 北海道の新型コロナウイルス感染症患者データのセットアップ
+        test_hokkaido_data = [
+            {
+                "patient_number": 1,
+                "city_code": "10006",
+                "prefecture": "北海道",
+                "city_name": "",
+                "publication_date": date(2020, 1, 28),
+                "onset_date": date(2020, 1, 21),
+                "residence": "中国武漢市",
+                "age": "40代",
+                "sex": "女性",
+                "occupation": "－",
+                "status": "－",
+                "symptom": "発熱",
+                "overseas_travel_history": True,
+                "be_discharged": None,
+                "note": "海外渡航先：中国武漢",
+            },
+            {
+                "patient_number": 2,
+                "city_code": "10006",
+                "prefecture": "北海道",
+                "city_name": "",
+                "publication_date": date(2020, 2, 14),
+                "onset_date": date(2020, 1, 31),
+                "residence": "重複削除",
+                "age": "50代",
+                "sex": "男性",
+                "occupation": "自営業",
+                "status": "－",
+                "symptom": "発熱;咳;倦怠感",
+                "overseas_travel_history": False,
+                "be_discharged": None,
+                "note": "",
+            },
+            {
+                "patient_number": 3,
+                "city_code": "10006",
+                "prefecture": "北海道",
+                "city_name": "",
+                "publication_date": date(2020, 2, 19),
+                "onset_date": date(2020, 2, 8),
+                "residence": "石狩振興局管内",
+                "age": "40代",
+                "sex": "男性",
+                "occupation": "会社員",
+                "status": "－",
+                "symptom": "倦怠感;筋肉痛;関節痛;発熱;咳",
+                "overseas_travel_history": False,
+                "be_discharged": None,
+                "note": "",
+            },
+        ]
+        self.hokkaido_factory = HokkaidoPatientFactory()
+        for row in test_hokkaido_data:
+            self.hokkaido_factory.create(**row)
+        self.hokkaido_service = HokkaidoPatientService()
+        self.hokkaido_service.delete_all()
+        self.hokkaido_service.create(self.hokkaido_factory)
 
     def test_delete(self):
         self.assertTrue(self.service.delete(patient_number=1121))
 
-    def test_find(self):
-        results = self.service.find()
-        patient = results[0]
+    def test_find_all(self):
+        results = self.service.find_all()
+        patient = results.items[0]
         self.assertEqual(patient.patient_number, 715)
         self.assertEqual(patient.publication_date, date(2021, 12, 9))
         self.assertEqual(patient.age, "90歳以上")
         self.assertEqual(patient.sex, "女性")
 
-    def test_get_patients_csv_rows(self):
-        results = self.service.get_patients_csv_rows()
+    def test_get_csv_rows(self):
+        results = self.service.get_csv_rows()
         expect = [
             [
                 "No",
@@ -373,20 +354,20 @@ class TestAsahikawaPatientService(unittest.TestCase):
             ],
         )
 
-    def test_get_aggregate_by_weeks(self):
-        from_date = date(2021, 1, 25)
-        to_date = date(2021, 2, 28)
-        result = self.service.get_aggregate_by_weeks(
-            from_date=from_date, to_date=to_date
-        )
-        expect = [
-            ("02-01", 1),
-            ("02-08", 0),
-            ("02-15", 0),
-            ("02-22", 0),
-            ("03-01", 4),
-        ]
-        self.assertEqual(result, expect)
+        def test_get_aggregate_by_weeks(self):
+            from_date = date(2021, 1, 25)
+            to_date = date(2021, 2, 28)
+            result = self.service.get_aggregate_by_weeks(
+                from_date=from_date, to_date=to_date
+            )
+            expect = [
+                ("02-01", 1),
+                ("02-08", 0),
+                ("02-15", 0),
+                ("02-22", 0),
+                ("03-01", 4),
+            ]
+            self.assertEqual(result, expect)
 
     def test_get_total_by_months(self):
         from_date = date(2021, 1, 1)
@@ -399,55 +380,29 @@ class TestAsahikawaPatientService(unittest.TestCase):
         self.assertEqual(result, expect)
 
 
-class TestHokkaidoPatientService(unittest.TestCase):
-    @classmethod
-    def setUpClass(self):
-        self.factory = HokkaidoPatientFactory()
-        for row in test_hokkaido_data:
-            self.factory.create(**row)
-        self.db = DB()
-        self.service = HokkaidoPatientService(self.db)
-
-    @classmethod
-    def tearDownClass(self):
-        self.db.close()
-
-    def test_create(self):
-        self.service.truncate()
-        for item in self.factory.items:
-            self.assertTrue(self.service.create(item))
-        self.db.commit()
-
-
 class TestMedicalInstitutionService(unittest.TestCase):
     @classmethod
-    def setUpClass(self):
-        self.factory = MedicalInstitutionFactory()
-        for row in test_medical_institution_data:
-            self.factory.create(**row)
-        self.db = DB()
-        self.service = MedicalInstitutionService(self.db)
-
-    @classmethod
-    def tearDownClass(self):
-        self.db.close()
-
     def setUp(self):
-        self.service.truncate()
-        for item in self.factory.items:
-            self.service.create(item)
-        self.db.commit()
+        test_data = [
+            {
+                "name": "市立旭川病院",
+                "address": "金星町1",
+                "phone_number": "0166-29-0202",
+                "book_at_medical_institution": True,
+                "book_at_call_center": False,
+                "area": "新富・東・金星町",
+            }
+        ]
+        self.factory = MedicalInstitutionFactory()
+        for row in test_data:
+            self.factory.create(**row)
+        self.service = MedicalInstitutionService()
+        self.service.delete_all()
+        self.service.create(self.factory)
 
-    def teaDown(self):
-        pass
-
-    def test_create(self):
-        for item in self.factory.items:
-            self.assertTrue(self.service.create(item))
-
-    def test_find(self):
-        results = self.service.find()
-        medical_institution = results[0]
+    def test_find_all(self):
+        results = self.service.find_all()
+        medical_institution = results.items[0]
         self.assertEqual(medical_institution.name, "市立旭川病院")
         self.assertEqual(medical_institution.book_at_medical_institution, True)
         self.assertEqual(medical_institution.book_at_call_center, False)

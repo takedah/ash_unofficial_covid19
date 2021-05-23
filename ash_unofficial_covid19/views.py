@@ -12,7 +12,6 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.font_manager import FontProperties
 from matplotlib.ticker import MultipleLocator
 
-from ash_unofficial_covid19.db import DB
 from ash_unofficial_covid19.services import (
     AsahikawaPatientService,
     MedicalInstitutionService
@@ -54,22 +53,6 @@ def dated_url_for(endpoint, **values):
     return url_for(endpoint, **values)
 
 
-def connect_db():
-    return DB()
-
-
-def get_db():
-    if not hasattr(g, "postgres_db"):
-        g.postgres_db = connect_db()
-    return g.postgres_db
-
-
-@app.teardown_appcontext
-def close_db(error):
-    if hasattr(g, "postgres_db"):
-        g.postgres_db.close()
-
-
 def get_today():
     return datetime.now(timezone(timedelta(hours=+9), "JST")).date()
 
@@ -78,7 +61,7 @@ def get_week_data():
     # 週次新規陽性患者数データをグラフ描画処理でも使うためグローバル変数に格納しておく
     if not hasattr(g, "week_data"):
         today = get_today()
-        patient_service = AsahikawaPatientService(get_db())
+        patient_service = AsahikawaPatientService()
         g.week_data = patient_service.get_aggregate_by_weeks(
             from_date=today - relativedelta(months=3, days=1), to_date=today
         )
@@ -89,7 +72,7 @@ def get_month_total_data():
     # 月次累計陽性患者数データをグラフ描画処理でも使うためグローバル変数に格納しておく
     if not hasattr(g, "month_total_data"):
         today = get_today()
-        patient_service = AsahikawaPatientService(get_db())
+        patient_service = AsahikawaPatientService()
         g.month_total_data = patient_service.get_total_by_months(
             from_date=date(2020, 1, 1), to_date=today
         )
@@ -98,7 +81,7 @@ def get_month_total_data():
 
 @app.route("/medical_institutions")
 def medical_institutions():
-    medical_institution_service = MedicalInstitutionService(get_db())
+    medical_institution_service = MedicalInstitutionService()
     medical_institutions_rows = medical_institution_service.get_csv_rows()
     medical_institutions_rows.pop(0)
     title = "旭川市新型コロナワクチン接種医療機関一覧"
@@ -113,7 +96,7 @@ def medical_institutions():
 
 @app.route("/")
 def index():
-    patient_service = AsahikawaPatientService(get_db())
+    patient_service = AsahikawaPatientService()
     today = get_today()
 
     week_data = get_week_data()
@@ -162,8 +145,8 @@ def index():
 
 @app.route("/012041_asahikawa_covid19_patients.csv")
 def patients_csv():
-    patient_service = AsahikawaPatientService(get_db())
-    patients_rows = patient_service.get_patients_csv_rows()
+    patient_service = AsahikawaPatientService()
+    patients_rows = patient_service.get_csv_rows()
     f = io.StringIO()
     writer = csv.writer(f, quoting=csv.QUOTE_ALL, lineterminator="\n")
     writer.writerows(patients_rows)
@@ -178,7 +161,7 @@ def patients_csv():
 
 @app.route("/012041_asahikawa_covid19_medical_institutions.csv")
 def medical_institutions_csv():
-    medical_institution_service = MedicalInstitutionService(get_db())
+    medical_institution_service = MedicalInstitutionService()
     medical_institutions_rows = medical_institution_service.get_csv_rows()
     f = io.StringIO()
     writer = csv.writer(f, quoting=csv.QUOTE_ALL, lineterminator="\n")

@@ -1,9 +1,4 @@
-from ash_unofficial_covid19.db import DB
-from ash_unofficial_covid19.errors import (
-    DatabaseError,
-    DataError,
-    DataModelError
-)
+from ash_unofficial_covid19.errors import DatabaseConnectionError, ServiceError
 from ash_unofficial_covid19.logs import AppLog
 from ash_unofficial_covid19.services import (
     AsahikawaPatientService,
@@ -21,13 +16,9 @@ def truncate_hokkaido_table() -> bool:
     """
     logger = AppLog()
     try:
-        conn = DB()
-        service = HokkaidoPatientService(conn)
-        service.truncate()
-        conn.commit()
-        conn.close()
-    except (DataError, DatabaseError, DataModelError) as e:
-        conn.close()
+        service = HokkaidoPatientService()
+        service.delete_all()
+    except (DatabaseConnectionError, ServiceError) as e:
         logger.warning(e.message)
         return False
 
@@ -43,13 +34,9 @@ def truncate_asahikawa_table() -> bool:
     """
     logger = AppLog()
     try:
-        conn = DB()
-        service = AsahikawaPatientService(conn)
-        service.truncate()
-        conn.commit()
-        conn.close()
-    except (DataError, DatabaseError, DataModelError) as e:
-        conn.close()
+        service = AsahikawaPatientService()
+        service.delete_all()
+    except (DatabaseConnectionError, ServiceError) as e:
         logger.warning(e.message)
         return False
 
@@ -65,13 +52,9 @@ def truncate_medical_institutions_table() -> bool:
     """
     logger = AppLog()
     try:
-        conn = DB()
-        service = MedicalInstitutionService(conn)
-        service.truncate()
-        conn.commit()
-        conn.close()
-    except (DataError, DatabaseError, DataModelError) as e:
-        conn.close()
+        service = MedicalInstitutionService()
+        service.delete_all()
+    except (DatabaseConnectionError, ServiceError) as e:
         logger.warning(e.message)
         return False
 

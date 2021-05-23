@@ -14,7 +14,7 @@ class Error(Exception):
         return self.__message
 
 
-class DatabaseError(Error):
+class DatabaseConnectionError(Error):
     """データベース接続に関するエラー
 
     Attributes:
@@ -26,7 +26,7 @@ class DatabaseError(Error):
         Error.__init__(self, message)
 
 
-class DataError(Error):
+class ServiceError(Error):
     """SQL実行に関するエラー
 
     Attributes:
