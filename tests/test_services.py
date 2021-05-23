@@ -354,28 +354,60 @@ class TestAsahikawaPatientService(unittest.TestCase):
             ],
         )
 
-        def test_get_aggregate_by_weeks(self):
-            from_date = date(2021, 1, 25)
-            to_date = date(2021, 2, 28)
-            result = self.service.get_aggregate_by_weeks(
-                from_date=from_date, to_date=to_date
-            )
-            expect = [
-                ("02-01", 1),
-                ("02-08", 0),
-                ("02-15", 0),
-                ("02-22", 0),
-                ("03-01", 4),
-            ]
-            self.assertEqual(result, expect)
+    def test_get_aggregate_by_days(self):
+        from_date = date(2021, 2, 22)
+        to_date = date(2021, 2, 28)
+        result = self.service.get_aggregate_by_days(
+            from_date=from_date, to_date=to_date
+        )
+        expect = [
+            (date(2021, 2, 22), 1),
+            (date(2021, 2, 23), 0),
+            (date(2021, 2, 24), 0),
+            (date(2021, 2, 25), 1),
+            (date(2021, 2, 26), 1),
+            (date(2021, 2, 27), 1),
+            (date(2021, 2, 28), 0),
+        ]
+        self.assertEqual(result, expect)
+
+    def test_get_aggregate_by_weeks(self):
+        from_date = date(2021, 1, 25)
+        to_date = date(2021, 2, 28)
+        result = self.service.get_aggregate_by_weeks(
+            from_date=from_date, to_date=to_date
+        )
+        expect = [
+            (date(2021, 1, 25), 1),
+            (date(2021, 2, 1), 0),
+            (date(2021, 2, 8), 0),
+            (date(2021, 2, 15), 0),
+            (date(2021, 2, 22), 4),
+        ]
+        self.assertEqual(result, expect)
+
+    def test_get_seven_days_moving_average(self):
+        from_date = date(2021, 1, 25)
+        to_date = date(2021, 2, 28)
+        result = self.service.get_seven_days_moving_average(
+            from_date=from_date, to_date=to_date
+        )
+        expect = [
+            (date(2021, 1, 25), 0.14),
+            (date(2021, 2, 1), 0),
+            (date(2021, 2, 8), 0),
+            (date(2021, 2, 15), 0),
+            (date(2021, 2, 22), 0.57),
+        ]
+        self.assertEqual(result, expect)
 
     def test_get_total_by_months(self):
         from_date = date(2021, 1, 1)
         to_date = date(2021, 2, 28)
         result = self.service.get_total_by_months(from_date=from_date, to_date=to_date)
         expect = [
-            ("2021-01", 1),
-            ("2021-02", 5),
+            (date(2021, 1, 1), 1),
+            (date(2021, 2, 1), 5),
         ]
         self.assertEqual(result, expect)
 

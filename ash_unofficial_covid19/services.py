@@ -1,4 +1,5 @@
 from datetime import date, datetime, timedelta, timezone
+from decimal import ROUND_HALF_UP, Decimal
 from typing import Optional
 
 import psycopg2
@@ -396,6 +397,39 @@ class AsahikawaPatientService(Service):
             )
         return rows
 
+    def get_aggregate_by_days(self, from_date: date, to_date: date) -> list:
+        """指定した期間の1日ごとの陽性患者数の集計結果を返す
+
+        Args:
+            from_date (obj:`date`): 集計の始期
+            to_date (obj:`date`): 集計の終期
+
+        Returns:
+            aggregate_by_days (list of tuple): 1日ごとの日付とその週の新規陽性患者数を要素とするタプル
+
+        """
+        state = (
+            "SELECT date(from_day) AS days, "
+            + "COUNT(DISTINCT patient_number) AS patients FROM "
+            + "(SELECT generate_series AS from_day, "
+            + "generate_series + '1 day'::interval AS to_day FROM "
+            + "generate_series('"
+            + from_date.strftime("%Y-%m-%d")
+            + "'::DATE, '"
+            + to_date.strftime("%Y-%m-%d")
+            + "'::DATE, '1 day')) "
+            + "AS day_ranges LEFT JOIN asahikawa_patients ON "
+            + "from_day <= asahikawa_patients.publication_date AND "
+            + "asahikawa_patients.publication_date < to_day GROUP BY from_day;"
+        )
+        aggregate_by_days = list()
+        with self.get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(state)
+                for row in cur.fetchall():
+                    aggregate_by_days.append((row[0], row[1]))
+        return aggregate_by_days
+
     def get_aggregate_by_weeks(self, from_date: date, to_date: date) -> list:
         """指定した期間の1週間ごとの陽性患者数の集計結果を返す
 
@@ -404,11 +438,11 @@ class AsahikawaPatientService(Service):
             to_date (obj:`date`): 集計の終期
 
         Returns:
-            aggregate_by_weeks (list of tuple): 1週間ごとの日付とその週の新規陽性患者数を要素とするタプル
+            aggregate_by_weeks (list of tuple): 1週間ごとの日付とその週の新規陽性患者数を要素とするタプルのリスト
 
         """
         state = (
-            "SELECT to_char(to_week, 'MM-DD') AS weeks, "
+            "SELECT date(from_week) AS weeks, "
             + "COUNT(DISTINCT patient_number) AS patients FROM "
             + "(SELECT generate_series AS from_week, "
             + "generate_series + '7 days'::interval AS to_week FROM "
@@ -419,7 +453,7 @@ class AsahikawaPatientService(Service):
             + "'::DATE, '7 days')) "
             + "AS week_ranges LEFT JOIN asahikawa_patients ON "
             + "from_week <= asahikawa_patients.publication_date AND "
-            + "asahikawa_patients.publication_date < to_week GROUP BY to_week;"
+            + "asahikawa_patients.publication_date < to_week GROUP BY from_week;"
         )
         aggregate_by_weeks = list()
         with self.get_connection() as conn:
@@ -428,6 +462,29 @@ class AsahikawaPatientService(Service):
                 for row in cur.fetchall():
                     aggregate_by_weeks.append((row[0], row[1]))
         return aggregate_by_weeks
+
+    def get_seven_days_moving_average(self, from_date: date, to_date: date) -> list:
+        """1日あたりの新規陽性患者数の7日間移動平均の計算結果を返す
+
+        Args:
+            from_date (obj:`date`): 集計の始期
+            to_date (obj:`date`): 集計の終期
+
+        Returns:
+            seven_days_moving_average (list of tuple): 1週間ごとの日付とその週の新規陽性患者数を要素とするタプルのリスト
+        """
+        aggregate_by_weeks = self.get_aggregate_by_weeks(
+            from_date=from_date, to_date=to_date
+        )
+        seven_days_moving_average = list()
+        for patients_number in aggregate_by_weeks:
+            moving_average = float(
+                Decimal(str(patients_number[1] / 7)).quantize(
+                    Decimal("0.01"), rounding=ROUND_HALF_UP
+                )
+            )
+            seven_days_moving_average.append((patients_number[0], moving_average))
+        return seven_days_moving_average
 
     def get_total_by_months(self, from_date: date, to_date: date) -> list:
         """指定した期間の1か月ごとの陽性患者数の累計結果を返す
@@ -441,7 +498,7 @@ class AsahikawaPatientService(Service):
 
         """
         state = (
-            "SELECT to_char(aggregate_patients.from_month, 'YYYY-MM'), "
+            "SELECT date(aggregate_patients.from_month), "
             + "SUM(aggregate_patients.patients) OVER("
             + "ORDER BY aggregate_patients.from_month) AS total_patients FROM "
             + "("
