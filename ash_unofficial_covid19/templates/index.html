@@ -36,8 +36,8 @@
                 </div>
                 <div class="card-body">
                     <p><img src="./day_per_patients.png" alt="{{ page_data["day_graph_alt"] }}" title="新規陽性患者数（日別）の推移" class="img-fluid"></p>
-                    <p class="text-right mb-0">{{ today }}の新規患者数（{{ last_updated }} 現在） <strong class="display-4">{{ page_data["today_patients_number"] }}</strong>人</p>
-                    <p class="text-right text-secondary">（昨日 {{ page_data["increase_of_last_day"] }}人）</p>
+                    <p class="text-right mb-0">{{ yesterday }} の新規患者数 <strong class="display-4">{{ page_data["yesterday_patients_number"] }}</strong>人</p>
+                    <p class="text-right text-secondary">（前々日 {{ page_data["increase_of_day_before_yesterday"] }}人）</p>
                 </div>
             </div>
             <div class="card">
@@ -47,7 +47,7 @@
                 <div class="card-body">
                     <p><img src="./month_total_patients.png" alt="{{ page_data["month_total_graph_alt"] }}" title="累計陽性患者数（月別）の推移" class="img-fluid"></p>
                     <p></p>
-                    <p class="text-right mb-0">累計患者数 <strong class="display-4">{{ page_data["total_patients_number"] }}</strong>人</p>
+                    <p class="text-right mb-0">昨日までの累計患者数 <strong class="display-4">{{ page_data["total_patients_number"] }}</strong>人</p>
                     <p class="text-right text-secondary">（先月 {{ page_data["increase_of_total"] }}人）</p>
                 </div>
             </div>
@@ -59,7 +59,7 @@
                 </div>
                 <div class="card-body">
                     <p><img src="./week_per_patients.png" alt="{{ page_data["week_graph_alt"] }}" title="新規陽性患者数（週別）の推移" class="img-fluid"></p>
-                    <p class="text-right mb-0">直近1週間の新規患者数（{{ last_updated }} 現在） <strong class="display-4">{{ page_data["this_week_patients_number"] }}</strong>人</p>
+                    <p class="text-right mb-0">直近1週間の新規患者数 <strong class="display-4">{{ page_data["this_week_patients_number"] }}</strong>人</p>
                     <p class="text-right text-secondary">（先週 {{ page_data["increase_of_last_week"] }}人）</p>
                 </div>
             </div>
@@ -70,7 +70,7 @@
                 <div class="card-body">
                     <p><img src="./seven_days_moving_average.png" alt="{{ page_data["moving_average_graph_alt"] }}" title="1日あたり新規患者数の7日間移動平均の推移" class="img-fluid"></p>
                     <p></p>
-                    <p class="text-right mb-0">新規患者数の直近7日間移動平均 <strong class="display-4">{{ page_data["this_seven_days_average"] }}</strong>人</p>
+                    <p class="text-right mb-0">1日あたり新規患者数の直近7日間移動平均 <strong class="display-4">{{ page_data["this_seven_days_average"] }}</strong>人</p>
                     <p class="text-right text-secondary">（先週 {{ page_data["increase_of_average"] }}人）</p>
                 </div>
             </div>

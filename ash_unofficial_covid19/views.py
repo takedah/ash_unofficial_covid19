@@ -2,6 +2,7 @@ import csv
 import io
 import os
 from datetime import date, datetime, timedelta, timezone
+from decimal import ROUND_HALF_UP, Decimal
 from io import BytesIO
 
 from dateutil.relativedelta import relativedelta
@@ -53,17 +54,19 @@ def dated_url_for(endpoint, **values):
     return url_for(endpoint, **values)
 
 
-def get_today():
-    return datetime.now(timezone(timedelta(hours=+9), "JST")).date()
+def get_yesterday():
+    return datetime.now(timezone(timedelta(hours=+9), "JST")).date() - relativedelta(
+        days=1
+    )
 
 
 def get_day_data():
     # 日次新規陽性患者数データをグラフ描画処理でも使うためグローバル変数に格納しておく
     if not hasattr(g, "day_data"):
-        today = get_today()
+        yesterday = get_yesterday()
         patient_service = AsahikawaPatientService()
         g.day_data = patient_service.get_aggregate_by_days(
-            from_date=today - relativedelta(years=1), to_date=today
+            from_date=yesterday - relativedelta(years=1), to_date=yesterday
         )
     return g.day_data
 
@@ -71,10 +74,10 @@ def get_day_data():
 def get_week_data():
     # 週次新規陽性患者数データをグラフ描画処理でも使うためグローバル変数に格納しておく
     if not hasattr(g, "week_data"):
-        today = get_today()
+        yesterday = get_yesterday()
         patient_service = AsahikawaPatientService()
         g.week_data = patient_service.get_aggregate_by_weeks(
-            from_date=today - relativedelta(months=3, days=1), to_date=today
+            from_date=yesterday - relativedelta(months=3, days=1), to_date=yesterday
         )
     return g.week_data
 
@@ -82,10 +85,10 @@ def get_week_data():
 def get_moving_average_data():
     # 7日間移動平均データをグラフ描画処理でも使うためグローバル変数に格納しておく
     if not hasattr(g, "moving_average_data"):
-        today = get_today()
+        yesterday = get_yesterday()
         patient_service = AsahikawaPatientService()
         g.moving_average_data = patient_service.get_seven_days_moving_average(
-            from_date=today - relativedelta(months=3, days=1), to_date=today
+            from_date=yesterday - relativedelta(months=3, days=1), to_date=yesterday
         )
     return g.moving_average_data
 
@@ -93,10 +96,10 @@ def get_moving_average_data():
 def get_month_total_data():
     # 月次累計陽性患者数データをグラフ描画処理でも使うためグローバル変数に格納しておく
     if not hasattr(g, "month_total_data"):
-        today = get_today()
+        yesterday = get_yesterday()
         patient_service = AsahikawaPatientService()
         g.month_total_data = patient_service.get_total_by_months(
-            from_date=date(2020, 1, 1), to_date=today
+            from_date=date(2020, 1, 1), to_date=yesterday
         )
     return g.month_total_data
 
@@ -119,7 +122,7 @@ def medical_institutions():
 @app.route("/")
 def index():
     patient_service = AsahikawaPatientService()
-    today = get_today()
+    yesterday = get_yesterday()
     page_data = dict()
 
     # 日次集計
@@ -127,12 +130,18 @@ def index():
     page_data["day_graph_alt"] = ", ".join(
         ["{0}={1}".format(row[0].strftime("%m月%d日"), row[1]) for row in day_data]
     )
-    today_patients_number = day_data[-1][1]
-    last_day_patients_number = day_data[-2][1]
-    increase_of_last_day = today_patients_number - last_day_patients_number
-    page_data["today_patients_number"] = "{:,}".format(today_patients_number)
-    page_data["last_day_patients_number"] = "{:,}".format(last_day_patients_number)
-    page_data["increase_of_last_day"] = "{:+,}".format(increase_of_last_day)
+    yesterday_patients_number = day_data[-1][1]
+    day_before_yesterday_patients_number = day_data[-2][1]
+    increase_of_day_before_yesterday = (
+        yesterday_patients_number - day_before_yesterday_patients_number
+    )
+    page_data["yesterday_patients_number"] = "{:,}".format(yesterday_patients_number)
+    page_data["day_before_yesterday_patients_number"] = "{:,}".format(
+        day_before_yesterday_patients_number
+    )
+    page_data["increase_of_day_before_yesterday"] = "{:+,}".format(
+        increase_of_day_before_yesterday
+    )
 
     # 週次集計
     week_data = get_week_data()
@@ -153,7 +162,11 @@ def index():
     )
     this_seven_days_average = moving_average_data[-1][1]
     last_seven_days_average = moving_average_data[-2][1]
-    increase_of_average = this_seven_days_average - last_seven_days_average
+    increase_of_average = float(
+        Decimal(str(this_seven_days_average - last_seven_days_average)).quantize(
+            Decimal("0.01"), rounding=ROUND_HALF_UP
+        )
+    )
     page_data["this_seven_days_average"] = "{:,}".format(this_seven_days_average)
     page_data["last_seven_days_average"] = "{:,}".format(last_seven_days_average)
     page_data["increase_of_average"] = "{:+,}".format(increase_of_average)
@@ -181,7 +194,7 @@ def index():
         "index.html",
         title=title,
         last_updated=last_updated.strftime("%Y/%m/%d %H:%M"),
-        today=today.strftime("%m月%d日"),
+        yesterday=yesterday.strftime("%Y/%m/%d (%a)"),
         page_data=page_data,
     )
 
