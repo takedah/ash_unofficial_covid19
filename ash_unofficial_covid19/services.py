@@ -494,7 +494,7 @@ class AsahikawaPatientService(Service):
             to_date (obj:`date`): 累計の終期
 
         Returns:
-            total_by_months (list of tuple): 1か月ごとの年月とその週までの累計陽性患者数を要素とするタプル
+            total_by_months (list of tuple): 1か月ごとの年月とその週までの累計陽性患者数を要素とするタプルのリスト
 
         """
         state = (
@@ -523,6 +523,28 @@ class AsahikawaPatientService(Service):
                 for row in cur.fetchall():
                     total_by_months.append((row[0], row[1]))
         return total_by_months
+
+    def get_patients_number_by_age(self) -> list:
+        """年代別の陽性患者数を返す
+
+        Returns:
+            patients_number_by_age (list of tuple): 年代別の陽性患者数を要素とするタプルのリスト
+
+        """
+        state = (
+            "SELECT age,COUNT(age) FROM asahikawa_patients GROUP BY age ORDER BY age;"
+        )
+        patients_number_by_age = list()
+        with self.get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(state)
+                for row in cur.fetchall():
+                    if row[0] == "":
+                        label = "非公表"
+                    else:
+                        label = row[0]
+                    patients_number_by_age.append((label, row[1]))
+        return patients_number_by_age
 
 
 class HokkaidoPatientService(Service):

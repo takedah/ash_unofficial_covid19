@@ -71,17 +71,6 @@ def get_day_data():
     return g.day_data
 
 
-def get_week_data():
-    # 週次新規陽性患者数データをグラフ描画処理でも使うためグローバル変数に格納しておく
-    if not hasattr(g, "week_data"):
-        yesterday = get_yesterday()
-        patient_service = AsahikawaPatientService()
-        g.week_data = patient_service.get_aggregate_by_weeks(
-            from_date=yesterday - relativedelta(months=3, days=1), to_date=yesterday
-        )
-    return g.week_data
-
-
 def get_moving_average_data():
     # 7日間移動平均データをグラフ描画処理でも使うためグローバル変数に格納しておく
     if not hasattr(g, "moving_average_data"):
@@ -102,6 +91,14 @@ def get_month_total_data():
             from_date=date(2020, 1, 1), to_date=yesterday
         )
     return g.month_total_data
+
+
+def get_by_age_data():
+    # 年代別患者数データをグラフ描画処理でも使うためグローバル変数に格納しておく
+    if not hasattr(g, "by_age_data"):
+        patient_service = AsahikawaPatientService()
+        g.by_age_data = patient_service.get_patients_number_by_age()
+    return g.by_age_data
 
 
 @app.route("/medical_institutions")
@@ -143,22 +140,13 @@ def index():
         increase_of_day_before_yesterday
     )
 
-    # 週次集計
-    week_data = get_week_data()
-    page_data["week_graph_alt"] = ", ".join(
-        ["{0}={1}".format(row[0].strftime("%m月%d日"), row[1]) for row in week_data]
-    )
-    this_week_patients_number = week_data[-1][1]
-    last_week_patients_number = week_data[-2][1]
-    increase_of_last_week = this_week_patients_number - last_week_patients_number
-    page_data["this_week_patients_number"] = "{:,}".format(this_week_patients_number)
-    page_data["last_week_patients_number"] = "{:,}".format(last_week_patients_number)
-    page_data["increase_of_last_week"] = "{:+,}".format(increase_of_last_week)
-
     # 7日間移動平均集計
     moving_average_data = get_moving_average_data()
     page_data["moving_average_graph_alt"] = ", ".join(
-        ["{0}={1}".format(row[0].strftime("%m月%d日"), row[1]) for row in week_data]
+        [
+            "{0}={1}".format(row[0].strftime("%m月%d日"), row[1])
+            for row in moving_average_data
+        ]
     )
     this_seven_days_average = moving_average_data[-1][1]
     last_seven_days_average = moving_average_data[-2][1]
@@ -187,6 +175,12 @@ def index():
         last_month_total_patients_number
     )
     page_data["increase_of_total"] = "{:+,}".format(increase_of_total)
+
+    # 年代別集計
+    by_age_data = get_by_age_data()
+    page_data["by_age_graph_alt"] = ", ".join(
+        ["{0}={1}".format(row[0], row[1]) for row in by_age_data]
+    )
 
     title = "旭川市新型コロナウイルス感染症非公式オープンデータ"
     last_updated = patient_service.get_last_updated()
@@ -301,40 +295,6 @@ def get_moving_average_graph():
     return res
 
 
-@app.route("/week_per_patients.png")
-def get_week_graph():
-    week_data = get_week_data()
-    font = FontProperties(
-        fname="./ash_unofficial_covid19/static/fonts/NotoSansCJKjp-Light.otf", size=12
-    )
-    fig = plt.figure()
-    ax = fig.add_subplot()
-    week_x = [row[0].strftime("%m-%d") + "~" for row in week_data]
-    week_y = [row[1] for row in week_data]
-    ax.bar(week_x, week_y, color="salmon")
-    ax.yaxis.set_major_locator(MultipleLocator(5))
-    ax.grid(axis="y", color="lightgray")
-    ax.set_title("旭川市新規陽性患者数の推移（週次）", font_properties=font)
-    ax.set_ylabel("新規陽性患者数（人）", font_properties=font)
-    ax.tick_params(labelsize=8)
-    ax.tick_params(axis="x", rotation=45)
-    fig.tight_layout()
-    canvas = FigureCanvasAgg(fig)
-    im = BytesIO()
-    canvas.print_png(im)
-    plt.cla()
-    plt.clf()
-    plt.close()
-    graph_image = im.getvalue()
-    res = make_response()
-    res.data = graph_image
-    res.headers["Content-Type"] = "img/png"
-    res.headers["Content-Disposition"] = (
-        "attachment: filename=" + "week_per_patients.png"
-    )
-    return res
-
-
 @app.route("/month_total_patients.png")
 def get_month_total_graph():
     month_total_data = get_month_total_data()
@@ -367,6 +327,55 @@ def get_month_total_graph():
     res.headers["Content-Type"] = "img/png"
     res.headers["Content-Disposition"] = (
         "attachment: filename=" + "month_total_patients.png"
+    )
+    return res
+
+
+@app.route("/patients_number_by_age.png")
+def get_by_age_graph():
+    by_age_data = get_by_age_data()
+    font = FontProperties(
+        fname="./ash_unofficial_covid19/static/fonts/NotoSansCJKjp-Light.otf", size=12
+    )
+    fig = plt.figure()
+    ax = fig.add_subplot()
+    by_age_label = [row[0] for row in by_age_data]
+    by_age_x = [row[1] for row in by_age_data]
+    pie_colors = [
+        "floralwhite",
+        "orange",
+        "oldlace",
+        "wheat",
+        "moccasin",
+        "papayawhip",
+        "blanchedalmond",
+        "navajowhite",
+        "tan",
+        "antiquewhite",
+        "burlywood",
+    ]
+    ax.pie(
+        by_age_x,
+        labels=by_age_label,
+        autopct="%1.1f %%",
+        startangle=90,
+        radius=1.3,
+        colors=pie_colors,
+        textprops={"font_properties": font},
+    )
+    # ax.set_title("旭川市年代別陽性患者数の割合", font_properties=font)
+    canvas = FigureCanvasAgg(fig)
+    im = BytesIO()
+    canvas.print_png(im)
+    plt.cla()
+    plt.clf()
+    plt.close()
+    graph_image = im.getvalue()
+    res = make_response()
+    res.data = graph_image
+    res.headers["Content-Type"] = "img/png"
+    res.headers["Content-Disposition"] = (
+        "attachment: filename=" + "patients_number_by_age.png"
     )
     return res
 
