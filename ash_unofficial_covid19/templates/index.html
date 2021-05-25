@@ -1,141 +1,61 @@
 {% extends 'layout.html' %}
 {% block content %}
 <article>
-    <div class="jumbotron jumbotron-fruid text-white bg-dark">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-8">
-                    <h1 class="h4 border-bottom border-light pb-2">旭川市新型コロナウイルス感染症非公式オープンデータ</h1>
-                    <p class="lead">旭川市公式ホームページから新型コロナウイルス感染症の市内発生状況のデータから、<a href="https://www.code4japan.org/" title="Code for Japan" class="text-white-50">Code for Japan</a>の陽性患者属性データセットに基づいたCSV形式のテキストファイルを作成し、非公式のオープンデータとしてダウンロードできるようにしました。</p>
-                </div>
-                <div class="col-md-4">
-                    <p><a href="/012041_asahikawa_covid19_patients.csv" tabindex="1" accesskey="g" title="旭川市新型コロナ陽性患者属性CSVをダウンロード" class="btn btn-lg btn-info">陽性患者属性CSVをダウンロード</a></p>
-                </div>
+    <h1 class="h4">旭川市新型コロナウイルス感染症の最新動向</h1>
+    <p class="text-secondary">（{{ last_updated }} 現在）</p>
+    <div class="card-group">
+        <div class="card">
+            <div class="card-header">
+                新規陽性患者数（日別）
+            </div>
+            <div class="card-body">
+                <p><img src="./day_per_patients.png" alt="{{ page_data["day_graph_alt"] }}" title="新規陽性患者数（日別）の推移" class="img-fluid"></p>
+                <p class="card-text text-right mb-0">{{ yesterday }} の新規患者数 <strong class="display-4">{{ page_data["yesterday_patients_number"] }}</strong>人</p>
+                <p class="card-text text-right">（前日 {{ page_data["increase_of_day_before_yesterday"] }}人）</p>
+            </div>
+            <div class="card-footer text-muted bg-white">
+                <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a> 最終更新: {{ last_updated }}</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                累計陽性患者数（月別）
+            </div>
+            <div class="card-body">
+                <p><img src="./month_total_patients.png" alt="{{ page_data["month_total_graph_alt"] }}" title="累計陽性患者数（月別）の推移" class="img-fluid"></p>
+                <p class="card-text text-right mb-0">昨日までの累計患者数 <strong class="display-4">{{ page_data["total_patients_number"] }}</strong>人</p>
+                <p class="card-text text-right">（先月 {{ page_data["increase_of_total"] }}人）</p>
+            </div>
+            <div class="card-footer text-muted bg-white">
+                <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a> 最終更新: {{ last_updated }}</p>
             </div>
         </div>
     </div>
-    <div class="container">
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <p class="mb-0">{{ last_updated }}にダウンロードしたデータを元に表示しています。正確な情報は必ず<a class="alert-link" href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ">旭川市公式ホームページ</a>を確認してください。</p>
-            <button type="button" tabindex="2" accesskey="x" class="close" data-dismiss="alert" aria-label="close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-          <p class="mb-0">試験的に<a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/146/149/d072466.html" title="旭川市公式ホームページ" class="alert-link">旭川市公式ホームページ</a>に掲載されている新型コロナワクチン接種医療機関一覧PDFファイルからデータを抽出し、<a href="/medical_institutions" title="旭川市新型コロナワクチン接種医療機関一覧へ" class="alert-link">HTMLページで表示</a>、<a href="/012041_asahikawa_covid19_medical_institutions.csv" title="旭川市新型コロナワクチン接種医療機関一覧CSVファイルをダウンロード" class="alert-link">CSVファイルをダウンロード</a>できるようにしてみました。</p>
-            <button type="button" tabindex="2" accesskey="c" class="close" data-dismiss="alert" aria-label="close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    </div>
-    <div class="container">
-        <div class="card-group">
-            <div class="card">
-                <div class="card-header">
-                    新規陽性患者数（日別）
-                </div>
-                <div class="card-body">
-                    <p><img src="./day_per_patients.png" alt="{{ page_data["day_graph_alt"] }}" title="新規陽性患者数（日別）の推移" class="img-fluid"></p>
-                    <p class="text-right mb-0">{{ yesterday }} の新規患者数 <strong class="display-4">{{ page_data["yesterday_patients_number"] }}</strong>人</p>
-                    <p class="text-right text-secondary">（前々日 {{ page_data["increase_of_day_before_yesterday"] }}人）</p>
-                </div>
+    <div class="card-group">
+        <div class="card">
+            <div class="card-header">
+                年代別陽性患者数の割合
             </div>
-            <div class="card">
-                <div class="card-header">
-                    累計陽性患者数（月別）
-                </div>
-                <div class="card-body">
-                    <p><img src="./month_total_patients.png" alt="{{ page_data["month_total_graph_alt"] }}" title="累計陽性患者数（月別）の推移" class="img-fluid"></p>
-                    <p class="text-right mb-0">昨日までの累計患者数 <strong class="display-4">{{ page_data["total_patients_number"] }}</strong>人</p>
-                    <p class="text-right text-secondary">（先月 {{ page_data["increase_of_total"] }}人）</p>
-                </div>
-            </div>
-        </div>
-        <div class="card-group">
-            <div class="card">
-                <div class="card-header">
-                    年代別陽性患者数の割合
-                </div>
-                <div class="card-body">
-                    <p><img src="./patients_number_by_age.png" alt="{{ page_data["by_age_graph_alt"] }}" title="年代別陽性患者数の割合" class="img-fluid"></p>
-                    <p class="text-right mb-0">{{ last_updated }} 現在</p>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-header">
-                    1日あたり新規患者数の7日間移動平均
-                </div>
-                <div class="card-body">
-                    <p><img src="./seven_days_moving_average.png" alt="{{ page_data["moving_average_graph_alt"] }}" title="1日あたり新規患者数の7日間移動平均の推移" class="img-fluid"></p>
-                    <p class="text-right mb-0">1日あたり新規患者数の直近7日間移動平均 <strong class="display-4">{{ page_data["this_seven_days_average"] }}</strong>人</p>
-                    <p class="text-right text-secondary">（先週 {{ page_data["increase_of_average"] }}人）</p>
-                </div>
-            </div>
-        </div>
-        <div class="card mt-3">
             <div class="card-body">
-                <section>
-                    <h2 class="h5 card-title">このサイトについて</h2>
-                    <p class="card-text">北海道全体の新型コロナウイルス感染症の情報については、<a href="https://stopcovid19.hokkaido.dev/" title="北海道新型コロナウイルスまとめサイト">北海道新型コロナウイルスまとめサイト</a>や<a href="https://www.harp.lg.jp/opendata/" title="北海道オープンデータポータル">北海道オープンデータポータル</a>でCSV形式のテキストファイルやJSON形式のWeb APIといった再利用しやすい形式で取得できますが、旭川市単独のデータは<a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ">旭川市公式ホームページ</a>に掲載はあるものの、再利用しやすい形式とはなっていないのが現状です。</p>
-                    <p class="card-text">そこで、旭川市公式ホームページからスクレイピングして新型コロナウイルス感染症の情報を取得し、<a href="https://www.code4japan.org/activity/stopcovid19#doc" title="新型コロナウイルス感染症対策のためのデータ公開支援 - Code for Japan">新型コロナウイルス感染症対策に関するオープンデータ項目定義書</a>のうち、陽性患者属性データセットに基づいたCSV形式のテキストファイルを、非公式のオープンデータとしてダウンロードできるようにしたものです。</p>
-                    <p class="card-text">ただし、以下のデータ項目は旭川市公式ホームページからスクレイピングで取得することが困難だったため、北海道オープンデータポータルの陽性患者属性CSVから値を逆輸入？して取得しています。</p>
-                </section>
-                <section class="m-3">
-                    <table class="table table-striped table-bordered table-hover">
-                        <tbody>
-                            <tr>
-                                <th>No.6</th>
-                                <td>発症_年月日</td>
-                            </tr>
-                            <tr>
-                                <th>No.10</th>
-                                <td>患者_職業</td>
-                            </tr>
-                            <tr>
-                                <th>No.11</th>
-                                <td>患者_状態</td>
-                            </tr>
-                            <tr>
-                                <th>No.12</th>
-                                <td>患者_症状</td>
-                            </tr>
-                            <tr>
-                                <th>No.13</th>
-                                <td>患者_渡航歴の有無フラグ</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </section>
+                <p><img src="./patients_number_by_age.png" alt="{{ page_data["by_age_graph_alt"] }}" title="年代別陽性患者数の割合" class="img-fluid"></p>
+            </div>
+            <div class="card-footer text-muted bg-white">
+                <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a> 最終更新: {{ last_updated }}</p>
             </div>
         </div>
-        <div class="card mt-3">
-            <div class="card-body">
-                <section>
-                    <h2 class="h5 card-title">データのライセンス</h2>
-                    <p class="card-text"><a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="クリエイティブ・コモンズ・ライセンス" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />この サイトのデータ は <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ 表示 4.0 国際 ライセンス</a>の下に提供されています。</p>
-                </section>
+        <div class="card">
+            <div class="card-header">
+                1日あたり新規患者数の7日間移動平均
             </div>
-        </div>
-        <div class="card mt-3">
             <div class="card-body">
-                <section>
-                    <h2 class="h5 card-title">免責事項</h2>
-                    <p class="card-text">当サイトは個人が開発・運用しているものであり、旭川市とは一切関係ありません。内容の正確性も保証できませんので、利用の際はご注意ください。また、当サイトの開発・運用者は、利用者がこのサイトのデータを用いて行う一切の行為について責任を負うものではありません。</p>
-                    <p class="card-text">当サイトについてのお問い合わせは<a href="https://twitter.com/takeda30">Twitter</a>までお願いします。</p>
-                </section>
+                <p><img src="./seven_days_moving_average.png" alt="{{ page_data["moving_average_graph_alt"] }}" title="1日あたり新規患者数の7日間移動平均の推移" class="img-fluid"></p>
+                <p class="card-text text-right mb-0">1日あたり新規患者数の直近7日間移動平均 <strong class="display-4">{{ page_data["this_seven_days_average"] }}</strong>人</p>
+                <p class="card-text text-right">（先週 {{ page_data["increase_of_average"] }}人）</p>
             </div>
-        </div>
-        <div class="card mt-3">
-            <div class="card-body">
-                <section>
-                    <h3 class="h5 card-title">陽性患者属性CSVファイルのURL</h3>
-                    <div class="input-group">
-                        <input id="csv-url" type="text" class="form-control" value="https://ash-unofficial-covid19.herokuapp.com/012041_asahikawa_covid19_patients.csv">
-                    </div>
-                </section>
+            <div class="card-footer text-muted bg-white">
+                <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a> 最終更新: {{ last_updated }}</p>
             </div>
         </div>
     </div>
 </article>
-<script charset="utf-8" src="{{ url_for('static', filename='js/select_input.js') }}"></script>
 {% endblock %}

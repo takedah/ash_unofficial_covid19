@@ -101,21 +101,6 @@ def get_by_age_data():
     return g.by_age_data
 
 
-@app.route("/medical_institutions")
-def medical_institutions():
-    medical_institution_service = MedicalInstitutionService()
-    medical_institutions_rows = medical_institution_service.get_csv_rows()
-    medical_institutions_rows.pop(0)
-    title = "旭川市新型コロナワクチン接種医療機関一覧"
-    last_updated = medical_institution_service.get_last_updated()
-    return render_template(
-        "medical_institutions.html",
-        title=title,
-        last_updated=last_updated.strftime("%Y/%m/%d %H:%M"),
-        medical_institutions=medical_institutions_rows,
-    )
-
-
 @app.route("/")
 def index():
     patient_service = AsahikawaPatientService()
@@ -182,7 +167,7 @@ def index():
         ["{0}={1}".format(row[0], row[1]) for row in by_age_data]
     )
 
-    title = "旭川市新型コロナウイルス感染症非公式オープンデータ"
+    title = "旭川市新型コロナウイルスまとめサイト"
     last_updated = patient_service.get_last_updated()
     return render_template(
         "index.html",
@@ -190,6 +175,42 @@ def index():
         last_updated=last_updated.strftime("%Y/%m/%d %H:%M"),
         yesterday=yesterday.strftime("%Y/%m/%d (%a)"),
         page_data=page_data,
+    )
+
+
+@app.route("/about")
+def about():
+    title = "旭川市新型コロナウイルスまとめサイトについて"
+    return render_template(
+        "about.html",
+        title=title,
+    )
+
+
+@app.route("/opendata")
+def opendata():
+    patient_service = AsahikawaPatientService()
+    last_updated = patient_service.get_last_updated()
+    title = "旭川市新型コロナウイルス非公式オープンデータ（陽性者属性CSV）"
+    return render_template(
+        "opendata.html",
+        title=title,
+        last_updated=last_updated.strftime("%Y/%m/%d %H:%M"),
+    )
+
+
+@app.route("/medical_institutions")
+def medical_institutions():
+    medical_institution_service = MedicalInstitutionService()
+    medical_institutions_rows = medical_institution_service.get_csv_rows()
+    medical_institutions_rows.pop(0)
+    title = "旭川市新型コロナワクチン接種医療機関一覧"
+    last_updated = medical_institution_service.get_last_updated()
+    return render_template(
+        "medical_institutions.html",
+        title=title,
+        last_updated=last_updated.strftime("%Y/%m/%d %H:%M"),
+        medical_institutions=medical_institutions_rows,
     )
 
 
