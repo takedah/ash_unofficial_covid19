@@ -539,11 +539,10 @@ class AsahikawaPatientService(Service):
             with conn.cursor(cursor_factory=DictCursor) as cur:
                 cur.execute(state)
                 for row in cur.fetchall():
+                    # 年代非公表のデータは除外する
                     if row[0] == "":
-                        label = "非公表"
-                    else:
-                        label = row[0]
-                    patients_number_by_age.append((label, row[1]))
+                        continue
+                    patients_number_by_age.append((row[0], row[1]))
         return patients_number_by_age
 
 

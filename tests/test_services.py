@@ -414,7 +414,6 @@ class TestAsahikawaPatientService(unittest.TestCase):
     def test_get_patients_number_by_age(self):
         result = self.service.get_patients_number_by_age()
         expect = [
-            ("非公表", 1),
             ("10歳未満", 1),
             ("30代", 1),
             ("50代", 1),

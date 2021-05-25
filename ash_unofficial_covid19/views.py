@@ -363,7 +363,6 @@ def get_by_age_graph():
     by_age_label = [row[0] for row in by_age_data]
     by_age_x = [row[1] for row in by_age_data]
     pie_colors = [
-        "floralwhite",
         "orange",
         "oldlace",
         "wheat",
@@ -381,10 +380,12 @@ def get_by_age_graph():
         autopct="%1.1f %%",
         startangle=90,
         radius=1.3,
+        labeldistance=1.1,
+        pctdistance=0.7,
         colors=pie_colors,
         textprops={"font_properties": font},
     )
-    # ax.set_title("旭川市年代別陽性患者数の割合", font_properties=font)
+    fig.tight_layout()
     canvas = FigureCanvasAgg(fig)
     im = BytesIO()
     canvas.print_png(im)
