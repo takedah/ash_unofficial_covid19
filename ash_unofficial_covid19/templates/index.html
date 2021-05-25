@@ -1,8 +1,7 @@
 {% extends 'layout.html' %}
 {% block content %}
 <article>
-    <h1 class="h4 pt-3">旭川市新型コロナウイルス感染症の最新動向</h1>
-    <p class="text-secondary">（{{ last_updated }} 現在）</p>
+    <h1 class="h4 pt-3">旭川市内の新型コロナウイルス感染症の最新動向<strong class="small">（ {{ last_updated }} 現在）</strong></h1>
     <div class="card-group m-3">
         <div class="card">
             <div class="card-header">
@@ -49,7 +48,7 @@
             </div>
             <div class="card-body">
                 <p><img src="./seven_days_moving_average.png" alt="{{ page_data["moving_average_graph_alt"] }}" title="1日あたり新規患者数の7日間移動平均の推移" class="img-fluid"></p>
-                <p class="card-text text-right mb-0">1日あたり新規患者数の直近7日間移動平均 <strong class="display-4">{{ page_data["this_seven_days_average"] }}</strong>人</p>
+                <p class="card-text text-right mb-0">1日あたり新規患者数の7日間移動平均 <strong class="display-4">{{ page_data["this_seven_days_average"] }}</strong>人</p>
                 <p class="card-text text-right">（先週 {{ page_data["increase_of_average"] }}人）</p>
             </div>
             <div class="card-footer text-muted bg-white">
