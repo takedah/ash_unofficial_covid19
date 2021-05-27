@@ -1,42 +1,40 @@
 {% extends 'layout.html' %}
 {% block content %}
 <article>
-    <h1 class="h4 pt-3">旭川市新型コロナウイルス非公式オープンデータ（陽性患者属性CSV）</h1>
-    <section>
-        <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
-            <p class="mb-0">{{ last_updated }}にダウンロードしたデータを元に表示しています。正確な情報は必ず<a class="alert-link" href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ">旭川市公式ホームページ</a>を確認してください。</p>
-            <button type="button" class="close" data-dismiss="alert" aria-label="close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    </section>
-    <section>
-        <div class="card mt-3">
-            <div class="card-body">
+    <h1 class="h4 py-3">旭川市新型コロナウイルス非公式オープンデータ（陽性患者属性CSV）</h1>
+    <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+        <p class="mb-0">{{ last_updated }}にダウンロードしたデータを元に表示しています。正確な情報は必ず<a class="alert-link" href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ">旭川市公式ホームページ</a>を確認してください。</p>
+        <button type="button" class="close" data-dismiss="alert" aria-label="close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="card mt-3">
+        <div class="card-body">
+            <section>
                 <h2 class="h5 card-title">陽性患者属性CSVをダウンロード</h2>
                 <p>旭川市公式ホームページから新型コロナウイルス感染症の市内発生状況のデータから、<a href="https://www.code4japan.org/" title="Code for Japan">Code for Japan</a>の陽性患者属性データセットに基づいたCSV形式のテキストファイルを作成し、非公式のオープンデータとしてダウンロードできるようにしました。</p>
                 <p><a href="/012041_asahikawa_covid19_patients.csv" title="旭川市新型コロナ陽性患者属性CSVをダウンロード" class="btn btn-primary">陽性患者属性CSVをダウンロード</a></p>
-            </div>
+            </section>
         </div>
-    </section>
-    <section>
-        <div class="card mt-3">
-            <div class="card-body">
+    </div>
+    <div class="card mt-3">
+        <div class="card-body">
+            <section>
                 <h2 class="h5 card-title">陽性患者属性CSVファイルのURL</h2>
                 <div class="input-group">
                     <input id="csv-url" type="text" class="form-control" value="https://ash-unofficial-covid19.herokuapp.com/012041_asahikawa_covid19_patients.csv">
                 </div>
-            </div>
+            </section>
         </div>
-    </section>
-    <section>
-        <div class="card mt-3">
-            <div class="card-body">
+    </div>
+    <div class="card mt-3">
+        <div class="card-body">
+            <section>
                 <h2 class="h5 card-title">データのライセンス</h2>
                 <p class="card-text"><a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="クリエイティブ・コモンズ・ライセンス" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />この サイトのデータ は <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ 表示 4.0 国際 ライセンス</a>の下に提供されています。</p>
-            </div>
+            </section>
         </div>
-    </section>
+    </div>
 </article>
 <script charset="utf-8" src="{{ url_for('static', filename='js/select_input.js') }}"></script>
 {% endblock %}
