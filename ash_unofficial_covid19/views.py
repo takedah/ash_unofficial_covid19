@@ -77,7 +77,7 @@ def get_moving_average_data():
         yesterday = get_yesterday()
         patient_service = AsahikawaPatientService()
         g.moving_average_data = patient_service.get_seven_days_moving_average(
-            from_date=yesterday - relativedelta(months=3, days=1), to_date=yesterday
+            from_date=yesterday - relativedelta(days=90), to_date=yesterday
         )
     return g.moving_average_data
 
@@ -110,7 +110,10 @@ def index():
     # 日次集計
     day_data = get_day_data()
     page_data["day_graph_alt"] = ", ".join(
-        ["{0}={1}".format(row[0].strftime("%m月%d日"), row[1]) for row in day_data]
+        [
+            "{0} {1}人".format(row[0].strftime("%Y年%m月%d日"), row[1])
+            for row in day_data[-14:]
+        ]
     )
     yesterday_patients_number = day_data[-1][1]
     day_before_yesterday_patients_number = day_data[-2][1]
@@ -129,7 +132,7 @@ def index():
     moving_average_data = get_moving_average_data()
     page_data["moving_average_graph_alt"] = ", ".join(
         [
-            "{0}={1}".format(row[0].strftime("%m月%d日"), row[1])
+            "{0} {1}人".format(row[0].strftime("%Y年%m月%d日"), row[1])
             for row in moving_average_data
         ]
     )
@@ -148,7 +151,7 @@ def index():
     month_total_data = get_month_total_data()
     page_data["month_total_graph_alt"] = ", ".join(
         [
-            "{0}={1}".format(row[0].strftime("%Y年%m月"), row[1])
+            "{0} {1}人".format(row[0].strftime("%Y年%m月"), row[1])
             for row in month_total_data
         ]
     )
@@ -164,10 +167,10 @@ def index():
     # 年代別集計
     by_age_data = get_by_age_data()
     page_data["by_age_graph_alt"] = ", ".join(
-        ["{0}={1}".format(row[0], row[1]) for row in by_age_data]
+        ["{0} {1}人".format(row[0], row[1]) for row in by_age_data]
     )
 
-    title = "旭川市新型コロナウイルスまとめサイト"
+    title = "旭川市内の最新感染動向"
     last_updated = patient_service.get_last_updated()
     return render_template(
         "index.html",
@@ -180,7 +183,7 @@ def index():
 
 @app.route("/about")
 def about():
-    title = "旭川市新型コロナウイルスまとめサイトについて"
+    title = "このサイトについて"
     return render_template(
         "about.html",
         title=title,
@@ -191,7 +194,7 @@ def about():
 def opendata():
     patient_service = AsahikawaPatientService()
     last_updated = patient_service.get_last_updated()
-    title = "旭川市新型コロナウイルス非公式オープンデータ（陽性者属性CSV）"
+    title = "非公式オープンデータ（陽性者属性CSV）"
     return render_template(
         "opendata.html",
         title=title,
@@ -204,7 +207,7 @@ def medical_institutions():
     medical_institution_service = MedicalInstitutionService()
     medical_institutions_rows = medical_institution_service.get_csv_rows()
     medical_institutions_rows.pop(0)
-    title = "旭川市新型コロナワクチン接種医療機関一覧"
+    title = "ワクチン接種医療機関一覧"
     last_updated = medical_institution_service.get_last_updated()
     return render_template(
         "medical_institutions.html",
