@@ -18,13 +18,16 @@
     </head>
     <body>
         <header>
-            <nav class="navbar navbar-expand-md fixed-top navbar-light bg-light">
-                <a class="navbar-brand" href="/"><i class="fas fa-hospital"></i> COVID-19 Asahikawa</a>
+            <nav class="navbar navbar-expand-md fixed-top navbar-light bg-white">
+                <a class="navbar-brand" href="/"><img src="{{ url_for('static', filename='images/title.png') }}" alt="COVID-19 ASAHIKAWA 新型コロナウイルスまとめサイト" title="COVID-19 ASAHIKAWA 新型コロナウイルスまとめサイト" width="256" height="56"></a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
                     <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a href="/" title="旭川市新型コロナウイルス感染症状況の最新動向へ" class="nav-link" >旭川市内感染状況の最新動向</a>
+                        </li>
                         <li class="nav-item">
                             <a href="/opendata" title="旭川市新型コロナウイルス感染症非公式オープンデータ（陽性患者属性CSV）へ" class="nav-link" >非公式オープンデータ</a>
                         </li>
@@ -40,8 +43,9 @@
                 <div class="row">
                     <div class="col-md-3">
                         <nav>
+                            <a href="/"></a>
                             <div class="list-group list-group-flush">
-                                <a href="/" title="旭川市新型コロナウイルスまとめサイトへ" class="list-group-item list-group-item-action font-weight-bold text-danger">旭川市新型コロナウイルスまとめサイト</a>
+                                <a href="/" title="旭川市新型コロナウイルス感染症状況の最新動向へ" class="list-group-item list-group-item-action font-weight-bold text-danger"><i class="far fa-chart-bar"></i> 旭川市内感染状況の最新動向</a>
                                 <a href="/about" title="このサイトについてへ" class="list-group-item list-group-item-action">このサイトについて</a>
                                 <a href="/opendata" title="旭川市新型コロナウイルス感染症非公式オープンデータ（陽性患者属性CSV）へ" class="list-group-item list-group-item-action">非公式オープンデータ</a>
                                 <a href="/medical_institutions" title="旭川市新型コロナワクチン接種医療機関一覧へ" class="list-group-item list-group-item-action">ワクチン接種医療機関一覧</a>
@@ -58,7 +62,7 @@
                 </div>
             </div>
         </main>
-        <footer class="footer p-4">
+        <footer class="footer py-3">
         </footer>
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
