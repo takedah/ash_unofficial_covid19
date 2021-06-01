@@ -155,6 +155,7 @@ def import_medical_institutions_data(url: str) -> bool:
 if __name__ == "__main__":
     import_hokkaido_data(Config.HOKKAIDO_URL)
     import_asahikawa_data(Config.LATEST_DATA_URL, 2021)
+    import_asahikawa_data(Config.MAY2021_DATA_URL, 2021)
     import_asahikawa_data(Config.APR2021_DATA_URL, 2021)
     import_asahikawa_data(Config.MAR2021_DATA_URL, 2021)
     import_asahikawa_data(Config.FEB2021_DATA_URL, 2021)
