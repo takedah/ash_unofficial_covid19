@@ -13,6 +13,7 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.font_manager import FontProperties
 from matplotlib.ticker import MultipleLocator
 
+from ash_unofficial_covid19.config import Config
 from ash_unofficial_covid19.services import (
     AsahikawaPatientService,
     MedicalInstitutionService
@@ -28,8 +29,11 @@ def add_security_headers(response):
         "default-src 'self'; style-src 'self' 'unsafe-inline' \
                 stackpath.bootstrapcdn.com kit.fontawesome.com; \
                 script-src 'self' code.jquery.com cdnjs.cloudflare.com \
-                stackpath.bootstrapcdn.com kit.fontawesome.com; \
-                connect-src ka-f.fontawesome.com; \
+                stackpath.bootstrapcdn.com kit.fontawesome.com \
+                www.googletagmanager.com \
+                'sha256-+iJtBA6NMPYaPCqsBCowyVmxC9zwobJh6EkGSchebqQ='; \
+                connect-src ka-f.fontawesome.com \
+                www.google-analytics.com; \
                 font-src ka-f.fontawesome.com; \
                 img-src 'self' i.creativecommons.org licensebuttons.net \
                 data: https:;",
@@ -178,6 +182,7 @@ def index():
         last_updated=last_updated.strftime("%Y/%m/%d %H:%M"),
         yesterday=yesterday.strftime("%Y/%m/%d (%a)"),
         page_data=page_data,
+        gtag_id=Config.GTAG_ID,
     )
 
 
@@ -187,6 +192,7 @@ def about():
     return render_template(
         "about.html",
         title=title,
+        gtag_id=Config.GTAG_ID,
     )
 
 
@@ -199,6 +205,7 @@ def opendata():
         "opendata.html",
         title=title,
         last_updated=last_updated.strftime("%Y/%m/%d %H:%M"),
+        gtag_id=Config.GTAG_ID,
     )
 
 
@@ -214,6 +221,7 @@ def medical_institutions():
         title=title,
         last_updated=last_updated.strftime("%Y/%m/%d %H:%M"),
         medical_institutions=medical_institutions_rows,
+        gtag_id=Config.GTAG_ID,
     )
 
 
@@ -408,7 +416,7 @@ def get_by_age_graph():
 @app.errorhandler(404)
 def not_found(error):
     title = "404 Page Not Found."
-    return render_template("404.html", title=title)
+    return render_template("404.html", title=title, gtag_id=Config.GTAG_ID)
 
 
 if __name__ == "__main__":

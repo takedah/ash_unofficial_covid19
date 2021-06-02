@@ -35,6 +35,7 @@
 
 ```bash
 $ export DATABASE_URL=postgresql://{user_name}:{password}@{host_name}/{db_name}
+$ export GTAG_ID={google_analytics_id}
 $ psql -f db/schema.sql -U {user_name} -d {db_name} -h {host_name}
 $ make init
 ```
