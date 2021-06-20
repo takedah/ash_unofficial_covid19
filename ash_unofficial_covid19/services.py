@@ -3,7 +3,7 @@ from decimal import ROUND_HALF_UP, Decimal
 from typing import Optional
 
 import psycopg2
-from psycopg2.extras import DictCursor
+from psycopg2.extras import DictCursor, execute_values
 
 from ash_unofficial_covid19.config import Config
 from ash_unofficial_covid19.errors import DatabaseConnectionError, ServiceError
@@ -78,7 +78,7 @@ class Service:
         for item in items:
             column_names += "," + item
             place_holders += ",%s"
-            upsert += "," + item + "=%s"
+            upsert += "," + item + "=EXCLUDED." + item
 
         state = (
             "INSERT INTO"
@@ -89,9 +89,7 @@ class Service:
             + column_names[1:]
             + ")"
             + " "
-            + "VALUES ("
-            + place_holders[1:]
-            + ")"
+            + "VALUES %s"
             + " "
             + "ON CONFLICT("
             + primary_key
@@ -102,16 +100,10 @@ class Service:
             + upsert[1:]
         )
 
-        insert_lists = list()
-        for data in data_lists:
-            # UPSERT句用にリストを重複させる。
-            values = tuple(data + data)
-            insert_lists.append(values)
-
         with self.get_connection() as conn:
             try:
                 with conn.cursor(cursor_factory=DictCursor) as cur:
-                    cur.executemany(state, insert_lists)
+                    execute_values(cur, state, data_lists)
                 conn.commit()
             except (
                 psycopg2.DataError,

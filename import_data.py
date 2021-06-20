@@ -59,17 +59,16 @@ def import_hokkaido_data(url: str) -> bool:
     return True
 
 
-def import_asahikawa_data(url: str, target_year: int) -> bool:
+def get_asahikawa_data(url: str, target_year: int) -> bool:
     """
-    旭川市公式ホームページから新型コロナウイルス感染症の感染者情報一覧を取得し、
-    データベースへ格納する。
+    旭川市公式ホームページから新型コロナウイルス感染症の感染者情報一覧を取得する。
 
     Args:
         url (str): 旭川市公式ホームページのURL
         target_year (int): 対象年
 
     Returns:
-        bool: データベースへ格納が成功したら真を返す
+        scraped_data (obj:`ScrapedHTMLData`): ダウンロードしたHTMLデータ
 
     """
     logger = AppLog()
@@ -80,10 +79,30 @@ def import_asahikawa_data(url: str, target_year: int) -> bool:
         return False
 
     scraped_data = ScrapedHTMLData(downloaded_html=html_data, target_year=target_year)
-    patients_data = AsahikawaPatientFactory()
-    for row in scraped_data.patients_data:
-        patients_data.create(**row)
+    return scraped_data
 
+
+def import_asahikawa_data(download_lists: list) -> bool:
+    """
+    旭川市公式ホームページから新型コロナウイルス感染症の感染者情報を、
+    データベースへ格納する。
+
+    Args:
+        download_lists (list of tuple): スクレイピング対象URLとデータの対象年を要素に
+            持つタプルを要素としたリスト
+
+    Returns:
+        bool: データベースへ格納が成功したら真を返す
+
+    """
+    logger = AppLog()
+    patients_data = AsahikawaPatientFactory()
+    for download_list in download_lists:
+        url = download_list[0]
+        target_year = download_list[1]
+        scraped_data = get_asahikawa_data(url=url, target_year=target_year)
+        for row in scraped_data.patients_data:
+            patients_data.create(**row)
     try:
         service = AsahikawaPatientService()
         service.create(patients_data)
@@ -153,14 +172,22 @@ def import_medical_institutions_data(url: str) -> bool:
 
 
 if __name__ == "__main__":
+    # 北海道の陽性患者データをデータベースへ登録
     import_hokkaido_data(Config.HOKKAIDO_URL)
-    import_asahikawa_data(Config.LATEST_DATA_URL, 2021)
-    import_asahikawa_data(Config.MAY2021_DATA_URL, 2021)
-    import_asahikawa_data(Config.APR2021_DATA_URL, 2021)
-    import_asahikawa_data(Config.MAR2021_DATA_URL, 2021)
-    import_asahikawa_data(Config.FEB2021_DATA_URL, 2021)
-    import_asahikawa_data(Config.JAN2021_DATA_URL, 2021)
-    import_asahikawa_data(Config.DEC2020_DATA_URL, 2020)
-    import_asahikawa_data(Config.NOV2020_OR_EARLIER_URL, 2020)
+
+    # 旭川市の陽性患者データをダウンロードしてデータベースへ登録
+    download_lists = [
+        (Config.NOV2020_OR_EARLIER_URL, 2020),
+        (Config.DEC2020_DATA_URL, 2020),
+        (Config.JAN2021_DATA_URL, 2021),
+        (Config.FEB2021_DATA_URL, 2021),
+        (Config.MAR2021_DATA_URL, 2021),
+        (Config.APR2021_DATA_URL, 2021),
+        (Config.MAY2021_DATA_URL, 2021),
+        (Config.LATEST_DATA_URL, 2021),
+    ]
+    import_asahikawa_data(download_lists)
     delete_duplicate_data()
+
+    # 旭川市のワクチン接種医療機関の一覧をデータベースへ登録
     import_medical_institutions_data(Config.PDF_URL)
