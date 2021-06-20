@@ -59,9 +59,15 @@ def dated_url_for(endpoint, **values):
 
 
 def get_yesterday():
-    return datetime.now(timezone(timedelta(hours=+9), "JST")).date() - relativedelta(
-        days=1
-    )
+    now = datetime.now(timezone(timedelta(hours=+9), "JST"))
+    today = now.date()
+    # 市の発表が15時が多いので、15時より前なら前々日の情報を表示するようにする
+    if now.hour < 15:
+        adjust_days = 2
+    else:
+        adjust_days = 1
+
+    return today - relativedelta(days=adjust_days)
 
 
 def get_day_data():

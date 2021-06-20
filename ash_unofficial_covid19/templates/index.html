@@ -22,7 +22,7 @@
             </div>
             <div class="card-body">
                 <p><img src="./month_total_patients.png" alt="{{ page_data["month_total_graph_alt"] }}" title="累計陽性患者数（月別）の推移" class="img-fluid"></p>
-                <p class="card-text text-right mb-0">昨日までの累計患者数 <strong class="display-4">{{ page_data["total_patients_number"] }}</strong>人</p>
+                <p class="card-text text-right mb-0">{{ yesterday }} までの累計患者数 <strong class="display-4">{{ page_data["total_patients_number"] }}</strong>人</p>
                 <p class="card-text text-right">（先月 {{ page_data["increase_of_total"] }}人）</p>
             </div>
             <div class="card-footer text-muted bg-white">
