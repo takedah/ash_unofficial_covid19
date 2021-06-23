@@ -3,7 +3,7 @@
 <article>
     <h1 class="h4 py-3">旭川市新型コロナワクチン接種医療機関一覧</h1>
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <p class="mb-0">{{ last_updated }}にダウンロードしたデータを元に表示しています。正確な情報は必ず<a class="alert-link" href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/146/149/d073180.html" title="旭川市公式ホームページ">旭川市公式ホームページ</a>を確認してください。</p>
+        <p class="mb-0">{{ medical_institutions.last_updated }}にダウンロードしたデータを元に表示しています。正確な情報は必ず<a class="alert-link" href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/146/149/d073180.html" title="旭川市公式ホームページ">旭川市公式ホームページ</a>を確認してください。</p>
         <button type="button" class="close" data-dismiss="alert" aria-label="close">
             <span aria-hidden="true">&times;</span>
         </button>
@@ -21,7 +21,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for row in medical_institutions %}
+                {% for row in medical_institutions.get_rows() %}
                 <tr>
                     <td class="text-nowrap">{{ row[0] }}</td>
                     <td class="text-nowrap">{{ row[1] }}</td>

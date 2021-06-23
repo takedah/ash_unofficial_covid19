@@ -59,7 +59,7 @@ def import_hokkaido_data(url: str) -> bool:
     return True
 
 
-def get_asahikawa_data(url: str, target_year: int) -> bool:
+def get_asahikawa_data(url: str, target_year: int) -> ScrapedHTMLData:
     """
     旭川市公式ホームページから新型コロナウイルス感染症の感染者情報一覧を取得する。
 

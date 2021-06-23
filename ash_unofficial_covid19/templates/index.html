@@ -1,19 +1,19 @@
 {% extends 'layout.html' %}
 {% block content %}
 <article>
-    <h1 class="h4 py-3">旭川市内の新型コロナウイルス感染症の最新動向<strong class="small">（ {{ last_updated }} 現在）</strong></h1>
+    <h1 class="h4 py-3">旭川市内の新型コロナウイルス感染症の最新動向<strong class="small">（ {{ asahikawa_patients.last_updated }} 現在）</strong></h1>
     <div class="card-group mb-2">
         <div class="card">
             <div class="card-header">
                 新規陽性患者数（日別）
             </div>
             <div class="card-body">
-                <p><img src="./day_per_patients.png" alt="{{ page_data["day_graph_alt"] }}" title="新規陽性患者数（日別）の推移" class="img-fluid"></p>
-                <p class="card-text text-right mb-0">{{ yesterday }} の新規患者数 <strong class="display-4">{{ page_data["yesterday_patients_number"] }}</strong>人</p>
-                <p class="card-text text-right">（前日 {{ page_data["increase_of_day_before_yesterday"] }}人）</p>
+                <p><img src="./daily_total.png" alt="{{ daily_total.get_graph_alt() }}" title="新規陽性患者数（日別）の推移" class="img-fluid"></p>
+                <p class="card-text text-right mb-0">{{ daily_total.yesterday }} の新規患者数 <strong class="display-4">{{ daily_total.most_recent }}</strong>人</p>
+                <p class="card-text text-right">（前日 {{ daily_total.increase_from_day_before }}人）</p>
             </div>
             <div class="card-footer text-muted bg-white">
-                <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a> 最終更新: {{ last_updated }}</p>
+                <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a> 最終更新: {{ asahikawa_patients.last_updated }}</p>
             </div>
         </div>
         <div class="card">
@@ -21,12 +21,12 @@
                 累計陽性患者数（月別）
             </div>
             <div class="card-body">
-                <p><img src="./month_total_patients.png" alt="{{ page_data["month_total_graph_alt"] }}" title="累計陽性患者数（月別）の推移" class="img-fluid"></p>
-                <p class="card-text text-right mb-0">{{ yesterday }} までの累計患者数 <strong class="display-4">{{ page_data["total_patients_number"] }}</strong>人</p>
-                <p class="card-text text-right">（先月 {{ page_data["increase_of_total"] }}人）</p>
+                <p><img src="./month_total.png" alt="{{ month_total.get_graph_alt() }}" title="累計陽性患者数（月別）の推移" class="img-fluid"></p>
+                <p class="card-text text-right mb-0">{{ month_total.yesterday }} までの累計患者数 <strong class="display-4">{{ month_total.this_month }}</strong>人</p>
+                <p class="card-text text-right">（先月 {{ month_total.increase_from_last_month }}人）</p>
             </div>
             <div class="card-footer text-muted bg-white">
-                <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a> 最終更新: {{ last_updated }}</p>
+                <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a> 最終更新: {{ asahikawa_patients.last_updated }}</p>
             </div>
         </div>
     </div>
@@ -36,11 +36,11 @@
                 年代別陽性患者数の割合
             </div>
             <div class="card-body">
-                <p><img src="./patients_number_by_age.png" alt="{{ page_data["by_age_graph_alt"] }}" title="年代別陽性患者数の割合" class="img-fluid"></p>
+                <p><img src="./by_age.png" alt="{{ by_age.get_graph_alt() }}" title="年代別陽性患者数の割合" class="img-fluid"></p>
                 <p class="card-text text-right">※年代非公表の人数を除いているため、実態と一致していない可能性があります。</p>
             </div>
             <div class="card-footer text-muted bg-white">
-                <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a> 最終更新: {{ last_updated }}</p>
+                <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a> 最終更新: {{ asahikawa_patients.last_updated }}</p>
             </div>
         </div>
         <div class="card">
@@ -48,12 +48,12 @@
                 1日あたり新規患者数の7日間移動平均
             </div>
             <div class="card-body">
-                <p><img src="./seven_days_moving_average.png" alt="{{ page_data["moving_average_graph_alt"] }}" title="1日あたり新規患者数の7日間移動平均の推移" class="img-fluid"></p>
-                <p class="card-text text-right mb-0">1日あたり新規患者数の7日間移動平均 <strong class="display-4">{{ page_data["this_seven_days_average"] }}</strong>人</p>
-                <p class="card-text text-right">（先週 {{ page_data["increase_of_average"] }}人）</p>
+                <p><img src="./moving_average.png" alt="{{ moving_average.get_graph_alt() }}" title="1日あたり新規患者数の7日間移動平均の推移" class="img-fluid"></p>
+                <p class="card-text text-right mb-0">1日あたり新規患者数の7日間移動平均 <strong class="display-4">{{ moving_average.this_week }}</strong>人</p>
+                <p class="card-text text-right">（先週 {{ moving_average.increase_from_last_week }}人）</p>
             </div>
             <div class="card-footer text-muted bg-white">
-                <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a> 最終更新: {{ last_updated }}</p>
+                <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a> 最終更新: {{ asahikawa_patients.last_updated }}</p>
             </div>
         </div>
     </div>
