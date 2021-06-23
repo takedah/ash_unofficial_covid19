@@ -3,6 +3,7 @@ from abc import ABCMeta, abstractclassmethod
 from datetime import date, datetime, timedelta, timezone
 from decimal import ROUND_HALF_UP, Decimal
 from io import BytesIO, StringIO
+from typing import Optional
 
 from dateutil.relativedelta import relativedelta
 from matplotlib import dates as mdates
@@ -64,7 +65,7 @@ class GraphView(metaclass=ABCMeta):
         pass
 
     @abstractclassmethod
-    def get_graph_image(self) -> BytesIO:
+    def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
         pass
 
     def get_yesterday(self) -> date:
@@ -117,12 +118,15 @@ class DailyTotalView(GraphView):
             ]
         )
 
-    def get_graph_image(self) -> BytesIO:
+    def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
         font = FontProperties(
             fname="./ash_unofficial_covid19/static/fonts/NotoSansCJKjp-Light.otf",
             size=12,
         )
-        fig = plt.figure()
+        if figsize:
+            fig = plt.figure(figsize=figsize)
+        else:
+            fig = plt.figure()
         ax = fig.add_subplot()
         day_x = [row[0] for row in self.__daily_total_data]
         day_y = [row[1] for row in self.__daily_total_data]
@@ -184,14 +188,17 @@ class MonthTotalView(GraphView):
             ]
         )
 
-    def get_graph_image(self) -> BytesIO:
+    def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
         # グラフの描画は直近12か月分のみとする
         month_total_data = self.__month_total_data[-12:]
         font = FontProperties(
             fname="./ash_unofficial_covid19/static/fonts/NotoSansCJKjp-Light.otf",
             size=12,
         )
-        fig = plt.figure()
+        if figsize:
+            fig = plt.figure(figsize=figsize)
+        else:
+            fig = plt.figure()
         ax = fig.add_subplot()
         month_total_x = [row[0].strftime("%Y-%m") for row in month_total_data]
         month_total_y = [row[1] for row in month_total_data]
@@ -222,12 +229,15 @@ class ByAgeView(GraphView):
             ["{0} {1}人".format(row[0], row[1]) for row in self.__by_age_data]
         )
 
-    def get_graph_image(self):
+    def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
         font = FontProperties(
             fname="./ash_unofficial_covid19/static/fonts/NotoSansCJKjp-Light.otf",
             size=12,
         )
-        fig = plt.figure()
+        if figsize:
+            fig = plt.figure(figsize=figsize)
+        else:
+            fig = plt.figure()
         ax = fig.add_subplot()
         by_age_label = [row[0] for row in self.__by_age_data]
         by_age_x = [row[1] for row in self.__by_age_data]
@@ -302,12 +312,15 @@ class MovingAverageView(GraphView):
             ]
         )
 
-    def get_graph_image(self) -> BytesIO:
+    def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
         font = FontProperties(
             fname="./ash_unofficial_covid19/static/fonts/NotoSansCJKjp-Light.otf",
             size=12,
         )
-        fig = plt.figure()
+        if figsize:
+            fig = plt.figure(figsize=figsize)
+        else:
+            fig = plt.figure()
         ax = fig.add_subplot()
         moving_average_x = [
             row[0].strftime("%m-%d") + "~" for row in self.__moving_average_data
