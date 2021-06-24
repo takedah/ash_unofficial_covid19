@@ -11,6 +11,7 @@ from ash_unofficial_covid19.scraper import (
     DownloadedPDF,
     ScrapedCSVData,
     ScrapedHTMLData,
+    ScrapedMedicalInstitutionsHTMLData,
     ScrapedPDFData
 )
 
@@ -132,6 +133,44 @@ No,全国地方公共団体コード,都道府県名,市区町村名,公表_年�
 3,10006,北海道,,2020-02-19,2020-02-08,石狩振興局管内,40代,男性,会社員,−,倦怠感;筋肉痛;関節痛;発熱;咳,0,0,,
 """
     return csv_data.encode("cp932")
+
+
+def medical_institution_html_content():
+    html_data = """
+<table cellspacing="0" cellpadding="0">
+    <caption>新型コロナワクチン接種医療機関一覧 </caption>
+    <tbody>
+        <tr>
+            <th>医療機関名</th>
+            <th>住所</th>
+            <th>電話</th>
+            <th>かかりつけ医療機関</th>
+            <th>コールセンター、インターネット受付</th>
+        </tr>
+        <tr>
+            <th>新富・東・金星町</th>
+        </tr>
+        <tr>
+            <td>市立旭川病院</td>
+            <td>金星町1</td>
+            <td>29-0202</td>
+            <td>○</td>
+            <td>－</td>
+        </tr>
+        <tr>
+            <th>西地区</th>
+        </tr>
+        <tr>
+            <td>旭川赤十字病院</td>
+            <td>曙1の1</td>
+            <td>22-8111</td>
+            <td>○</td>
+            <td>○</td>
+        </tr>
+    </tbody>
+</table>
+"""
+    return html_data
 
 
 class TestDownloadedHTML(unittest.TestCase):
@@ -554,6 +593,41 @@ class TestScrapedPDFData(unittest.TestCase):
             },
         ]
         self.assertEqual(scraper.medical_institutions_data, expect)
+
+
+class TestScrapedMedicalInstitutionsHTMLData(unittest.TestCase):
+    def setUp(self):
+        self.html_content = medical_institution_html_content()
+
+    def tearDown(self):
+        pass
+
+    @patch("ash_unofficial_covid19.scraper.requests")
+    def test_items(self, mock_requests):
+        mock_requests.get.return_value = Mock(
+            status_code=200, content=self.html_content
+        )
+        downloaded_html = DownloadedHTML("http://dummy.local")
+        scraper = ScrapedMedicalInstitutionsHTMLData(downloaded_html=downloaded_html)
+        expect = [
+            {
+                "name": "市立旭川病院",
+                "address": "旭川市金星町1",
+                "phone_number": "0166-29-0202",
+                "book_at_medical_institution": True,
+                "book_at_call_center": False,
+                "area": "新富・東・金星町",
+            },
+            {
+                "name": "旭川赤十字病院",
+                "address": "旭川市曙1の1",
+                "phone_number": "0166-22-8111",
+                "book_at_medical_institution": True,
+                "book_at_call_center": True,
+                "area": "西地区",
+            },
+        ]
+        self.assertEqual(scraper.items, expect)
 
 
 if __name__ == "__main__":

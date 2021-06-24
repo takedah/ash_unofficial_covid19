@@ -709,3 +709,120 @@ class ScrapedPDFData:
         )
 
         return formatted_df.to_dict(orient="records")
+
+
+class ScrapedMedicalInstitutionsHTMLData:
+    """旭川市新型コロナワクチン接種医療機関の一覧を抽出
+
+    旭川市公式WebサイトからダウンロードしたHTMLファイルから、
+    新型コロナワクチン接種医療機関データを抽出し、リストに変換する。
+
+    Attributes:
+        items (list of dict): 医療機関データを表す辞書のリスト
+
+    """
+
+    def __init__(self, downloaded_html: DownloadedHTML):
+        """
+        Args:
+            downloaded_html (:obj:`DownloadedHTML`): ダウンロードした旭川市公式サイトの
+                新型コロナ接種医療機関のページのHTMLファイルのbytesデータ
+                を要素に持つオブジェクト
+
+        """
+        self.__items = list()
+        for row in self._get_table_values(downloaded_html):
+            extracted_data = self._extract_medical_institutions_data(row)
+            if extracted_data is not None:
+                self.__items.append(extracted_data)
+
+    @property
+    def items(self) -> list:
+        return self.__items
+
+    def _get_table_values(self, downloaded_html: DownloadedHTML) -> list:
+        """HTMLからtableの内容を抽出してリストに格納
+
+        Args:
+            downloaded_html (:obj:`DownloadedHTML`): ダウンロードしたHTMLファイルの
+                bytesデータを要素に持つオブジェクト
+
+        Returns:
+            table_values (list of list): tableの内容で構成される二次元配列
+
+        """
+        soup = BeautifulSoup(downloaded_html.content, "html.parser")
+        table_values = list()
+        for table in soup.find_all("table"):
+            if table.find("caption") is not None:
+                table_caption = table.find("caption").text.strip().replace("\n", "")
+            else:
+                table_caption = None
+            if table_caption == "新型コロナワクチン接種医療機関一覧":
+                area = ""
+                for tr in table.find_all("tr"):
+                    row = list()
+                    th = tr.find("th")
+                    if th:
+                        area = th.text.strip().replace("\n", "")
+                    row.append(area)
+                    for td in tr.find_all("td"):
+                        val = td.text.strip().replace("\n", "")
+                        row.append(val)
+                    row = list(
+                        map(
+                            lambda x: x.replace("\n", "")
+                            .replace("\r", "")
+                            .replace(" ", ""),
+                            row,
+                        )
+                    )
+                    table_values.append(row)
+
+        return table_values
+
+    def _extract_medical_institutions_data(self, row: list) -> Optional[dict]:
+        """新型コロナワクチン接種医療機関データへの変換
+
+        旭川市公式ホームページのワクチン接種医療機関一覧HTMLから抽出した行データの
+        リストを、辞書に変換する。
+
+        Args:
+            row (list): table要素から抽出した行データのリスト
+
+        Returns:
+            medical_institutions_data (dict): 新型コロナワクチン接種医療機関データを
+                表すハッシュ
+
+        """
+        try:
+            if isinstance(row[2], str):
+                address = "旭川市" + row[2]
+            else:
+                address = ""
+            if isinstance(row[3], str):
+                if row[3] == "":
+                    phone_number = ""
+                else:
+                    phone_number = "0166-" + row[3]
+            else:
+                phone_number = ""
+            if row[4] == "○":
+                book_at_medical_institution = True
+            else:
+                book_at_medical_institution = False
+            if row[5] == "○":
+                book_at_call_center = True
+            else:
+                book_at_call_center = False
+            medical_institutions_data = {
+                "name": row[1],
+                "address": address,
+                "phone_number": phone_number,
+                "book_at_medical_institution": book_at_medical_institution,
+                "book_at_call_center": book_at_call_center,
+                "area": row[0],
+            }
+            return medical_institutions_data
+        except (ValueError, IndexError):
+            return None

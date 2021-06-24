@@ -1,3 +1,5 @@
+from typing import Optional
+
 from ash_unofficial_covid19.config import Config
 from ash_unofficial_covid19.errors import (
     DatabaseConnectionError,
@@ -13,10 +15,9 @@ from ash_unofficial_covid19.models import (
 )
 from ash_unofficial_covid19.scraper import (
     DownloadedHTML,
-    DownloadedPDF,
     ScrapedCSVData,
     ScrapedHTMLData,
-    ScrapedPDFData
+    ScrapedMedicalInstitutionsHTMLData
 )
 from ash_unofficial_covid19.services import (
     AsahikawaPatientService,
@@ -59,7 +60,7 @@ def import_hokkaido_data(url: str) -> bool:
     return True
 
 
-def get_asahikawa_data(url: str, target_year: int) -> ScrapedHTMLData:
+def get_asahikawa_data(url: str, target_year: int) -> Optional[ScrapedHTMLData]:
     """
     旭川市公式ホームページから新型コロナウイルス感染症の感染者情報一覧を取得する。
 
@@ -76,7 +77,7 @@ def get_asahikawa_data(url: str, target_year: int) -> ScrapedHTMLData:
         html_data = DownloadedHTML(url)
     except HTTPDownloadError as e:
         logger.warning(e.message)
-        return False
+        return None
 
     scraped_data = ScrapedHTMLData(downloaded_html=html_data, target_year=target_year)
     return scraped_data
@@ -101,8 +102,9 @@ def import_asahikawa_data(download_lists: list) -> bool:
         url = download_list[0]
         target_year = download_list[1]
         scraped_data = get_asahikawa_data(url=url, target_year=target_year)
-        for row in scraped_data.patients_data:
-            patients_data.create(**row)
+        if scraped_data:
+            for row in scraped_data.patients_data:
+                patients_data.create(**row)
     try:
         service = AsahikawaPatientService()
         service.create(patients_data)
@@ -150,14 +152,14 @@ def import_medical_institutions_data(url: str) -> bool:
     """
     logger = AppLog()
     try:
-        pdf_content = DownloadedPDF(url)
+        html_content = DownloadedHTML(url)
     except HTTPDownloadError as e:
         logger.warning(e.message)
         return False
 
-    scraped_data = ScrapedPDFData(pdf_content)
+    scraped_data = ScrapedMedicalInstitutionsHTMLData(html_content)
     medical_institutions_data = MedicalInstitutionFactory()
-    for row in scraped_data.medical_institutions_data:
+    for row in scraped_data.items:
         medical_institutions_data.create(**row)
 
     try:
@@ -190,4 +192,4 @@ if __name__ == "__main__":
     delete_duplicate_data()
 
     # 旭川市のワクチン接種医療機関の一覧をデータベースへ登録
-    import_medical_institutions_data(Config.PDF_URL)
+    import_medical_institutions_data(Config.MEDICAL_INSTITUTIONS_URL)
