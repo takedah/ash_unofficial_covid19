@@ -1,7 +1,8 @@
 {% extends 'layout.html' %}
 {% block content %}
 <article>
-    <h1 class="h4 py-3">旭川市内の新型コロナウイルス感染症の最新動向<strong class="small">（ {{ asahikawa_patients.last_updated }} 現在）</strong></h1>
+    <h1 class="h4 pt-2 pb-1">旭川市内の新型コロナウイルス感染症の最新動向</h1>
+    <p class="text-secondary">患者数は旭川市公式ホームページの新型コロナウイルス感染症患者の状況から取得したデータに基づいて算出しています。（ {{ asahikawa_patients.last_updated }} 現在）</p>
     <div class="card-group mb-2">
         <div class="card">
             <div class="card-header">
@@ -13,7 +14,7 @@
                 <p class="card-text text-right">（前日 {{ daily_total.increase_from_day_before }}人）</p>
             </div>
             <div class="card-footer text-muted bg-white">
-                <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a> 最終更新: {{ asahikawa_patients.last_updated }}</p>
+                <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted" target="_blank">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a> 最終更新: {{ asahikawa_patients.last_updated }}</p>
             </div>
         </div>
         <div class="card">
@@ -26,7 +27,7 @@
                 <p class="card-text text-right">（先月 {{ month_total.increase_from_last_month }}人）</p>
             </div>
             <div class="card-footer text-muted bg-white">
-                <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a> 最終更新: {{ asahikawa_patients.last_updated }}</p>
+                <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted" target="_blank">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a> 最終更新: {{ asahikawa_patients.last_updated }}</p>
             </div>
         </div>
     </div>
@@ -40,7 +41,7 @@
                 <p class="card-text text-right">※年代非公表の人数を除いているため、実態と一致していない可能性があります。</p>
             </div>
             <div class="card-footer text-muted bg-white">
-                <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a> 最終更新: {{ asahikawa_patients.last_updated }}</p>
+                <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted" target="_blank">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a> 最終更新: {{ asahikawa_patients.last_updated }}</p>
             </div>
         </div>
         <div class="card">
@@ -53,7 +54,7 @@
                 <p class="card-text text-right">（先週 {{ moving_average.increase_from_last_week }}人）</p>
             </div>
             <div class="card-footer text-muted bg-white">
-                <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a> 最終更新: {{ asahikawa_patients.last_updated }}</p>
+                <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted" target="_blank">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a> 最終更新: {{ asahikawa_patients.last_updated }}</p>
             </div>
         </div>
     </div>

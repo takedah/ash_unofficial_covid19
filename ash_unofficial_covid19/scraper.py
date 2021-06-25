@@ -142,8 +142,16 @@ class ScrapedHTMLData:
                 for tr in table.find_all("tr"):
                     row = list()
                     for td in tr.find_all("td"):
-                        val = td.text.strip().replace("\n", " ")
+                        val = td.text.strip()
                         row.append(val)
+                    row = list(
+                        map(
+                            lambda x: re.sub("( +)", " ", x)
+                            .replace("\r", " ")
+                            .replace("\n", " "),
+                            row,
+                        )
+                    )
                     table_values.append(row)
 
         return table_values
@@ -273,17 +281,18 @@ class ScrapedHTMLData:
             # 旭川市公式サイトにあるがオープンデータ定義書にない項目は半角スペース区切りで
             # 全て備考に入れる。
             note = (
-                "北海道発表NO.:"
-                + " "
+                "北海道発表No."
+                + ";"
                 + row[1]
-                + " "
-                + "周囲の患者の発生:"
-                + " "
+                + ";"
+                + "周囲の患者の発生"
+                + ";"
                 + row[6]
-                + " "
-                + "濃厚接触者の状況:"
-                + " "
+                + ";"
+                + "濃厚接触者の状況"
+                + ";"
                 + row[7]
+                + ";"
             )
             patient_data = {
                 "patient_number": patient_number,
