@@ -278,6 +278,94 @@ class AsahikawaPatientService(Service):
                     factory.create(**row)
         return factory
 
+    def find(self, page: int = 1, desc: bool = True) -> tuple:
+        """新型コロナウイルス感染症患者データのリストをページネーション用に分割して返す
+
+        Args:
+            page (int): 検索結果を分割する場合、何番目の分割結果か数値で指定
+            desc (bool): 降順にする場合Trueを指定
+
+        Returns:
+            res (tuple): AsahikawaPatientFactoryオブジェクトと
+                ページネーションした場合の最大ページ数の数値を要素に持つタプル
+
+        """
+        if not isinstance(page, int):
+            raise ServiceError("検索結果のページ指定に誤りがあります。")
+
+        pagenation_option = ""
+        max_page = 1
+
+        count_state = (
+            "SELECT"
+            + " "
+            + "count(patient_number)"
+            + " "
+            + "FROM"
+            + " "
+            + self.table_name
+            + ";"
+        )
+        with self.get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(count_state)
+                res = cur.fetchone()
+        results_number = res["count"]
+        # 検索結果の最大ページ数を取得
+        max_view_number = 100
+        if results_number < max_view_number:
+            max_page = 1
+        else:
+            if divmod(results_number, max_view_number)[1] == 0:
+                max_page = divmod(results_number, max_view_number)[0]
+            else:
+                max_page = divmod(results_number, max_view_number)[0] + 1
+        # 指定されたページ数の検索結果を表示するためにスキップするレコード数を取得
+        if max_page < page:
+            raise ServiceError("指定したページ数が上限を超えています。")
+        else:
+            skip_record_number = (page - 1) * max_view_number
+        # ページネーション用の追加SQL文字列を生成
+        pagenation_option = " LIMIT " + str(max_view_number)
+        if 1 < page:
+            pagenation_option += " OFFSET " + str(skip_record_number)
+
+        if desc:
+            order = "DESC"
+        else:
+            order = "ASC"
+        state = (
+            "SELECT"
+            + " "
+            + "a.patient_number,a.city_code,a.prefecture,a.city_name,"
+            + "a.publication_date,"
+            + "h.onset_date,a.residence,a.age,a.sex,h.occupation,h.status,h.symptom,"
+            + "h.overseas_travel_history,h.be_discharged,a.note,"
+            + "a.hokkaido_patient_number,a.surrounding_status,a.close_contact"
+            + " "
+            + "FROM"
+            + " "
+            + self.table_name
+            + " "
+            + "AS a"
+            + " "
+            + "LEFT JOIN hokkaido_patients AS h"
+            + " "
+            + "ON a.hokkaido_patient_number = h.patient_number"
+            + " "
+            + "ORDER BY a.patient_number"
+            + " "
+            + order
+        )
+        state += pagenation_option + ";"
+        factory = AsahikawaPatientFactory()
+        with self.get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(state)
+                for row in cur.fetchall():
+                    factory.create(**row)
+        return (factory, max_page)
+
     def get_duplicate_patient_numbers(self) -> list:
         """
         旭川市の公表した陽性患者情報の中に重複があるが、旭川市公式ホームページは重複分も表示されたままなので、

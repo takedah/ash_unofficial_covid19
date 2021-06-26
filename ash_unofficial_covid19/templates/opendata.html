@@ -35,6 +35,58 @@
             </section>
         </div>
     </div>
+    <div class="card mt-3">
+        <div class="card-body">
+            <section>
+                <h2 class="h5 card-title">陽性患者の属性（概要、全 {{ max_page }} ページ中 {{ page }} ページ目）</h2>
+                <table class="table table-striped table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>市内番号</th>
+                            <th>公表日</th>
+                            <th>居住地</th>
+                            <th>年代</th>
+                            <th>性別</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in rows %}
+                        <tr>
+                            <td>{{ row.patient_number }}</a></td>
+                            <td>{{ row.publication_date }}</a></td>
+                            <td>{{ "非公表" if row.residence == "" else row.residence}}</td>
+                            <td>{{ "非公表" if row.age == "" else row.age}}</td>
+                            <td>{{ "非公表" if row.sex == "" else row.sex}}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+            <section>
+                <ul class="list-group list-group-horizontal">
+                    {% if 1 < page %}
+                    {% for i in range(1, page) %}
+                    {% if loop.index == 1 %}
+                    <li class="list-group-item"><a href="/opendata/{{ page - 1 }}">&lt;&lt;</a></li>
+                    {% endif %}
+                    {% if page - 6 < i %}
+                    <li class="list-group-item"><a href="/opendata/{{ i }}">{{ i }}</a></li>
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                    <li class="list-group-item">{{ page }}</li>
+                    {% if page < max_page %}
+                    {% for i in range(page + 1, max_page + 1) %}
+                    {% if i < page + 6 %}
+                    <li class="list-group-item"><a href="/opendata/{{ i }}">{{ i }}</a></li>
+                    {% endif %}
+                    {% endfor %}
+                    <li class="list-group-item"><a href="/opendata/{{ page + 1 }}">&gt;&gt;</a></li>
+                    {% endif %}
+                </ul>
+            </section>
+        </div>
+    </div>
 </article>
 <script charset="utf-8" src="{{ url_for('static', filename='js/select_input.js') }}"></script>
 {% endblock %}

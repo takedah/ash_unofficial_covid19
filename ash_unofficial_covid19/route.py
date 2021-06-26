@@ -1,8 +1,17 @@
 import os
 
-from flask import Flask, g, make_response, render_template, url_for
+from flask import (
+    Flask,
+    abort,
+    escape,
+    g,
+    make_response,
+    render_template,
+    url_for
+)
 
 from ash_unofficial_covid19.config import Config
+from ash_unofficial_covid19.errors import ServiceError
 from ash_unofficial_covid19.views import (
     AsahikawaPatientsView,
     ByAgeView,
@@ -112,11 +121,40 @@ def about():
 
 @app.route("/opendata")
 def opendata():
+    asahikawa_patients = get_asahikawa_patients()
+    results = asahikawa_patients.get_rows()
     return render_template(
         "opendata.html",
-        title="非公式オープンデータ（陽性者属性CSV",
+        title="非公式オープンデータ（陽性者属性CSV）",
         gtag_id=Config.GTAG_ID,
-        asahikawa_patients=get_asahikawa_patients(),
+        asahikawa_patients=asahikawa_patients,
+        rows=results[0].items,
+        max_page=results[1],
+        page=1,
+    )
+
+
+@app.route("/opendata/<page>")
+def opendata_pages(page):
+    try:
+        page = int(escape(page))
+    except ValueError:
+        abort(404)
+    try:
+        asahikawa_patients = get_asahikawa_patients()
+        results = asahikawa_patients.get_rows(page=page)
+    except ServiceError:
+        abort(404)
+    max_page = results[1]
+    title = "非公式オープンデータ（陽性者属性CSV）全" + str(max_page) + "ページ中" + str(page) + "ページ目"
+    return render_template(
+        "opendata.html",
+        title=title,
+        gtag_id=Config.GTAG_ID,
+        asahikawa_patients=asahikawa_patients,
+        rows=results[0].items,
+        max_page=max_page,
+        page=page,
     )
 
 
@@ -216,7 +254,7 @@ def get_moving_average_graph():
 @app.errorhandler(404)
 def not_found(error):
     title = "404 Page Not Found."
-    return render_template("404.html", title=title, gtag_id=Config.GTAG_ID)
+    return render_template("404.html", title=title, gtag_id=Config.GTAG_ID), 404
 
 
 if __name__ == "__main__":

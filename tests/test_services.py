@@ -1,6 +1,7 @@
 import unittest
 from datetime import date
 
+from ash_unofficial_covid19.errors import ServiceError
 from ash_unofficial_covid19.models import (
     AsahikawaPatientFactory,
     HokkaidoPatientFactory,
@@ -218,6 +219,14 @@ class TestAsahikawaPatientService(unittest.TestCase):
         self.assertEqual(patient.publication_date, date(2021, 12, 9))
         self.assertEqual(patient.age, "90歳以上")
         self.assertEqual(patient.sex, "女性")
+
+    def test_find(self):
+        results = self.service.find(page=1, desc=False)
+        patient = results[0].items[1]
+        self.assertEqual(patient.patient_number, 1032)
+        # 存在しないページ指定
+        with self.assertRaises(ServiceError):
+            self.service.find(page=2)
 
     def test_get_csv_rows(self):
         results = self.service.get_csv_rows()

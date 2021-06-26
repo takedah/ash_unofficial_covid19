@@ -29,11 +29,14 @@ class AsahikawaPatientsView:
         return self.__last_updated
 
     def get_csv(self) -> StringIO:
-        rows = self.__service.get_csv_rows()
+        csv_rows = self.__service.get_csv_rows()
         f = StringIO()
         writer = csv.writer(f, quoting=csv.QUOTE_ALL, lineterminator="\n")
-        writer.writerows(rows)
+        writer.writerows(csv_rows)
         return f
+
+    def get_rows(self, page: int = 1, desc: bool = True) -> list:
+        return self.__service.find(page=page, desc=desc)
 
 
 class MedicalInstitutionsView:
