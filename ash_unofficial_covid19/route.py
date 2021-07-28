@@ -158,16 +158,6 @@ def opendata_pages(page):
     )
 
 
-@app.route("/medical_institutions")
-def medical_institutions():
-    return render_template(
-        "medical_institutions.html",
-        title="ワクチン接種医療機関一覧",
-        gtag_id=Config.GTAG_ID,
-        medical_institutions=get_medical_institutions(),
-    )
-
-
 @app.route("/012041_asahikawa_covid19_patients.csv")
 def patients_csv():
     asahikawa_patient = get_asahikawa_patients()
@@ -177,19 +167,6 @@ def patients_csv():
     res.headers["Content-Type"] = "text/csv"
     res.headers["Content-Disposition"] = (
         "attachment: filename=" + "012041_asahikawa_covid19_patients.csv"
-    )
-    return res
-
-
-@app.route("/012041_asahikawa_covid19_medical_institutions.csv")
-def medical_institutions_csv():
-    medical_institution = get_medical_institutions()
-    f = medical_institution.get_csv()
-    res = make_response()
-    res.data = f.getvalue()
-    res.headers["Content-Type"] = "text/csv"
-    res.headers["Content-Disposition"] = (
-        "attachment: filename=" + "012041_asahikawa_covid19_medical_institutions.csv"
     )
     return res
 

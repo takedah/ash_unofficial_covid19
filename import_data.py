@@ -141,28 +141,6 @@ def import_asahikawa_data(download_lists: list) -> bool:
     return True
 
 
-def delete_duplicate_data() -> bool:
-    """
-    旭川市公式ホームページから取得した新型コロナウイルス感染症の感染者情報には、
-    重複した事例が掲載されたままのため、当該データを削除する。
-
-    Returns:
-        bool: 削除が成功したら真を返す
-
-    """
-    logger = AppLog()
-    try:
-        service = AsahikawaPatientService()
-        for duplicate_patient_number in service.get_duplicate_patient_numbers():
-            service.delete(patient_number=duplicate_patient_number)
-    except (DatabaseConnectionError, ServiceError) as e:
-        logger.warning(e.message)
-        return False
-
-    logger.info("重複事例のデータ削除処理が完了しました。")
-    return True
-
-
 def import_medical_institutions_data(url: str) -> bool:
     """
     旭川市公式ホームページから新型コロナワクチン接種医療機関一覧を取得し、
@@ -199,6 +177,7 @@ def import_medical_institutions_data(url: str) -> bool:
 
 
 if __name__ == "__main__":
+    import_hokkaido_data(Config.HOKKAIDO_URL)
     # 旭川市の陽性患者データをダウンロードしてデータベースへ登録
     download_lists = [
         (Config.NOV2020_OR_EARLIER_URL, 2020),
@@ -212,6 +191,3 @@ if __name__ == "__main__":
         (Config.LATEST_DATA_URL, 2021),
     ]
     import_asahikawa_data(download_lists)
-
-    # 旭川市のワクチン接種医療機関の一覧をデータベースへ登録
-    import_medical_institutions_data(Config.MEDICAL_INSTITUTIONS_URL)
