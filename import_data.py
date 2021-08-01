@@ -188,6 +188,7 @@ if __name__ == "__main__":
         (Config.APR2021_DATA_URL, 2021),
         (Config.MAY2021_DATA_URL, 2021),
         (Config.JUN2021_DATA_URL, 2021),
+        (Config.JUL2021_DATA_URL, 2021),
         (Config.LATEST_DATA_URL, 2021),
     ]
     import_asahikawa_data(download_lists)
