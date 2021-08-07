@@ -14,7 +14,54 @@ from ash_unofficial_covid19.errors import HTTPDownloadError
 from ash_unofficial_covid19.logs import AppLog
 
 
-class DownloadedHTML:
+class Downloader:
+    """Webからコンテンツをダウンロードするクラスの基底クラス"""
+
+    def __init__(self):
+        self.__logger = AppLog()
+
+    def info_log(self, message: str) -> None:
+        """AppLog.infoのラッパー
+
+        Args:
+            message (str): 通常のログメッセージ
+
+        """
+        self.__logger.info(message)
+
+    def error_log(self, message: str) -> None:
+        """AppLog.errorのラッパー
+
+        Args:
+            message (str): エラーログメッセージ
+
+        """
+        self.__logger.error(message)
+
+
+class Scraper:
+    """ダウンロードしたコンテンツを解析するクラスの基底クラス"""
+
+    @staticmethod
+    def format_string(value: str) -> Optional[str]:
+        """改行を半角スペースに置換し、文字列から連続する半角スペースを除去する
+
+        Args:
+            value (str): 整形前の文字列
+
+        Returns:
+            formatted_str (str): 整形後の文字列
+
+        """
+        if isinstance(value, str):
+            return re.sub(
+                "( +)", " ", value.replace("\r", " ").replace("\n", " ").strip()
+            )
+        else:
+            return None
+
+
+class DownloadedHTML(Downloader):
     """HTMLファイルのbytesデータの取得
 
     WebサイトからHTMLファイルをダウンロードしてbytesデータに変換する。
@@ -30,30 +77,12 @@ class DownloadedHTML:
             url (str): WebサイトのHTMLファイルのURL
 
         """
-        self.__logger = AppLog()
+        Downloader.__init__(self)
         self.__content = self._get_html_content(url)
 
     @property
     def content(self) -> bytes:
         return self.__content
-
-    def _info_log(self, message: str) -> None:
-        """AppLog.infoのラッパー
-
-        Args:
-            message (str): 通常のログメッセージ
-
-        """
-        self.__logger.info(message)
-
-    def _error_log(self, message: str) -> None:
-        """AppLog.errorのラッパー
-
-        Args:
-            message (str): エラーログメッセージ
-
-        """
-        self.__logger.error(message)
 
     def _get_html_content(self, url: str) -> bytes:
         """WebサイトからHTMLファイルのbytesデータを取得
@@ -66,22 +95,23 @@ class DownloadedHTML:
 
         """
         try:
-            # 旭川市ホームページのTLS証明書のDH鍵長に問題があるためセキュリティを下げて回避する
+            # 旭川市ホームページのTLS証明書のDH鍵長に問題があるためセキュリティを下げて
+            # 回避する
             requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += "HIGH:!DH"
             response = requests.get(url)
-            self._info_log("HTMLファイルのダウンロードに成功しました。")
+            self.info_log("HTMLファイルのダウンロードに成功しました。")
         except (ConnectionError, Timeout, HTTPError):
             message = "cannot connect to web server."
-            self._error_log(message)
+            self.error_log(message)
             raise HTTPDownloadError(message)
         if response.status_code != 200:
             message = "cannot get HTML contents."
-            self._error_log(message)
+            self.error_log(message)
             raise HTTPDownloadError(message)
         return response.content
 
 
-class ScrapedHTMLData:
+class ScrapeAsahikawaPatients(Scraper):
     """旭川市新型コロナウイルス感染症患者データの抽出
 
     旭川市公式WebサイトからダウンロードしたHTMLファイルから、
@@ -107,7 +137,7 @@ class ScrapedHTMLData:
         else:
             raise TypeError("対象年の指定が正しくありません。")
         self.__patients_data = list()
-        for row in self._get_table_values(downloaded_html):
+        for row in self._get_table_values(downloaded_html.content):
             extracted_data = self._extract_patient_data(row)
             if extracted_data is not None:
                 self.__patients_data.append(extracted_data)
@@ -120,18 +150,18 @@ class ScrapedHTMLData:
     def target_year(self) -> int:
         return self.__target_year
 
-    def _get_table_values(self, downloaded_html: DownloadedHTML) -> list:
+    def _get_table_values(self, html_bytes: bytes) -> list:
         """HTMLからtableの内容を抽出してリストに格納
 
         Args:
-            downloaded_html (:obj:`DownloadedHTML`): ダウンロードしたHTMLファイルの
-                bytesデータを要素に持つオブジェクト
+            html_bytes (bytes): ダウンロードしたHTMLファイルのbytesデータを要素に持つ
+                オブジェクト
 
         Returns:
             table_values (list of list): tableの内容で構成される二次元配列
 
         """
-        soup = BeautifulSoup(downloaded_html.content, "html.parser")
+        soup = BeautifulSoup(html_bytes, "html.parser")
         table_values = list()
         for table in soup.find_all("table"):
             if table.find("caption") is not None:
@@ -144,14 +174,7 @@ class ScrapedHTMLData:
                     for td in tr.find_all("td"):
                         val = td.text.strip()
                         row.append(val)
-                    row = list(
-                        map(
-                            lambda x: re.sub("( +)", " ", x)
-                            .replace("\r", " ")
-                            .replace("\n", " "),
-                            row,
-                        )
-                    )
+                    row = list(map(lambda x: self.format_string(x), row))
                     table_values.append(row)
 
         return table_values
@@ -183,8 +206,8 @@ class ScrapedHTMLData:
         else:
             return ""
 
-    @staticmethod
-    def format_date(date_string: str, target_year: int) -> Optional[date]:
+    @classmethod
+    def format_date(self, date_string: str, target_year: int) -> Optional[date]:
         """元データに年のデータがないためこれを加えてdatetime.dateに変換
 
         Args:
@@ -196,9 +219,7 @@ class ScrapedHTMLData:
 
         """
         try:
-            date_string = ScrapedHTMLData._z2h(
-                date_string.replace(" ", "").replace("　", "")
-            )
+            date_string = self._z2h(date_string.replace(" ", "").replace("　", ""))
             matched_texts = re.match("([0-9]+)月([0-9]+)日", date_string)
             if matched_texts is None:
                 return None
@@ -209,8 +230,8 @@ class ScrapedHTMLData:
         except (TypeError, ValueError):
             return None
 
-    @staticmethod
-    def format_age(age_string: str) -> str:
+    @classmethod
+    def format_age(self, age_string: str) -> str:
         """患者の年代表記をオープンデータ定義書の仕様に合わせる。
 
         Args:
@@ -220,7 +241,7 @@ class ScrapedHTMLData:
             formatted_age (str): 修正後の患者の年代表記
 
         """
-        age_string = ScrapedHTMLData._z2h(age_string)
+        age_string = self._z2h(age_string)
         if age_string is None:
             return ""
         if age_string == "非公表" or age_string == "調査中":
@@ -239,8 +260,8 @@ class ScrapedHTMLData:
         else:
             return str(age) + "代"
 
-    @staticmethod
-    def format_sex(sex_string: str) -> str:
+    @classmethod
+    def format_sex(self, sex_string: str) -> str:
         """患者の性別表記をオープンデータ定義書の仕様に合わせる。
 
         Args:
@@ -321,54 +342,31 @@ class ScrapedHTMLData:
             return None
 
 
-class ScrapedCSVData:
-    """北海道新型コロナウイルス感染症患者データの抽出
+class DownloadedCSV(Downloader):
+    """CSVファイルのStringIOデータの取得
 
-    北海道オープンデータポータルからダウンロードした陽性患者属性CSVファイルから、
-    新型コロナウイルス感染症患者データを抽出し、リストに変換する。
+    WebサイトからCSVファイルをダウンロードしてStringIOで返す
 
     Attributes:
-        patients_data (list of dict): 患者データを表す辞書のリスト
+        content (StringIO): ダウンロードしたCSVファイルのStringIOデータ
 
     """
 
-    def __init__(self, url: str):
+    def __init__(self, url: str, encoding: str = "utf-8"):
         """
         Args:
-            url (str): CSVファイルのURL
+            url (str): WebサイトのCSVファイルのURL
+            encoding (str): CSVファイルの文字コード
 
         """
-        self.__logger = AppLog()
-        self.__patients_data = list()
-        csv_io = self._get_csv_io(url=url, encoding="cp932")
-        for row in self._get_table_values(csv_io):
-            extracted_data = self._extract_patient_data(row)
-            if extracted_data is not None:
-                self.__patients_data.append(extracted_data)
+        Downloader.__init__(self)
+        self.__content = self._get_csv_content(url=url, encoding=encoding)
 
     @property
-    def patients_data(self) -> list:
-        return self.__patients_data
+    def content(self) -> StringIO:
+        return self.__content
 
-    def _info_log(self, message: str) -> None:
-        """AppLog.infoのラッパー
-
-        Args:
-            message (str): 通常のログメッセージ
-
-        """
-        self.__logger.info(message)
-
-    def _error_log(self, message: str) -> None:
-        """AppLog.errorのラッパー
-
-        Args:
-            message (str): エラーログメッセージ
-
-        """
-        self.__logger.error(message)
-
-    def _get_csv_io(self, url: str, encoding: str = "utf-8") -> StringIO:
+    def _get_csv_content(self, url: str, encoding: str) -> StringIO:
         """WebサイトからCSVファイルのStringIOデータを取得
 
         Args:
@@ -382,22 +380,52 @@ class ScrapedCSVData:
         try:
             response = requests.get(url)
             csv_io = StringIO(response.content.decode(encoding))
-            self._info_log("CSVファイルのダウンロードに成功しました。")
+            self.info_log("CSVファイルのダウンロードに成功しました。")
         except (ConnectionError, Timeout, HTTPError):
             message = "cannot connect to web server."
-            self._error_log(message)
+            self.error_log(message)
             raise HTTPDownloadError(message)
         if response.status_code != 200:
             message = "cannot get CSV contents."
-            self._error_log(message)
+            self.error_log(message)
             raise HTTPDownloadError(message)
         return csv_io
+
+
+class ScrapeHokkaidoPatients(Scraper):
+    """北海道新型コロナウイルス感染症患者データの抽出
+
+    北海道オープンデータポータルからダウンロードした陽性患者属性CSVファイルから、
+    新型コロナウイルス感染症患者データを抽出し、リストに変換する。
+
+    Attributes:
+        patients_data (list of dict): 患者データを表す辞書のリスト
+
+    """
+
+    def __init__(self, downloaded_csv: DownloadedCSV):
+        """
+        Args:
+            downloaded_csv (:obj:`DownloadedCSV`):
+            CSVファイルのStringIOデータを要素に持つオブジェクト
+
+        """
+        Scraper.__init__(self)
+        self.__patients_data = list()
+        for row in self._get_table_values(downloaded_csv.content):
+            extracted_data = self._extract_patient_data(row)
+            if extracted_data is not None:
+                self.__patients_data.append(extracted_data)
+
+    @property
+    def patients_data(self) -> list:
+        return self.__patients_data
 
     def _get_table_values(self, csv_io: StringIO) -> list:
         """CSVから内容を抽出してリストに格納
 
         Args:
-            csv_io (:obj:`StringIO`): ダウンロードしたCSVファイルのStringIOデータ
+            csv_io (:obj:`StringIO`): CSVファイルのStringIOデータ
 
         Returns:
             table_values (list of list): CSVの内容で構成される二次元配列
@@ -493,77 +521,95 @@ class ScrapedCSVData:
             return None
 
 
-class DownloadedPDF:
-    """旭川市新型コロナワクチン接種医療機関一覧PDFファイルのスクレイピング
+class DownloadedPDF(Downloader):
+    """PDFファイルのBytesIOデータの取得
 
-    旭川市公式ホームページからダウンロードしたPDFファイルから、
-    新型コロナワクチン接種医療機関一覧データをpandasのDataFrameで抽出する。
+    WebサイトからPDFファイルをダウンロードしてBytesIOで返す
 
     Attributes:
-        extraced_data (obj:`pd.DataFrame`): ワクチン接種医療機関一覧PDFから
-            抽出したデータ
+        content (BytesIO): ダウンロードしたPDFファイルのBytesIOデータ
 
     """
 
-    def __init__(self, pdf_url: str):
+    def __init__(self, url: str):
         """
         Args:
-            pdf_url (str): PDFファイルのURL
+            url (str): WebサイトのPDFファイルのURL
 
         """
-        self.__logger = AppLog()
-        self.__extracted_data = self._get_pdf_content(pdf_url)
+        Downloader.__init__(self)
+        self.__content = self._get_pdf_content(url)
 
     @property
-    def extracted_data(self) -> list:
-        return self.__extracted_data
+    def content(self) -> BytesIO:
+        return self.__content
 
-    def _info_log(self, message: str) -> None:
-        """AppLog.infoのラッパー
-
-        Args:
-            message (str): 通常のログメッセージ
-
-        """
-        self.__logger.info(message)
-
-    def _error_log(self, message: str) -> None:
-        """AppLog.errorのラッパー
+    def _get_pdf_content(self, url: str) -> BytesIO:
+        """WebサイトからCSVファイルのBytesIOデータを取得
 
         Args:
-            message (str): エラーログメッセージ
-
-        """
-        self.__logger.error(message)
-
-    def _get_pdf_content(self, pdf_url: str) -> pd.DataFrame:
-        """
-        Args:
-            pdf_url (str): PDFファイルのURL
+            url (str): PDFファイルのURL
 
         Returns:
-            pdf_content (obj:`pd.DataFrame`): ワクチン接種医療機関一覧PDFデータから
-                抽出したデータ
+            pdf_io (BytesIO): ワクチン接種医療機関一覧PDFデータから抽出したデータ
 
         """
         try:
-            # 旭川市ホームページのTLS証明書のDH鍵長に問題があるためセキュリティを下げて回避する
+            # 旭川市ホームページのTLS証明書のDH鍵長に問題があるためセキュリティを下げて
+            # 回避する
             requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += "HIGH:!DH"
-            response = requests.get(pdf_url)
-            self._info_log("PDFファイルのダウンロードに成功しました。")
+            response = requests.get(url)
+            self.info_log("PDFファイルのダウンロードに成功しました。")
         except (ConnectionError, Timeout, HTTPError):
             message = "cannot connect to web server."
-            self._error_log(message)
+            self.error_log(message)
             raise HTTPDownloadError(message)
 
         if response.status_code != 200:
             message = "cannot get PDF contents."
-            self._error_log(message)
+            self.error_log(message)
             raise HTTPDownloadError(message)
 
-        dfs = tabula.read_pdf(
-            BytesIO(response.content), multiple_tables=True, lattice=True, pages="all"
-        )
+        return BytesIO(response)
+
+
+class ScrapeMedicalInstitutions(Scraper):
+    """旭川市新型コロナワクチン接種医療機関一覧データの抽出
+
+    旭川市公式ホームページからダウンロードしたPDFファイルのデータから、
+    新型コロナワクチン接種医療機関一覧データを抽出し、リストに変換する。
+
+    Attributes:
+        medical_institution_data (list of dict): ワクチン接種医療機関データを表す
+            辞書のリスト
+
+    """
+
+    def __init__(self, downloaded_pdf: DownloadedPDF):
+        """
+        Args:
+            downloaded_pdf (:obj:`DownloadedPDF`): PDFファイルのBytesIOデータを要素に持つ
+                オブジェクト
+
+        """
+        pdf_df = self._get_dataframe(downloaded_pdf.content)
+        self.__medical_institutions_data = self._extract_from_pdf(pdf_df)
+
+    @property
+    def medical_institutions_data(self) -> list:
+        return self.__medical_institutions_data
+
+    def _get_dataframe(self, pdf_io: BytesIO) -> pd.DataFrame:
+        """
+        Args:
+            pdf_io (BytesIO): PDFファイルのBytesIOデータ
+
+        Returns:
+            pdf_content (obj:`pd.DataFrame`): ワクチン接種医療機関一覧PDFデータから
+                抽出したpandas DataFrameデータ
+
+        """
+        dfs = tabula.read_pdf(pdf_io, multiple_tables=True, lattice=True, pages="all")
         df = dfs[0]
         df.columns = [
             "name1",
@@ -580,51 +626,22 @@ class DownloadedPDF:
         ]
         return df
 
-
-class ScrapedPDFData:
-    """旭川市新型コロナワクチン接種医療機関一覧データの抽出
-
-    旭川市公式ホームページからダウンロードしたPDFファイルのデータから、
-    新型コロナワクチン接種医療機関一覧データを抽出し、リストに変換する。
-
-    Attributes:
-        medical_institution_data (list of dict): ワクチン接種医療機関データを表す
-            辞書のリスト
-
-    """
-
-    def __init__(self, pdf_content: DownloadedPDF):
+    def _extract_from_pdf(self, pdf_df: pd.DataFrame) -> list:
         """
         Args:
-            pdf_content (obj:`DownloadedPDF`): PDFファイルのデータをpandasのDataFrameに
-                抽出したデータを持つオブジェクト
-
-        """
-        self.__logger = AppLog()
-        self.__medical_institutions_data = self.extract_from_pdf(pdf_content)
-
-    @property
-    def medical_institutions_data(self) -> list:
-        return self.__medical_institutions_data
-
-    def extract_from_pdf(self, pdf_content: DownloadedPDF) -> list:
-        """
-        Args:
-            pdf_content (obj:`DownloadedPDF`): PDFファイルのデータをpandasのDataFrameに
-                抽出したデータを持つオブジェクト
+            pdf_df (:obj:`pd.DataFrame`): PDFファイルから抽出したpandasのDataFrameデータ
 
         Returns:
             pdf_data (list of dict): ワクチン接種医療機関データを表す辞書のリスト
 
         """
-        df = pdf_content.extracted_data
         # 見出し行を削除し、最終行が注釈なのでこれも削除
-        df.drop(df.index[[0, -1]], inplace=True)
+        pdf_df.drop(pdf_df.index[[0, -1]], inplace=True)
         # 最終列がNaNのみの列なので削除
-        df.drop(columns="null", inplace=True)
-        df.replace("\r", "", regex=True, inplace=True)
+        pdf_df.drop(columns="null", inplace=True)
+        pdf_df.replace("\r", "", regex=True, inplace=True)
         # 表が2段組なので左側の列のみを取り出す
-        left_df = df[
+        left_df = pdf_df[
             [
                 "name1",
                 "address1",
@@ -634,7 +651,7 @@ class ScrapedPDFData:
             ]
         ]
         # 右側の列のみを取り出す
-        right_df = df[
+        right_df = pdf_df[
             [
                 "name2",
                 "address2",
@@ -720,7 +737,7 @@ class ScrapedPDFData:
         return formatted_df.to_dict(orient="records")
 
 
-class ScrapedMedicalInstitutionsHTMLData:
+class ScrapedMedicalInstitutionsHTMLData(Scraper):
     """旭川市新型コロナワクチン接種医療機関の一覧を抽出
 
     旭川市公式WebサイトからダウンロードしたHTMLファイルから、
@@ -773,19 +790,17 @@ class ScrapedMedicalInstitutionsHTMLData:
                     row = list()
                     th = tr.find("th")
                     if th:
-                        area = th.text.strip().replace("\n", "")
+                        th_text = self.format_string(th.text)
+                        match = re.match("^※.+", th_text)
+                        if match:
+                            pass
+                        else:
+                            area = th_text
                     row.append(area)
                     for td in tr.find_all("td"):
-                        val = td.text.strip().replace("\n", "")
+                        val = td.text
                         row.append(val)
-                    row = list(
-                        map(
-                            lambda x: x.replace("\n", "")
-                            .replace("\r", "")
-                            .replace(" ", ""),
-                            row,
-                        )
-                    )
+                    row = list(map(lambda x: self.format_string(x), row))
                     table_values.append(row)
 
         return table_values
@@ -816,12 +831,20 @@ class ScrapedMedicalInstitutionsHTMLData:
                     phone_number = "0166-" + row[3]
             else:
                 phone_number = ""
-            if row[4] == "○":
-                book_at_medical_institution = True
+            if isinstance(row[4], str):
+                match = re.match("^.*○.*$", row[4])
+                if match:
+                    book_at_medical_institution = True
+                else:
+                    book_at_medical_institution = False
             else:
                 book_at_medical_institution = False
-            if row[5] == "○":
-                book_at_call_center = True
+            if isinstance(row[5], str):
+                match = re.match("^.*○.*$", row[5])
+                if match:
+                    book_at_call_center = True
+                else:
+                    book_at_call_center = False
             else:
                 book_at_call_center = False
             medical_institutions_data = {

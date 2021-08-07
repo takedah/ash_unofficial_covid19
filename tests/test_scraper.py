@@ -1,5 +1,6 @@
 import unittest
 from datetime import date
+from io import BytesIO
 from unittest.mock import Mock, patch
 
 import pandas as pd
@@ -7,12 +8,13 @@ from requests import HTTPError, Timeout
 
 from ash_unofficial_covid19.errors import HTTPDownloadError
 from ash_unofficial_covid19.scraper import (
+    DownloadedCSV,
     DownloadedHTML,
     DownloadedPDF,
-    ScrapedCSVData,
-    ScrapedHTMLData,
+    ScrapeAsahikawaPatients,
     ScrapedMedicalInstitutionsHTMLData,
-    ScrapedPDFData
+    ScrapeHokkaidoPatients,
+    ScrapeMedicalInstitutions
 )
 
 
@@ -163,9 +165,38 @@ def medical_institution_html_content():
         <tr>
             <td>旭川赤十字病院</td>
             <td>曙1の1</td>
-            <td>22-8111</td>
+            <td>
+            <p>76-9838</p>
+            <p>予約専用</P>
+            </td>
             <td>○</td>
             <td>○</td>
+        </tr>
+        <tr>
+            <th>大成</th>
+        </tr>
+        <tr>
+            <td>道北勤医協<br />
+
+            一条通病院</td>
+            <td>東光1の1</td>
+            <td>
+            <p>34-0015</p>
+
+            <p>予約専用</p>
+
+            </td>
+            <td>○※1</td>
+            <td>－</td>
+        </tr>
+        <tr>
+            <th>
+
+            <p>※1　道北勤医協一条通病院及び道北勤医協一条クリニックは、予約専用番号(34-0015)に変更となります。</p>
+
+            <p>開始時期は、各医療機関のホームページ及び院内掲示をご覧ください。</p>
+
+            </th>
         </tr>
     </tbody>
 </table>
@@ -207,7 +238,7 @@ class TestDownloadedHTML(unittest.TestCase):
             DownloadedHTML("http://dummy.local")
 
 
-class TestScrapedHTMLData(unittest.TestCase):
+class TestScrapeAsahikawaPatients(unittest.TestCase):
     def setUp(self):
         self.html_content = html_content()
 
@@ -216,36 +247,36 @@ class TestScrapedHTMLData(unittest.TestCase):
 
     def test_format_date(self):
         self.assertEqual(
-            ScrapedHTMLData.format_date(date_string="3月6日", target_year=2021),
+            ScrapeAsahikawaPatients.format_date(date_string="3月6日", target_year=2021),
             date(2021, 3, 6),
         )
 
         # 全角数字が含まれている場合でも正しく変換する
         self.assertEqual(
-            ScrapedHTMLData.format_date(date_string="３月６日", target_year=2021),
+            ScrapeAsahikawaPatients.format_date(date_string="３月６日", target_year=2021),
             date(2021, 3, 6),
         )
 
         # 日付ではない数字の場合Noneを返す
         self.assertEqual(
-            ScrapedHTMLData.format_date(date_string="13月6日", target_year=2021),
+            ScrapeAsahikawaPatients.format_date(date_string="13月6日", target_year=2021),
             None,
         )
 
     def test_format_age(self):
-        self.assertEqual(ScrapedHTMLData.format_age("20代"), "20代")
-        self.assertEqual(ScrapedHTMLData.format_age("調査中"), "")
-        self.assertEqual(ScrapedHTMLData.format_age("10代未満"), "10歳未満")
-        self.assertEqual(ScrapedHTMLData.format_age("100代"), "90歳以上")
+        self.assertEqual(ScrapeAsahikawaPatients.format_age("20代"), "20代")
+        self.assertEqual(ScrapeAsahikawaPatients.format_age("調査中"), "")
+        self.assertEqual(ScrapeAsahikawaPatients.format_age("10代未満"), "10歳未満")
+        self.assertEqual(ScrapeAsahikawaPatients.format_age("100代"), "90歳以上")
 
         # 全角数字が含まれている場合でも正しく変換する
-        self.assertEqual(ScrapedHTMLData.format_age("２０代"), "20代")
+        self.assertEqual(ScrapeAsahikawaPatients.format_age("２０代"), "20代")
 
     def test_format_sex(self):
-        self.assertEqual(ScrapedHTMLData.format_sex("男性"), "男性")
-        self.assertEqual(ScrapedHTMLData.format_sex("非公表"), "")
-        self.assertEqual(ScrapedHTMLData.format_sex("その他"), "その他")
-        self.assertEqual(ScrapedHTMLData.format_sex("women"), "")
+        self.assertEqual(ScrapeAsahikawaPatients.format_sex("男性"), "男性")
+        self.assertEqual(ScrapeAsahikawaPatients.format_sex("非公表"), "")
+        self.assertEqual(ScrapeAsahikawaPatients.format_sex("その他"), "その他")
+        self.assertEqual(ScrapeAsahikawaPatients.format_sex("women"), "")
 
     @patch("ash_unofficial_covid19.scraper.requests")
     def test_data_list(self, mock_requests):
@@ -255,9 +286,11 @@ class TestScrapedHTMLData(unittest.TestCase):
         downloaded_html = DownloadedHTML("http://dummy.local")
         # 年指定が正しくない場合エラーを返す
         with self.assertRaises(TypeError):
-            ScrapedHTMLData(downloaded_html=downloaded_html, target_year=2019)
+            ScrapeAsahikawaPatients(downloaded_html=downloaded_html, target_year=2019)
 
-        scraper = ScrapedHTMLData(downloaded_html=downloaded_html, target_year=2021)
+        scraper = ScrapeAsahikawaPatients(
+            downloaded_html=downloaded_html, target_year=2021
+        )
         expect = [
             {
                 "patient_number": 1121,
@@ -315,9 +348,9 @@ class TestScrapedHTMLData(unittest.TestCase):
                 "symptom": "",
                 "overseas_travel_history": None,
                 "be_discharged": None,
-                "note": "北海道発表No.;19004;周囲の患者の発生;No.1092  No.1093;濃厚接触者の状況;1人;",
+                "note": "北海道発表No.;19004;周囲の患者の発生;No.1092 No.1093;濃厚接触者の状況;1人;",
                 "hokkaido_patient_number": 19004,
-                "surrounding_status": "No.1092  No.1093",
+                "surrounding_status": "No.1092 No.1093",
                 "close_contact": "1人",
             },
             {
@@ -395,11 +428,38 @@ class TestScrapedHTMLData(unittest.TestCase):
         """
         mock_requests.get.return_value = Mock(status_code=200, content=dummy_table)
         downloaded_html = DownloadedHTML("http://dummy.local")
-        scraper = ScrapedHTMLData(downloaded_html=downloaded_html, target_year=2021)
+        scraper = ScrapeAsahikawaPatients(
+            downloaded_html=downloaded_html, target_year=2021
+        )
         self.assertEqual(scraper.patients_data, [])
 
 
-class TestScrapedCSVData(unittest.TestCase):
+class TestDownloadedCSV(unittest.TestCase):
+    @patch("ash_unofficial_covid19.scraper.requests")
+    def test_content(self, mock_requests):
+        mock_requests.get.return_value = Mock(
+            status_code=200,
+            content=csv_content(),
+            headers={"content-type": "text/csv"},
+        )
+        mock_requests.get.side_effect = Timeout("Dummy Error.")
+        with self.assertRaises(HTTPDownloadError):
+            DownloadedCSV(url="http://dummy.local", encoding="cp932")
+
+        mock_requests.get.side_effect = HTTPError("Dummy Error.")
+        with self.assertRaises(HTTPDownloadError):
+            DownloadedCSV(url="http://dummy.local", encoding="cp932")
+
+        mock_requests.get.side_effect = ConnectionError("Dummy Error.")
+        with self.assertRaises(HTTPDownloadError):
+            DownloadedCSV(url="http://dummy.local", encoding="cp932")
+
+        mock_requests.get.return_value = Mock(status_code=404)
+        with self.assertRaises(HTTPDownloadError):
+            DownloadedCSV(url="http://dummy.local", encoding="cp932")
+
+
+class TestScrapeHokkaidoPatients(unittest.TestCase):
     def setUp(self):
         self.csv_content = csv_content()
 
@@ -407,13 +467,14 @@ class TestScrapedCSVData(unittest.TestCase):
         pass
 
     @patch("ash_unofficial_covid19.scraper.requests")
-    def test_content(self, mock_requests):
+    def test_patients_data(self, mock_requests):
         mock_requests.get.return_value = Mock(
             status_code=200,
-            content=self.csv_content,
+            content=csv_content(),
             headers={"content-type": "text/csv"},
         )
-        csv_data = ScrapedCSVData(url="http://dummy.local")
+        downloaded_csv = DownloadedCSV(url="http://dummy.local", encoding="cp932")
+        csv_data = ScrapeHokkaidoPatients(downloaded_csv)
         result = csv_data.patients_data
         expect = [
             {
@@ -470,22 +531,6 @@ class TestScrapedCSVData(unittest.TestCase):
         ]
         self.assertEqual(result, expect)
 
-        mock_requests.get.side_effect = Timeout("Dummy Error.")
-        with self.assertRaises(HTTPDownloadError):
-            ScrapedCSVData("http://dummy.local")
-
-        mock_requests.get.side_effect = HTTPError("Dummy Error.")
-        with self.assertRaises(HTTPDownloadError):
-            ScrapedCSVData("http://dummy.local")
-
-        mock_requests.get.side_effect = ConnectionError("Dummy Error.")
-        with self.assertRaises(HTTPDownloadError):
-            ScrapedCSVData("http://dummy.local")
-
-        mock_requests.get.return_value = Mock(status_code=404)
-        with self.assertRaises(HTTPDownloadError):
-            ScrapedCSVData("http://dummy.local")
-
 
 class TestDownloadedPDF(unittest.TestCase):
     @patch("ash_unofficial_covid19.scraper.requests")
@@ -507,9 +552,10 @@ class TestDownloadedPDF(unittest.TestCase):
             DownloadedPDF("http://dummy.local")
 
 
-class TestScrapedPDFData(unittest.TestCase):
-    def test_medical_institutions_data(self):
-        pdf_content = pd.DataFrame(
+class TestScrapeMedicalInstitutions(unittest.TestCase):
+    @patch("ash_unofficial_covid19.scraper.ScrapeMedicalInstitutions._get_dataframe")
+    def test_medical_institutions_data(self, mock_get_dataframe):
+        mock_get_dataframe.return_value = pd.DataFrame(
             [
                 [],
                 [
@@ -554,9 +600,8 @@ class TestScrapedPDFData(unittest.TestCase):
                 "null",
             ],
         )
-        mock_pdf_content = Mock()
-        mock_pdf_content.extracted_data = pdf_content
-        scraper = ScrapedPDFData(pdf_content=mock_pdf_content)
+        downloaded_pdf = Mock(content=BytesIO())
+        scraper = ScrapeMedicalInstitutions(downloaded_pdf=downloaded_pdf)
         expect = [
             {
                 "name": "市立旭川病院",
@@ -620,10 +665,18 @@ class TestScrapedMedicalInstitutionsHTMLData(unittest.TestCase):
             {
                 "name": "旭川赤十字病院",
                 "address": "旭川市曙1の1",
-                "phone_number": "0166-22-8111",
+                "phone_number": "0166-76-9838 予約専用",
                 "book_at_medical_institution": True,
                 "book_at_call_center": True,
                 "area": "西地区",
+            },
+            {
+                "name": "道北勤医協 一条通病院",
+                "address": "旭川市東光1の1",
+                "phone_number": "0166-34-0015 予約専用",
+                "book_at_medical_institution": True,
+                "book_at_call_center": False,
+                "area": "大成",
             },
         ]
         self.assertEqual(scraper.items, expect)
