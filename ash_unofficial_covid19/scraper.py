@@ -604,7 +604,7 @@ class ScrapeMedicalInstitutionsPDF(Scraper):
 
         """
         pdf_df = self._get_dataframe(downloaded_pdf.content)
-        self.__lists = self._extract_from_pdf(pdf_df)
+        self.__lists = self._extract_medical_institutions_data(pdf_df)
 
     @property
     def lists(self) -> list:
@@ -637,7 +637,7 @@ class ScrapeMedicalInstitutionsPDF(Scraper):
         ]
         return df
 
-    def _extract_from_pdf(self, pdf_df: pd.DataFrame) -> list:
+    def _extract_medical_institutions_data(self, pdf_df: pd.DataFrame) -> list:
         """
         Args:
             pdf_df (:obj:`pd.DataFrame`): PDFファイルから抽出したpandasのDataFrameデータ
@@ -769,7 +769,7 @@ class ScrapeMedicalInstitutions(Scraper):
         """
         self.__lists = list()
         for row in self._get_table_values(downloaded_html):
-            extracted_data = self._extract_medical_institutions_data(row)
+            extracted_data = self._extract_medical_institution_data(row)
             if extracted_data is not None:
                 self.__lists.append(extracted_data)
 
@@ -816,7 +816,7 @@ class ScrapeMedicalInstitutions(Scraper):
 
         return table_values
 
-    def _extract_medical_institutions_data(self, row: list) -> Optional[dict]:
+    def _extract_medical_institution_data(self, row: list) -> Optional[dict]:
         """新型コロナワクチン接種医療機関データへの変換
 
         旭川市公式ホームページのワクチン接種医療機関一覧HTMLから抽出した行データの

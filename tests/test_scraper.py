@@ -12,9 +12,9 @@ from ash_unofficial_covid19.scraper import (
     DownloadedHTML,
     DownloadedPDF,
     ScrapeAsahikawaPatients,
-    ScrapeMedicalInstitutions,
-    ScrapeMedicalInstitutionsPDF,
     ScrapeHokkaidoPatients,
+    ScrapeMedicalInstitutions,
+    ScrapeMedicalInstitutionsPDF
 )
 
 
