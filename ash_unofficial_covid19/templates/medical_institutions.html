@@ -8,37 +8,19 @@
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
-    <div class="table-responsive">
-        <table class="table table-striped table-bordered">
-            <thead>
-                <tr>
-                    <th class="text-nowrap">地区</th>
-                    <th class="text-nowrap">医療機関名</th>
-                    <th class="text-nowrap">住所</th>
-                    <th class="text-nowrap">電話番号</th>
-                    <th class="text-nowrap">かかりつけの医療機関で予約できます</th>
-                    <th class="text-nowrap">コールセンターやインターネットで予約できます</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in medical_institutions.get_rows() %}
-                <tr>
-                    <td class="text-nowrap">{{ row[0] }}</td>
-                    <td class="text-nowrap">{{ row[1] }}</td>
-                    <td class="text-nowrap">{{ row[2] }}</td>
-                    <td class="text-nowrap">{{ row[3] }}</td>
-                    <td>{{ "OK" if row[4] == "1" else "NG"}}</td>
-                    <td>{{ "OK" if row[5] == "1" else "NG"}}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="card mt-3">
+        <div class="card-body">
+            <section>
+                <h2 class="h5 card-title">新型コロナワクチン接種医療機関一覧CSVをダウンロード</h2>
+                <p>旭川市公式ホームページに掲載の新型コロナワクチン接種医療機関一覧をCSVファイルでダウンロードできるようにしました。 </p>
+                <p><a href="/012041_asahikawa_covid19_medical_institutions.csv" title="旭川市新型コロナワクチン接種医療機関一覧CSVファイルをダウンロード" class="btn btn-primary">新型コロナワクチン接種医療機関一覧CSVをダウンロード</a></p>
+            </section>
+        </div>
     </div>
     <div class="card mt-3">
         <div class="card-body">
             <section>
-                <h2 class="h5 card-title">新型コロナワクチン接種医療機関一覧をCSVでダウンロード</h2>
-                <p><a href="/012041_asahikawa_covid19_medical_institutions.csv" title="旭川市新型コロナワクチン接種医療機関一覧CSVファイルをダウンロード">新型コロナワクチン接種医療機関一覧をCSVファイルでダウンロード</a>することができます。 URLは次のとおりです。</p>
+                <h2 class="h5 card-title">新型コロナワクチン接種医療機関一覧CSVファイルのURL</h2>
                 <div class="input-group">
                     <input id="csv-url" type="text" class="form-control" value="https://ash-unofficial-covid19.herokuapp.com/012041_asahikawa_covid19_medical_institutions.csv">
                 </div>

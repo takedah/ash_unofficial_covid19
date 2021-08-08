@@ -828,6 +828,29 @@ class ScrapeMedicalInstitutions(Scraper):
 
         return table_values, memos
 
+    def _get_memo(self, value: str, memos: dict):
+        """解析したHTMLから備考を抽出する
+
+        Args:
+            value (str): 備考を含む可能性のあるテキスト
+            memos (dict): 備考欄の番号をキー、本文を値とした辞書
+
+        Returns:
+            memo (str): 抽出した備考テキスト
+
+        """
+        memo_match = re.match("^.*(※[0-9]).*$", value)
+        if memo_match:
+            memo_number = memo_match[1]
+            memo = memos[memo_number]
+        else:
+            other_match = re.match("^.*○(.+)$", value)
+            if other_match:
+                memo = other_match[1]
+            else:
+                memo = ""
+        return memo
+
     def _extract_medical_institution_data(
         self, row: list, memos: dict
     ) -> Optional[dict]:
@@ -838,7 +861,7 @@ class ScrapeMedicalInstitutions(Scraper):
 
         Args:
             row (list): table要素から抽出した行データのリスト
-            memo (dict): 備考欄の番号をキー、本文を値とした辞書
+            memos (dict): 備考欄の番号をキー、本文を値とした辞書
 
         Returns:
             medical_institution_data (dict): 新型コロナワクチン接種医療機関データを
@@ -861,20 +884,14 @@ class ScrapeMedicalInstitutions(Scraper):
                 match = re.match("^.*○.*$", row[4])
                 if match:
                     book_at_medical_institution = True
-                    memo_match = re.match("^.*(※[0-9]).*$", row[4])
-                    if memo_match:
-                        memo_number = memo_match[1]
-                        memo = memos[memo_number]
+                    memo = self._get_memo(value=row[4], memos=memos)
 
             book_at_call_center = False
             if isinstance(row[5], str):
                 match = re.match("^.*○.*$", row[5])
                 if match:
                     book_at_call_center = True
-                    memo_match = re.match("^.*(※[0-9]).*$", row[5])
-                    if memo_match:
-                        memo_number = memo_match[1]
-                        memo = memos[memo_number]
+                    memo = self._get_memo(value=row[5], memos=memos)
 
             medical_institution_data = {
                 "name": row[1],

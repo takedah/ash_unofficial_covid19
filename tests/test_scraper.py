@@ -170,7 +170,7 @@ def medical_institution_html_content():
             <p>予約専用</P>
             </td>
             <td>○</td>
-            <td>○</td>
+            <td>○備考テスト</td>
         </tr>
         <tr>
             <th>大成</th>
@@ -670,7 +670,7 @@ class TestScrapeMedicalInstitutions(unittest.TestCase):
                 "book_at_medical_institution": True,
                 "book_at_call_center": True,
                 "area": "西地区",
-                "memo": "",
+                "memo": "備考テスト",
             },
             {
                 "name": "道北勤医協 一条通病院",
