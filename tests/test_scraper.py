@@ -12,9 +12,9 @@ from ash_unofficial_covid19.scraper import (
     DownloadedHTML,
     DownloadedPDF,
     ScrapeAsahikawaPatients,
-    ScrapedMedicalInstitutionsHTMLData,
+    ScrapeMedicalInstitutions,
+    ScrapeMedicalInstitutionsPDF,
     ScrapeHokkaidoPatients,
-    ScrapeMedicalInstitutions
 )
 
 
@@ -552,8 +552,8 @@ class TestDownloadedPDF(unittest.TestCase):
             DownloadedPDF("http://dummy.local")
 
 
-class TestScrapeMedicalInstitutions(unittest.TestCase):
-    @patch("ash_unofficial_covid19.scraper.ScrapeMedicalInstitutions._get_dataframe")
+class TestScrapeMedicalInstitutionsPDF(unittest.TestCase):
+    @patch("ash_unofficial_covid19.scraper.ScrapeMedicalInstitutionsPDF._get_dataframe")
     def test_lists(self, mock_get_dataframe):
         mock_get_dataframe.return_value = pd.DataFrame(
             [
@@ -601,7 +601,7 @@ class TestScrapeMedicalInstitutions(unittest.TestCase):
             ],
         )
         downloaded_pdf = Mock(content=BytesIO())
-        scraper = ScrapeMedicalInstitutions(downloaded_pdf=downloaded_pdf)
+        scraper = ScrapeMedicalInstitutionsPDF(downloaded_pdf=downloaded_pdf)
         expect = [
             {
                 "name": "市立旭川病院",
@@ -639,7 +639,7 @@ class TestScrapeMedicalInstitutions(unittest.TestCase):
         self.assertEqual(scraper.lists, expect)
 
 
-class TestScrapedMedicalInstitutionsHTMLData(unittest.TestCase):
+class TestScrapeMedicalInstitutions(unittest.TestCase):
     def setUp(self):
         self.html_content = medical_institution_html_content()
 
@@ -652,7 +652,7 @@ class TestScrapedMedicalInstitutionsHTMLData(unittest.TestCase):
             status_code=200, content=self.html_content
         )
         downloaded_html = DownloadedHTML("http://dummy.local")
-        scraper = ScrapedMedicalInstitutionsHTMLData(downloaded_html=downloaded_html)
+        scraper = ScrapeMedicalInstitutions(downloaded_html=downloaded_html)
         expect = [
             {
                 "name": "市立旭川病院",

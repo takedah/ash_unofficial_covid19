@@ -584,7 +584,7 @@ class DownloadedPDF(Downloader):
         return BytesIO(response)
 
 
-class ScrapeMedicalInstitutions(Scraper):
+class ScrapeMedicalInstitutionsPDF(Scraper):
     """旭川市新型コロナワクチン接種医療機関一覧データの抽出
 
     旭川市公式ホームページからダウンロードしたPDFファイルのデータから、
@@ -748,7 +748,7 @@ class ScrapeMedicalInstitutions(Scraper):
         return formatted_df.to_dict(orient="records")
 
 
-class ScrapedMedicalInstitutionsHTMLData(Scraper):
+class ScrapeMedicalInstitutions(Scraper):
     """旭川市新型コロナワクチン接種医療機関の一覧を抽出
 
     旭川市公式WebサイトからダウンロードしたHTMLファイルから、
