@@ -1,5 +1,6 @@
 import csv
 import re
+from abc import ABCMeta, abstractmethod
 from datetime import date, datetime
 from io import BytesIO, StringIO
 from typing import Optional
@@ -14,11 +15,16 @@ from ash_unofficial_covid19.errors import HTTPDownloadError
 from ash_unofficial_covid19.logs import AppLog
 
 
-class Downloader:
+class Downloader(metaclass=ABCMeta):
     """Webからコンテンツをダウンロードするクラスの基底クラス"""
 
     def __init__(self):
         self.__logger = AppLog()
+
+    @property
+    @abstractmethod
+    def content(self):
+        pass
 
     def info_log(self, message: str) -> None:
         """AppLog.infoのラッパー
@@ -39,8 +45,13 @@ class Downloader:
         self.__logger.error(message)
 
 
-class Scraper:
+class Scraper(metaclass=ABCMeta):
     """ダウンロードしたコンテンツを解析するクラスの基底クラス"""
+
+    @property
+    @abstractmethod
+    def lists(self):
+        pass
 
     @staticmethod
     def format_string(value: str) -> Optional[str]:
@@ -118,7 +129,7 @@ class ScrapeAsahikawaPatients(Scraper):
     新型コロナウイルス感染症患者データを抽出し、リストに変換する。
 
     Attributes:
-        patients_data (list of dict): 患者データを表す辞書のリスト
+        lists (list of dict): 患者データを表す辞書のリスト
         target_year (int): 取得データの属する年
 
     """
@@ -136,15 +147,15 @@ class ScrapeAsahikawaPatients(Scraper):
             self.__target_year = target_year
         else:
             raise TypeError("対象年の指定が正しくありません。")
-        self.__patients_data = list()
+        self.__lists = list()
         for row in self._get_table_values(downloaded_html.content):
             extracted_data = self._extract_patient_data(row)
             if extracted_data is not None:
-                self.__patients_data.append(extracted_data)
+                self.__lists.append(extracted_data)
 
     @property
-    def patients_data(self) -> list:
-        return self.__patients_data
+    def lists(self) -> list:
+        return self.__lists
 
     @property
     def target_year(self) -> int:
@@ -399,7 +410,7 @@ class ScrapeHokkaidoPatients(Scraper):
     新型コロナウイルス感染症患者データを抽出し、リストに変換する。
 
     Attributes:
-        patients_data (list of dict): 患者データを表す辞書のリスト
+        lists (list of dict): 患者データを表す辞書のリスト
 
     """
 
@@ -411,15 +422,15 @@ class ScrapeHokkaidoPatients(Scraper):
 
         """
         Scraper.__init__(self)
-        self.__patients_data = list()
+        self.__lists = list()
         for row in self._get_table_values(downloaded_csv.content):
             extracted_data = self._extract_patient_data(row)
             if extracted_data is not None:
-                self.__patients_data.append(extracted_data)
+                self.__lists.append(extracted_data)
 
     @property
-    def patients_data(self) -> list:
-        return self.__patients_data
+    def lists(self) -> list:
+        return self.__lists
 
     def _get_table_values(self, csv_io: StringIO) -> list:
         """CSVから内容を抽出してリストに格納
@@ -593,11 +604,11 @@ class ScrapeMedicalInstitutions(Scraper):
 
         """
         pdf_df = self._get_dataframe(downloaded_pdf.content)
-        self.__medical_institutions_data = self._extract_from_pdf(pdf_df)
+        self.__lists = self._extract_from_pdf(pdf_df)
 
     @property
-    def medical_institutions_data(self) -> list:
-        return self.__medical_institutions_data
+    def lists(self) -> list:
+        return self.__lists
 
     def _get_dataframe(self, pdf_io: BytesIO) -> pd.DataFrame:
         """
@@ -744,7 +755,7 @@ class ScrapedMedicalInstitutionsHTMLData(Scraper):
     新型コロナワクチン接種医療機関データを抽出し、リストに変換する。
 
     Attributes:
-        items (list of dict): 医療機関データを表す辞書のリスト
+        lists (list of dict): 医療機関データを表す辞書のリスト
 
     """
 
@@ -756,15 +767,15 @@ class ScrapedMedicalInstitutionsHTMLData(Scraper):
                 を要素に持つオブジェクト
 
         """
-        self.__items = list()
+        self.__lists = list()
         for row in self._get_table_values(downloaded_html):
             extracted_data = self._extract_medical_institutions_data(row)
             if extracted_data is not None:
-                self.__items.append(extracted_data)
+                self.__lists.append(extracted_data)
 
     @property
-    def items(self) -> list:
-        return self.__items
+    def lists(self) -> list:
+        return self.__lists
 
     def _get_table_values(self, downloaded_html: DownloadedHTML) -> list:
         """HTMLからtableの内容を抽出してリストに格納

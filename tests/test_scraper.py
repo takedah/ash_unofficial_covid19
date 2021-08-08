@@ -414,7 +414,7 @@ class TestScrapeAsahikawaPatients(unittest.TestCase):
                 "close_contact": "調査中",
             },
         ]
-        self.assertEqual(scraper.patients_data, expect)
+        self.assertEqual(scraper.lists, expect)
 
         # 想定外のテーブル要素があった場合は空リストを返す。
         dummy_table = """
@@ -431,7 +431,7 @@ class TestScrapeAsahikawaPatients(unittest.TestCase):
         scraper = ScrapeAsahikawaPatients(
             downloaded_html=downloaded_html, target_year=2021
         )
-        self.assertEqual(scraper.patients_data, [])
+        self.assertEqual(scraper.lists, [])
 
 
 class TestDownloadedCSV(unittest.TestCase):
@@ -467,7 +467,7 @@ class TestScrapeHokkaidoPatients(unittest.TestCase):
         pass
 
     @patch("ash_unofficial_covid19.scraper.requests")
-    def test_patients_data(self, mock_requests):
+    def test_lists(self, mock_requests):
         mock_requests.get.return_value = Mock(
             status_code=200,
             content=csv_content(),
@@ -475,7 +475,7 @@ class TestScrapeHokkaidoPatients(unittest.TestCase):
         )
         downloaded_csv = DownloadedCSV(url="http://dummy.local", encoding="cp932")
         csv_data = ScrapeHokkaidoPatients(downloaded_csv)
-        result = csv_data.patients_data
+        result = csv_data.lists
         expect = [
             {
                 "patient_number": 1,
@@ -554,7 +554,7 @@ class TestDownloadedPDF(unittest.TestCase):
 
 class TestScrapeMedicalInstitutions(unittest.TestCase):
     @patch("ash_unofficial_covid19.scraper.ScrapeMedicalInstitutions._get_dataframe")
-    def test_medical_institutions_data(self, mock_get_dataframe):
+    def test_lists(self, mock_get_dataframe):
         mock_get_dataframe.return_value = pd.DataFrame(
             [
                 [],
@@ -636,7 +636,7 @@ class TestScrapeMedicalInstitutions(unittest.TestCase):
                 "area": "",
             },
         ]
-        self.assertEqual(scraper.medical_institutions_data, expect)
+        self.assertEqual(scraper.lists, expect)
 
 
 class TestScrapedMedicalInstitutionsHTMLData(unittest.TestCase):
@@ -647,7 +647,7 @@ class TestScrapedMedicalInstitutionsHTMLData(unittest.TestCase):
         pass
 
     @patch("ash_unofficial_covid19.scraper.requests")
-    def test_items(self, mock_requests):
+    def test_lists(self, mock_requests):
         mock_requests.get.return_value = Mock(
             status_code=200, content=self.html_content
         )
@@ -679,7 +679,7 @@ class TestScrapedMedicalInstitutionsHTMLData(unittest.TestCase):
                 "area": "大成",
             },
         ]
-        self.assertEqual(scraper.items, expect)
+        self.assertEqual(scraper.lists, expect)
 
 
 if __name__ == "__main__":
