@@ -15,16 +15,19 @@ from ash_unofficial_covid19.models import (
     MedicalInstitutionFactory
 )
 from ash_unofficial_covid19.scraper import (
+    DownloadedCSV,
     DownloadedHTML,
-    ScrapedCSVData,
-    ScrapedHTMLData,
-    ScrapedMedicalInstitutionsHTMLData
+    ScrapeAsahikawaPatients,
+    ScrapeHokkaidoPatients,
+    ScrapeMedicalInstitutions
 )
 from ash_unofficial_covid19.services import (
     AsahikawaPatientService,
     HokkaidoPatientService,
     MedicalInstitutionService
 )
+
+logger = AppLog()
 
 
 def import_hokkaido_data(url: str) -> bool:
@@ -39,15 +42,15 @@ def import_hokkaido_data(url: str) -> bool:
         bool: データベースへ格納が成功したら真を返す
 
     """
-    logger = AppLog()
     try:
-        scraped_data = ScrapedCSVData(url)
+        csv_data = DownloadedCSV(url=url, encoding="cp932")
     except HTTPDownloadError as e:
         logger.warning(e.message)
         return False
 
+    scraped_data = ScrapeHokkaidoPatients(csv_data)
     patients_data = HokkaidoPatientFactory()
-    for row in scraped_data.patients_data:
+    for row in scraped_data.lists:
         patients_data.create(**row)
 
     try:
@@ -61,7 +64,7 @@ def import_hokkaido_data(url: str) -> bool:
     return True
 
 
-def get_asahikawa_data(url: str, target_year: int) -> Optional[ScrapedHTMLData]:
+def get_asahikawa_data(url: str, target_year: int) -> Optional[ScrapeAsahikawaPatients]:
     """
     旭川市公式ホームページから新型コロナウイルス感染症の感染者情報一覧を取得する。
 
@@ -73,15 +76,13 @@ def get_asahikawa_data(url: str, target_year: int) -> Optional[ScrapedHTMLData]:
         scraped_data (obj:`ScrapedHTMLData`): ダウンロードしたHTMLデータ
 
     """
-    logger = AppLog()
     try:
         html_data = DownloadedHTML(url)
     except HTTPDownloadError as e:
         logger.warning(e.message)
         return None
 
-    scraped_data = ScrapedHTMLData(downloaded_html=html_data, target_year=target_year)
-    return scraped_data
+    return ScrapeAsahikawaPatients(downloaded_html=html_data, target_year=target_year)
 
 
 def import_asahikawa_data(download_lists: list) -> bool:
@@ -97,14 +98,13 @@ def import_asahikawa_data(download_lists: list) -> bool:
         bool: データベースへ格納が成功したら真を返す
 
     """
-    logger = AppLog()
     patients_data = AsahikawaPatientFactory()
     for download_list in download_lists:
         url = download_list[0]
         target_year = download_list[1]
         scraped_data = get_asahikawa_data(url=url, target_year=target_year)
         if scraped_data:
-            for row in scraped_data.patients_data:
+            for row in scraped_data.lists:
                 patients_data.create(**row)
 
     # HTMLに市内番号489の掲載が抜けているので手動で追加する
@@ -153,16 +153,15 @@ def import_medical_institutions_data(url: str) -> bool:
         bool: データベースへ格納が成功したら真を返す
 
     """
-    logger = AppLog()
     try:
         html_content = DownloadedHTML(url)
     except HTTPDownloadError as e:
         logger.warning(e.message)
         return False
 
-    scraped_data = ScrapedMedicalInstitutionsHTMLData(html_content)
+    scraped_data = ScrapeMedicalInstitutions(html_content)
     medical_institutions_data = MedicalInstitutionFactory()
-    for row in scraped_data.items:
+    for row in scraped_data.lists:
         medical_institutions_data.create(**row)
 
     try:
@@ -191,4 +190,5 @@ if __name__ == "__main__":
         (Config.JUL2021_DATA_URL, 2021),
         (Config.LATEST_DATA_URL, 2021),
     ]
-    import_asahikawa_data(download_lists)
+    # import_asahikawa_data(download_lists)
+    import_medical_institutions_data(Config.MEDICAL_INSTITUTIONS_URL)

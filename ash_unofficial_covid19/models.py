@@ -459,6 +459,7 @@ class MedicalInstitution(Patient):
         book_at_medical_institution: bool,
         book_at_call_center: bool,
         area: str,
+        memo: str,
     ):
         """
         Args:
@@ -468,6 +469,7 @@ class MedicalInstitution(Patient):
             book_at_medical_institution (bool): 医療機関で予約が可能か
             book_at_call_center (bool): コールセンターやインターネットで予約が可能か
             area (str): 医療機関の地区
+            memo (str): 備考
 
         """
         self.__name = name
@@ -476,6 +478,7 @@ class MedicalInstitution(Patient):
         self.__book_at_medical_institution = book_at_medical_institution
         self.__book_at_call_center = book_at_call_center
         self.__area = area
+        self.__memo = memo
 
     @property
     def name(self) -> str:
@@ -500,6 +503,10 @@ class MedicalInstitution(Patient):
     @property
     def area(self) -> str:
         return self.__area
+
+    @property
+    def memo(self) -> str:
+        return self.__memo
 
 
 class MedicalInstitutionFactory(Factory):

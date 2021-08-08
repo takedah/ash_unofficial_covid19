@@ -661,6 +661,7 @@ class TestScrapeMedicalInstitutions(unittest.TestCase):
                 "book_at_medical_institution": True,
                 "book_at_call_center": False,
                 "area": "新富・東・金星町",
+                "memo": "",
             },
             {
                 "name": "旭川赤十字病院",
@@ -669,6 +670,7 @@ class TestScrapeMedicalInstitutions(unittest.TestCase):
                 "book_at_medical_institution": True,
                 "book_at_call_center": True,
                 "area": "西地区",
+                "memo": "",
             },
             {
                 "name": "道北勤医協 一条通病院",
@@ -677,6 +679,11 @@ class TestScrapeMedicalInstitutions(unittest.TestCase):
                 "book_at_medical_institution": True,
                 "book_at_call_center": False,
                 "area": "大成",
+                "memo": (
+                    "道北勤医協一条通病院及び道北勤医協一条クリニックは、"
+                    + "予約専用番号(34-0015)に変更となります。 開始時期は、"
+                    + "各医療機関のホームページ及び院内掲示をご覧ください。"
+                ),
             },
         ]
         self.assertEqual(scraper.lists, expect)

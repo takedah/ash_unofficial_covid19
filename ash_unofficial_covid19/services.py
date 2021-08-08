@@ -117,7 +117,8 @@ class Service:
         """テーブルの最終更新日を返す。
 
         Returns:
-            last_updated (:obj:`datetime.datetime'): 対象テーブルのupdatedカラムで一番最新の値を返す。
+            last_updated (:obj:`datetime.datetime'): 対象テーブルのupdatedカラムで
+                一番最新の値を返す。
 
         """
         state = "SELECT max(updated_at) FROM " + self.table_name + ";"
@@ -158,7 +159,8 @@ class AsahikawaPatientService(Service):
         """データベースへ新型コロナウイルス感染症患者データを一括登録する
 
         Args:
-            patients (:obj:`AsahikawaPatientFactory`): 患者データのオブジェクトのリストを要素に持つオブジェクト
+            patients (:obj:`AsahikawaPatientFactory`): 患者データのオブジェクトのリストを
+                要素に持つオブジェクト
 
         """
         items = (
@@ -246,7 +248,8 @@ class AsahikawaPatientService(Service):
         """新型コロナウイルス感染症患者の全件を返す
 
         Returns:
-            res (:obj:`AsahikawaPatientFactory`): 新型コロナウイルス感染症患者オブジェクトの全件リストを要素に持つリスト
+            res (:obj:`AsahikawaPatientFactory`): 新型コロナウイルス感染症患者
+                オブジェクトの全件リストを要素に持つリスト
 
         """
         state = (
@@ -366,42 +369,6 @@ class AsahikawaPatientService(Service):
                     factory.create(**row)
         return (factory, max_page)
 
-    def get_duplicate_patient_numbers(self) -> list:
-        """
-        旭川市の公表した陽性患者情報の中に重複があるが、旭川市公式ホームページは重複分も表示されたままなので、
-        北海道の公表するオープンデータで重複削除とされているデータに該当する識別番号をリストで返す。
-
-        Returns:
-            res (list): 重複削除とされているデータの識別番号
-
-        """
-        state = (
-            "SELECT"
-            + " "
-            + "a.patient_number"
-            + " "
-            + "FROM"
-            + " "
-            + self.table_name
-            + " "
-            + "AS a"
-            + " "
-            + "LEFT JOIN hokkaido_patients AS h"
-            + " "
-            + "ON a.hokkaido_patient_number = h.patient_number"
-            + " "
-            + "WHERE h.residence = '重複削除'"
-            + " "
-            + "ORDER BY a.patient_number ASC;"
-        )
-        duplicate_patient_numbers = list()
-        with self.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state)
-                for row in cur.fetchall():
-                    duplicate_patient_numbers.append(row["patient_number"])
-        return duplicate_patient_numbers
-
     def get_csv_rows(self) -> list:
         """陽性患者属性CSVファイルを出力するためのリストを返す
 
@@ -485,7 +452,8 @@ class AsahikawaPatientService(Service):
             to_date (obj:`date`): 集計の終期
 
         Returns:
-            aggregate_by_days (list of tuple): 1日ごとの日付とその週の新規陽性患者数を要素とするタプル
+            aggregate_by_days (list of tuple): 1日ごとの日付とその週の新規陽性患者数を
+                要素とするタプル
 
         """
         state = (
@@ -518,7 +486,8 @@ class AsahikawaPatientService(Service):
             to_date (obj:`date`): 集計の終期
 
         Returns:
-            aggregate_by_weeks (list of tuple): 1週間ごとの日付とその週の新規陽性患者数を要素とするタプルのリスト
+            aggregate_by_weeks (list of tuple): 1週間ごとの日付とその週の新規陽性患者数を
+                要素とするタプルのリスト
 
         """
         state = (
@@ -551,7 +520,8 @@ class AsahikawaPatientService(Service):
             to_date (obj:`date`): 集計の終期
 
         Returns:
-            seven_days_moving_average (list of tuple): 1週間ごとの日付とその週の新規陽性患者数を要素とするタプルのリスト
+            seven_days_moving_average (list of tuple): 1週間ごとの日付とその週の
+                新規陽性患者数を要素とするタプルのリスト
         """
         aggregate_by_weeks = self.get_aggregate_by_weeks(
             from_date=from_date, to_date=to_date
@@ -574,7 +544,8 @@ class AsahikawaPatientService(Service):
             to_date (obj:`date`): 累計の終期
 
         Returns:
-            total_by_months (list of tuple): 1か月ごとの年月とその週までの累計陽性患者数を要素とするタプルのリスト
+            total_by_months (list of tuple): 1か月ごとの年月とその週までの
+                累計陽性患者数を要素とするタプルのリスト
 
         """
         state = (
@@ -608,7 +579,8 @@ class AsahikawaPatientService(Service):
         """年代別の陽性患者数を返す
 
         Returns:
-            patients_number_by_age (list of tuple): 年代別の陽性患者数を要素とするタプルのリスト
+            patients_number_by_age (list of tuple): 年代別の陽性患者数を要素とする
+                タプルのリスト
 
         """
         state = (
@@ -636,7 +608,8 @@ class HokkaidoPatientService(Service):
         """データベースへ新型コロナウイルス感染症患者データを保存
 
         Args:
-            patient (:obj:`HokkaidoPatientFactory`): 患者データのオブジェクトのリストを要素に持つオブジェクト
+            patient (:obj:`HokkaidoPatientFactory`): 患者データのオブジェクトのリストを
+                要素に持つオブジェクト
 
         """
         items = (
@@ -708,6 +681,7 @@ class MedicalInstitutionService(Service):
             "book_at_medical_institution",
             "book_at_call_center",
             "area",
+            "memo",
             "updated_at",
         )
 
@@ -721,6 +695,7 @@ class MedicalInstitutionService(Service):
                     medical_institution.book_at_medical_institution,
                     medical_institution.book_at_call_center,
                     medical_institution.area,
+                    medical_institution.memo,
                     datetime.now(timezone(timedelta(hours=+9))),
                 ]
             )
@@ -734,14 +709,15 @@ class MedicalInstitutionService(Service):
         """新型コロナワクチン接種医療機関の全件リストを返す
 
         Returns:
-            res (:obj:`MedicalInstitutionFactory`): 新型コロナウイルス感染症患者オブジェクトのリストを要素に持つオブジェクト
+            res (:obj:`MedicalInstitutionFactory`): 新型コロナウイルス感染症患者
+                オブジェクトのリストを要素に持つオブジェクト
 
         """
         state = (
             "SELECT"
             + " "
             + "name,address,phone_number,book_at_medical_institution,"
-            + "book_at_call_center,area"
+            + "book_at_call_center,area,memo"
             + " "
             + "FROM"
             + " "
@@ -775,6 +751,7 @@ class MedicalInstitutionService(Service):
                 "電話",
                 "かかりつけの医療機関で予約ができます",
                 "コールセンターやインターネットで予約ができます",
+                "備考",
             ]
         )
         for medical_institution in medical_institutions.items:
@@ -799,6 +776,7 @@ class MedicalInstitutionService(Service):
                         medical_institution.phone_number,
                         book_at_medical_institution,
                         book_at_call_center,
+                        medical_institution.memo,
                     ]
                 ]
             )

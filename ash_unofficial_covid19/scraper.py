@@ -54,7 +54,7 @@ class Scraper(metaclass=ABCMeta):
         pass
 
     @staticmethod
-    def format_string(value: str) -> Optional[str]:
+    def format_string(value: str) -> str:
         """改行を半角スペースに置換し、文字列から連続する半角スペースを除去する
 
         Args:
@@ -69,7 +69,7 @@ class Scraper(metaclass=ABCMeta):
                 "( +)", " ", value.replace("\r", " ").replace("\n", " ").strip()
             )
         else:
-            return None
+            return ""
 
 
 class DownloadedHTML(Downloader):
@@ -581,7 +581,7 @@ class DownloadedPDF(Downloader):
             self.error_log(message)
             raise HTTPDownloadError(message)
 
-        return BytesIO(response)
+        return BytesIO(response.content)
 
 
 class ScrapeMedicalInstitutionsPDF(Scraper):
@@ -768,8 +768,13 @@ class ScrapeMedicalInstitutions(Scraper):
 
         """
         self.__lists = list()
-        for row in self._get_table_values(downloaded_html):
-            extracted_data = self._extract_medical_institution_data(row)
+        table_values = self._get_table_values(downloaded_html)
+        rows = table_values[0]
+        memos = table_values[1]
+        for row in rows:
+            extracted_data = self._extract_medical_institution_data(
+                row=row, memos=memos
+            )
             if extracted_data is not None:
                 self.__lists.append(extracted_data)
 
@@ -777,7 +782,7 @@ class ScrapeMedicalInstitutions(Scraper):
     def lists(self) -> list:
         return self.__lists
 
-    def _get_table_values(self, downloaded_html: DownloadedHTML) -> list:
+    def _get_table_values(self, downloaded_html: DownloadedHTML) -> tuple:
         """HTMLからtableの内容を抽出してリストに格納
 
         Args:
@@ -786,6 +791,7 @@ class ScrapeMedicalInstitutions(Scraper):
 
         Returns:
             table_values (list of list): tableの内容で構成される二次元配列
+            memos (dict): 備考欄の番号をキー、本文を値とした辞書
 
         """
         soup = BeautifulSoup(downloaded_html.content, "html.parser")
@@ -797,16 +803,22 @@ class ScrapeMedicalInstitutions(Scraper):
                 table_caption = None
             if table_caption == "新型コロナワクチン接種医療機関一覧":
                 area = ""
+                memos = dict()
                 for tr in table.find_all("tr"):
                     row = list()
                     th = tr.find("th")
+                    # th要素は地区か備考を表しているので、備考の場合番号と内容を辞書に
+                    # 格納しておく
                     if th:
                         th_text = self.format_string(th.text)
-                        match = re.match("^※.+", th_text)
+                        match = re.match("^(※[0-9]+)(.+)$", th_text)
                         if match:
-                            pass
+                            memo_number = match[1]
+                            memo_body = match[2].strip()
+                            memos[memo_number] = memo_body
                         else:
                             area = th_text
+                        continue
                     row.append(area)
                     for td in tr.find_all("td"):
                         val = td.text
@@ -814,9 +826,11 @@ class ScrapeMedicalInstitutions(Scraper):
                     row = list(map(lambda x: self.format_string(x), row))
                     table_values.append(row)
 
-        return table_values
+        return table_values, memos
 
-    def _extract_medical_institution_data(self, row: list) -> Optional[dict]:
+    def _extract_medical_institution_data(
+        self, row: list, memos: dict
+    ) -> Optional[dict]:
         """新型コロナワクチン接種医療機関データへの変換
 
         旭川市公式ホームページのワクチン接種医療機関一覧HTMLから抽出した行データの
@@ -824,48 +838,53 @@ class ScrapeMedicalInstitutions(Scraper):
 
         Args:
             row (list): table要素から抽出した行データのリスト
+            memo (dict): 備考欄の番号をキー、本文を値とした辞書
 
         Returns:
-            medical_institutions_data (dict): 新型コロナワクチン接種医療機関データを
+            medical_institution_data (dict): 新型コロナワクチン接種医療機関データを
                 表すハッシュ
 
         """
         try:
+            address = ""
             if isinstance(row[2], str):
                 address = "旭川市" + row[2]
-            else:
-                address = ""
+
+            phone_number = ""
             if isinstance(row[3], str):
-                if row[3] == "":
-                    phone_number = ""
-                else:
+                if row[3] != "":
                     phone_number = "0166-" + row[3]
-            else:
-                phone_number = ""
+
+            memo = ""
+            book_at_medical_institution = False
             if isinstance(row[4], str):
                 match = re.match("^.*○.*$", row[4])
                 if match:
                     book_at_medical_institution = True
-                else:
-                    book_at_medical_institution = False
-            else:
-                book_at_medical_institution = False
+                    memo_match = re.match("^.*(※[0-9]).*$", row[4])
+                    if memo_match:
+                        memo_number = memo_match[1]
+                        memo = memos[memo_number]
+
+            book_at_call_center = False
             if isinstance(row[5], str):
                 match = re.match("^.*○.*$", row[5])
                 if match:
                     book_at_call_center = True
-                else:
-                    book_at_call_center = False
-            else:
-                book_at_call_center = False
-            medical_institutions_data = {
+                    memo_match = re.match("^.*(※[0-9]).*$", row[5])
+                    if memo_match:
+                        memo_number = memo_match[1]
+                        memo = memos[memo_number]
+
+            medical_institution_data = {
                 "name": row[1],
                 "address": address,
                 "phone_number": phone_number,
                 "book_at_medical_institution": book_at_medical_institution,
                 "book_at_call_center": book_at_call_center,
                 "area": row[0],
+                "memo": memo,
             }
-            return medical_institutions_data
+            return medical_institution_data
         except (ValueError, IndexError):
             return None

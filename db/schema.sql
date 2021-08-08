@@ -46,9 +46,10 @@ CREATE TABLE medical_institutions(
     id SERIAL PRIMARY KEY NOT NULL,
     name VARCHAR(128) UNIQUE NOT NULL,
     address TEXT,
-    phone_number VARCHAR(16),
+    phone_number TEXT,
     book_at_medical_institution BOOLEAN,
     book_at_call_center BOOLEAN,
     area TEXT,
+    memo TEXT,
     updated_at TIMESTAMPTZ NOT NULL
 );
