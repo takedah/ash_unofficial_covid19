@@ -46,23 +46,6 @@ class Service:
             raise DatabaseConnectionError(e.args[0])
         return conn
 
-    def delete_all(self) -> None:
-        """テーブルのデータを全削除する。"""
-        state = "TRUNCATE TABLE " + self.table_name + " RESTART IDENTITY;"
-        with self.get_connection() as conn:
-            try:
-                with conn.cursor(cursor_factory=DictCursor) as cur:
-                    cur.execute(state)
-                conn.commit()
-                self.info_log(self.table_name + "テーブルを初期化しました。")
-            except (
-                psycopg2.DataError,
-                psycopg2.IntegrityError,
-                psycopg2.InternalError,
-            ) as e:
-                self.error_log(self.table_name + "テーブルを初期化できませんでした。")
-                raise ServiceError(e.args[0])
-
     def upsert(self, items: tuple, primary_key: str, data_lists: list) -> None:
         """データベースのテーブルへデータをバルクインサートでUPSERT登録する。
 

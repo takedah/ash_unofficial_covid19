@@ -145,7 +145,6 @@ class TestAsahikawaPatientService(unittest.TestCase):
         for row in test_data:
             self.factory.create(**row)
         self.service = AsahikawaPatientService()
-        self.service.delete_all()
         self.service.create(self.factory)
 
         # 北海道の新型コロナウイルス感染症患者データのセットアップ
@@ -206,7 +205,6 @@ class TestAsahikawaPatientService(unittest.TestCase):
         for row in test_hokkaido_data:
             self.hokkaido_factory.create(**row)
         self.hokkaido_service = HokkaidoPatientService()
-        self.hokkaido_service.delete_all()
         self.hokkaido_service.create(self.hokkaido_factory)
 
     def test_delete(self):
@@ -453,7 +451,6 @@ class TestMedicalInstitutionService(unittest.TestCase):
         for row in test_data:
             self.factory.create(**row)
         self.service = MedicalInstitutionService()
-        self.service.delete_all()
         self.service.create(self.factory)
 
     def test_find_all(self):
