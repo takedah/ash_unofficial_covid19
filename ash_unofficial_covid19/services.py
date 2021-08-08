@@ -88,6 +88,10 @@ class Service:
                 with conn.cursor(cursor_factory=DictCursor) as cur:
                     execute_values(cur, state, data_lists)
                 conn.commit()
+                data_number = len(data_lists)
+                self.info_log(
+                    self.table_name + "テーブルへ" + str(data_number) + "件データを登録しました。"
+                )
             except (
                 psycopg2.DataError,
                 psycopg2.IntegrityError,
@@ -193,11 +197,13 @@ class AsahikawaPatientService(Service):
                     datetime.now(timezone(timedelta(hours=+9))),
                 ]
             )
-            self.upsert(
-                items=items,
-                primary_key="patient_number",
-                data_lists=data_lists,
-            )
+
+        # データベースへ登録処理
+        self.upsert(
+            items=items,
+            primary_key="patient_number",
+            data_lists=data_lists,
+        )
 
     def delete(self, patient_number: int) -> bool:
         """指定した識別番号の陽性患者データを削除する
@@ -636,6 +642,8 @@ class HokkaidoPatientService(Service):
                     datetime.now(timezone(timedelta(hours=+9))),
                 ]
             )
+
+        # データベースへ登録処理
         self.upsert(
             items=items,
             primary_key="patient_number",
@@ -682,6 +690,8 @@ class MedicalInstitutionService(Service):
                     datetime.now(timezone(timedelta(hours=+9))),
                 ]
             )
+
+        # データベースへ登録処理
         self.upsert(
             items=items,
             primary_key="name",

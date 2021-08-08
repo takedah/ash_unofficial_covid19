@@ -2,13 +2,7 @@ from datetime import date
 from typing import Optional
 
 from ash_unofficial_covid19.config import Config
-from ash_unofficial_covid19.errors import (
-    DatabaseConnectionError,
-    DataModelError,
-    HTTPDownloadError,
-    ServiceError
-)
-from ash_unofficial_covid19.logs import AppLog
+from ash_unofficial_covid19.errors import HTTPDownloadError
 from ash_unofficial_covid19.models import (
     AsahikawaPatientFactory,
     HokkaidoPatientFactory,
@@ -27,10 +21,8 @@ from ash_unofficial_covid19.services import (
     MedicalInstitutionService
 )
 
-logger = AppLog()
 
-
-def import_hokkaido_data(url: str) -> bool:
+def import_hokkaido_data(url: str) -> None:
     """
     旭川市公式ホームページから新型コロナウイルス感染症の感染者情報一覧を取得し、
     データベースへ格納する。
@@ -38,30 +30,15 @@ def import_hokkaido_data(url: str) -> bool:
     Args:
         url (str): 旭川市公式ホームページのURL
 
-    Returns:
-        bool: データベースへ格納が成功したら真を返す
-
     """
-    try:
-        csv_data = DownloadedCSV(url=url, encoding="cp932")
-    except HTTPDownloadError as e:
-        logger.warning(e.message)
-        return False
-
+    csv_data = DownloadedCSV(url=url, encoding="cp932")
     scraped_data = ScrapeHokkaidoPatients(csv_data)
     patients_data = HokkaidoPatientFactory()
     for row in scraped_data.lists:
         patients_data.create(**row)
 
-    try:
-        service = HokkaidoPatientService()
-        service.create(patients_data)
-    except (DatabaseConnectionError, ServiceError, DataModelError) as e:
-        logger.warning(e.message)
-        return False
-
-    logger.info("北海道のデータ登録処理が完了しました。")
-    return True
+    service = HokkaidoPatientService()
+    service.create(patients_data)
 
 
 def get_asahikawa_data(url: str, target_year: int) -> Optional[ScrapeAsahikawaPatients]:
@@ -78,14 +55,13 @@ def get_asahikawa_data(url: str, target_year: int) -> Optional[ScrapeAsahikawaPa
     """
     try:
         html_data = DownloadedHTML(url)
-    except HTTPDownloadError as e:
-        logger.warning(e.message)
+    except HTTPDownloadError:
         return None
 
     return ScrapeAsahikawaPatients(downloaded_html=html_data, target_year=target_year)
 
 
-def import_asahikawa_data(download_lists: list) -> bool:
+def import_asahikawa_data(download_lists: list) -> None:
     """
     旭川市公式ホームページから新型コロナウイルス感染症の感染者情報を、
     データベースへ格納する。
@@ -93,9 +69,6 @@ def import_asahikawa_data(download_lists: list) -> bool:
     Args:
         download_lists (list of tuple): スクレイピング対象URLとデータの対象年を要素に
             持つタプルを要素としたリスト
-
-    Returns:
-        bool: データベースへ格納が成功したら真を返す
 
     """
     patients_data = AsahikawaPatientFactory()
@@ -130,18 +103,11 @@ def import_asahikawa_data(download_lists: list) -> bool:
     }
     patients_data.create(**additional_data)
 
-    try:
-        service = AsahikawaPatientService()
-        service.create(patients_data)
-    except (DatabaseConnectionError, ServiceError, DataModelError) as e:
-        logger.warning(e.message)
-        return False
-
-    logger.info("旭川市のデータ登録処理が完了しました。")
-    return True
+    service = AsahikawaPatientService()
+    service.create(patients_data)
 
 
-def import_medical_institutions_data(url: str) -> bool:
+def import_medical_institutions_data(url: str) -> None:
     """
     旭川市公式ホームページから新型コロナワクチン接種医療機関一覧を取得し、
     データベースへ格納する。
@@ -149,30 +115,15 @@ def import_medical_institutions_data(url: str) -> bool:
     Args:
         url (str): 旭川市公式ホームページのURL
 
-    Returns:
-        bool: データベースへ格納が成功したら真を返す
-
     """
-    try:
-        html_content = DownloadedHTML(url)
-    except HTTPDownloadError as e:
-        logger.warning(e.message)
-        return False
-
+    html_content = DownloadedHTML(url)
     scraped_data = ScrapeMedicalInstitutions(html_content)
     medical_institutions_data = MedicalInstitutionFactory()
     for row in scraped_data.lists:
         medical_institutions_data.create(**row)
 
-    try:
-        service = MedicalInstitutionService()
-        service.create(medical_institutions_data)
-    except (DatabaseConnectionError, ServiceError, DataModelError) as e:
-        logger.warning(e.message)
-        return False
-
-    logger.info("医療機関のデータ登録処理が完了しました。")
-    return True
+    service = MedicalInstitutionService()
+    service.create(medical_institutions_data)
 
 
 if __name__ == "__main__":
@@ -190,5 +141,5 @@ if __name__ == "__main__":
         (Config.JUL2021_DATA_URL, 2021),
         (Config.LATEST_DATA_URL, 2021),
     ]
-    # import_asahikawa_data(download_lists)
+    import_asahikawa_data(download_lists)
     import_medical_institutions_data(Config.MEDICAL_INSTITUTIONS_URL)
