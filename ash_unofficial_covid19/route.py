@@ -18,7 +18,8 @@ from ash_unofficial_covid19.views import (
     DailyTotalView,
     MedicalInstitutionsView,
     MonthTotalView,
-    MovingAverageView
+    MovingAverageView,
+    PerHundredThousandPopulationView
 )
 
 app = Flask(__name__)
@@ -96,6 +97,12 @@ def get_moving_average():
     return g.moving_average
 
 
+def get_per_hundred_thousand_population():
+    if not hasattr(g, "per_hundred_thousand_population"):
+        g.per_hundred_thousand_population = PerHundredThousandPopulationView()
+    return g.per_hundred_thousand_population
+
+
 @app.route("/")
 def index():
     return render_template(
@@ -105,6 +112,7 @@ def index():
         asahikawa_patients=get_asahikawa_patients(),
         daily_total=get_daily_total(),
         moving_average=get_moving_average(),
+        per_hundred_thousand_population=get_per_hundred_thousand_population(),
         month_total=get_month_total(),
         by_age=get_by_age(),
     )
@@ -248,6 +256,19 @@ def get_moving_average_graph():
     res.data = graph_image.getvalue()
     res.headers["Content-Type"] = "img/png"
     res.headers["Content-Disposition"] = "attachment: filename=" + "moving_average.png"
+    return res
+
+
+@app.route("/per_hundred_thousand_population.png")
+def get_per_hundred_thousand_population_graph():
+    per_hundred_thousand_population = get_per_hundred_thousand_population()
+    graph_image = per_hundred_thousand_population.get_graph_image()
+    res = make_response()
+    res.data = graph_image.getvalue()
+    res.headers["Content-Type"] = "img/png"
+    res.headers["Content-Disposition"] = (
+        "attachment: filename=" + "per_hundred_thousand_population.png"
+    )
     return res
 
 

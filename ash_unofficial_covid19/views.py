@@ -344,3 +344,129 @@ class MovingAverageView(GraphView):
         plt.clf()
         plt.close()
         return im
+
+
+class PerHundredThousandPopulationView(GraphView):
+    def __init__(self):
+        service = AsahikawaPatientService()
+        yesterday = self.get_yesterday()
+        self.__per_hundred_thousand_population_data = (
+            service.get_per_hundred_thousand_population_per_week(
+                from_date=yesterday - relativedelta(days=90), to_date=yesterday
+            )
+        )
+        this_week = self.__per_hundred_thousand_population_data[-1][1]
+        last_week = self.__per_hundred_thousand_population_data[-2][1]
+        increase_from_last_week = float(
+            Decimal(str(this_week - last_week)).quantize(
+                Decimal("0.01"), rounding=ROUND_HALF_UP
+            )
+        )
+        alert_level = self._get_alert_level(this_week)
+        self.__this_week = "{:,}".format(this_week)
+        self.__last_week = "{:,}".format(last_week)
+        self.__increase_from_last_week = "{:+,}".format(increase_from_last_week)
+        self.__alert_level = alert_level
+
+    @property
+    def this_week(self) -> str:
+        return self.__this_week
+
+    @property
+    def last_week(self) -> str:
+        return self.__last_week
+
+    @property
+    def increase_from_last_week(self) -> str:
+        return self.__increase_from_last_week
+
+    @property
+    def alert_level(self) -> str:
+        return self.__alert_level
+
+    def get_graph_alt(self) -> str:
+        return ", ".join(
+            [
+                "{0} {1}人".format(row[0].strftime("%Y年%m月%d日"), row[1])
+                for row in self.__per_hundred_thousand_population_data
+            ]
+        )
+
+    def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
+        font = FontProperties(
+            fname="./ash_unofficial_covid19/static/fonts/NotoSansCJKjp-Light.otf",
+            size=12,
+        )
+        if figsize:
+            fig = plt.figure(figsize=figsize)
+        else:
+            fig = plt.figure()
+        ax = fig.add_subplot()
+        per_hundred_thousand_population_x = [
+            row[0].strftime("%m-%d") + "~"
+            for row in self.__per_hundred_thousand_population_data
+        ]
+        per_hundred_thousand_population_y = [
+            row[1] for row in self.__per_hundred_thousand_population_data
+        ]
+        ax.plot(
+            per_hundred_thousand_population_x,
+            per_hundred_thousand_population_y,
+            color="darkgray",
+        )
+        ax.yaxis.set_major_locator(MultipleLocator(5))
+        ax.grid(axis="y", color="lightgray")
+        ax.set_title("旭川市1週間の人口10万人あたり新規陽性患者数の推移", font_properties=font)
+        ax.set_ylabel("1週間の新規陽性患者数（人/人口10万人あたり）", font_properties=font)
+        ax.tick_params(labelsize=8)
+        ax.tick_params(axis="x", rotation=45)
+        ax.text(
+            per_hundred_thousand_population_x[0],
+            15,
+            "警戒ステージ4",
+            va="center",
+            ha="left",
+            backgroundcolor="white",
+            font_properties=font,
+        )
+        ax.axhline(y=15, color="orange", linewidth=1, linestyle="--")
+        ax.text(
+            per_hundred_thousand_population_x[0],
+            25,
+            "警戒ステージ5",
+            va="center",
+            ha="left",
+            backgroundcolor="white",
+            font_properties=font,
+        )
+        ax.axhline(y=25, color="salmon", linewidth=1, linestyle="--")
+        fig.tight_layout()
+        canvas = FigureCanvasAgg(fig)
+        im = BytesIO()
+        canvas.print_png(im)
+        plt.cla()
+        plt.clf()
+        plt.close()
+        return im
+
+    @staticmethod
+    def _get_alert_level(per_hundred_thousand_population: float) -> str:
+        """北海道の警戒ステージレベルを返す
+
+        Args:
+            per_hundred_thousand_population (float): 1週間の人口10万人あたり新規陽性患者数
+
+        Returns:
+            alert_level (str): 北海道の警戒ステージレベル
+
+        """
+        if per_hundred_thousand_population >= 25:
+            return "警戒ステージ5相当（緊急事態宣言の目安）"
+        elif per_hundred_thousand_population >= 15:
+            return "警戒ステージ4相当（まん延防止等重点措置の目安）"
+        elif per_hundred_thousand_population >= 2.5:
+            return "警戒ステージ3相当"
+        elif per_hundred_thousand_population >= 2.0:
+            return "警戒ステージ2相当"
+        else:
+            return "警戒ステージ1相当"

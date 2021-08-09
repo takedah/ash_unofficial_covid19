@@ -95,6 +95,7 @@ test_medical_institution_data = {
     "book_at_medical_institution": True,
     "book_at_call_center": False,
     "area": "",
+    "memo": "",
 }
 
 

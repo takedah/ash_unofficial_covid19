@@ -399,6 +399,21 @@ class TestAsahikawaPatientService(unittest.TestCase):
         ]
         self.assertEqual(result, expect)
 
+    def test_get_per_hundred_thousand_population_per_week(self):
+        from_date = date(2021, 1, 25)
+        to_date = date(2021, 2, 28)
+        result = self.service.get_per_hundred_thousand_population_per_week(
+            from_date=from_date, to_date=to_date
+        )
+        expect = [
+            (date(2021, 1, 25), 0.30),
+            (date(2021, 2, 1), 0),
+            (date(2021, 2, 8), 0),
+            (date(2021, 2, 15), 0),
+            (date(2021, 2, 22), 1.22),
+        ]
+        self.assertEqual(result, expect)
+
     def test_get_total_by_months(self):
         from_date = date(2021, 1, 1)
         to_date = date(2021, 2, 28)

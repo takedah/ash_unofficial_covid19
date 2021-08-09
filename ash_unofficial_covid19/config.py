@@ -20,4 +20,5 @@ class Config:
         + "1369/resource/3132/010006_hokkaido_covid19_patients.csv"
     )
     MEDICAL_INSTITUTIONS_URL = BASE_URL + "kurashi/135/146/149/d073389.html"
+    POPULATION = 329033
     GTAG_ID = os.environ.get("GTAG_ID")
