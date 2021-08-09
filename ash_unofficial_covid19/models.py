@@ -289,7 +289,8 @@ class AsahikawaPatientFactory(Factory):
     """旭川市の公表する新型コロナウイルス感染症患者モデルオブジェクトを生成
 
     Attributes:
-        items (list of :obj:`AsahikawaPatient`): AsahikawaPatientクラスのオブジェクトのリスト
+        items (list of :obj:`AsahikawaPatient`): 旭川市の患者データリスト
+            AsahikawaPatientクラスのオブジェクトのリスト
 
     """
 
@@ -304,7 +305,8 @@ class AsahikawaPatientFactory(Factory):
         """AsahikawaPatientオブジェクトの生成
 
         Args:
-            row (dict): 新型コロナウイルス感染症患者データオブジェクトを作成するための引数
+            row (dict): 旭川市の患者データの辞書
+                新型コロナウイルス感染症患者データオブジェクトを作成するための引数
 
         Returns:
             patient (:obj:`AsahikawaPatient`): AsahikawaPatientクラスのオブジェクト
@@ -405,7 +407,8 @@ class HokkaidoPatientFactory(Factory):
     """北海道の公表する新型コロナウイルス感染症患者モデルオブジェクトを生成
 
     Attributes:
-        items (list of :obj:`HokkaidoPatient`): HokkaidoPatientクラスのオブジェクトのリスト
+        items (list of :obj:`HokkaidoPatient`): 北海道の患者データリスト
+            HokkaidoPatientクラスのオブジェクトのリスト
 
     """
 
@@ -420,7 +423,8 @@ class HokkaidoPatientFactory(Factory):
         """HokkaidoPatientオブジェクトの生成
 
         Args:
-            row (dict): 新型コロナウイルス感染症患者データオブジェクトを作成するための引数
+            row (dict): 北海道の患者データの辞書
+                新型コロナウイルス感染症患者データオブジェクトを作成するための引数
 
         Returns:
             patient (:obj:`HokkaidoPatient`): HokkaidoPatientクラスのオブジェクト
@@ -513,8 +517,8 @@ class MedicalInstitutionFactory(Factory):
     """旭川市新型コロナワクチン接種医療機関を表すモデルオブジェクトを生成
 
     Attributes:
-        items (list of :obj:`MedicalInstitution`): MedicalInstitutionクラスの
-            オブジェクトのリスト
+        items (list of :obj:`MedicalInstitution`): 医療機関一覧リスト
+            MedicalInstitutionクラスのオブジェクトのリスト
 
     """
 
@@ -529,12 +533,12 @@ class MedicalInstitutionFactory(Factory):
         """MedicalInstitutionオブジェクトの生成
 
         Args:
-            row (dict): 新型コロナワクチン接種医療機関データオブジェクトを
-                作成するための引数
+            row (dict): 医療機関データの辞書
+                新型コロナワクチン接種医療機関データオブジェクトを作成するための引数
 
         Returns:
-            medical_institution (:obj:`MedicalInstitution`): MedicalInstitutionクラスの
-                オブジェクト
+            medical_institution (:obj:`MedicalInstitution`): 医療機関データ
+                MedicalInstitutionクラスのオブジェクト
 
         """
         return MedicalInstitution(**row)

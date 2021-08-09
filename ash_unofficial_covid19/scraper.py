@@ -137,9 +137,9 @@ class ScrapeAsahikawaPatients(Scraper):
     def __init__(self, downloaded_html: DownloadedHTML, target_year: int = 2020):
         """
         Args:
-            downloaded_html (:obj:`DownloadedHTML`): ダウンロードした旭川市公式サイトの
-                新型コロナウイルス感染症の市内発生状況のページのHTMLファイルのbytesデータ
-                を要素に持つオブジェクト
+            downloaded_html (:obj:`DownloadedHTML`): ダウンロードしたHTMLデータ
+                ダウンロードした旭川市公式サイトの新型コロナウイルス感染症の
+                市内発生状況のページのHTMLファイルのbytesデータを要素に持つオブジェクト
             target_year (int): 元データに年が表記されていないため直接指定する
 
         """
@@ -165,8 +165,8 @@ class ScrapeAsahikawaPatients(Scraper):
         """HTMLからtableの内容を抽出してリストに格納
 
         Args:
-            html_bytes (bytes): ダウンロードしたHTMLファイルのbytesデータを要素に持つ
-                オブジェクト
+            html_bytes (bytes): ダウンロードしたHTMLデータ
+                ダウンロードしたHTMLファイルのbytesデータを要素に持つオブジェクト
 
         Returns:
             table_values (list of list): tableの内容で構成される二次元配列
@@ -591,16 +591,16 @@ class ScrapeMedicalInstitutionsPDF(Scraper):
     新型コロナワクチン接種医療機関一覧データを抽出し、リストに変換する。
 
     Attributes:
-        medical_institution_data (list of dict): ワクチン接種医療機関データを表す
-            辞書のリスト
+        medical_institution_data (list of dict): ワクチン接種医療機関データ
+            ワクチン接種医療機関データを表す辞書のリスト
 
     """
 
     def __init__(self, downloaded_pdf: DownloadedPDF):
         """
         Args:
-            downloaded_pdf (:obj:`DownloadedPDF`): PDFファイルのBytesIOデータを要素に持つ
-                オブジェクト
+            downloaded_pdf (:obj:`DownloadedPDF`): PDFデータ
+                PDFファイルのBytesIOデータを要素に持つオブジェクト
 
         """
         pdf_df = self._get_dataframe(downloaded_pdf.content)
@@ -616,8 +616,8 @@ class ScrapeMedicalInstitutionsPDF(Scraper):
             pdf_io (BytesIO): PDFファイルのBytesIOデータ
 
         Returns:
-            pdf_content (obj:`pd.DataFrame`): ワクチン接種医療機関一覧PDFデータから
-                抽出したpandas DataFrameデータ
+            pdf_content (obj:`pd.DataFrame`): ワクチン接種医療機関一覧PDFデータ
+                ワクチン接種医療機関一覧PDFデータから抽出したpandas DataFrameデータ
 
         """
         dfs = tabula.read_pdf(pdf_io, multiple_tables=True, lattice=True, pages="all")
@@ -762,9 +762,9 @@ class ScrapeMedicalInstitutions(Scraper):
     def __init__(self, downloaded_html: DownloadedHTML):
         """
         Args:
-            downloaded_html (:obj:`DownloadedHTML`): ダウンロードした旭川市公式サイトの
-                新型コロナ接種医療機関のページのHTMLファイルのbytesデータ
-                を要素に持つオブジェクト
+            downloaded_html (:obj:`DownloadedHTML`): ダウンロードしたHTMLデータ
+                ダウンロードした旭川市公式サイトの新型コロナ接種医療機関のページの
+                HTMLファイルのbytesデータを要素に持つオブジェクト
 
         """
         self.__lists = list()
@@ -786,8 +786,8 @@ class ScrapeMedicalInstitutions(Scraper):
         """HTMLからtableの内容を抽出してリストに格納
 
         Args:
-            downloaded_html (:obj:`DownloadedHTML`): ダウンロードしたHTMLファイルの
-                bytesデータを要素に持つオブジェクト
+            downloaded_html (:obj:`DownloadedHTML`): ダウンロードしたHTMLデータ
+                ダウンロードしたHTMLファイルのbytesデータを要素に持つオブジェクト
 
         Returns:
             table_values (list of list): tableの内容で構成される二次元配列
@@ -864,8 +864,8 @@ class ScrapeMedicalInstitutions(Scraper):
             memos (dict): 備考欄の番号をキー、本文を値とした辞書
 
         Returns:
-            medical_institution_data (dict): 新型コロナワクチン接種医療機関データを
-                表すハッシュ
+            medical_institution_data (dict): 新型コロナワクチン接種医療機関データ
+                新型コロナワクチン接種医療機関データを表すハッシュ
 
         """
         try:

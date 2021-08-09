@@ -2,6 +2,8 @@ import os
 
 
 class Config:
+    """パッケージ全体で使用する定数をまとめる"""
+
     DATABASE_URL = os.environ.get("DATABASE_URL")
     BASE_URL = "https://www.city.asahikawa.hokkaido.jp/"
     LATEST_DATA_URL = BASE_URL + "kurashi/135/136/150/d073650.html"

@@ -1,5 +1,5 @@
 import csv
-from abc import ABCMeta, abstractclassmethod
+from abc import ABCMeta, abstractmethod
 from datetime import date, datetime, timedelta, timezone
 from decimal import ROUND_HALF_UP, Decimal
 from io import BytesIO, StringIO
@@ -19,6 +19,15 @@ from ash_unofficial_covid19.services import (
 
 
 class AsahikawaPatientsView:
+    """旭川市新型コロナウイルス陽性患者データ
+
+    旭川市新型コロナウイルス陽性患者データをFlaskへ渡すデータにする
+
+    Attributes:
+        last_updated (str): 最終更新日の文字列
+
+    """
+
     def __init__(self):
         self.__service = AsahikawaPatientService()
         last_updated = self.__service.get_last_updated()
@@ -29,17 +38,46 @@ class AsahikawaPatientsView:
         return self.__last_updated
 
     def get_csv(self) -> StringIO:
+        """グラフのデータをCSVで返す
+
+        Returns:
+            csv_data (StringIO): グラフのCSVデータ
+
+        """
         csv_rows = self.__service.get_csv_rows()
         f = StringIO()
         writer = csv.writer(f, quoting=csv.QUOTE_ALL, lineterminator="\n")
         writer.writerows(csv_rows)
         return f
 
-    def get_rows(self, page: int = 1, desc: bool = True) -> list:
+    def get_rows(self, page: int = 1, desc: bool = True) -> tuple:
+        """グラフのデータをオブジェクトデータのリストで返す
+
+        ページネーションできるよう指定したページ番号分のデータのみ返す
+
+        Args:
+            page (int): ページ番号
+            desc (bool): 真なら降順、偽なら昇順でリストを返す
+
+        Returns:
+            rows (tuple): ページネーションデータ
+                AsahikawaPatientFactoryオブジェクトと
+                ページネーションした場合の最大ページ数の数値を要素に持つタプル
+
+        """
         return self.__service.find(page=page, desc=desc)
 
 
 class MedicalInstitutionsView:
+    """旭川市新型コロナワクチン接種医療機関データ
+
+    旭川市新型コロナワクチン接種医療機関データをFlaskへ渡すデータにする
+
+    Attributes:
+        last_updated (str): 最終更新日の文字列
+
+    """
+
     def __init__(self):
         self.__service = MedicalInstitutionService()
         last_updated = self.__service.get_last_updated()
@@ -50,11 +88,24 @@ class MedicalInstitutionsView:
         return self.__last_updated
 
     def get_rows(self) -> list:
+        """グラフのデータをオブジェクトデータのリストで返す
+
+        Returns:
+            rows (tuple): データリスト
+                MedicalInstitutionFactoryオブジェクトのリスト
+
+        """
         csv_rows = self.__service.get_csv_rows()
         csv_rows.pop(0)
         return csv_rows
 
     def get_csv(self) -> StringIO:
+        """グラフのデータをCSVで返す
+
+        Returns:
+            csv_data (StringIO): グラフのCSVデータ
+
+        """
         csv_rows = self.__service.get_csv_rows()
         f = StringIO()
         writer = csv.writer(f, quoting=csv.QUOTE_ALL, lineterminator="\n")
@@ -63,18 +114,27 @@ class MedicalInstitutionsView:
 
 
 class GraphView(metaclass=ABCMeta):
-    @abstractclassmethod
+    """グラフを出力するクラスの基底クラス"""
+
+    @abstractmethod
     def get_graph_alt(self) -> str:
         pass
 
-    @abstractclassmethod
+    @abstractmethod
     def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
         pass
 
     def get_yesterday(self) -> date:
+        """グラフの基準となる現在の前日の日付を返す
+
+        市の発表が15時が多いので、15時より前なら前々日の情報を返すようにする
+
+        Returns:
+            yesterday (date): 前日の日付データ
+
+        """
         now = datetime.now(timezone(timedelta(hours=+9), "JST"))
         today = now.date()
-        # 市の発表が15時が多いので、15時より前なら前々日の情報を表示するようにする
         if now.hour < 15:
             adjust_days = 2
         else:
@@ -83,6 +143,16 @@ class GraphView(metaclass=ABCMeta):
 
 
 class DailyTotalView(GraphView):
+    """日別累計患者数グラフ
+
+    Attributes:
+        yesterday (str): 直近の日付
+        most_recent (str): 直近の日別累積患者数
+        day_before_most_recent (str): 直近の前日の日別累積患者数
+        increase_from_day_before (str): 直近の前日からの増加数
+
+    """
+
     def __init__(self):
         service = AsahikawaPatientService()
         yesterday = self.get_yesterday()
@@ -114,6 +184,12 @@ class DailyTotalView(GraphView):
         return self.__increase_from_day_before
 
     def get_graph_alt(self) -> str:
+        """グラフの代替テキストを生成
+
+        Returns:
+            graph_alt (str): グラフの代替テキスト
+
+        """
         return ", ".join(
             [
                 "{0} {1}人".format(row[0].strftime("%Y年%m月%d日"), row[1])
@@ -122,6 +198,15 @@ class DailyTotalView(GraphView):
         )
 
     def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
+        """グラフの画像を生成
+
+        Args:
+            figsize (tuple): グラフ画像データの縦横サイズを要素に持つタプル
+
+        Returns:
+            graph_image (BytesIO): グラフの画像データ
+
+        """
         font = FontProperties(
             fname="./ash_unofficial_covid19/static/fonts/NotoSansCJKjp-Light.otf",
             size=12,
@@ -153,6 +238,16 @@ class DailyTotalView(GraphView):
 
 
 class MonthTotalView(GraphView):
+    """月別累計患者数グラフ
+
+    Attributes:
+        yesterday (str): 直近の日付
+        this_month (str): 今月の月別累積患者数
+        last_month (str): 前月の日別累積患者数
+        increase_from_last_month (str): 前月からの増加数
+
+    """
+
     def __init__(self):
         service = AsahikawaPatientService()
         yesterday = self.get_yesterday()
@@ -184,6 +279,12 @@ class MonthTotalView(GraphView):
         return self.__increase_from_last_month
 
     def get_graph_alt(self) -> str:
+        """グラフの代替テキストを生成
+
+        Returns:
+            graph_alt (str): グラフの代替テキスト
+
+        """
         return ", ".join(
             [
                 "{0} {1}人".format(row[0].strftime("%Y年%m月"), row[1])
@@ -192,6 +293,15 @@ class MonthTotalView(GraphView):
         )
 
     def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
+        """グラフの画像を生成
+
+        Args:
+            figsize (tuple): グラフ画像データの縦横サイズを要素に持つタプル
+
+        Returns:
+            graph_image (BytesIO): グラフの画像データ
+
+        """
         # グラフの描画は直近12か月分のみとする
         month_total_data = self.__month_total_data[-12:]
         font = FontProperties(
@@ -223,16 +333,33 @@ class MonthTotalView(GraphView):
 
 
 class ByAgeView(GraphView):
+    """年代別患者数グラフ"""
+
     def __init__(self):
         service = AsahikawaPatientService()
         self.__by_age_data = service.get_patients_number_by_age()
 
     def get_graph_alt(self) -> str:
+        """グラフの代替テキストを生成
+
+        Returns:
+            graph_alt (str): グラフの代替テキスト
+
+        """
         return ", ".join(
             ["{0} {1}人".format(row[0], row[1]) for row in self.__by_age_data]
         )
 
     def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
+        """グラフの画像を生成
+
+        Args:
+            figsize (tuple): グラフ画像データの縦横サイズを要素に持つタプル
+
+        Returns:
+            graph_image (BytesIO): グラフの画像データ
+
+        """
         font = FontProperties(
             fname="./ash_unofficial_covid19/static/fonts/NotoSansCJKjp-Light.otf",
             size=12,
@@ -278,6 +405,16 @@ class ByAgeView(GraphView):
 
 
 class MovingAverageView(GraphView):
+    """1日あたり患者数の7日間移動平均グラフ
+
+    Attributes:
+        yesterday (str): 直近の日付
+        this_week (str): 今週の平均患者数
+        last_week (str): 先週の平均患者数
+        increase_from_last_week (str): 先週からの増加数
+
+    """
+
     def __init__(self):
         service = AsahikawaPatientService()
         yesterday = self.get_yesterday()
@@ -308,6 +445,12 @@ class MovingAverageView(GraphView):
         return self.__increase_from_last_week
 
     def get_graph_alt(self) -> str:
+        """グラフの代替テキストを生成
+
+        Returns:
+            graph_alt (str): グラフの代替テキスト
+
+        """
         return ", ".join(
             [
                 "{0} {1}人".format(row[0].strftime("%Y年%m月%d日"), row[1])
@@ -316,6 +459,15 @@ class MovingAverageView(GraphView):
         )
 
     def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
+        """グラフの画像を生成
+
+        Args:
+            figsize (tuple): グラフ画像データの縦横サイズを要素に持つタプル
+
+        Returns:
+            graph_image (BytesIO): グラフの画像データ
+
+        """
         font = FontProperties(
             fname="./ash_unofficial_covid19/static/fonts/NotoSansCJKjp-Light.otf",
             size=12,
@@ -347,6 +499,18 @@ class MovingAverageView(GraphView):
 
 
 class PerHundredThousandPopulationView(GraphView):
+    """1週間の人口10万人あたり患者数グラフ
+
+    Attributes:
+        yesterday (str): 直近の日付
+        this_week (str): 今週の人口10万人あたり患者数
+        last_week (str): 先週の人口10万人あたり患者数
+        increase_from_last_week (str): 先週からの増加数
+        alert_level (str): 警戒レベル
+            1週間の人口10万人あたり患者数を基準とした北海道の警戒レベル
+
+    """
+
     def __init__(self):
         service = AsahikawaPatientService()
         yesterday = self.get_yesterday()
@@ -385,6 +549,12 @@ class PerHundredThousandPopulationView(GraphView):
         return self.__alert_level
 
     def get_graph_alt(self) -> str:
+        """グラフの代替テキストを生成
+
+        Returns:
+            graph_alt (str): グラフの代替テキスト
+
+        """
         return ", ".join(
             [
                 "{0} {1}人".format(row[0].strftime("%Y年%m月%d日"), row[1])
@@ -393,6 +563,15 @@ class PerHundredThousandPopulationView(GraphView):
         )
 
     def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
+        """グラフの画像を生成
+
+        Args:
+            figsize (tuple): グラフ画像データの縦横サイズを要素に持つタプル
+
+        Returns:
+            graph_image (BytesIO): グラフの画像データ
+
+        """
         font = FontProperties(
             fname="./ash_unofficial_covid19/static/fonts/NotoSansCJKjp-Light.otf",
             size=12,

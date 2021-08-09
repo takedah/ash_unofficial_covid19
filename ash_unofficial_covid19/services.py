@@ -101,11 +101,11 @@ class Service:
                 raise ServiceError(e.args[0])
 
     def get_last_updated(self) -> Optional[datetime]:
-        """テーブルの最終更新日を返す。
+        """テーブルの最終更新日を返す
 
         Returns:
-            last_updated (:obj:`datetime.datetime'): 対象テーブルのupdatedカラムで
-                一番最新の値を返す。
+            last_updated (:obj:`datetime.datetime'): 最終更新日
+                対象テーブルのupdatedカラムで一番最新の値を返す
 
         """
         state = "SELECT max(updated_at) FROM " + self.table_name + ";"
@@ -119,7 +119,7 @@ class Service:
             return result["max"]
 
     def info_log(self, message) -> None:
-        """AppLogオブジェクトのinfoメソッドのラッパー。
+        """AppLogオブジェクトのinfoメソッドのラッパー
 
         Args:
             message (str): 通常のログメッセージ
@@ -127,7 +127,7 @@ class Service:
         self.__logger.info(message)
 
     def error_log(self, message) -> None:
-        """AppLogオブジェクトのerrorメソッドのラッパー。
+        """AppLogオブジェクトのerrorメソッドのラッパー
 
         Args:
             message (str): エラーログメッセージ
@@ -146,8 +146,8 @@ class AsahikawaPatientService(Service):
         """データベースへ新型コロナウイルス感染症患者データを一括登録する
 
         Args:
-            patients (:obj:`AsahikawaPatientFactory`): 患者データのオブジェクトのリストを
-                要素に持つオブジェクト
+            patients (:obj:`AsahikawaPatientFactory`): 患者データリスト
+                患者データのオブジェクトのリストを要素に持つオブジェクト
 
         """
         items = (
@@ -237,8 +237,9 @@ class AsahikawaPatientService(Service):
         """新型コロナウイルス感染症患者の全件を返す
 
         Returns:
-            res (:obj:`AsahikawaPatientFactory`): 新型コロナウイルス感染症患者
-                オブジェクトの全件リストを要素に持つリスト
+            res (:obj:`AsahikawaPatientFactory`): 患者データリストデータ
+                新型コロナウイルス感染症患者オブジェクトの全件リストを要素に持つ
+                オブジェクト
 
         """
         state = (
@@ -278,7 +279,8 @@ class AsahikawaPatientService(Service):
             desc (bool): 降順にする場合Trueを指定
 
         Returns:
-            res (tuple): AsahikawaPatientFactoryオブジェクトと
+            res (tuple): ページネーションデータ
+                AsahikawaPatientFactoryオブジェクトと
                 ページネーションした場合の最大ページ数の数値を要素に持つタプル
 
         """
@@ -441,8 +443,8 @@ class AsahikawaPatientService(Service):
             to_date (obj:`date`): 集計の終期
 
         Returns:
-            aggregate_by_days (list of tuple): 1日ごとの日付とその週の新規陽性患者数を
-                要素とするタプル
+            aggregate_by_days (list of tuple): 集計結果
+                1日ごとの日付とその週の新規陽性患者数を要素とするタプル
 
         """
         state = (
@@ -475,8 +477,8 @@ class AsahikawaPatientService(Service):
             to_date (obj:`date`): 集計の終期
 
         Returns:
-            aggregate_by_weeks (list of tuple): 1週間ごとの日付とその週の新規陽性患者数を
-                要素とするタプルのリスト
+            aggregate_by_weeks (list of tuple): 集計結果
+                1週間ごとの日付とその週の新規陽性患者数を要素とするタプルのリスト
 
         """
         state = (
@@ -509,8 +511,9 @@ class AsahikawaPatientService(Service):
             to_date (obj:`date`): 集計の終期
 
         Returns:
-            seven_days_moving_average (list of tuple): 1週間ごとの日付とその週の
-                1日あたり平均新規陽性患者数を要素とするタプルのリスト
+            seven_days_moving_average (list of tuple): 集計結果
+                1週間ごとの日付とその週の1日あたり平均新規陽性患者数を要素とする
+                タプルのリスト
         """
         aggregate_by_weeks = self.get_aggregate_by_weeks(
             from_date=from_date, to_date=to_date
@@ -535,8 +538,9 @@ class AsahikawaPatientService(Service):
             to_date (obj:`date`): 集計の終期
 
         Returns:
-            per_hundred_thousand (list of tuple): 1週間ごとの日付とその週の
-                人口10万人あたり新規陽性患者数を要素とするタプルのリスト
+            per_hundred_thousand (list of tuple): 集計結果
+                1週間ごとの日付とその週の人口10万人あたり新規陽性患者数を要素とする
+                タプルのリスト
         """
         aggregate_by_weeks = self.get_aggregate_by_weeks(
             from_date=from_date, to_date=to_date
@@ -561,8 +565,8 @@ class AsahikawaPatientService(Service):
             to_date (obj:`date`): 累計の終期
 
         Returns:
-            total_by_months (list of tuple): 1か月ごとの年月とその週までの
-                累計陽性患者数を要素とするタプルのリスト
+            total_by_months (list of tuple): 集計結果
+                1か月ごとの年月とその週までの累計陽性患者数を要素とするタプルのリスト
 
         """
         state = (
@@ -596,8 +600,8 @@ class AsahikawaPatientService(Service):
         """年代別の陽性患者数を返す
 
         Returns:
-            patients_number_by_age (list of tuple): 年代別の陽性患者数を要素とする
-                タプルのリスト
+            patients_number_by_age (list of tuple): 集計結果
+                年代別の陽性患者数を要素とするタプルのリスト
 
         """
         state = (
@@ -625,8 +629,8 @@ class HokkaidoPatientService(Service):
         """データベースへ新型コロナウイルス感染症患者データを保存
 
         Args:
-            patient (:obj:`HokkaidoPatientFactory`): 患者データのオブジェクトのリストを
-                要素に持つオブジェクト
+            patient (:obj:`HokkaidoPatientFactory`): 集計結果
+                患者データのオブジェクトのリストを要素に持つオブジェクト
 
         """
         items = (
@@ -689,7 +693,7 @@ class MedicalInstitutionService(Service):
         """データベースへ新型コロナワクチン接種医療機関データを保存
 
         Args:
-            medical_institutions (:obj:`MedicalInstitutionFactory`):
+            medical_institutions (:obj:`MedicalInstitutionFactory`): 医療機関データ
                 医療機関データのオブジェクトのリストを要素に持つオブジェクト
 
         """
@@ -730,8 +734,9 @@ class MedicalInstitutionService(Service):
         """新型コロナワクチン接種医療機関の全件リストを返す
 
         Returns:
-            res (:obj:`MedicalInstitutionFactory`): 新型コロナウイルス感染症患者
-                オブジェクトのリストを要素に持つオブジェクト
+            res (:obj:`MedicalInstitutionFactory`): 医療機関一覧データ
+                新型コロナワクチン接種医療機関オブジェクトのリストを要素に持つ
+                オブジェクト
 
         """
         state = (
