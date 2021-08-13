@@ -34,7 +34,7 @@ def add_security_headers(response):
                 script-src 'self' code.jquery.com cdnjs.cloudflare.com \
                 stackpath.bootstrapcdn.com kit.fontawesome.com \
                 www.googletagmanager.com \
-                'sha256-+iJtBA6NMPYaPCqsBCowyVmxC9zwobJh6EkGSchebqQ='; \
+                'nonce-Pbq-X7F-632oxHhPe6mzMC-LHYE'; \
                 connect-src ka-f.fontawesome.com \
                 www.google-analytics.com; \
                 font-src ka-f.fontawesome.com; \
