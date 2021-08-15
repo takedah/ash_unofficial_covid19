@@ -119,22 +119,29 @@ class Service:
         else:
             return result["max"]
 
-    def info_log(self, message) -> None:
+    def info_log(self, message: str) -> None:
         """AppLogオブジェクトのinfoメソッドのラッパー
 
         Args:
             message (str): 通常のログメッセージ
-        """
-        self.__logger.info(message)
 
-    def error_log(self, message) -> None:
+        """
+        if isinstance(message, str):
+            self.__logger.info(message)
+        else:
+            self.__logger.info("通常メッセージの指定が正しくない")
+
+    def error_log(self, message: str) -> None:
         """AppLogオブジェクトのerrorメソッドのラッパー
 
         Args:
             message (str): エラーログメッセージ
 
         """
-        self.__logger.error(message)
+        if isinstance(message, str):
+            self.__logger.error(message)
+        else:
+            self.__logger.info("エラーメッセージの指定が正しくない")
 
 
 class AsahikawaPatientService(Service):
@@ -810,7 +817,7 @@ class MedicalInstitutionService(Service):
         return rows
 
     def get_name_list(self) -> list:
-        """新型コロナワクチン接種医療機関の名称全件をリストを返す
+        """新型コロナワクチン接種医療機関の名称全件のリストを返す
 
         Returns:
             res (list): 医療機関の名称一覧リスト
@@ -824,6 +831,58 @@ class MedicalInstitutionService(Service):
                 for row in cur.fetchall():
                     name_list.append(row["name"])
         return name_list
+
+    def get_area_list(self) -> list:
+        """新型コロナワクチン接種医療機関の地域全件のリストを返す
+
+        Returns:
+            res (list): 医療機関の地域一覧リスト
+
+        """
+        state = "SELECT DISTINCT(area) FROM " + self.table_name + " ORDER BY area;"
+        area_list = list()
+        with self.get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(state)
+                for row in cur.fetchall():
+                    area_list.append(row["area"])
+        return area_list
+
+    def get_locations(self, area: Optional[str] = None) -> list:
+        """新型コロナワクチン接種医療機関の一覧に医療機関の位置情報を付けて返す
+
+        Args:
+            area (str): 医療機関の地区
+
+        Returns:
+            locations (list of list): 新型コロナワクチン接種医療機関の緯度経度を含めた一覧
+
+        """
+        state = (
+            "SELECT"
+            + " "
+            + "name,address,phone_number,book_at_medical_institution,"
+            + "book_at_call_center,memo,latitude,longitude"
+            + " "
+            + "FROM"
+            + " "
+            + self.table_name
+            + " "
+            + "LEFT JOIN locations ON"
+            + " "
+            + self.table_name
+            + ".name = locations.medical_institution_name"
+        )
+        if area:
+            state = state + " WHERE area = " + "'" + area + "'"
+        state = state + " ORDER BY " + self.table_name + ".id;"
+        locations = list()
+        with self.get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(state)
+                for row in cur.fetchall():
+                    locations.append(row)
+        return locations
 
 
 class LocationService(Service):

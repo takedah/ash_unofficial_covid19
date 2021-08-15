@@ -451,7 +451,7 @@ class TestMedicalInstitutionService(unittest.TestCase):
                 "memo": "",
             },
             {
-                "name": "道北勤医協 一条通病院",
+                "name": "道北勤医協一条通病院",
                 "address": "旭川市東光1の1",
                 "phone_number": "0166-34-0015 予約専用",
                 "book_at_medical_institution": True,
@@ -500,7 +500,7 @@ class TestMedicalInstitutionService(unittest.TestCase):
             ],
             [
                 "大成",
-                "道北勤医協 一条通病院",
+                "道北勤医協一条通病院",
                 "旭川市東光1の1",
                 "0166-34-0015 予約専用",
                 "1",
@@ -516,7 +516,28 @@ class TestMedicalInstitutionService(unittest.TestCase):
 
     def test_get_name_list(self):
         results = self.service.get_name_list()
-        expect = ["市立旭川病院", "道北勤医協 一条通病院"]
+        expect = ["市立旭川病院", "道北勤医協一条通病院"]
+        self.assertEqual(results, expect)
+
+    def test_get_area_list(self):
+        results = self.service.get_area_list()
+        expect = ["新富・東・金星町", "大成"]
+        self.assertEqual(results, expect)
+
+    def test_get_locations(self):
+        results = self.service.get_locations(area="新富・東・金星町")
+        expect = [
+            [
+                "市立旭川病院",
+                "金星町1",
+                "0166-29-0202",
+                True,
+                False,
+                "",
+                43.778422777778,
+                142.365976388889,
+            ]
+        ]
         self.assertEqual(results, expect)
 
 
