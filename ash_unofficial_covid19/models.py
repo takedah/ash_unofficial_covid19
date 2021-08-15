@@ -585,11 +585,11 @@ class Location:
         return self.__medical_institution_name
 
     @property
-    def longitude(self) -> str:
+    def longitude(self) -> float:
         return self.__longitude
 
     @property
-    def latitude(self) -> str:
+    def latitude(self) -> float:
         return self.__latitude
 
 

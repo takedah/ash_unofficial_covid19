@@ -53,3 +53,11 @@ CREATE TABLE medical_institutions(
     memo TEXT,
     updated_at TIMESTAMPTZ NOT NULL
 );
+DROP TABLE IF EXISTS locations;
+CREATE TABLE locations(
+    id SERIAL PRIMARY KEY NOT NULL,
+    medical_institution_name VARCHAR(128) UNIQUE NOT NULL,
+    longitude FLOAT,
+    latitude FLOAT,
+    updated_at TIMESTAMPTZ NOT NULL
+);

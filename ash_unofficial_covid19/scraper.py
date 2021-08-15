@@ -4,6 +4,7 @@ import urllib.parse
 from abc import ABCMeta, abstractmethod
 from datetime import date, datetime
 from io import BytesIO, StringIO
+from json import JSONDecodeError
 from typing import Optional
 
 import pandas as pd
@@ -956,11 +957,20 @@ class DownloadedJSON(Downloader):
             message = "cannot connect to web server."
             self.error_log(message)
             raise HTTPDownloadError(message)
+
         if response.status_code != 200:
             message = "cannot get HTML contents."
             self.error_log(message)
             raise HTTPDownloadError(message)
-        return response.json()
+
+        try:
+            json_res = response.json()
+        except JSONDecodeError:
+            message = "cannot decode json response."
+            self.error_log(message)
+            raise HTTPDownloadError(message)
+
+        return json_res
 
 
 class ScrapeYOLPLocation(Scraper):
@@ -985,10 +995,15 @@ class ScrapeYOLPLocation(Scraper):
 
         city_code = "01204"
         industry_code = "0401"
+        if Config.YOLP_APP_ID:
+            app_id = Config.YOLP_APP_ID
+        else:
+            raise RuntimeError("YOLPアプリケーションIDの指定が正しくありません。")
+
         json_url = (
             Config.YOLP_BASE_URL
             + "?appid="
-            + Config.YOLP_APP_ID
+            + app_id
             + "&query="
             + facility_name
             + "&ac="
@@ -1031,8 +1046,22 @@ class ScrapeYOLPLocation(Scraper):
                 JSONデータから検索結果の部分を辞書データで抽出したリスト
 
         """
-        res = downloaded_json.content
-        return res["Feature"]
+        json_res = downloaded_json.content
+        try:
+            if json_res["ResultInfo"]["Count"] == 0:
+                # 検索結果が0件の場合、緯度経度にダミーの値をセットして返す
+                search_results = [
+                    {
+                        "Geometry": {
+                            "Coordinates": "0,0",
+                        },
+                    },
+                ]
+            else:
+                search_results = json_res["Feature"]
+            return search_results
+        except KeyError:
+            raise RuntimeError("期待したJSONレスポンスが得られていません。")
 
     def _extract_location_data(self, search_result: dict) -> dict:
         """YOLP Web APIの返すJSONデータから緯度経度情報を抽出
