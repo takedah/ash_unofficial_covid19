@@ -442,7 +442,7 @@ class HokkaidoPatientFactory(Factory):
         self.__items.append(item)
 
 
-class MedicalInstitution(Patient):
+class MedicalInstitution:
     """旭川市新型コロナワクチン接種医療機関を表すモデルオブジェクト
 
     Attributes:
