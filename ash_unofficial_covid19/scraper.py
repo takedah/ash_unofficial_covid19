@@ -1,5 +1,6 @@
 import csv
 import re
+import urllib.parse
 from abc import ABCMeta, abstractmethod
 from datetime import date, datetime
 from io import BytesIO, StringIO
@@ -9,8 +10,10 @@ import pandas as pd
 import requests
 import tabula
 from bs4 import BeautifulSoup
+from flask import escape
 from requests import HTTPError, Timeout
 
+from ash_unofficial_covid19.config import Config
 from ash_unofficial_covid19.errors import HTTPDownloadError
 from ash_unofficial_covid19.logs import AppLog
 
@@ -33,7 +36,10 @@ class Downloader(metaclass=ABCMeta):
             message (str): 通常のログメッセージ
 
         """
-        self.__logger.info(message)
+        if isinstance(message, str):
+            self.__logger.info(message)
+        else:
+            self.__logger.info("通常メッセージの指定が正しくない")
 
     def error_log(self, message: str) -> None:
         """AppLog.errorのラッパー
@@ -42,7 +48,10 @@ class Downloader(metaclass=ABCMeta):
             message (str): エラーログメッセージ
 
         """
-        self.__logger.error(message)
+        if isinstance(message, str):
+            self.__logger.error(message)
+        else:
+            self.__logger.info("エラーメッセージの指定が正しくない")
 
 
 class Scraper(metaclass=ABCMeta):
@@ -905,3 +914,138 @@ class ScrapeMedicalInstitutions(Scraper):
             return medical_institution_data
         except (ValueError, IndexError):
             return None
+
+
+class DownloadedJSON(Downloader):
+    """Web APIからJSONデータの取得
+
+    WebサイトからJSONファイルをダウンロードして辞書データに変換する。
+
+    Attributes:
+        content (bytes): ダウンロードしたJSONファイルの辞書データ
+
+    """
+
+    def __init__(self, url: str):
+        """
+        Args:
+            url (str): WebサイトのJSONファイルのURL
+
+        """
+        Downloader.__init__(self)
+        self.__content = self._get_json_content(url)
+
+    @property
+    def content(self) -> dict:
+        return self.__content
+
+    def _get_json_content(self, url: str) -> dict:
+        """WebサイトからJSONファイルの辞書データを取得
+
+        Args:
+            url (str): JSONファイルのURL
+
+        Returns:
+            content (dict): ダウンロードしたHTMLファイルのbytesデータ
+
+        """
+        try:
+            response = requests.get(url)
+            self.info_log("JSONファイルのダウンロードに成功しました。")
+        except (ConnectionError, Timeout, HTTPError):
+            message = "cannot connect to web server."
+            self.error_log(message)
+            raise HTTPDownloadError(message)
+        if response.status_code != 200:
+            message = "cannot get HTML contents."
+            self.error_log(message)
+            raise HTTPDownloadError(message)
+        return response.json()
+
+
+class ScrapeYOLPLocation(Scraper):
+    """Yahoo! Open Local Platform (YOLP) Web APIから指定した施設の緯度経度情報を取得
+
+    Attributes:
+        lists (list of dict): 緯度経度データを表す辞書のリスト
+
+    """
+
+    def __init__(self, facility_name: str):
+        """
+        Args:
+            facility_name (str): 緯度経度情報を取得したい施設の名称
+
+        """
+        self.__lists = list()
+        if isinstance(facility_name, str):
+            facility_name = urllib.parse.quote(escape(facility_name))
+        else:
+            raise TypeError("施設名の指定が正しくありません。")
+
+        city_code = "01204"
+        industry_code = "0401"
+        json_url = (
+            Config.YOLP_BASE_URL
+            + "?appid="
+            + Config.YOLP_APP_ID
+            + "&query="
+            + facility_name
+            + "&ac="
+            + city_code
+            + "&gc="
+            + industry_code
+            + "&sort=-match&detail=simple&output=json"
+        )
+        downloaded_json = self._get_json(json_url)
+        for search_result in self._get_search_results(downloaded_json):
+            self.__lists.append(self._extract_location_data(search_result))
+
+    @property
+    def lists(self) -> list:
+        return self.__lists
+
+    def _get_json(self, json_url: str) -> DownloadedJSON:
+        """JSONデータを要素に持つオブジェクトを返す
+
+        Args:
+            json_url (str): YOLP Web APIのURL
+
+        Returns:
+            downloaded_json (:obj:`DownloadedJSON`): JSONデータを要素に持つオブジェクト
+
+        """
+        if isinstance(json_url, str):
+            return DownloadedJSON(json_url)
+        else:
+            raise TypeError("Web API URLの指定が正しくありません。")
+
+    def _get_search_results(self, downloaded_json: DownloadedJSON) -> list:
+        """YOLP Web APIの返すJSONデータから検索結果データを抽出
+
+        Args:
+            downloaded_json (:obj:`DownloadedJSON`): JSONデータを要素に持つオブジェクト
+
+        Returns:
+            search_results (list of dict): 検索結果辞書データリスト
+                JSONデータから検索結果の部分を辞書データで抽出したリスト
+
+        """
+        res = downloaded_json.content
+        return res["Feature"]
+
+    def _extract_location_data(self, search_result: dict) -> dict:
+        """YOLP Web APIの返すJSONデータから緯度経度情報を抽出
+
+        Args:
+            yolp_json (dict): YOLP Web APIの返すJSONデータ
+
+        Returns:
+            location_data (dict): 緯度経度の辞書データ
+
+        """
+        location_data = dict()
+        coordinates = search_result["Geometry"]["Coordinates"].split(",")
+        location_data["longitude"] = float(coordinates[0])
+        location_data["latitude"] = float(coordinates[1])
+        return location_data

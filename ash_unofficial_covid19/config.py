@@ -4,6 +4,10 @@ import os
 class Config:
     """パッケージ全体で使用する定数をまとめる"""
 
+    # 旭川市の人口
+    POPULATION = 329033
+
+    # 旭川市公式ホームページと北海道オープンデータポータルの設定
     DATABASE_URL = os.environ.get("DATABASE_URL")
     BASE_URL = "https://www.city.asahikawa.hokkaido.jp/"
     LATEST_DATA_URL = BASE_URL + "kurashi/135/136/150/d073650.html"
@@ -22,5 +26,10 @@ class Config:
         + "1369/resource/3132/010006_hokkaido_covid19_patients.csv"
     )
     MEDICAL_INSTITUTIONS_URL = BASE_URL + "kurashi/135/146/149/d073389.html"
-    POPULATION = 329033
+
+    # Yahoo! Open Local Platformの設定
+    YOLP_BASE_URL = "https://map.yahooapis.jp/search/local/V1/localSearch"
+    YOLP_APP_ID = os.environ.get("YOLP_APP_ID")
+
+    # Google Analyticsの設定
     GTAG_ID = os.environ.get("GTAG_ID")

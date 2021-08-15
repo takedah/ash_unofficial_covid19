@@ -14,7 +14,8 @@ from ash_unofficial_covid19.scraper import (
     ScrapeAsahikawaPatients,
     ScrapeHokkaidoPatients,
     ScrapeMedicalInstitutions,
-    ScrapeMedicalInstitutionsPDF
+    ScrapeMedicalInstitutionsPDF,
+    ScrapeYOLPLocation
 )
 
 
@@ -687,6 +688,13 @@ class TestScrapeMedicalInstitutions(unittest.TestCase):
             },
         ]
         self.assertEqual(scraper.lists, expect)
+
+
+class TestScrapeYOLPLocation(unittest.TestCase):
+    def test_lists(self):
+        location_data = ScrapeYOLPLocation("市立旭川病院")
+        self.assertEqual(location_data.lists[0]["longitude"], 142.365976388889)
+        self.assertEqual(location_data.lists[0]["latitude"], 43.778422777778)
 
 
 if __name__ == "__main__":
