@@ -514,6 +514,11 @@ class TestMedicalInstitutionService(unittest.TestCase):
         ]
         self.assertEqual(results, expect)
 
+    def test_get_name_list(self):
+        results = self.service.get_name_list()
+        expect = ["市立旭川病院", "道北勤医協 一条通病院"]
+        self.assertEqual(results, expect)
+
 
 class TestLocationService(unittest.TestCase):
     @classmethod

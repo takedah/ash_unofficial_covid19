@@ -809,6 +809,22 @@ class MedicalInstitutionService(Service):
             )
         return rows
 
+    def get_name_list(self) -> list:
+        """新型コロナワクチン接種医療機関の名称全件をリストを返す
+
+        Returns:
+            res (list): 医療機関の名称一覧リスト
+
+        """
+        state = "SELECT name FROM " + self.table_name + " ORDER BY id;"
+        name_list = list()
+        with self.get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(state)
+                for row in cur.fetchall():
+                    name_list.append(row["name"])
+        return name_list
+
 
 class LocationService(Service):
     """医療機関の緯度経度データを扱うサービス"""
