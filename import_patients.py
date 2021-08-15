@@ -5,20 +5,17 @@ from ash_unofficial_covid19.config import Config
 from ash_unofficial_covid19.errors import HTTPDownloadError
 from ash_unofficial_covid19.models import (
     AsahikawaPatientFactory,
-    HokkaidoPatientFactory,
-    MedicalInstitutionFactory
+    HokkaidoPatientFactory
 )
 from ash_unofficial_covid19.scraper import (
     DownloadedCSV,
     DownloadedHTML,
     ScrapeAsahikawaPatients,
-    ScrapeHokkaidoPatients,
-    ScrapeMedicalInstitutions
+    ScrapeHokkaidoPatients
 )
 from ash_unofficial_covid19.services import (
     AsahikawaPatientService,
-    HokkaidoPatientService,
-    MedicalInstitutionService
+    HokkaidoPatientService
 )
 
 
@@ -107,28 +104,8 @@ def import_asahikawa_data(download_lists: list) -> None:
     service.create(patients_data)
 
 
-def import_medical_institutions_data(url: str) -> None:
-    """
-    旭川市公式ホームページから新型コロナワクチン接種医療機関一覧を取得し、
-    データベースへ格納する。
-
-    Args:
-        url (str): 旭川市公式ホームページのURL
-
-    """
-    html_content = DownloadedHTML(url)
-    scraped_data = ScrapeMedicalInstitutions(html_content)
-    medical_institutions_data = MedicalInstitutionFactory()
-    for row in scraped_data.lists:
-        medical_institutions_data.create(**row)
-
-    service = MedicalInstitutionService()
-    service.create(medical_institutions_data)
-
-
 if __name__ == "__main__":
     import_hokkaido_data(Config.HOKKAIDO_URL)
-    # 旭川市の陽性患者データをダウンロードしてデータベースへ登録
     download_lists = [
         (Config.NOV2020_OR_EARLIER_URL, 2020),
         (Config.DEC2020_DATA_URL, 2020),
@@ -142,4 +119,3 @@ if __name__ == "__main__":
         (Config.LATEST_DATA_URL, 2021),
     ]
     import_asahikawa_data(download_lists)
-    import_medical_institutions_data(Config.MEDICAL_INSTITUTIONS_URL)

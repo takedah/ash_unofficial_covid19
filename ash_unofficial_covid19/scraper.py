@@ -879,14 +879,19 @@ class ScrapeMedicalInstitutions(Scraper):
 
         """
         try:
+            name = ""
+            if isinstance(row[1], str):
+                name = row[1].replace(" ", "").replace("　", "")
+
             address = ""
             if isinstance(row[2], str):
                 address = "旭川市" + row[2]
 
             phone_number = ""
             if isinstance(row[3], str):
-                if row[3] != "":
-                    phone_number = "0166-" + row[3]
+                phone_number = row[3].replace("‐", "-")
+                if re.match("^[0-9]{2}-[0-9]{4}.*$", phone_number):
+                    phone_number = "0166-" + phone_number
 
             memo = ""
             book_at_medical_institution = False
@@ -904,7 +909,7 @@ class ScrapeMedicalInstitutions(Scraper):
                     memo = self._get_memo(value=row[5], memos=memos)
 
             medical_institution_data = {
-                "name": row[1],
+                "name": name,
                 "address": address,
                 "phone_number": phone_number,
                 "book_at_medical_institution": book_at_medical_institution,
@@ -1014,7 +1019,11 @@ class ScrapeYOLPLocation(Scraper):
         )
         downloaded_json = self._get_json(json_url)
         for search_result in self._get_search_results(downloaded_json):
-            self.__lists.append(self._extract_location_data(search_result))
+            location_data = self._extract_location_data(search_result)
+            location_data["medical_institution_name"] = urllib.parse.unquote(
+                facility_name
+            )
+            self.__lists.append(location_data)
 
     @property
     def lists(self) -> list:

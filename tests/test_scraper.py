@@ -674,7 +674,7 @@ class TestScrapeMedicalInstitutions(unittest.TestCase):
                 "memo": "備考テスト",
             },
             {
-                "name": "道北勤医協 一条通病院",
+                "name": "道北勤医協一条通病院",
                 "address": "旭川市東光1の1",
                 "phone_number": "0166-34-0015 予約専用",
                 "book_at_medical_institution": True,
@@ -693,6 +693,7 @@ class TestScrapeMedicalInstitutions(unittest.TestCase):
 class TestScrapeYOLPLocation(unittest.TestCase):
     def test_lists(self):
         location_data = ScrapeYOLPLocation("市立旭川病院")
+        self.assertEqual(location_data.lists[0]["medical_institution_name"], "市立旭川病院")
         self.assertEqual(location_data.lists[0]["longitude"], 142.365976388889)
         self.assertEqual(location_data.lists[0]["latitude"], 43.778422777778)
 
