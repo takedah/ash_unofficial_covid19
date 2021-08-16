@@ -855,7 +855,8 @@ class MedicalInstitutionService(Service):
             area (str): 医療機関の地区
 
         Returns:
-            locations (list of list): 新型コロナワクチン接種医療機関の緯度経度を含めた一覧
+            locations (list of tuple): 位置情報付き医療機関一覧データ
+                新型コロナワクチン接種医療機関の情報に緯度経度を含めたタプルのリスト
 
         """
         state = (
@@ -878,7 +879,7 @@ class MedicalInstitutionService(Service):
         state = state + " ORDER BY " + self.table_name + ".id;"
         locations = list()
         with self.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
+            with conn.cursor() as cur:
                 cur.execute(state)
                 for row in cur.fetchall():
                     locations.append(row)

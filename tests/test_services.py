@@ -527,7 +527,7 @@ class TestMedicalInstitutionService(unittest.TestCase):
     def test_get_locations(self):
         results = self.service.get_locations(area="新富・東・金星町")
         expect = [
-            [
+            (
                 "市立旭川病院",
                 "金星町1",
                 "0166-29-0202",
@@ -536,7 +536,7 @@ class TestMedicalInstitutionService(unittest.TestCase):
                 "",
                 43.778422777778,
                 142.365976388889,
-            ]
+            )
         ]
         self.assertEqual(results, expect)
 
