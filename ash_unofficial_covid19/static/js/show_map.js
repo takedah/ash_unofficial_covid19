@@ -30,7 +30,8 @@ document.addEventListener("DOMContentLoaded", function() {
             locationData["latitude" + currentReversedOrder],
             locationData["longitude" + currentReversedOrder]
         ]).addTo(map)
-            .bindPopup(locationData["locationName" + currentReversedOrder])
+        .bindPopup(locationData["locationName" + currentReversedOrder], {autoClose:
+          false})
             .openPopup();
     }
 
