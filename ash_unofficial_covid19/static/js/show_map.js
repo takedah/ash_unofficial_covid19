@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function() {
     var resultsLength = Number(JSON.parse(
         document.getElementById("results").dataset.length));
 
-    var map = L.map('mapid');
+  var map = L.map('mapid', { "tap": false });
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
