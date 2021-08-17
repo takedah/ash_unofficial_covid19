@@ -58,48 +58,48 @@ def import_locations_data() -> None:
     fix_list = [
         {
             "medical_institution_name": "唐沢病院",
-            "longitude": 142.36950,
-            "latitude": 43.76629,
+            "longitude": 142.36361116952028,
+            "latitude": 43.76824898808485,
         },
         {
             "medical_institution_name": "旭川キュアメディクス",
-            "longitude": 142.36927,
-            "latitude": 43.76549,
+            "longitude": 142.37285062533863,
+            "latitude": 43.76773531393752,
         },
         {
             "medical_institution_name": "豊岡産科婦人科医院",
-            "longitude": 142.36497,
-            "latitude": 43.78279,
+            "longitude": 142.3898197271928,
+            "latitude": 43.760557864278475,
         },
         {
             "medical_institution_name": "佐藤内科医院",
-            "longitude": 142.36468,
-            "latitude": 43.77808,
+            "longitude": 142.39588151965012,
+            "latitude": 43.76034860571178,
         },
         {
             "medical_institution_name": "東旭川病院",
-            "longitude": 142.41126,
-            "latitude": 43.77274,
+            "longitude": 142.4377094983569,
+            "latitude": 43.777870139580855,
         },
         {
             "medical_institution_name": "旭川医療センター",
-            "longitude": 142.38146,
-            "latitude": 43.79878,
+            "longitude": 142.3815237271935,
+            "latitude": 43.798826491523464,
         },
         {
             "medical_institution_name": "フクダクリニック",
-            "longitude": 142.38269,
-            "latitude": 43.81551,
+            "longitude": 142.38243298115825,
+            "latitude": 43.81521459576975,
         },
         {
             "medical_institution_name": "旭川リハビリテーション病院",
-            "longitude": 142.35709,
-            "latitude": 43.77479,
+            "longitude": 142.3871075983558,
+            "latitude": 43.73051097382853,
         },
         {
             "medical_institution_name": "旭川医科大学病院",
-            "longitude": 142.36904,
-            "latitude": 43.74737,
+            "longitude": 142.38382199835564,
+            "latitude": 43.73007572101459,
         },
     ]
     locations_data = LocationFactory()

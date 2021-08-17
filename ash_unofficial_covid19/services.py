@@ -875,12 +875,15 @@ class MedicalInstitutionService(Service):
             + ".name = locations.medical_institution_name"
         )
         if area:
-            state = state + " WHERE area = " + "'" + area + "'"
+            state = state + " WHERE area=%s"
         state = state + " ORDER BY " + self.table_name + ".id;"
         locations = list()
         with self.get_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute(state)
+                if area:
+                    cur.execute(state, (area,))
+                else:
+                    cur.execute(state)
                 for row in cur.fetchall():
                     locations.append(row)
         return locations

@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 {% block content %}
 <article>
-  <h1 class="h4 py-3">旭川市新型コロナウイルス非公式オープンデータ（陽性患者属性CSV）</h1>
+  <h1 class="h4 py-3">感染者の状況（非公式オープンデータ）</h1>
   <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
     <p class="mb-0">{{ asahikawa_patients.last_updated }}にダウンロードしたデータを元に表示しています。正確な情報は必ず<a class="alert-link" href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" target="_blank">旭川市公式ホームページ</a>を確認してください。</p>
     <button type="button" class="close" data-dismiss="alert" aria-label="close">
@@ -11,7 +11,7 @@
   <div class="card mt-3">
     <div class="card-body">
       <section>
-        <h2 class="h5 card-title">陽性患者属性CSVをダウンロード</h2>
+        <h2 class="h5 card-title">非公式オープンデータ（陽性患者属性CSV）をダウンロード</h2>
         <p>旭川市公式ホームページの新型コロナウイルス感染症の市内発生状況のデータから、<a href="https://www.code4japan.org/" title="Code for Japan" target="_blank">Code for Japan</a>の陽性患者属性データセットに基づいたCSV形式のテキストファイルを作成し、非公式のオープンデータとしてダウンロードできるようにしました。</p>
         <p><a href="/012041_asahikawa_covid19_patients.csv" title="旭川市新型コロナ陽性患者属性CSVをダウンロード" class="btn btn-primary">陽性患者属性CSVをダウンロード</a></p>
       </section>

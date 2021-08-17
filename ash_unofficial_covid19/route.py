@@ -30,9 +30,9 @@ def add_security_headers(response):
     response.headers.add(
         "Content-Security-Policy",
         "default-src 'self'; style-src 'self' 'unsafe-inline' \
-                stackpath.bootstrapcdn.com kit.fontawesome.com; \
+                stackpath.bootstrapcdn.com unpkg.com kit.fontawesome.com; \
                 script-src 'self' code.jquery.com cdnjs.cloudflare.com \
-                stackpath.bootstrapcdn.com kit.fontawesome.com \
+                stackpath.bootstrapcdn.com unpkg.com kit.fontawesome.com \
                 www.googletagmanager.com \
                 'nonce-Pbq-X7F-632oxHhPe6mzMC-LHYE'; \
                 connect-src ka-f.fontawesome.com \
@@ -133,7 +133,7 @@ def opendata():
     results = asahikawa_patients.get_rows()
     return render_template(
         "opendata.html",
-        title="非公式オープンデータ（陽性者属性CSV）",
+        title="感染者の状況（非公式オープンデータ）",
         gtag_id=Config.GTAG_ID,
         asahikawa_patients=asahikawa_patients,
         rows=results[0].items,
@@ -168,11 +168,35 @@ def opendata_pages(page):
 
 @app.route("/medical_institutions")
 def medical_institutions():
+    medical_institutions = get_medical_institutions()
+    area_list = medical_institutions.get_area_list()
     return render_template(
         "medical_institutions.html",
-        title="ワクチン接種医療機関一覧",
+        title="新型コロナワクチン接種医療機関一覧",
         gtag_id=Config.GTAG_ID,
-        medical_institutions=get_medical_institutions(),
+        medical_institutions=medical_institutions,
+        area_list=area_list,
+    )
+
+
+@app.route("/medical_institutions/<area>")
+def medical_institutions_areas(area):
+    medical_institutions = get_medical_institutions()
+    area = escape(area)
+    search_results = medical_institutions.get_locations(area=area)
+    search_lengths = len(search_results)
+    if search_lengths == 0:
+        abort(404)
+    area_list = medical_institutions.get_area_list()
+    return render_template(
+        "area.html",
+        title=area + "の新型コロナワクチン接種医療機関一覧",
+        gtag_id=Config.GTAG_ID,
+        medical_institutions=medical_institutions,
+        area=area,
+        search_results=search_results,
+        search_lengths=search_lengths,
+        area_list=area_list,
     )
 
 

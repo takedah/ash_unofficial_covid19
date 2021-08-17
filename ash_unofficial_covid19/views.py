@@ -1,4 +1,5 @@
 import csv
+import urllib.parse
 from abc import ABCMeta, abstractmethod
 from datetime import date, datetime, timedelta, timezone
 from decimal import ROUND_HALF_UP, Decimal
@@ -87,23 +88,37 @@ class MedicalInstitutionsView:
     def last_updated(self) -> str:
         return self.__last_updated
 
-    def get_rows(self) -> list:
-        """グラフのデータをオブジェクトデータのリストで返す
+    def get_locations(self, area: Optional[str] = None) -> list:
+        """位置情報付きで新型コロナワクチン接種医療機関一覧のデータを返す
+
+        Args:
+            area (str): 医療機関の地区
 
         Returns:
-            rows (tuple): データリスト
-                MedicalInstitutionFactoryオブジェクトのリスト
+            locations (list of tuple): 位置情報付きの接種医療機関データリスト
+                新型コロナワクチン接種医療機関の情報に緯度経度を含めたタプルのリスト
 
         """
-        csv_rows = self.__service.get_csv_rows()
-        csv_rows.pop(0)
-        return csv_rows
+        return self.__service.get_locations(area=area)
 
-    def get_csv(self) -> StringIO:
-        """グラフのデータをCSVで返す
+    def get_area_list(self) -> list:
+        """新型コロナワクチン接種医療機関の地域全件のリストを返す
 
         Returns:
-            csv_data (StringIO): グラフのCSVデータ
+            res (list of tuple): 医療機関の地域一覧リスト
+                医療機関の地域名称とそれをURLエンコードした文字列と対で返す
+
+        """
+        area_list = list()
+        for area in self.__service.get_area_list():
+            area_list.append((area, urllib.parse.quote(area)))
+        return area_list
+
+    def get_csv(self) -> StringIO:
+        """新型コロナワクチン接種医療機関一覧のデータをCSVで返す
+
+        Returns:
+            csv_data (StringIO): 新型コロナワクチン接種医療機関一覧のCSVデータ
 
         """
         csv_rows = self.__service.get_csv_rows()
