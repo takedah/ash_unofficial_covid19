@@ -139,10 +139,13 @@ class GraphView(metaclass=ABCMeta):
     def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
         pass
 
-    def get_yesterday(self) -> date:
+    def get_yesterday(self, more_adjust: bool = False) -> date:
         """グラフの基準となる現在の前日の日付を返す
 
-        市の発表が16時が多いので、16時より前なら前々日の情報を返すようにする
+        市の発表が16時が多いので、17時より前なら前々日の情報を返すようにする
+
+        Args:
+            more_adjust (bool): 更に前日の日付データとしたい場合真を指定
 
         Returns:
             yesterday (date): 前日の日付データ
@@ -150,10 +153,14 @@ class GraphView(metaclass=ABCMeta):
         """
         now = datetime.now(timezone(timedelta(hours=+9), "JST"))
         today = now.date()
-        if now.hour < 16:
+        if now.hour < 17:
             adjust_days = 2
         else:
             adjust_days = 1
+
+        if more_adjust:
+            adjust_days += 1
+
         return today - relativedelta(days=adjust_days)
 
 
@@ -171,6 +178,13 @@ class DailyTotalView(GraphView):
     def __init__(self):
         service = AsahikawaPatientService()
         yesterday = self.get_yesterday()
+
+        # 前日の患者数がゼロを返す場合、公式ホームページが更新されていない可能性が
+        # あるので、その場合前々日のグラフを描画するようにする
+        yesterday_patients_number = service.get_patients_number(target_date=yesterday)
+        if yesterday_patients_number == 0:
+            yesterday = self.get_yesterday(more_adjust=True)
+
         self.__daily_total_data = service.get_aggregate_by_days(
             from_date=yesterday - relativedelta(years=1), to_date=yesterday
         )
@@ -266,6 +280,13 @@ class MonthTotalView(GraphView):
     def __init__(self):
         service = AsahikawaPatientService()
         yesterday = self.get_yesterday()
+
+        # 前日の患者数がゼロを返す場合、公式ホームページが更新されていない可能性が
+        # あるので、その場合前々日のグラフを描画するようにする
+        yesterday_patients_number = service.get_patients_number(target_date=yesterday)
+        if yesterday_patients_number == 0:
+            yesterday = self.get_yesterday(more_adjust=True)
+
         self.__month_total_data = service.get_total_by_months(
             from_date=date(2020, 1, 1), to_date=yesterday
         )
@@ -433,6 +454,13 @@ class MovingAverageView(GraphView):
     def __init__(self):
         service = AsahikawaPatientService()
         yesterday = self.get_yesterday()
+
+        # 前日の患者数がゼロを返す場合、公式ホームページが更新されていない可能性が
+        # あるので、その場合前々日のグラフを描画するようにする
+        yesterday_patients_number = service.get_patients_number(target_date=yesterday)
+        if yesterday_patients_number == 0:
+            yesterday = self.get_yesterday(more_adjust=True)
+
         self.__moving_average_data = service.get_seven_days_moving_average(
             from_date=yesterday - relativedelta(days=90), to_date=yesterday
         )
@@ -529,6 +557,13 @@ class PerHundredThousandPopulationView(GraphView):
     def __init__(self):
         service = AsahikawaPatientService()
         yesterday = self.get_yesterday()
+
+        # 前日の患者数がゼロを返す場合、公式ホームページが更新されていない可能性が
+        # あるので、その場合前々日のグラフを描画するようにする
+        yesterday_patients_number = service.get_patients_number(target_date=yesterday)
+        if yesterday_patients_number == 0:
+            yesterday = self.get_yesterday(more_adjust=True)
+
         self.__per_hundred_thousand_population_data = (
             service.get_per_hundred_thousand_population_per_week(
                 from_date=yesterday - relativedelta(days=90), to_date=yesterday

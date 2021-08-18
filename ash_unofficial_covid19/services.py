@@ -626,6 +626,29 @@ class AsahikawaPatientService(Service):
                     patients_number_by_age.append((row[0], row[1]))
         return patients_number_by_age
 
+    def get_patients_number(self, target_date: date) -> list:
+        """指定した日の陽性患者数を返す
+
+        Args:
+            target_date (obj:`date`): 対象年月日
+
+        Returns:
+            patients_number (int): 対象年月日の陽性患者数
+
+        """
+        state = (
+            "SELECT COUNT(patient_number) FROM"
+            + " "
+            + self.table_name
+            + " "
+            + "WHERE publication_date = %s;"
+        )
+        with self.get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(state, (target_date,))
+                patients_number = cur.fetchone()
+        return patients_number[0]
+
 
 class HokkaidoPatientService(Service):
     """北海道の公表する新型コロナウイルス感染症患者データを扱うサービス"""

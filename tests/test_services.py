@@ -436,6 +436,11 @@ class TestAsahikawaPatientService(unittest.TestCase):
         ]
         self.assertEqual(result, expect)
 
+    def test_get_patients_number(self):
+        result = self.service.get_patients_number(date(2021, 2, 22))
+        expect = 1
+        self.assertEqual(result, expect)
+
 
 class TestMedicalInstitutionService(unittest.TestCase):
     @classmethod
