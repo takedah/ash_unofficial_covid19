@@ -142,7 +142,7 @@ class GraphView(metaclass=ABCMeta):
     def get_yesterday(self, more_adjust: bool = False) -> date:
         """グラフの基準となる現在の前日の日付を返す
 
-        市の発表が16時が多いので、17時より前なら前々日の情報を返すようにする
+        市の発表が16時が多いので、16時より前なら前々日の情報を返すようにする
 
         Args:
             more_adjust (bool): 更に前日の日付データとしたい場合真を指定
@@ -153,7 +153,7 @@ class GraphView(metaclass=ABCMeta):
         """
         now = datetime.now(timezone(timedelta(hours=+9), "JST"))
         today = now.date()
-        if now.hour < 17:
+        if now.hour < 16:
             adjust_days = 2
         else:
             adjust_days = 1

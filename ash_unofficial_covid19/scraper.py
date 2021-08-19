@@ -427,7 +427,7 @@ class ScrapePressReleaseLink(Scraper):
                 "新型コロナウイルス感染症の発生状況.*令和[0-9]+年([0-9]+月[0-9]+日)発表分.*", anker_text
             )
             if search_press_release is not None:
-                public_date_string = search_press_release.groups()[0]
+                public_date_string = search_press_release.group(1)
                 values = {
                     "url": urllib.parse.urljoin(downloaded_html.url, a["href"]),
                     "publication_date": self.format_date(
@@ -632,6 +632,7 @@ class DownloadedPDF(Downloader):
 
     Attributes:
         content (BytesIO): ダウンロードしたPDFファイルのBytesIOデータ
+        url (str): ダウンロードしたPDFファイルのURL
 
     """
 
