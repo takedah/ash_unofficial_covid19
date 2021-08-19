@@ -4,6 +4,7 @@ from io import BytesIO
 from unittest.mock import Mock, patch
 
 import pandas as pd
+from numpy import nan
 from requests import HTTPError, Timeout
 
 from ash_unofficial_covid19.errors import HTTPDownloadError
@@ -12,9 +13,11 @@ from ash_unofficial_covid19.scraper import (
     DownloadedHTML,
     DownloadedPDF,
     ScrapeAsahikawaPatients,
+    ScrapeAsahikawaPatientsPDF,
     ScrapeHokkaidoPatients,
     ScrapeMedicalInstitutions,
     ScrapeMedicalInstitutionsPDF,
+    ScrapePressReleaseLink,
     ScrapeYOLPLocation
 )
 
@@ -125,7 +128,8 @@ def html_content():
         </tr>
     </tbody>
 </table>
-    """
+<p><a href="test.html">新型コロナウイルス感染症の発生状況（令和3年8月19日発表分）（PDF形式90キロバイト）</a></p>
+"""
 
 
 def csv_content():
@@ -435,6 +439,31 @@ class TestScrapeAsahikawaPatients(unittest.TestCase):
         self.assertEqual(scraper.lists, [])
 
 
+class TestScrapePressReleaseLink(unittest.TestCase):
+    def setUp(self):
+        self.html_content = html_content()
+
+    def tearDown(self):
+        pass
+
+    @patch("ash_unofficial_covid19.scraper.requests")
+    def test_lists(self, mock_requests):
+        mock_requests.get.return_value = Mock(
+            status_code=200, content=self.html_content
+        )
+        downloaded_html = DownloadedHTML("http://dummy.local/kurashi/")
+        scraper = ScrapePressReleaseLink(
+            downloaded_html=downloaded_html, target_year=2021
+        )
+        expect = [
+            {
+                "publication_date": date(2021, 8, 19),
+                "url": "http://dummy.local/kurashi/test.html",
+            },
+        ]
+        self.assertEqual(scraper.lists, expect)
+
+
 class TestDownloadedCSV(unittest.TestCase):
     @patch("ash_unofficial_covid19.scraper.requests")
     def test_content(self, mock_requests):
@@ -551,6 +580,59 @@ class TestDownloadedPDF(unittest.TestCase):
         mock_requests.get.return_value = Mock(status_code=404)
         with self.assertRaises(HTTPDownloadError):
             DownloadedPDF("http://dummy.local")
+
+
+class TestScrapeAsahikawaPatientsPDF(unittest.TestCase):
+    @patch("ash_unofficial_covid19.scraper.ScrapeAsahikawaPatientsPDF._get_dataframe")
+    def test_lists(self, mock_get_dataframe):
+        dfs = list()
+        df1 = pd.DataFrame([[]])
+        df2 = pd.DataFrame(
+            [
+                [
+                    nan,
+                    "市内番号",
+                    "道内番号",
+                    "国籍",
+                    "居住地",
+                    "年代",
+                    "性別",
+                    "職業等",
+                    "リンク",
+                    "濃厚接触者",
+                ],
+                [1.0, "6", "66", "日本", "旭川市", "40代", "男性", "非公表", "有り", "3人"],
+            ]
+        )
+        dfs = [df1, df2]
+        mock_get_dataframe.return_value = dfs
+        downloaded_pdf = Mock(content=BytesIO())
+        scraper = ScrapeAsahikawaPatientsPDF(
+            downloaded_pdf=downloaded_pdf, publication_date=date(2021, 8, 19)
+        )
+        expect = [
+            {
+                "patient_number": 6,
+                "city_code": "01241",
+                "prefecture": "北海道",
+                "city_name": "旭川市",
+                "publication_date": date(2021, 8, 18),
+                "onset_date": None,
+                "residence": "旭川市",
+                "age": "40代",
+                "sex": "男性",
+                "occupation": None,
+                "status": None,
+                "symptom": None,
+                "overseas_travel_history": None,
+                "be_discharged": None,
+                "note": "北海道発表No.;66",
+                "hokkaido_patient_number": 66,
+                "surrounding_status": None,
+                "close_contact": None,
+            },
+        ]
+        self.assertEqual(scraper.lists, expect)
 
 
 class TestScrapeMedicalInstitutionsPDF(unittest.TestCase):

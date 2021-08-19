@@ -10,8 +10,11 @@ from ash_unofficial_covid19.models import (
 from ash_unofficial_covid19.scraper import (
     DownloadedCSV,
     DownloadedHTML,
+    DownloadedPDF,
     ScrapeAsahikawaPatients,
-    ScrapeHokkaidoPatients
+    ScrapeAsahikawaPatientsPDF,
+    ScrapeHokkaidoPatients,
+    ScrapePressReleaseLink
 )
 from ash_unofficial_covid19.services import (
     AsahikawaPatientService,
@@ -104,7 +107,38 @@ def import_asahikawa_data(download_lists: list) -> None:
     service.create(patients_data)
 
 
+def import_asahikawa_data_from_press_release(url: str, target_year: int) -> None:
+    """
+    旭川市公式ホームページから新型コロナウイルス感染症の感染者情報を、
+    報道発表資料のPDFから抽出し、データベースへ格納する。
+    HTMLページの更新よりPDFファイルの更新の方が早いため、先にPDFからデータを抽出する。
+
+    Args:
+        url (str): 旭川市公式ホームページのURL
+        target_year (int): 対象年
+
+    """
+    html_data = DownloadedHTML(url)
+    press_release_link = ScrapePressReleaseLink(
+        downloaded_html=html_data, target_year=target_year
+    )
+    publication_date = press_release_link.lists[0]["publication_date"]
+    pdf_url = press_release_link.lists[0]["url"]
+
+    pdf_data = DownloadedPDF(pdf_url)
+    scraped_data = ScrapeAsahikawaPatientsPDF(
+        downloaded_pdf=pdf_data, publication_date=publication_date
+    )
+    service = AsahikawaPatientService()
+    for row in scraped_data.lists:
+        patients_data = AsahikawaPatientFactory()
+        patients_data.create(**row)
+        service.create(patients_data)
+
+
 if __name__ == "__main__":
+    import_asahikawa_data_from_press_release(Config.OVERVIEW_URL, 2021)
+
     import_hokkaido_data(Config.HOKKAIDO_URL)
     download_lists = [
         (Config.NOV2020_OR_EARLIER_URL, 2020),

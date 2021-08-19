@@ -11,6 +11,7 @@ import pandas as pd
 import requests
 import tabula
 from bs4 import BeautifulSoup
+from dateutil.relativedelta import relativedelta
 from flask import escape
 from requests import HTTPError, Timeout
 
@@ -28,6 +29,11 @@ class Downloader(metaclass=ABCMeta):
     @property
     @abstractmethod
     def content(self):
+        pass
+
+    @property
+    @abstractmethod
+    def url(self):
         pass
 
     def info_log(self, message: str) -> None:
@@ -81,6 +87,108 @@ class Scraper(metaclass=ABCMeta):
         else:
             return ""
 
+    @staticmethod
+    def z2h_number(zenkaku_string: str) -> str:
+        """全角数字が含まれている文字列の全角数字を全て半角数字に変換する
+
+        Args:
+            zenkaku_string (str): 全角数字が含まれている文字列
+
+        """
+        z2h_table = str.maketrans(
+            {
+                "０": "0",
+                "１": "1",
+                "２": "2",
+                "３": "3",
+                "４": "4",
+                "５": "5",
+                "６": "6",
+                "７": "7",
+                "８": "8",
+                "９": "9",
+            }
+        )
+        if type(zenkaku_string) is str:
+            return zenkaku_string.translate(z2h_table)
+        else:
+            return ""
+
+    @classmethod
+    def format_date(self, date_string: str, target_year: int) -> Optional[date]:
+        """元データに年のデータがないためこれを加えてdatetime.dateに変換
+
+        Args:
+            date_string (str): 元データの日付表記
+            target_year (int): 対象年
+
+        Returns:
+            formatted_date (date): datetime.dateに変換した日付データ
+
+        """
+        try:
+            date_string = self.z2h_number(date_string.replace(" ", "").replace("　", ""))
+            matched_texts = re.match("([0-9]+)月([0-9]+)日", date_string)
+            if matched_texts is None:
+                return None
+            month_and_day = matched_texts.groups()
+            month = int(month_and_day[0])
+            day = int(month_and_day[1])
+            return date(target_year, month, day)
+        except (TypeError, ValueError):
+            return None
+
+    @classmethod
+    def format_age(self, age_string: str) -> str:
+        """患者の年代表記をオープンデータ定義書の仕様に合わせる。
+
+        Args:
+            age_string (str): 元データの患者の年代表記
+
+        Returns:
+            formatted_age (str): 修正後の患者の年代表記
+
+        """
+        age_string = self.z2h_number(age_string)
+        if age_string is None:
+            return ""
+        if age_string == "非公表" or age_string == "調査中":
+            return ""
+        elif age_string == "10代未満" or age_string == "10歳未満":
+            return "10歳未満"
+        elif age_string == "90代":
+            return "90歳以上"
+
+        matched_text = re.match("([0-9]+)", age_string)
+        if matched_text is None:
+            return ""
+        age = int(matched_text.group(1))
+        if 90 < age:
+            return "90歳以上"
+        else:
+            return str(age) + "代"
+
+    @classmethod
+    def format_sex(self, sex_string: str) -> str:
+        """患者の性別表記をオープンデータ定義書の仕様に合わせる。
+
+        Args:
+            sex_string (str): 元データの患者の性別表記
+
+        Returns:
+            formatted_sex (str): 修正後の患者の性別表記
+
+        """
+        if sex_string == "非公表" or sex_string == "調査中":
+            return ""
+        if sex_string == "その他":
+            return "その他"
+        matched_text = re.match("(男|女)", sex_string)
+        if matched_text is None:
+            return ""
+        sex = matched_text.group(1)
+        return sex + "性"
+
 
 class DownloadedHTML(Downloader):
     """HTMLファイルのbytesデータの取得
@@ -89,6 +197,7 @@ class DownloadedHTML(Downloader):
 
     Attributes:
         content (bytes): ダウンロードしたHTMLファイルのbytesデータ
+        url (str): HTMLファイルのURL
 
     """
 
@@ -99,11 +208,16 @@ class DownloadedHTML(Downloader):
 
         """
         Downloader.__init__(self)
-        self.__content = self._get_html_content(url)
+        self.__url = url
+        self.__content = self._get_html_content(self.__url)
 
     @property
     def content(self) -> bytes:
         return self.__content
+
+    @property
+    def url(self) -> str:
+        return self.__url
 
     def _get_html_content(self, url: str) -> bytes:
         """WebサイトからHTMLファイルのbytesデータを取得
@@ -158,7 +272,7 @@ class ScrapeAsahikawaPatients(Scraper):
         else:
             raise TypeError("対象年の指定が正しくありません。")
         self.__lists = list()
-        for row in self._get_table_values(downloaded_html.content):
+        for row in self._get_table_values(downloaded_html):
             extracted_data = self._extract_patient_data(row)
             if extracted_data is not None:
                 self.__lists.append(extracted_data)
@@ -171,18 +285,18 @@ class ScrapeAsahikawaPatients(Scraper):
     def target_year(self) -> int:
         return self.__target_year
 
-    def _get_table_values(self, html_bytes: bytes) -> list:
+    def _get_table_values(self, downloaded_html: DownloadedHTML) -> list:
         """HTMLからtableの内容を抽出してリストに格納
 
         Args:
-            html_bytes (bytes): ダウンロードしたHTMLデータ
+            downloaded_html (obj:`DownloadedHTML`): ダウンロードしたHTMLデータ
                 ダウンロードしたHTMLファイルのbytesデータを要素に持つオブジェクト
 
         Returns:
             table_values (list of list): tableの内容で構成される二次元配列
 
         """
-        soup = BeautifulSoup(html_bytes, "html.parser")
+        soup = BeautifulSoup(downloaded_html.content, "html.parser")
         table_values = list()
         for table in soup.find_all("table"):
             if table.find("caption") is not None:
@@ -199,108 +313,6 @@ class ScrapeAsahikawaPatients(Scraper):
                     table_values.append(row)
 
         return table_values
-
-    @staticmethod
-    def _z2h(zenkaku_string: str) -> str:
-        """全角数字が含まれている文字列の全角数字を全て半角数字に変換する
-
-        Args:
-            zenkaku_string (str): 全角数字が含まれている文字列
-
-        """
-        z2h_table = str.maketrans(
-            {
-                "０": "0",
-                "１": "1",
-                "２": "2",
-                "３": "3",
-                "４": "4",
-                "５": "5",
-                "６": "6",
-                "７": "7",
-                "８": "8",
-                "９": "9",
-            }
-        )
-        if type(zenkaku_string) is str:
-            return zenkaku_string.translate(z2h_table)
-        else:
-            return ""
-
-    @classmethod
-    def format_date(self, date_string: str, target_year: int) -> Optional[date]:
-        """元データに年のデータがないためこれを加えてdatetime.dateに変換
-
-        Args:
-            date_string (str): 元データの日付表記
-            target_year (int): 対象年
-
-        Returns:
-            formatted_date (date): datetime.dateに変換した日付データ
-
-        """
-        try:
-            date_string = self._z2h(date_string.replace(" ", "").replace("　", ""))
-            matched_texts = re.match("([0-9]+)月([0-9]+)日", date_string)
-            if matched_texts is None:
-                return None
-            month_and_day = matched_texts.groups()
-            month = int(month_and_day[0])
-            day = int(month_and_day[1])
-            return date(target_year, month, day)
-        except (TypeError, ValueError):
-            return None
-
-    @classmethod
-    def format_age(self, age_string: str) -> str:
-        """患者の年代表記をオープンデータ定義書の仕様に合わせる。
-
-        Args:
-            age_string (str): 元データの患者の年代表記
-
-        Returns:
-            formatted_age (str): 修正後の患者の年代表記
-
-        """
-        age_string = self._z2h(age_string)
-        if age_string is None:
-            return ""
-        if age_string == "非公表" or age_string == "調査中":
-            return ""
-        elif age_string == "10代未満" or age_string == "10歳未満":
-            return "10歳未満"
-        elif age_string == "90代":
-            return "90歳以上"
-
-        matched_text = re.match("([0-9]+)", age_string)
-        if matched_text is None:
-            return ""
-        age = int(matched_text.group(1))
-        if 90 < age:
-            return "90歳以上"
-        else:
-            return str(age) + "代"
-
-    @classmethod
-    def format_sex(self, sex_string: str) -> str:
-        """患者の性別表記をオープンデータ定義書の仕様に合わせる。
-
-        Args:
-            sex_string (str): 元データの患者の性別表記
-
-        Returns:
-            formatted_sex (str): 修正後の患者の性別表記
-
-        """
-        if sex_string == "非公表" or sex_string == "調査中":
-            return ""
-        if sex_string == "その他":
-            return "その他"
-        matched_text = re.match("(男|女)", sex_string)
-        if matched_text is None:
-            return ""
-        sex = matched_text.group(1)
-        return sex + "性"
 
     def _extract_patient_data(self, row: list) -> Optional[dict]:
         """新型コロナウイルス感染症患者データへの変換
@@ -363,6 +375,70 @@ class ScrapeAsahikawaPatients(Scraper):
             return None
 
 
+class ScrapePressReleaseLink(Scraper):
+    """新型コロナウイルス感染症の市内発生状況ページの報道発表資料へのリンクを抽出
+
+    Attributes:
+        lists (list of dict): 報道発表日と報道発表PDFへのリンクリスト
+            報道発表日と報道発表PDFへのリンクを要素とする辞書ののリスト
+
+    """
+
+    def __init__(self, downloaded_html: DownloadedHTML, target_year: int = 2020):
+        """
+        Args:
+            downloaded_html (:obj:`DownloadedHTML`): ダウンロードしたHTMLデータ
+                ダウンロードした旭川市公式サイトの新型コロナウイルス感染症の
+                市内発生状況のページのHTMLファイルのbytesデータを要素に持つオブジェクト
+            target_year (int): 元データに年が表記されていないため直接指定する
+
+        """
+        if 2020 <= target_year:
+            self.__target_year = target_year
+        else:
+            raise TypeError("対象年の指定が正しくありません。")
+
+        self.__lists = self._get_press_release_link(downloaded_html)
+
+    @property
+    def lists(self):
+        return self.__lists
+
+    @property
+    def target_year(self) -> int:
+        return self.__target_year
+
+    def _get_press_release_link(self, downloaded_html: DownloadedHTML) -> list:
+        """新型コロナウイルス感染症の発生状況の報道発表PDFへのリンクを抽出
+
+        Args:
+            downloaded_html (:obj:`DownloadedHTML`): ダウンロードしたHTMLデータ
+                ダウンロードしたHTMLファイルのbytesデータを要素に持つオブジェクト
+
+        Returns:
+            press_release_link (list of tuple): tableの内容で構成される二次元配列
+
+        """
+        soup = BeautifulSoup(downloaded_html.content, "html.parser")
+        press_release_link = list()
+        for a in soup.find_all("a"):
+            anker_text = self.format_string(self.z2h_number(a.text.strip()))
+            search_press_release = re.match(
+                "新型コロナウイルス感染症の発生状況.*令和[0-9]+年([0-9]+月[0-9]+日)発表分.*", anker_text
+            )
+            if search_press_release is not None:
+                public_date_string = search_press_release.groups()[0]
+                values = {
+                    "url": urllib.parse.urljoin(downloaded_html.url, a["href"]),
+                    "publication_date": self.format_date(
+                        public_date_string, self.target_year
+                    ),
+                }
+                press_release_link.append(values)
+
+        return sorted(press_release_link)
+
+
 class DownloadedCSV(Downloader):
     """CSVファイルのStringIOデータの取得
 
@@ -370,6 +446,7 @@ class DownloadedCSV(Downloader):
 
     Attributes:
         content (StringIO): ダウンロードしたCSVファイルのStringIOデータ
+        url (str): ダウンロードしたCSVファイルのURL
 
     """
 
@@ -381,11 +458,16 @@ class DownloadedCSV(Downloader):
 
         """
         Downloader.__init__(self)
-        self.__content = self._get_csv_content(url=url, encoding=encoding)
+        self.__url = url
+        self.__content = self._get_csv_content(url=self.__url, encoding=encoding)
 
     @property
     def content(self) -> StringIO:
         return self.__content
+
+    @property
+    def url(self) -> str:
+        return self.__url
 
     def _get_csv_content(self, url: str, encoding: str) -> StringIO:
         """WebサイトからCSVファイルのStringIOデータを取得
@@ -433,7 +515,7 @@ class ScrapeHokkaidoPatients(Scraper):
         """
         Scraper.__init__(self)
         self.__lists = list()
-        for row in self._get_table_values(downloaded_csv.content):
+        for row in self._get_table_values(downloaded_csv):
             extracted_data = self._extract_patient_data(row)
             if extracted_data is not None:
                 self.__lists.append(extracted_data)
@@ -442,18 +524,19 @@ class ScrapeHokkaidoPatients(Scraper):
     def lists(self) -> list:
         return self.__lists
 
-    def _get_table_values(self, csv_io: StringIO) -> list:
+    def _get_table_values(self, downloaded_csv: DownloadedCSV) -> list:
         """CSVから内容を抽出してリストに格納
 
         Args:
-            csv_io (:obj:`StringIO`): CSVファイルのStringIOデータ
+            downloaded_csv (:obj:`DownloadedCSV`): CSVファイルのデータ
+                ダウンロードしたCSVファイルのStringIOデータを要素に持つオブジェクト
 
         Returns:
             table_values (list of list): CSVの内容で構成される二次元配列
 
         """
         table_values = list()
-        reader = csv.reader(csv_io)
+        reader = csv.reader(downloaded_csv.content)
         for row in reader:
             table_values.append(row)
 
@@ -559,11 +642,16 @@ class DownloadedPDF(Downloader):
 
         """
         Downloader.__init__(self)
-        self.__content = self._get_pdf_content(url)
+        self.__url = url
+        self.__content = self._get_pdf_content(self.__url)
 
     @property
     def content(self) -> BytesIO:
         return self.__content
+
+    @property
+    def url(self) -> str:
+        return self.__url
 
     def _get_pdf_content(self, url: str) -> BytesIO:
         """WebサイトからCSVファイルのBytesIOデータを取得
@@ -592,6 +680,128 @@ class DownloadedPDF(Downloader):
             raise HTTPDownloadError(message)
 
         return BytesIO(response.content)
+
+
+class ScrapeAsahikawaPatientsPDF(Scraper):
+    """旭川市新型コロナウイルス陽性患者データの抽出
+
+    旭川市公式ホームページからダウンロードしたPDFファイルのデータから、
+    旭川市の新型コロナウイルス陽性患者データを抽出し、リストに変換する。
+
+    Attributes:
+        asahikawa_patients_data (list of dict): 旭川市の陽性患者データ
+            旭川市の新型コロナウイルス陽性患者データを表す辞書のリスト
+
+    """
+
+    def __init__(self, downloaded_pdf: DownloadedPDF, publication_date: date):
+        """
+        Args:
+            downloaded_pdf (:obj:`DownloadedPDF`): PDFデータ
+                旭川市の報道発表PDFファイルのBytesIOデータを要素に持つオブジェクト
+           publication_date (date): 報道発表日
+                報道発表PDFデータに公表日がないため、引数で指定した日付をセット
+
+        """
+        if isinstance(publication_date, date):
+            self.__publication_date = publication_date - relativedelta(days=1)
+        else:
+            raise TypeError("報道発表日の指定が正しくありません。")
+
+        pdf_df = self._get_dataframe(downloaded_pdf)
+        self.__lists = self._get_patients_data(pdf_df)
+
+    @property
+    def lists(self) -> list:
+        return self.__lists
+
+    @property
+    def publication_date(self) -> date:
+        return self.__publication_date
+
+    def _get_dataframe(self, downloaded_pdf: DownloadedPDF) -> pd.DataFrame:
+        """
+        Args:
+            downloaded_pdf (BytesIO): PDFファイルデータ
+                ダウンロードしたPDFファイルのBytesIOデータを要素に持つオブジェクト
+
+        Returns:
+            table_data (obj:`pd.DataFrame`): 旭川市の新型コロナウイルス陽性患者PDFデータ
+                旭川市の新型コロナウイルス陽性患者PDFデータから抽出した表データを、
+                pandas DataFrameで返す
+
+        """
+        return tabula.read_pdf(downloaded_pdf.content, lattice=True, pages="all")
+
+    def _get_patients_data(self, pdf_df: pd.DataFrame) -> list:
+        """
+        Args:
+            pdf_io (obj:`pd.DataFrame`): PDFファイルから抽出した表データ
+
+        Returns:
+            patients_data (list of dict): 旭川市の新型コロナウイルス陽性患者PDFデータ
+                旭川市の新型コロナウイルス陽性患者PDFデータから抽出した表データを、
+                患者データ辞書のリストで返す
+
+        """
+        patients_data = list()
+        for df in pdf_df:
+            # データフレームが空の場合スキップ
+            if df.empty:
+                continue
+            df.fillna("", inplace=True)
+            pdf_table = df.values.tolist()
+            header_row = pdf_table[0]
+            # 見出し行かどうかまず要素数で判定
+            if len(header_row) < 3:
+                continue
+            # 見出し行が決まった文字列の場合のみデータ抽出
+            if header_row[1] == "市内番号" and header_row[2] == "道内番号":
+                for row in pdf_table[1:]:
+                    extracted_data = self._extract_patient_data(row)
+                    if extracted_data:
+                        patients_data.append(extracted_data)
+
+        return patients_data
+
+    def _extract_patient_data(self, row: list) -> Optional[dict]:
+        """PDFから抽出した表データ二次元配列から新型コロナウイルス陽性患者情報のみ抽出
+
+        Args:
+            row (list): PDFから抽出した表データの1行を表すリスト
+
+        Returns:
+            patient_data (dict): 患者データの辞書
+                引数のリストが新型コロナウイルス陽性患者情報なら辞書にして返す
+
+        """
+        search_patient_number = re.match("^([0-9]{,4})$", row[1].strip())
+        search_hokkaido_patient_number = re.match("^([0-9]{,5})$", row[2].strip())
+        if search_patient_number is None or search_hokkaido_patient_number is None:
+            return None
+        patient_number = int(search_patient_number.group(1))
+        hokkaido_patient_number = int(search_hokkaido_patient_number.group(1))
+        patient_data = {
+            "patient_number": patient_number,
+            "city_code": "01241",
+            "prefecture": "北海道",
+            "city_name": "旭川市",
+            "publication_date": self.publication_date,
+            "onset_date": None,
+            "residence": row[4],
+            "age": self.format_age(row[5]),
+            "sex": self.format_sex(row[6]),
+            "occupation": None,
+            "status": None,
+            "symptom": None,
+            "overseas_travel_history": None,
+            "be_discharged": None,
+            "note": "北海道発表No.;" + str(hokkaido_patient_number),
+            "hokkaido_patient_number": hokkaido_patient_number,
+            "surrounding_status": None,
+            "close_contact": None,
+        }
+        return patient_data
 
 
 class ScrapeMedicalInstitutionsPDF(Scraper):
@@ -929,6 +1139,7 @@ class DownloadedJSON(Downloader):
 
     Attributes:
         content (bytes): ダウンロードしたJSONファイルの辞書データ
+        url (str): ダウンロードしたJSONファイルのURL
 
     """
 
@@ -939,11 +1150,16 @@ class DownloadedJSON(Downloader):
 
         """
         Downloader.__init__(self)
-        self.__content = self._get_json_content(url)
+        self.__url = url
+        self.__content = self._get_json_content(self.__url)
 
     @property
     def content(self) -> dict:
         return self.__content
+
+    @property
+    def url(self) -> str:
+        return self.__url
 
     def _get_json_content(self, url: str) -> dict:
         """WebサイトからJSONファイルの辞書データを取得
