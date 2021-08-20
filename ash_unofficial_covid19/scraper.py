@@ -734,10 +734,10 @@ class ScrapeAsahikawaPatientsPDF(Scraper):
         """
         return tabula.read_pdf(downloaded_pdf.content, lattice=True, pages="all")
 
-    def _get_patients_data(self, pdf_df: pd.DataFrame) -> list:
+    def _get_patients_data(self, pdf_df: list) -> list:
         """
         Args:
-            pdf_io (obj:`pd.DataFrame`): PDFファイルから抽出した表データ
+            pdf_df (list of :obj:`pd.DataFrame`): PDFファイルから抽出した表データ
 
         Returns:
             patients_data (list of dict): 旭川市の新型コロナウイルス陽性患者PDFデータ
@@ -750,6 +750,8 @@ class ScrapeAsahikawaPatientsPDF(Scraper):
             # データフレームが空の場合スキップ
             if df.empty:
                 continue
+            df.dropna(how="all", inplace=True)
+            df.drop_duplicates(inplace=True)
             df.fillna("", inplace=True)
             pdf_table = df.values.tolist()
             header_row = pdf_table[0]
