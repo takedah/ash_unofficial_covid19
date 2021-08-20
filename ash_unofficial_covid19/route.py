@@ -62,44 +62,37 @@ def dated_url_for(endpoint, **values):
 
 
 def get_asahikawa_patients():
-    if not hasattr(g, "asahikawa_patients"):
-        g.asahikawa_patients = AsahikawaPatientsView()
+    g.asahikawa_patients = AsahikawaPatientsView()
     return g.asahikawa_patients
 
 
 def get_medical_institutions():
-    if not hasattr(g, "medical_institutions"):
-        g.medical_institutions = MedicalInstitutionsView()
+    g.medical_institutions = MedicalInstitutionsView()
     return g.medical_institutions
 
 
 def get_daily_total():
-    if not hasattr(g, "daily_total"):
-        g.daily_total = DailyTotalView()
+    g.daily_total = DailyTotalView()
     return g.daily_total
 
 
 def get_month_total():
-    if not hasattr(g, "month_total"):
-        g.month_total = MonthTotalView()
+    g.month_total = MonthTotalView()
     return g.month_total
 
 
 def get_by_age():
-    if not hasattr(g, "by_age"):
-        g.by_age = ByAgeView()
+    g.by_age = ByAgeView()
     return g.by_age
 
 
 def get_moving_average():
-    if not hasattr(g, "moving_average"):
-        g.moving_average = MovingAverageView()
+    g.moving_average = MovingAverageView()
     return g.moving_average
 
 
 def get_per_hundred_thousand_population():
-    if not hasattr(g, "per_hundred_thousand_population"):
-        g.per_hundred_thousand_population = PerHundredThousandPopulationView()
+    g.per_hundred_thousand_population = PerHundredThousandPopulationView()
     return g.per_hundred_thousand_population
 
 
