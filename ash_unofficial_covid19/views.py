@@ -751,7 +751,7 @@ class WeeklyPerAgeView(GraphView):
         df = self.__aggregate_by_weeks_per_age.transpose()
         font_file = "./ash_unofficial_covid19/static/fonts/NotoSansCJKjp-Light.otf"
         font = FontProperties(fname=font_file, size=12)
-        legend_font = FontProperties(fname=font_file, size=8)
+        legend_font = FontProperties(fname=font_file, size=10)
         if figsize:
             fig = plt.figure(figsize=figsize)
         else:
