@@ -566,7 +566,8 @@ class PerHundredThousandPopulationView(GraphView):
 
         self.__per_hundred_thousand_population_data = (
             service.get_per_hundred_thousand_population_per_week(
-                from_date=yesterday - relativedelta(days=90), to_date=yesterday
+                from_date=yesterday - relativedelta(weeks=16, days=-1),
+                to_date=yesterday,
             )
         )
         this_week = self.__per_hundred_thousand_population_data[-1][1]
@@ -641,7 +642,7 @@ class PerHundredThousandPopulationView(GraphView):
         ax.plot(
             per_hundred_thousand_population_x,
             per_hundred_thousand_population_y,
-            color="darkgray",
+            color="salmon",
         )
         ax.yaxis.set_major_locator(MultipleLocator(5))
         ax.grid(axis="y", color="lightgray")
@@ -699,3 +700,92 @@ class PerHundredThousandPopulationView(GraphView):
             return "警戒ステージ2相当"
         else:
             return "警戒ステージ1相当"
+
+
+class WeeklyPerAgeView(GraphView):
+    """1週間ごとの年代別新規陽性患者数グラフ"""
+
+    def __init__(self):
+        service = AsahikawaPatientService()
+        yesterday = self.get_yesterday()
+
+        # 前日の患者数がゼロを返す場合、公式ホームページが更新されていない可能性が
+        # あるので、その場合前々日のグラフを描画するようにする
+        yesterday_patients_number = service.get_patients_number(target_date=yesterday)
+        if yesterday_patients_number == 0:
+            yesterday = self.get_yesterday(more_adjust=True)
+
+        df = service.get_aggregate_by_weeks_per_age(
+            from_date=yesterday - relativedelta(weeks=4, days=-1), to_date=yesterday
+        )
+        self.__aggregate_by_weeks_per_age = df
+
+    def get_graph_alt(self) -> str:
+        """グラフの代替テキストを生成
+
+        Returns:
+            graph_alt (str): グラフの代替テキスト
+
+        """
+        df = self.__aggregate_by_weeks_per_age
+        alt_text = ""
+        cols = df.columns.tolist()
+        for index, row in df.iterrows():
+            i = 0
+            alt_text = alt_text + index.strftime("%m月%d日以降") + " "
+            for value in row:
+                alt_text = alt_text + cols[i] + ": " + str(value) + "人,"
+                i += 1
+        return alt_text
+
+    def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
+        """グラフの画像を生成
+
+        Args:
+            figsize (tuple): グラフ画像データの縦横サイズを要素に持つタプル
+
+        Returns:
+            graph_image (BytesIO): グラフの画像データ
+
+        """
+        df = self.__aggregate_by_weeks_per_age.transpose()
+        font_file = "./ash_unofficial_covid19/static/fonts/NotoSansCJKjp-Light.otf"
+        font = FontProperties(fname=font_file, size=12)
+        legend_font = FontProperties(fname=font_file, size=8)
+        if figsize:
+            fig = plt.figure(figsize=figsize)
+        else:
+            fig = plt.figure()
+        ax = fig.add_subplot()
+        colors = [
+            "lightblue",
+            "gold",
+            "yellowgreen",
+            "tomato",
+            "plum",
+            "peru",
+            "lightpink",
+            "cornflowerblue",
+            "tan",
+            "paleturquoise",
+            "whitesmoke",
+        ]
+        cols = list(map(lambda x: x.strftime("%m-%d") + "~", df.columns.tolist()))
+        for i in range(len(df)):
+            ax.barh(
+                cols,
+                df.iloc[i],
+                left=df.iloc[:i].sum(),
+                color=colors[i],
+            )
+        ax.tick_params(labelsize=8)
+        ax.set_title("旭川市年代別新規陽性患者数の推移（週別）", font_properties=font)
+        ax.legend(df.index.tolist(), prop=legend_font)
+        fig.tight_layout()
+        canvas = FigureCanvasAgg(fig)
+        im = BytesIO()
+        canvas.print_png(im)
+        plt.cla()
+        plt.clf()
+        plt.close()
+        return im

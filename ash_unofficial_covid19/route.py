@@ -19,7 +19,8 @@ from ash_unofficial_covid19.views import (
     MedicalInstitutionsView,
     MonthTotalView,
     MovingAverageView,
-    PerHundredThousandPopulationView
+    PerHundredThousandPopulationView,
+    WeeklyPerAgeView
 )
 
 app = Flask(__name__)
@@ -96,6 +97,11 @@ def get_per_hundred_thousand_population():
     return g.per_hundred_thousand_population
 
 
+def get_weekly_per_age():
+    g.weekly_per_age = WeeklyPerAgeView()
+    return g.weekly_per_age
+
+
 @app.route("/")
 def index():
     return render_template(
@@ -104,7 +110,7 @@ def index():
         gtag_id=Config.GTAG_ID,
         asahikawa_patients=get_asahikawa_patients(),
         daily_total=get_daily_total(),
-        moving_average=get_moving_average(),
+        weekly_per_age=get_weekly_per_age(),
         per_hundred_thousand_population=get_per_hundred_thousand_population(),
         month_total=get_month_total(),
         by_age=get_by_age(),
@@ -286,6 +292,17 @@ def get_per_hundred_thousand_population_graph():
     res.headers["Content-Disposition"] = (
         "attachment: filename=" + "per_hundred_thousand_population.png"
     )
+    return res
+
+
+@app.route("/weekly_per_age.png")
+def get_weekly_per_age_graph():
+    weekly_per_age = get_weekly_per_age()
+    graph_image = weekly_per_age.get_graph_image()
+    res = make_response()
+    res.data = graph_image.getvalue()
+    res.headers["Content-Type"] = "img/png"
+    res.headers["Content-Disposition"] = "attachment: filename=" + "weekly_per_age.png"
     return res
 
 

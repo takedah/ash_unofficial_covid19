@@ -2,6 +2,7 @@ from datetime import date, datetime, timedelta, timezone
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Optional
 
+import pandas as pd
 import psycopg2
 from psycopg2.extras import DictCursor, execute_values
 
@@ -511,7 +512,9 @@ class AsahikawaPatientService(Service):
                     aggregate_by_weeks.append((row[0], row[1]))
         return aggregate_by_weeks
 
-    def get_aggregate_by_weeks_per_age(self, from_date: date, to_date: date) -> list:
+    def get_aggregate_by_weeks_per_age(
+        self, from_date: date, to_date: date
+    ) -> pd.DataFrame:
         """指定した期間の1週間ごとの年代別の陽性患者数の集計結果を返す
 
         Args:
@@ -519,8 +522,8 @@ class AsahikawaPatientService(Service):
             to_date (obj:`date`): 集計の終期
 
         Returns:
-            aggregate_by_weeks (list of tuple): 集計結果
-                1週間ごとの日付とその週の新規陽性患者数を要素とするタプルのリスト
+            aggregate_by_weeks (:obj:`pd.DataFrame`): 集計結果
+                1週間ごとの日付とその週の年代別新規陽性患者数をpandasのDataFrameで返す
 
         """
         state = (
@@ -538,20 +541,33 @@ class AsahikawaPatientService(Service):
             + "asahikawa_patients.publication_date < to_week GROUP BY from_week, age "
             + "ORDER BY weeks, age;"
         )
-        aggregate_by_weeks_per_age = list()
+        df = pd.DataFrame(
+            columns=[
+                "10歳未満",
+                "10代",
+                "20代",
+                "30代",
+                "40代",
+                "50代",
+                "60代",
+                "70代",
+                "80代",
+                "90歳以上",
+                "非公表",
+            ]
+        )
         with self.get_connection() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
                 cur.execute(state)
                 for row in cur.fetchall():
-                    values = {
-                        "weeks": row["weeks"],
-                        "age": row["age"],
-                        "patients": row["patients"],
-                    }
-                    if values["age"] == "":
-                        values["age"] = "非公表"
-                    aggregate_by_weeks_per_age.append(values)
-        return aggregate_by_weeks_per_age
+                    if row["age"] is None:
+                        df.loc[row["weeks"]] = 0
+                    elif row["age"] == "":
+                        df.at[row["weeks"], "非公表"] = row["patients"]
+                    else:
+                        df.at[row["weeks"], row["age"]] = row["patients"]
+
+        return df.fillna(0)
 
     def get_seven_days_moving_average(self, from_date: date, to_date: date) -> list:
         """1日あたりの新規陽性患者数の7日間移動平均の計算結果を返す

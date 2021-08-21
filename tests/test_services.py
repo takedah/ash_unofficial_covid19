@@ -1,6 +1,9 @@
 import unittest
 from datetime import date
 
+import pandas as pd
+from pandas._testing import assert_frame_equal
+
 from ash_unofficial_covid19.errors import ServiceError
 from ash_unofficial_covid19.models import (
     AsahikawaPatientFactory,
@@ -392,17 +395,36 @@ class TestAsahikawaPatientService(unittest.TestCase):
         result = self.service.get_aggregate_by_weeks_per_age(
             from_date=from_date, to_date=to_date
         )
-        expect = [
-            {"weeks": date(2021, 1, 25), "age": "90歳以上", "patients": 1},
-            {"weeks": date(2021, 2, 1), "age": None, "patients": 0},
-            {"weeks": date(2021, 2, 8), "age": None, "patients": 0},
-            {"weeks": date(2021, 2, 15), "age": None, "patients": 0},
-            {"weeks": date(2021, 2, 22), "age": "非公表", "patients": 1},
-            {"weeks": date(2021, 2, 22), "age": "10歳未満", "patients": 1},
-            {"weeks": date(2021, 2, 22), "age": "30代", "patients": 1},
-            {"weeks": date(2021, 2, 22), "age": "50代", "patients": 1},
-        ]
-        self.assertEqual(result, expect)
+        expect = pd.DataFrame(
+            [
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1],
+            ],
+            columns=[
+                "10歳未満",
+                "10代",
+                "20代",
+                "30代",
+                "40代",
+                "50代",
+                "60代",
+                "70代",
+                "80代",
+                "90歳以上",
+                "非公表",
+            ],
+            index=[
+                date(2021, 1, 25),
+                date(2021, 2, 1),
+                date(2021, 2, 8),
+                date(2021, 2, 15),
+                date(2021, 2, 22),
+            ],
+        )
+        assert_frame_equal(result, expect)
 
     def test_get_seven_days_moving_average(self):
         from_date = date(2021, 1, 25)
