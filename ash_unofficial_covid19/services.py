@@ -511,6 +511,48 @@ class AsahikawaPatientService(Service):
                     aggregate_by_weeks.append((row[0], row[1]))
         return aggregate_by_weeks
 
+    def get_aggregate_by_weeks_per_age(self, from_date: date, to_date: date) -> list:
+        """指定した期間の1週間ごとの年代別の陽性患者数の集計結果を返す
+
+        Args:
+            from_date (obj:`date`): 集計の始期
+            to_date (obj:`date`): 集計の終期
+
+        Returns:
+            aggregate_by_weeks (list of tuple): 集計結果
+                1週間ごとの日付とその週の新規陽性患者数を要素とするタプルのリスト
+
+        """
+        state = (
+            "SELECT date(from_week) AS weeks, age, "
+            + "COUNT(DISTINCT patient_number) AS patients FROM "
+            + "(SELECT generate_series AS from_week, "
+            + "generate_series + '7 days'::interval AS to_week FROM "
+            + "generate_series('"
+            + from_date.strftime("%Y-%m-%d")
+            + "'::DATE, '"
+            + to_date.strftime("%Y-%m-%d")
+            + "'::DATE, '7 days')) "
+            + "AS week_ranges LEFT JOIN asahikawa_patients ON "
+            + "from_week <= asahikawa_patients.publication_date AND "
+            + "asahikawa_patients.publication_date < to_week GROUP BY from_week, age "
+            + "ORDER BY weeks, age;"
+        )
+        aggregate_by_weeks_per_age = list()
+        with self.get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(state)
+                for row in cur.fetchall():
+                    values = {
+                        "weeks": row["weeks"],
+                        "age": row["age"],
+                        "patients": row["patients"],
+                    }
+                    if values["age"] == "":
+                        values["age"] = "非公表"
+                    aggregate_by_weeks_per_age.append(values)
+        return aggregate_by_weeks_per_age
+
     def get_seven_days_moving_average(self, from_date: date, to_date: date) -> list:
         """1日あたりの新規陽性患者数の7日間移動平均の計算結果を返す
 

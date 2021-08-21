@@ -386,6 +386,24 @@ class TestAsahikawaPatientService(unittest.TestCase):
         ]
         self.assertEqual(result, expect)
 
+    def test_get_aggregate_by_weeks_per_age(self):
+        from_date = date(2021, 1, 25)
+        to_date = date(2021, 2, 28)
+        result = self.service.get_aggregate_by_weeks_per_age(
+            from_date=from_date, to_date=to_date
+        )
+        expect = [
+            {"weeks": date(2021, 1, 25), "age": "90歳以上", "patients": 1},
+            {"weeks": date(2021, 2, 1), "age": None, "patients": 0},
+            {"weeks": date(2021, 2, 8), "age": None, "patients": 0},
+            {"weeks": date(2021, 2, 15), "age": None, "patients": 0},
+            {"weeks": date(2021, 2, 22), "age": "非公表", "patients": 1},
+            {"weeks": date(2021, 2, 22), "age": "10歳未満", "patients": 1},
+            {"weeks": date(2021, 2, 22), "age": "30代", "patients": 1},
+            {"weeks": date(2021, 2, 22), "age": "50代", "patients": 1},
+        ]
+        self.assertEqual(result, expect)
+
     def test_get_seven_days_moving_average(self):
         from_date = date(2021, 1, 25)
         to_date = date(2021, 2, 28)
