@@ -20,6 +20,7 @@ from ash_unofficial_covid19.views import (
     MonthTotalView,
     MovingAverageView,
     PerHundredThousandPopulationView,
+    PressReleaseLinksView,
     WeeklyPerAgeView
 )
 
@@ -72,6 +73,11 @@ def get_medical_institutions():
     return g.medical_institutions
 
 
+def get_press_release_link():
+    g.press_release_link = PressReleaseLinksView()
+    return g.press_release_link
+
+
 def get_daily_total():
     g.daily_total = DailyTotalView()
     return g.daily_total
@@ -109,6 +115,7 @@ def index():
         title="旭川市内の最新感染動向",
         gtag_id=Config.GTAG_ID,
         asahikawa_patients=get_asahikawa_patients(),
+        press_release_link=get_press_release_link(),
         daily_total=get_daily_total(),
         weekly_per_age=get_weekly_per_age(),
         per_hundred_thousand_population=get_per_hundred_thousand_population(),

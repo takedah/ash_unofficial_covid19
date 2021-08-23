@@ -633,6 +633,10 @@ class TestPressReleaseLinkService(unittest.TestCase):
         self.assertEqual(press_release_link.url, "https://www.example.com")
         self.assertEqual(press_release_link.publication_date, date(2021, 8, 23))
 
+    def test_latest_publication_date(self):
+        results = self.service.get_latest_publication_date()
+        self.assertEqual(results, date(2021, 8, 23))
+
 
 if __name__ == "__main__":
     unittest.main()

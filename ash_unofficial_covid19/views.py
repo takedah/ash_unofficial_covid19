@@ -1,4 +1,5 @@
 import csv
+import re
 import urllib.parse
 from abc import ABCMeta, abstractmethod
 from datetime import date, datetime, timedelta, timezone
@@ -13,9 +14,11 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.font_manager import FontProperties
 from matplotlib.ticker import MultipleLocator
 
+from ash_unofficial_covid19.errors import DatabaseConnectionError
 from ash_unofficial_covid19.services import (
     AsahikawaPatientService,
-    MedicalInstitutionService
+    MedicalInstitutionService,
+    PressReleaseLinkService
 )
 
 
@@ -128,6 +131,64 @@ class MedicalInstitutionsView:
         return f
 
 
+class PressReleaseLinksView:
+    """旭川市新型コロナ報道発表資料データ
+
+    旭川市新型コロナの報道発表資料データをFlaskへ渡すデータにする
+
+    Attributes:
+        latest_publication_date (str): 最新の報道発表日の文字列
+
+    """
+
+    def __init__(self):
+        self.__service = PressReleaseLinkService()
+        latest_publication_date = self.__service.get_latest_publication_date()
+        self.__latest_publication_date = self._format_date_style(
+            latest_publication_date
+        )
+
+    @property
+    def latest_publication_date(self) -> str:
+        return self.__latest_publication_date
+
+    def _format_date_style(self, target_date: date) -> str:
+        """datetime.dateを曜日を含めた文字列に変換
+
+        Args:
+            target_date (date): 対象の日付
+
+        Returns:
+            date_string (str): 曜日を含む日付文字列
+
+        """
+        search_strings = re.match(
+            "^([0-9]{4}/[0-9]{2}/[0-9]{2}) ([A-Z][a-z]{2})$",
+            target_date.strftime("%Y/%m/%d %a"),
+        )
+
+        date_string = search_strings.group(1)
+        day_of_week = search_strings.group(2)
+        if day_of_week == "Mon":
+            day_of_week_kanji = "月"
+        elif day_of_week == "Tue":
+            day_of_week_kanji = "火"
+        elif day_of_week == "Wed":
+            day_of_week_kanji = "水"
+        elif day_of_week == "Thu":
+            day_of_week_kanji = "木"
+        elif day_of_week == "Fri":
+            day_of_week_kanji = "金"
+        elif day_of_week == "Sat":
+            day_of_week_kanji = "土"
+        elif day_of_week == "Sun":
+            day_of_week_kanji = "日"
+        else:
+            day_of_week_kanji = ""
+
+        return date_string + " (" + day_of_week_kanji + ") "
+
+
 class GraphView(metaclass=ABCMeta):
     """グラフを出力するクラスの基底クラス"""
 
@@ -139,29 +200,25 @@ class GraphView(metaclass=ABCMeta):
     def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
         pass
 
-    def get_yesterday(self, more_adjust: bool = False) -> date:
-        """グラフの基準となる現在の前日の日付を返す
-
-        市の発表が16時が多いので、16時より前なら前々日の情報を返すようにする
-
-        Args:
-            more_adjust (bool): 更に前日の日付データとしたい場合真を指定
+    def get_yesterday(self) -> date:
+        """グラフの基準となる最新の報道発表日の前日の日付を返す
 
         Returns:
             yesterday (date): 前日の日付データ
 
         """
         now = datetime.now(timezone(timedelta(hours=+9), "JST"))
-        today = now.date()
-        if now.hour < 16:
-            adjust_days = 2
-        else:
-            adjust_days = 1
+        try:
+            press_release_link_service = PressReleaseLinkService()
+            today = press_release_link_service.get_latest_publication_date()
+        except DatabaseConnectionError:
+            # エラーが起きた場合現在日付を基準とする。
+            # このとき市の発表が16時になることが多いので16時より前なら前日を基準とする。
+            today = now.date()
+            if now.hour < 16:
+                today = today - relativedelta(days=1)
 
-        if more_adjust:
-            adjust_days += 1
-
-        return today - relativedelta(days=adjust_days)
+        return today - relativedelta(days=1)
 
 
 class DailyTotalView(GraphView):
@@ -178,13 +235,6 @@ class DailyTotalView(GraphView):
     def __init__(self):
         service = AsahikawaPatientService()
         yesterday = self.get_yesterday()
-
-        # 前日の患者数がゼロを返す場合、公式ホームページが更新されていない可能性が
-        # あるので、その場合前々日のグラフを描画するようにする
-        yesterday_patients_number = service.get_patients_number(target_date=yesterday)
-        if yesterday_patients_number == 0:
-            yesterday = self.get_yesterday(more_adjust=True)
-
         self.__daily_total_data = service.get_aggregate_by_days(
             from_date=yesterday - relativedelta(years=1), to_date=yesterday
         )
@@ -280,13 +330,6 @@ class MonthTotalView(GraphView):
     def __init__(self):
         service = AsahikawaPatientService()
         yesterday = self.get_yesterday()
-
-        # 前日の患者数がゼロを返す場合、公式ホームページが更新されていない可能性が
-        # あるので、その場合前々日のグラフを描画するようにする
-        yesterday_patients_number = service.get_patients_number(target_date=yesterday)
-        if yesterday_patients_number == 0:
-            yesterday = self.get_yesterday(more_adjust=True)
-
         self.__month_total_data = service.get_total_by_months(
             from_date=date(2020, 1, 1), to_date=yesterday
         )
@@ -454,13 +497,6 @@ class MovingAverageView(GraphView):
     def __init__(self):
         service = AsahikawaPatientService()
         yesterday = self.get_yesterday()
-
-        # 前日の患者数がゼロを返す場合、公式ホームページが更新されていない可能性が
-        # あるので、その場合前々日のグラフを描画するようにする
-        yesterday_patients_number = service.get_patients_number(target_date=yesterday)
-        if yesterday_patients_number == 0:
-            yesterday = self.get_yesterday(more_adjust=True)
-
         self.__moving_average_data = service.get_seven_days_moving_average(
             from_date=yesterday - relativedelta(days=90), to_date=yesterday
         )
@@ -557,13 +593,6 @@ class PerHundredThousandPopulationView(GraphView):
     def __init__(self):
         service = AsahikawaPatientService()
         yesterday = self.get_yesterday()
-
-        # 前日の患者数がゼロを返す場合、公式ホームページが更新されていない可能性が
-        # あるので、その場合前々日のグラフを描画するようにする
-        yesterday_patients_number = service.get_patients_number(target_date=yesterday)
-        if yesterday_patients_number == 0:
-            yesterday = self.get_yesterday(more_adjust=True)
-
         self.__per_hundred_thousand_population_data = (
             service.get_per_hundred_thousand_population_per_week(
                 from_date=yesterday - relativedelta(weeks=16, days=-1),
@@ -708,13 +737,6 @@ class WeeklyPerAgeView(GraphView):
     def __init__(self):
         service = AsahikawaPatientService()
         yesterday = self.get_yesterday()
-
-        # 前日の患者数がゼロを返す場合、公式ホームページが更新されていない可能性が
-        # あるので、その場合前々日のグラフを描画するようにする
-        yesterday_patients_number = service.get_patients_number(target_date=yesterday)
-        if yesterday_patients_number == 0:
-            yesterday = self.get_yesterday(more_adjust=True)
-
         df = service.get_aggregate_by_weeks_per_age(
             from_date=yesterday - relativedelta(weeks=4, days=-1), to_date=yesterday
         )

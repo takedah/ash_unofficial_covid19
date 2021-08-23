@@ -1105,3 +1105,20 @@ class PressReleaseLinkService(Service):
                 for row in cur.fetchall():
                     factory.create(**row)
         return factory
+
+    def get_latest_publication_date(self) -> date:
+        """最新の報道発表日を返す
+
+        Returns:
+            publication_date (:obj:`datetime.date'): 最新の報道発表日
+
+        """
+        state = "SELECT max(publication_date) FROM " + self.table_name + ";"
+        with self.get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(state)
+                result = cur.fetchone()
+        if result["max"] is None:
+            return date(1970, 1, 1)
+        else:
+            return result["max"]
