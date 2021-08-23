@@ -705,7 +705,7 @@ class ScrapeAsahikawaPatientsPDF(Scraper):
 
         """
         if isinstance(publication_date, date):
-            self.__publication_date = publication_date - relativedelta(days=1)
+            self.__publication_date = publication_date
         else:
             raise TypeError("報道発表日の指定が正しくありません。")
 
@@ -789,7 +789,7 @@ class ScrapeAsahikawaPatientsPDF(Scraper):
             "city_code": "01241",
             "prefecture": "北海道",
             "city_name": "旭川市",
-            "publication_date": self.publication_date,
+            "publication_date": self.publication_date - relativedelta(days=1),
             "onset_date": None,
             "residence": row[4],
             "age": self.format_age(row[5]),
