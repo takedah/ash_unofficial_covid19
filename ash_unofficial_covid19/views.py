@@ -240,11 +240,15 @@ class DailyTotalView(GraphView):
         )
         self.__yesterday = yesterday.strftime("%Y/%m/%d (%a)")
         most_recent = self.__daily_total_data[-1][1]
-        day_before_most_recent = self.__daily_total_data[-2][1]
-        increase_from_day_before = most_recent - day_before_most_recent
+        seven_days_before_most_recent = self.__daily_total_data[-8][1]
+        increase_from_seven_days_before = most_recent - seven_days_before_most_recent
         self.__most_recent = "{:,}".format(most_recent)
-        self.__day_before_most_recent = "{:,}".format(day_before_most_recent)
-        self.__increase_from_day_before = "{:+,}".format(increase_from_day_before)
+        self.__seven_days_before_most_recent = "{:,}".format(
+            seven_days_before_most_recent
+        )
+        self.__increase_from_seven_days_before = "{:+,}".format(
+            increase_from_seven_days_before
+        )
 
     @property
     def yesterday(self) -> str:
@@ -255,12 +259,12 @@ class DailyTotalView(GraphView):
         return self.__most_recent
 
     @property
-    def day_before_most_recent(self) -> str:
-        return self.__day_before_most_recent
+    def seven_days_before_most_recent(self) -> str:
+        return self.__seven_days_before_most_recent
 
     @property
-    def increase_from_day_before(self) -> str:
-        return self.__increase_from_day_before
+    def increase_from_seven_days_before(self) -> str:
+        return self.__increase_from_seven_days_before
 
     def get_graph_alt(self) -> str:
         """グラフの代替テキストを生成
