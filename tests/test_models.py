@@ -10,7 +10,9 @@ from ash_unofficial_covid19.models import (
     Location,
     LocationFactory,
     MedicalInstitution,
-    MedicalInstitutionFactory
+    MedicalInstitutionFactory,
+    PressReleaseLink,
+    PressReleaseLinkFactory
 )
 
 test_data = {
@@ -104,6 +106,10 @@ test_location_data = {
     "longitude": 142.365976388889,
     "latitude": 43.778422777778,
 }
+test_press_release_data = {
+    "url": "https://www.example.com",
+    "publication_date": date(2021, 8, 23),
+}
 
 
 class TestAsahikawaPatientFactory(unittest.TestCase):
@@ -144,6 +150,14 @@ class TestLocationFactory(unittest.TestCase):
         # Locationクラスのオブジェクトが生成できるか確認する。
         patient = factory.create(**test_location_data)
         self.assertTrue(isinstance(patient, Location))
+
+
+class TestPressReleaseLinkFactory(unittest.TestCase):
+    def test_create(self):
+        factory = PressReleaseLinkFactory()
+        # PressReleaseLinkクラスのオブジェクトが生成できるか確認する。
+        patient = factory.create(**test_press_release_data)
+        self.assertTrue(isinstance(patient, PressReleaseLink))
 
 
 if __name__ == "__main__":
