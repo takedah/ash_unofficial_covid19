@@ -5,7 +5,8 @@ from ash_unofficial_covid19.config import Config
 from ash_unofficial_covid19.errors import HTTPDownloadError
 from ash_unofficial_covid19.models import (
     AsahikawaPatientFactory,
-    HokkaidoPatientFactory
+    HokkaidoPatientFactory,
+    PressReleaseLinkFactory
 )
 from ash_unofficial_covid19.scraper import (
     DownloadedCSV,
@@ -18,7 +19,8 @@ from ash_unofficial_covid19.scraper import (
 )
 from ash_unofficial_covid19.services import (
     AsahikawaPatientService,
-    HokkaidoPatientService
+    HokkaidoPatientService,
+    PressReleaseLinkService
 )
 
 
@@ -107,6 +109,29 @@ def import_asahikawa_data(download_lists: list) -> None:
     service.create(patients_data)
 
 
+def _import_press_release_link(url: str, target_year: int) -> None:
+    """
+    旭川市公式ホームページから新型コロナウイルス感染症の感染者情報を、
+    報道発表資料のPDFから抽出し、データベースへ格納するため、
+    報道発表資料PDFファイル自体のURL等の情報を抽出する。
+
+    Args:
+        url (str): 旭川市公式ホームページのURL
+        target_year (int): 対象年
+
+    """
+    html_data = DownloadedHTML(url)
+    scraped_data = ScrapePressReleaseLink(
+        downloaded_html=html_data, target_year=target_year
+    )
+    press_release_links = PressReleaseLinkFactory()
+    for row in scraped_data.lists:
+        press_release_links.create(**row)
+
+    service = PressReleaseLinkService()
+    service.create(press_release_links)
+
+
 def import_asahikawa_data_from_press_release(url: str, target_year: int) -> None:
     """
     旭川市公式ホームページから新型コロナウイルス感染症の感染者情報を、
@@ -118,12 +143,12 @@ def import_asahikawa_data_from_press_release(url: str, target_year: int) -> None
         target_year (int): 対象年
 
     """
-    html_data = DownloadedHTML(url)
-    press_release_link = ScrapePressReleaseLink(
-        downloaded_html=html_data, target_year=target_year
-    )
-    publication_date = press_release_link.lists[0]["publication_date"]
-    pdf_url = press_release_link.lists[0]["url"]
+    _import_press_release_link(url, target_year)
+    press_release_link_service = PressReleaseLinkService()
+    press_release_links = press_release_link_service.find_all()
+    latest_press_release_link = press_release_links.items[0]
+    publication_date = latest_press_release_link.publication_date
+    pdf_url = latest_press_release_link.url
 
     pdf_data = DownloadedPDF(pdf_url)
     scraped_data = ScrapeAsahikawaPatientsPDF(
@@ -138,8 +163,7 @@ def import_asahikawa_data_from_press_release(url: str, target_year: int) -> None
 
 if __name__ == "__main__":
     import_asahikawa_data_from_press_release(Config.OVERVIEW_URL, 2021)
-
-    import_hokkaido_data(Config.HOKKAIDO_URL)
+    # import_hokkaido_data(Config.HOKKAIDO_URL)
     download_lists = [
         (Config.NOV2020_OR_EARLIER_URL, 2020),
         (Config.DEC2020_DATA_URL, 2020),

@@ -103,7 +103,7 @@ class Service:
                 self.error_log(self.table_name + "テーブルへデータを登録できませんでした。")
                 raise ServiceError(e.args[0])
 
-    def get_last_updated(self) -> Optional[datetime]:
+    def get_last_updated(self) -> datetime:
         """テーブルの最終更新日を返す
 
         Returns:
@@ -117,7 +117,7 @@ class Service:
                 cur.execute(state)
                 result = cur.fetchone()
         if result["max"] is None:
-            return None
+            return datetime(1970, 1, 1, 0, 0, 0)
         else:
             return result["max"]
 
