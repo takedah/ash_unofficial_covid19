@@ -9,13 +9,15 @@ from ash_unofficial_covid19.models import (
     AsahikawaPatientFactory,
     HokkaidoPatientFactory,
     LocationFactory,
-    MedicalInstitutionFactory
+    MedicalInstitutionFactory,
+    PressReleaseLinkFactory
 )
 from ash_unofficial_covid19.services import (
     AsahikawaPatientService,
     HokkaidoPatientService,
     LocationService,
-    MedicalInstitutionService
+    MedicalInstitutionService,
+    PressReleaseLinkService
 )
 
 
@@ -608,6 +610,28 @@ class TestLocationService(unittest.TestCase):
         self.assertEqual(location.medical_institution_name, "市立旭川病院")
         self.assertEqual(location.longitude, 142.365976388889)
         self.assertEqual(location.latitude, 43.778422777778)
+
+
+class TestPressReleaseLinkService(unittest.TestCase):
+    @classmethod
+    def setUp(self):
+        test_data = [
+            {
+                "url": "https://www.example.com",
+                "publication_date": date(2021, 8, 23),
+            },
+        ]
+        self.factory = PressReleaseLinkFactory()
+        for row in test_data:
+            self.factory.create(**row)
+        self.service = PressReleaseLinkService()
+        self.service.create(self.factory)
+
+    def test_find_all(self):
+        results = self.service.find_all()
+        press_release_link = results.items[0]
+        self.assertEqual(press_release_link.url, "https://www.example.com")
+        self.assertEqual(press_release_link.publication_date, date(2021, 8, 23))
 
 
 if __name__ == "__main__":

@@ -61,3 +61,10 @@ CREATE TABLE locations(
     latitude FLOAT,
     updated_at TIMESTAMPTZ NOT NULL
 );
+DROP TABLE IF EXISTS press_release_links;
+CREATE TABLE press_release_links(
+    id SERIAL PRIMARY KEY NOT NULL,
+    url VARCHAR(2083) UNIQUE NOT NULL,
+    publication_date DATE NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL
+);
