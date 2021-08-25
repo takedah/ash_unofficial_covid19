@@ -299,18 +299,13 @@ class ScrapeAsahikawaPatients(Scraper):
         soup = BeautifulSoup(downloaded_html.content, "html.parser")
         table_values = list()
         for table in soup.find_all("table"):
-            if table.find("caption") is not None:
-                table_caption = table.find("caption").text.strip().replace("\n", "")
-            else:
-                table_caption = None
-            if table_caption == "新型コロナウイルス感染症の市内発生状況":
-                for tr in table.find_all("tr"):
-                    row = list()
-                    for td in tr.find_all("td"):
-                        val = td.text.strip()
-                        row.append(val)
-                    row = list(map(lambda x: self.format_string(x), row))
-                    table_values.append(row)
+            for tr in table.find_all("tr"):
+                row = list()
+                for td in tr.find_all("td"):
+                    val = td.text.strip()
+                    row.append(val)
+                row = list(map(lambda x: self.format_string(x), row))
+                table_values.append(row)
 
         return table_values
 
@@ -784,6 +779,19 @@ class ScrapeAsahikawaPatientsPDF(Scraper):
             return None
         patient_number = int(search_patient_number.group(1))
         hokkaido_patient_number = int(search_hokkaido_patient_number.group(1))
+        surrounding_status = str(row[8])
+        close_contact = str(row[9])
+        note = (
+            "北海道発表No.;"
+            + str(hokkaido_patient_number)
+            + ";"
+            + "周囲の患者の発生;"
+            + surrounding_status
+            + ";"
+            + "濃厚接触者の状況;"
+            + close_contact
+            + ";"
+        )
         patient_data = {
             "patient_number": patient_number,
             "city_code": "01241",
@@ -799,10 +807,10 @@ class ScrapeAsahikawaPatientsPDF(Scraper):
             "symptom": None,
             "overseas_travel_history": None,
             "be_discharged": None,
-            "note": "北海道発表No.;" + str(hokkaido_patient_number),
+            "note": note,
             "hokkaido_patient_number": hokkaido_patient_number,
-            "surrounding_status": None,
-            "close_contact": None,
+            "surrounding_status": surrounding_status,
+            "close_contact": close_contact,
         }
         return patient_data
 

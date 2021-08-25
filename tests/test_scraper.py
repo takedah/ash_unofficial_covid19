@@ -626,10 +626,10 @@ class TestScrapeAsahikawaPatientsPDF(unittest.TestCase):
                 "symptom": None,
                 "overseas_travel_history": None,
                 "be_discharged": None,
-                "note": "北海道発表No.;66",
+                "note": "北海道発表No.;66;周囲の患者の発生;有り;濃厚接触者の状況;3人;",
                 "hokkaido_patient_number": 66,
-                "surrounding_status": None,
-                "close_contact": None,
+                "surrounding_status": "有り",
+                "close_contact": "3人",
             },
         ]
         self.assertEqual(scraper.lists, expect)
