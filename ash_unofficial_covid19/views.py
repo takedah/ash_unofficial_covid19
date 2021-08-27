@@ -686,7 +686,7 @@ class PerHundredThousandPopulationView(GraphView):
         ax.text(
             per_hundred_thousand_population_x[0],
             15,
-            "警戒ステージ4",
+            "警戒ステージ3",
             va="center",
             ha="left",
             backgroundcolor="white",
@@ -696,7 +696,7 @@ class PerHundredThousandPopulationView(GraphView):
         ax.text(
             per_hundred_thousand_population_x[0],
             25,
-            "警戒ステージ5",
+            "警戒ステージ4",
             va="center",
             ha="left",
             backgroundcolor="white",
@@ -724,11 +724,9 @@ class PerHundredThousandPopulationView(GraphView):
 
         """
         if per_hundred_thousand_population >= 25:
-            return "警戒ステージ5相当（緊急事態宣言の目安）"
+            return "警戒ステージ4相当（緊急事態宣言の目安）"
         elif per_hundred_thousand_population >= 15:
-            return "警戒ステージ4相当（まん延防止等重点措置の目安）"
-        elif per_hundred_thousand_population >= 2.5:
-            return "警戒ステージ3相当"
+            return "警戒ステージ3相当（まん延防止等重点措置の目安）"
         elif per_hundred_thousand_population >= 2.0:
             return "警戒ステージ2相当"
         else:

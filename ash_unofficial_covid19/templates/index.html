@@ -10,7 +10,8 @@
       </div>
       <div class="card-body">
         <p><img src="./daily_total.png" alt="{{ daily_total.get_graph_alt() }}" title="新規陽性患者数（日別）の推移" class="img-fluid"></p>
-        <p class="card-text text-right mb-0">{{ press_release_link.latest_publication_date }} 発表分の新規患者数 <strong class="display-4">{{ daily_total.most_recent }}</strong>人</p>
+        <p class="card-text text-right mb-0">{{ press_release_link.latest_publication_date }} 発表分の新規患者数</p>
+        <p class="card-text text-right mb-0"><strong class="display-4">{{ daily_total.most_recent }}</strong>人</p>
         <p class="card-text text-right">（先週の同じ曜日と比べて {{ daily_total.increase_from_seven_days_before }}人）</p>
       </div>
       <div class="card-footer text-muted bg-white">
@@ -36,7 +37,8 @@
       </div>
       <div class="card-body">
         <p><img src="./per_hundred_thousand_population.png" alt="{{ per_hundred_thousand_population.get_graph_alt() }}" title="1日あたり新規患者数の7日間移動平均の推移" class="img-fluid"></p>
-        <p class="card-text text-right mb-0">1週間の人口10万人あたり新規陽性患者数 <strong class="display-4">{{ per_hundred_thousand_population.this_week }}</strong>人</p>
+        <p class="card-text text-right mb-0">1週間の人口10万人あたり新規陽性患者数</p>
+        <p class="card-text text-right mb-0"><strong class="display-4">{{ per_hundred_thousand_population.this_week }}</strong>人</p>
         <p class="card-text text-right">（先週 {{ per_hundred_thousand_population.increase_from_last_week }}人）</p>
       </div>
       <div class="card-footer text-muted bg-white">
@@ -55,34 +57,24 @@
             <tr>
               <th class="text-nowrap">ステージ</th>
               <th>状況</th>
-              <th>参考</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td>1</td>
               <td>感染者が散発的に発生しており、医療提供体制に大きな支障がない段階</td>
-              <td></td>
             </tr>
             <tr>
               <td>2</td>
               <td>感染者の漸増及び医療提供体制への負荷が蓄積する段階</td>
-              <td></td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>感染者がさらに増加し、医療提供体制への負荷がより一層高まる段階</td>
-              <td></td>
             </tr>
             <tr class="table-warning">
-              <td>4</td>
+              <td>3</td>
               <td>感染者の急増及び医療提供体制における大きな支障の発生を避けるための対応が必要な段階</td>
-              <td>まん延防止等重点措置の目安</td>
             </tr>
             <tr class="table-danger">
-              <td>5</td>
+              <td>4</td>
               <td>爆発的な感染拡大及び深刻な医療提供体制の機能不全を避けるための対応が必要な段階</td>
-              <td>緊急事態宣言の目安</td>
             </tr>
           </tbody>
         </table>
@@ -111,7 +103,8 @@
       </div>
       <div class="card-body">
         <p><img src="./month_total.png" alt="{{ month_total.get_graph_alt() }}" title="累計陽性患者数（月別）の推移" class="img-fluid"></p>
-        <p class="card-text text-right mb-0">{{ month_total.yesterday }} までの累計患者数 <strong class="display-4">{{ month_total.this_month }}</strong>人</p>
+        <p class="card-text text-right mb-0">{{ month_total.yesterday }} までの累計患者数</p>
+        <p class="card-text text-right mb-0"><strong class="display-4">{{ month_total.this_month }}</strong>人</p>
         <p class="card-text text-right">（先月 {{ month_total.increase_from_last_month }}人）</p>
       </div>
       <div class="card-footer text-muted bg-white">
