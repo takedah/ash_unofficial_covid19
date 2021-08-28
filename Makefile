@@ -1,7 +1,8 @@
 .PHONY: init
 init:
 	pip install -r requirements.txt
-	python import_data.py
+	python -m ash_unofficial_covid19.import_patients
+	python -m ash_unofficial_covid19.import_medical_institutions
 
 formatter:
 	isort --force-single-line-imports .

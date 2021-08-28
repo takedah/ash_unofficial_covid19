@@ -145,7 +145,8 @@ No,全国地方公共団体コード,都道府県名,市区町村名,公表_年�
 def medical_institution_html_content():
     html_data = """
 <table cellspacing="0" cellpadding="0">
-    <caption>新型コロナワクチン接種医療機関一覧 </caption>
+    <caption>新型コロナワクチン接種医療機関 </caption>
+    <colgroup><col /><col /><col /><col span="2" /></colgroup>
     <tbody>
         <tr>
             <th>医療機関名</th>

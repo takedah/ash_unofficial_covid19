@@ -1027,14 +1027,14 @@ class ScrapeMedicalInstitutions(Scraper):
         """
         soup = BeautifulSoup(downloaded_html.content, "html.parser")
         table_values = list()
+        memos = dict()
         for table in soup.find_all("table"):
             if table.find("caption") is not None:
                 table_caption = table.find("caption").text.strip().replace("\n", "")
             else:
                 table_caption = None
-            if table_caption == "新型コロナワクチン接種医療機関一覧":
+            if table_caption == "新型コロナワクチン接種医療機関":
                 area = ""
-                memos = dict()
                 for tr in table.find_all("tr"):
                     row = list()
                     th = tr.find("th")
