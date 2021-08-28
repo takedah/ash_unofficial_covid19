@@ -3,23 +3,31 @@ from typing import Optional
 
 from ash_unofficial_covid19.config import Config
 from ash_unofficial_covid19.errors import HTTPDownloadError
-from ash_unofficial_covid19.models import (
+from ash_unofficial_covid19.models.patient import (
     AsahikawaPatientFactory,
-    HokkaidoPatientFactory,
+    HokkaidoPatientFactory
+)
+from ash_unofficial_covid19.models.press_release_link import (
     PressReleaseLinkFactory
 )
-from ash_unofficial_covid19.scraper import (
+from ash_unofficial_covid19.scrapers.downloader import (
     DownloadedCSV,
     DownloadedHTML,
-    DownloadedPDF,
+    DownloadedPDF
+)
+from ash_unofficial_covid19.scrapers.patient import (
     ScrapeAsahikawaPatients,
     ScrapeAsahikawaPatientsPDF,
-    ScrapeHokkaidoPatients,
+    ScrapeHokkaidoPatients
+)
+from ash_unofficial_covid19.scrapers.press_release_link import (
     ScrapePressReleaseLink
 )
-from ash_unofficial_covid19.services import (
+from ash_unofficial_covid19.services.patient import (
     AsahikawaPatientService,
-    HokkaidoPatientService,
+    HokkaidoPatientService
+)
+from ash_unofficial_covid19.services.press_release_link import (
     PressReleaseLinkService
 )
 

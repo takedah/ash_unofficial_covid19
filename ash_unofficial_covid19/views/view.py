@@ -15,9 +15,11 @@ from matplotlib.font_manager import FontProperties
 from matplotlib.ticker import MultipleLocator
 
 from ash_unofficial_covid19.errors import DatabaseConnectionError
-from ash_unofficial_covid19.services import (
-    AsahikawaPatientService,
-    MedicalInstitutionService,
+from ash_unofficial_covid19.services.medical_institution import (
+    MedicalInstitutionService
+)
+from ash_unofficial_covid19.services.patient import AsahikawaPatientService
+from ash_unofficial_covid19.services.press_release_link import (
     PressReleaseLinkService
 )
 
@@ -162,13 +164,22 @@ class PressReleaseLinksView:
             date_string (str): 曜日を含む日付文字列
 
         """
+        if isinstance(target_date, date):
+            target_date_to_string = target_date.strftime("%Y/%m/%d %a")
+        else:
+            return ""
+
         search_strings = re.match(
             "^([0-9]{4}/[0-9]{2}/[0-9]{2}) ([A-Z][a-z]{2})$",
-            target_date.strftime("%Y/%m/%d %a"),
+            target_date_to_string,
         )
 
-        date_string = search_strings.group(1)
-        day_of_week = search_strings.group(2)
+        if search_strings is None:
+            return ""
+        else:
+            date_string = search_strings.group(1)
+            day_of_week = search_strings.group(2)
+
         if day_of_week == "Mon":
             day_of_week_kanji = "月"
         elif day_of_week == "Tue":

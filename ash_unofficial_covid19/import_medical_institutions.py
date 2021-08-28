@@ -1,17 +1,17 @@
 import time
 
 from ash_unofficial_covid19.config import Config
-from ash_unofficial_covid19.models import (
-    LocationFactory,
+from ash_unofficial_covid19.models.location import LocationFactory
+from ash_unofficial_covid19.models.medical_institution import (
     MedicalInstitutionFactory
 )
-from ash_unofficial_covid19.scraper import (
-    DownloadedHTML,
-    ScrapeMedicalInstitutions,
-    ScrapeYOLPLocation
+from ash_unofficial_covid19.scrapers.downloader import DownloadedHTML
+from ash_unofficial_covid19.scrapers.location import ScrapeYOLPLocation
+from ash_unofficial_covid19.scrapers.medical_institution import (
+    ScrapeMedicalInstitutions
 )
-from ash_unofficial_covid19.services import (
-    LocationService,
+from ash_unofficial_covid19.services.location import LocationService
+from ash_unofficial_covid19.services.medical_institution import (
     MedicalInstitutionService
 )
 

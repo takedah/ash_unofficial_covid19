@@ -12,7 +12,7 @@ from flask import (
 
 from ash_unofficial_covid19.config import Config
 from ash_unofficial_covid19.errors import ServiceError
-from ash_unofficial_covid19.views import (
+from ash_unofficial_covid19.views.view import (
     AsahikawaPatientsView,
     ByAgeView,
     DailyTotalView,
