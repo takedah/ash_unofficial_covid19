@@ -28,12 +28,10 @@ class ScrapeAsahikawaPatients(Scraper):
 
     """
 
-    def __init__(self, downloaded_html: DownloadedHTML, target_year: int = 2020):
+    def __init__(self, html_url: str, target_year: int = 2020):
         """
         Args:
-            downloaded_html (:obj:`DownloadedHTML`): ダウンロードしたHTMLデータ
-                ダウンロードした旭川市公式サイトの新型コロナウイルス感染症の
-                市内発生状況のページのHTMLファイルのbytesデータを要素に持つオブジェクト
+            html_url (str): HTMLファイルのURL
             target_year (int): 元データに年が表記されていないため直接指定する
 
         """
@@ -41,6 +39,9 @@ class ScrapeAsahikawaPatients(Scraper):
             self.__target_year = target_year
         else:
             raise TypeError("対象年の指定が正しくありません。")
+
+        Scraper.__init__(self)
+        downloaded_html = self.get_html(html_url)
         self.__lists = list()
         for row in self._get_table_values(downloaded_html):
             extracted_data = self._extract_patient_data(row)
@@ -151,14 +152,14 @@ class ScrapeHokkaidoPatients(Scraper):
 
     """
 
-    def __init__(self, downloaded_csv: DownloadedCSV):
+    def __init__(self, csv_url: str):
         """
         Args:
-            downloaded_csv (:obj:`DownloadedCSV`):
-            CSVファイルのStringIOデータを要素に持つオブジェクト
+            csv_url (str): CSVファイルのURL
 
         """
         Scraper.__init__(self)
+        downloaded_csv = self.get_csv(csv_url=csv_url, encoding="cp932")
         self.__lists = list()
         for row in self._get_table_values(downloaded_csv):
             extracted_data = self._extract_patient_data(row)
@@ -282,20 +283,22 @@ class ScrapeAsahikawaPatientsPDF(Scraper):
 
     """
 
-    def __init__(self, downloaded_pdf: DownloadedPDF, publication_date: date):
+    def __init__(self, pdf_url: str, publication_date: date):
         """
         Args:
-            downloaded_pdf (:obj:`DownloadedPDF`): PDFデータ
-                旭川市の報道発表PDFファイルのBytesIOデータを要素に持つオブジェクト
+            pdf_url (str): PDFファイルのURL
+                旭川市の報道発表PDFファイルのURL
            publication_date (date): 報道発表日
                 報道発表PDFデータに公表日がないため、引数で指定した日付をセット
 
         """
+        Scraper.__init__(self)
         if isinstance(publication_date, date):
             self.__publication_date = publication_date
         else:
             raise TypeError("報道発表日の指定が正しくありません。")
 
+        downloaded_pdf = DownloadedPDF(pdf_url)
         pdf_df = self._get_dataframe(downloaded_pdf)
         self.__lists = self._get_patients_data(pdf_df)
 

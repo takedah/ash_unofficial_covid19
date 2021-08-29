@@ -4,7 +4,6 @@ from unittest.mock import Mock, patch
 
 import pandas as pd
 
-from ash_unofficial_covid19.scrapers.downloader import DownloadedHTML
 from ash_unofficial_covid19.scrapers.medical_institution import (
     ScrapeMedicalInstitutions,
     ScrapeMedicalInstitutionsPDF
@@ -81,9 +80,14 @@ def medical_institution_html_content():
 
 class TestScrapeMedicalInstitutionsPDF(unittest.TestCase):
     @patch(
-        "ash_unofficial_covid19.scrapers.medical_institution.ScrapeMedicalInstitutionsPDF._get_dataframe"
+        "ash_unofficial_covid19.scrapers.medical_institution"
+        + ".ScrapeMedicalInstitutionsPDF.get_pdf"
     )
-    def test_lists(self, mock_get_dataframe):
+    @patch(
+        "ash_unofficial_covid19.scrapers.medical_institution"
+        + ".ScrapeMedicalInstitutionsPDF._get_dataframe"
+    )
+    def test_lists(self, mock_get_dataframe, mock_get_pdf):
         mock_get_dataframe.return_value = pd.DataFrame(
             [
                 [],
@@ -129,8 +133,8 @@ class TestScrapeMedicalInstitutionsPDF(unittest.TestCase):
                 "null",
             ],
         )
-        downloaded_pdf = Mock(content=BytesIO())
-        scraper = ScrapeMedicalInstitutionsPDF(downloaded_pdf=downloaded_pdf)
+        mock_get_pdf.return_value = BytesIO()
+        scraper = ScrapeMedicalInstitutionsPDF("http://dummy")
         expect = [
             {
                 "name": "市立旭川病院",
@@ -180,8 +184,7 @@ class TestScrapeMedicalInstitutions(unittest.TestCase):
         mock_requests.get.return_value = Mock(
             status_code=200, content=self.html_content
         )
-        downloaded_html = DownloadedHTML("http://dummy.local")
-        scraper = ScrapeMedicalInstitutions(downloaded_html=downloaded_html)
+        scraper = ScrapeMedicalInstitutions("http://dummy.local")
         expect = [
             {
                 "name": "市立旭川病院",

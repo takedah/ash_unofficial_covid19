@@ -1,5 +1,4 @@
 import re
-from io import BytesIO
 from typing import Optional
 
 import pandas as pd
@@ -25,31 +24,35 @@ class ScrapeMedicalInstitutionsPDF(Scraper):
 
     """
 
-    def __init__(self, downloaded_pdf: DownloadedPDF):
+    def __init__(self, pdf_url: str):
         """
         Args:
-            downloaded_pdf (:obj:`DownloadedPDF`): PDFデータ
-                PDFファイルのBytesIOデータを要素に持つオブジェクト
+            pdf_url (url): PDFファイルのURL
 
         """
-        pdf_df = self._get_dataframe(downloaded_pdf.content)
+        downloaded_pdf = self.get_pdf(pdf_url)
+        pdf_df = self._get_dataframe(downloaded_pdf)
         self.__lists = self._extract_medical_institutions_data(pdf_df)
 
     @property
     def lists(self) -> list:
         return self.__lists
 
-    def _get_dataframe(self, pdf_io: BytesIO) -> pd.DataFrame:
-        """
+    def _get_dataframe(self, downloaded_pdf: DownloadedPDF) -> pd.DataFrame:
+        """PDFファイルのBytesIOデータからテーブルを抽出してpandasのDataFrameに変換。
+
         Args:
-            pdf_io (BytesIO): PDFファイルのBytesIOデータ
+            downloaded_pdf (obj:`DownloadedPDF`): PDFデータ
+                PDFファイルのBytesIOデータを要素に持つオブジェクト
 
         Returns:
             pdf_content (obj:`pd.DataFrame`): ワクチン接種医療機関一覧PDFデータ
                 ワクチン接種医療機関一覧PDFデータから抽出したpandas DataFrameデータ
 
         """
-        dfs = tabula.read_pdf(pdf_io, multiple_tables=True, lattice=True, pages="all")
+        dfs = tabula.read_pdf(
+            downloaded_pdf.content, multiple_tables=True, lattice=True, pages="all"
+        )
         df = dfs[0]
         df.columns = [
             "name1",
@@ -188,14 +191,13 @@ class ScrapeMedicalInstitutions(Scraper):
 
     """
 
-    def __init__(self, downloaded_html: DownloadedHTML):
+    def __init__(self, html_url: str):
         """
         Args:
-            downloaded_html (:obj:`DownloadedHTML`): ダウンロードしたHTMLデータ
-                ダウンロードした旭川市公式サイトの新型コロナ接種医療機関のページの
-                HTMLファイルのbytesデータを要素に持つオブジェクト
+            html_url (str): HTMLファイルのURL
 
         """
+        downloaded_html = self.get_html(html_url)
         self.__lists = list()
         table_values = self._get_table_values(downloaded_html)
         rows = table_values[0]

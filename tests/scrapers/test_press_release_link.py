@@ -2,7 +2,6 @@ import unittest
 from datetime import date
 from unittest.mock import Mock, patch
 
-from ash_unofficial_covid19.scrapers.downloader import DownloadedHTML
 from ash_unofficial_covid19.scrapers.press_release_link import (
     ScrapePressReleaseLink
 )
@@ -26,14 +25,12 @@ class TestScrapePressReleaseLink(unittest.TestCase):
         mock_requests.get.return_value = Mock(
             status_code=200, content=self.html_content
         )
-        downloaded_html = DownloadedHTML("http://dummy.local/kurashi/")
-        scraper = ScrapePressReleaseLink(
-            downloaded_html=downloaded_html, target_year=2021
-        )
+        dummy_url = "http://dummy.local/kurashi/test.html"
+        scraper = ScrapePressReleaseLink(html_url=dummy_url, target_year=2021)
         expect = [
             {
                 "publication_date": date(2021, 8, 19),
-                "url": "http://dummy.local/kurashi/test.html",
+                "url": dummy_url,
             },
         ]
         self.assertEqual(scraper.lists, expect)

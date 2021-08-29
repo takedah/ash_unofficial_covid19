@@ -1,5 +1,4 @@
 from datetime import date
-from typing import Optional
 
 from ash_unofficial_covid19.config import Config
 from ash_unofficial_covid19.errors import HTTPDownloadError
@@ -9,11 +8,6 @@ from ash_unofficial_covid19.models.patient import (
 )
 from ash_unofficial_covid19.models.press_release_link import (
     PressReleaseLinkFactory
-)
-from ash_unofficial_covid19.scrapers.downloader import (
-    DownloadedCSV,
-    DownloadedHTML,
-    DownloadedPDF
 )
 from ash_unofficial_covid19.scrapers.patient import (
     ScrapeAsahikawaPatients,
@@ -32,7 +26,7 @@ from ash_unofficial_covid19.services.press_release_link import (
 )
 
 
-def import_hokkaido_data(url: str) -> None:
+def import_hokkaido_patients(url: str) -> None:
     """
     旭川市公式ホームページから新型コロナウイルス感染症の感染者情報一覧を取得し、
     データベースへ格納する。
@@ -41,37 +35,16 @@ def import_hokkaido_data(url: str) -> None:
         url (str): 旭川市公式ホームページのURL
 
     """
-    csv_data = DownloadedCSV(url=url, encoding="cp932")
-    scraped_data = ScrapeHokkaidoPatients(csv_data)
-    patients_data = HokkaidoPatientFactory()
+    scraped_data = ScrapeHokkaidoPatients(url)
+    patients_factory = HokkaidoPatientFactory()
     for row in scraped_data.lists:
-        patients_data.create(**row)
+        patients_factory.create(**row)
 
     service = HokkaidoPatientService()
-    service.create(patients_data)
+    service.create(patients_factory)
 
 
-def get_asahikawa_data(url: str, target_year: int) -> Optional[ScrapeAsahikawaPatients]:
-    """
-    旭川市公式ホームページから新型コロナウイルス感染症の感染者情報一覧を取得する。
-
-    Args:
-        url (str): 旭川市公式ホームページのURL
-        target_year (int): 対象年
-
-    Returns:
-        scraped_data (obj:`ScrapedHTMLData`): ダウンロードしたHTMLデータ
-
-    """
-    try:
-        html_data = DownloadedHTML(url)
-    except HTTPDownloadError:
-        return None
-
-    return ScrapeAsahikawaPatients(downloaded_html=html_data, target_year=target_year)
-
-
-def import_asahikawa_data(download_lists: list) -> None:
+def import_asahikawa_patients(download_lists: list) -> None:
     """
     旭川市公式ホームページから新型コロナウイルス感染症の感染者情報を、
     データベースへ格納する。
@@ -81,14 +54,18 @@ def import_asahikawa_data(download_lists: list) -> None:
             持つタプルを要素としたリスト
 
     """
-    patients_data = AsahikawaPatientFactory()
+    patients_factory = AsahikawaPatientFactory()
     for download_list in download_lists:
         url = download_list[0]
         target_year = download_list[1]
-        scraped_data = get_asahikawa_data(url=url, target_year=target_year)
-        if scraped_data:
-            for row in scraped_data.lists:
-                patients_data.create(**row)
+        try:
+            scraped_data = ScrapeAsahikawaPatients(
+                html_url=url, target_year=target_year
+            )
+        except HTTPDownloadError:
+            continue
+        for row in scraped_data.lists:
+            patients_factory.create(**row)
 
     # HTMLに市内番号489の掲載が抜けているので手動で追加する
     additional_data = {
@@ -111,10 +88,10 @@ def import_asahikawa_data(download_lists: list) -> None:
         "surrounding_status": "No.488",
         "close_contact": "調査中",
     }
-    patients_data.create(**additional_data)
+    patients_factory.create(**additional_data)
 
     service = AsahikawaPatientService()
-    service.create(patients_data)
+    service.create(patients_factory)
 
 
 def _import_press_release_link(url: str, target_year: int) -> None:
@@ -128,16 +105,13 @@ def _import_press_release_link(url: str, target_year: int) -> None:
         target_year (int): 対象年
 
     """
-    html_data = DownloadedHTML(url)
-    scraped_data = ScrapePressReleaseLink(
-        downloaded_html=html_data, target_year=target_year
-    )
-    press_release_links = PressReleaseLinkFactory()
+    scraped_data = ScrapePressReleaseLink(html_url=url, target_year=target_year)
+    press_release_link_factory = PressReleaseLinkFactory()
     for row in scraped_data.lists:
-        press_release_links.create(**row)
+        press_release_link_factory.create(**row)
 
     service = PressReleaseLinkService()
-    service.create(press_release_links)
+    service.create(press_release_link_factory)
 
 
 def import_asahikawa_data_from_press_release(url: str, target_year: int) -> None:
@@ -158,20 +132,19 @@ def import_asahikawa_data_from_press_release(url: str, target_year: int) -> None
     publication_date = latest_press_release_link.publication_date
     pdf_url = latest_press_release_link.url
 
-    pdf_data = DownloadedPDF(pdf_url)
     scraped_data = ScrapeAsahikawaPatientsPDF(
-        downloaded_pdf=pdf_data, publication_date=publication_date
+        pdf_url=pdf_url, publication_date=publication_date
     )
     service = AsahikawaPatientService()
     for row in scraped_data.lists:
-        patients_data = AsahikawaPatientFactory()
-        patients_data.create(**row)
-        service.create(patients_data)
+        patients_factory = AsahikawaPatientFactory()
+        patients_factory.create(**row)
+        service.create(patients_factory)
 
 
 if __name__ == "__main__":
     import_asahikawa_data_from_press_release(Config.OVERVIEW_URL, 2021)
-    # import_hokkaido_data(Config.HOKKAIDO_URL)
+    # import_hokkaido_patients(Config.HOKKAIDO_URL)
     download_lists = [
         (Config.NOV2020_OR_EARLIER_URL, 2020),
         (Config.DEC2020_DATA_URL, 2020),
@@ -184,4 +157,4 @@ if __name__ == "__main__":
         (Config.JUL2021_DATA_URL, 2021),
         (Config.LATEST_DATA_URL, 2021),
     ]
-    import_asahikawa_data(download_lists)
+    import_asahikawa_patients(download_lists)

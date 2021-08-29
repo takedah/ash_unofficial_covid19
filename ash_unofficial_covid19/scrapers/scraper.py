@@ -3,6 +3,12 @@ from abc import ABCMeta, abstractmethod
 from datetime import date
 from typing import Optional
 
+from ash_unofficial_covid19.scrapers.downloader import (
+    DownloadedCSV,
+    DownloadedHTML,
+    DownloadedPDF
+)
+
 
 class Scraper(metaclass=ABCMeta):
     """ダウンロードしたコンテンツを解析するクラスの基底クラス"""
@@ -11,6 +17,37 @@ class Scraper(metaclass=ABCMeta):
     @abstractmethod
     def lists(self):
         pass
+
+    @staticmethod
+    def get_html(html_url: str) -> DownloadedHTML:
+        """HTMLファイルのbytesデータを要素に持つオブジェクトを返す
+
+        Args:
+            html_url (str): HTMLファイルのURL
+
+        """
+        return DownloadedHTML(html_url)
+
+    @staticmethod
+    def get_csv(csv_url: str, encoding: str = "utf-8") -> DownloadedCSV:
+        """CSVファイルのbytesデータを要素に持つオブジェクトを返す
+
+        Args:
+            csv_url (str): CSVファイルのURL
+            encoding (str): CSVファイルの文字コード
+
+        """
+        return DownloadedCSV(url=csv_url, encoding=encoding)
+
+    @staticmethod
+    def get_pdf(pdf_url: str) -> DownloadedPDF:
+        """PDFファイルのBytesIOデータを要素に持つオブジェクトを返す
+
+        Args:
+            pdf_url (url): PDFファイルのURL
+
+        """
+        return DownloadedPDF(pdf_url)
 
     @staticmethod
     def format_string(value: str) -> str:

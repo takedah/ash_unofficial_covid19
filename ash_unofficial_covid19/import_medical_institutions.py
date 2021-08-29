@@ -5,7 +5,6 @@ from ash_unofficial_covid19.models.location import LocationFactory
 from ash_unofficial_covid19.models.medical_institution import (
     MedicalInstitutionFactory
 )
-from ash_unofficial_covid19.scrapers.downloader import DownloadedHTML
 from ash_unofficial_covid19.scrapers.location import ScrapeYOLPLocation
 from ash_unofficial_covid19.scrapers.medical_institution import (
     ScrapeMedicalInstitutions
@@ -16,7 +15,7 @@ from ash_unofficial_covid19.services.medical_institution import (
 )
 
 
-def import_medical_institutions_data(url: str) -> None:
+def import_medical_institutions(url: str) -> None:
     """
     旭川市公式ホームページから新型コロナワクチン接種医療機関一覧を取得し、
     データベースへ格納する。
@@ -25,17 +24,16 @@ def import_medical_institutions_data(url: str) -> None:
         url (str): 旭川市公式ホームページのURL
 
     """
-    html_content = DownloadedHTML(url)
-    scraped_data = ScrapeMedicalInstitutions(html_content)
-    medical_institutions_data = MedicalInstitutionFactory()
+    scraped_data = ScrapeMedicalInstitutions(url)
+    medical_institution_factory = MedicalInstitutionFactory()
     for row in scraped_data.lists:
-        medical_institutions_data.create(**row)
+        medical_institution_factory.create(**row)
 
     service = MedicalInstitutionService()
-    service.create(medical_institutions_data)
+    service.create(medical_institution_factory)
 
 
-def import_locations_data() -> None:
+def import_locations() -> None:
     """
     医療機関の名称一覧から緯度経度を取得し、データベースへ格納する。
 
@@ -43,19 +41,19 @@ def import_locations_data() -> None:
     medical_institution_service = MedicalInstitutionService()
     medical_institution_names = medical_institution_service.get_name_list()
 
-    locations_data = LocationFactory()
+    locations_factory = LocationFactory()
     for medical_institution_name in medical_institution_names:
         scraped_data = ScrapeYOLPLocation(medical_institution_name)
         # 1番目の検索結果を採用する
         row = scraped_data.lists[0]
-        locations_data.create(**row)
+        locations_factory.create(**row)
         time.sleep(1)
 
     service = LocationService()
-    service.create(locations_data)
+    service.create(locations_factory)
 
     # YOLPで緯度経度を取得できなかった医療機関に手動で情報を追加
-    fix_list = [
+    fix_data = [
         {
             "medical_institution_name": "唐沢病院",
             "longitude": 142.36361116952028,
@@ -102,12 +100,12 @@ def import_locations_data() -> None:
             "latitude": 43.73007572101459,
         },
     ]
-    locations_data = LocationFactory()
-    for row in fix_list:
-        locations_data.create(**row)
-    service.create(locations_data)
+    locations_factory = LocationFactory()
+    for row in fix_data:
+        locations_factory.create(**row)
+    service.create(locations_factory)
 
 
 if __name__ == "__main__":
-    import_medical_institutions_data(Config.MEDICAL_INSTITUTIONS_URL)
-    import_locations_data()
+    import_medical_institutions(Config.MEDICAL_INSTITUTIONS_URL)
+    import_locations()

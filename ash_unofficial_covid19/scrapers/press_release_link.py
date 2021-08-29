@@ -16,12 +16,10 @@ class ScrapePressReleaseLink(Scraper):
 
     """
 
-    def __init__(self, downloaded_html: DownloadedHTML, target_year: int = 2020):
+    def __init__(self, html_url: str, target_year: int = 2020):
         """
         Args:
-            downloaded_html (:obj:`DownloadedHTML`): ダウンロードしたHTMLデータ
-                ダウンロードした旭川市公式サイトの新型コロナウイルス感染症の
-                市内発生状況のページのHTMLファイルのbytesデータを要素に持つオブジェクト
+            html_url (str): HTMLファイルのURL
             target_year (int): 元データに年が表記されていないため直接指定する
 
         """
@@ -30,6 +28,8 @@ class ScrapePressReleaseLink(Scraper):
         else:
             raise TypeError("対象年の指定が正しくありません。")
 
+        Scraper.__init__(self)
+        downloaded_html = DownloadedHTML(html_url)
         self.__lists = self._get_press_release_link(downloaded_html)
 
     @property

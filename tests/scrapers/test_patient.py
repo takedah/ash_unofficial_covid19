@@ -6,10 +6,6 @@ from unittest.mock import Mock, patch
 import pandas as pd
 from numpy import nan
 
-from ash_unofficial_covid19.scrapers.downloader import (
-    DownloadedCSV,
-    DownloadedHTML
-)
 from ash_unofficial_covid19.scrapers.patient import (
     ScrapeAsahikawaPatients,
     ScrapeAsahikawaPatientsPDF,
@@ -182,14 +178,12 @@ class TestScrapeAsahikawaPatients(unittest.TestCase):
         mock_requests.get.return_value = Mock(
             status_code=200, content=self.html_content
         )
-        downloaded_html = DownloadedHTML("http://dummy.local")
+        dummy_url = "http://dummy.local"
         # 年指定が正しくない場合エラーを返す
         with self.assertRaises(TypeError):
-            ScrapeAsahikawaPatients(downloaded_html=downloaded_html, target_year=2019)
+            ScrapeAsahikawaPatients(html_url=dummy_url, target_year=2019)
 
-        scraper = ScrapeAsahikawaPatients(
-            downloaded_html=downloaded_html, target_year=2021
-        )
+        scraper = ScrapeAsahikawaPatients(html_url=dummy_url, target_year=2021)
         expect = [
             {
                 "patient_number": 1121,
@@ -326,10 +320,7 @@ class TestScrapeAsahikawaPatients(unittest.TestCase):
         </table>
         """
         mock_requests.get.return_value = Mock(status_code=200, content=dummy_table)
-        downloaded_html = DownloadedHTML("http://dummy.local")
-        scraper = ScrapeAsahikawaPatients(
-            downloaded_html=downloaded_html, target_year=2021
-        )
+        scraper = ScrapeAsahikawaPatients(html_url=dummy_url, target_year=2021)
         self.assertEqual(scraper.lists, [])
 
 
@@ -347,8 +338,8 @@ class TestScrapeHokkaidoPatients(unittest.TestCase):
             content=csv_content(),
             headers={"content-type": "text/csv"},
         )
-        downloaded_csv = DownloadedCSV(url="http://dummy.local", encoding="cp932")
-        csv_data = ScrapeHokkaidoPatients(downloaded_csv)
+        dummy_url = "http://dummy.local"
+        csv_data = ScrapeHokkaidoPatients(dummy_url)
         result = csv_data.lists
         expect = [
             {
@@ -408,9 +399,20 @@ class TestScrapeHokkaidoPatients(unittest.TestCase):
 
 class TestScrapeAsahikawaPatientsPDF(unittest.TestCase):
     @patch(
-        "ash_unofficial_covid19.scrapers.patient.ScrapeAsahikawaPatientsPDF._get_dataframe"
+        "ash_unofficial_covid19.scrapers.patient"
+        + ".ScrapeAsahikawaPatientsPDF.get_pdf"
     )
-    def test_lists(self, mock_get_dataframe):
+    @patch(
+        "ash_unofficial_covid19.scrapers.patient"
+        + ".ScrapeAsahikawaPatientsPDF._get_dataframe"
+    )
+    @patch("ash_unofficial_covid19.scrapers.downloader.requests")
+    def test_lists(self, mock_requests, mock_get_dataframe, mock_get_pdf):
+        mock_requests.get.return_value = Mock(
+            status_code=200,
+            content=csv_content(),
+            headers={"content-type": "text/csv"},
+        )
         dfs = list()
         df1 = pd.DataFrame([[]])
         df2 = pd.DataFrame(
@@ -432,9 +434,10 @@ class TestScrapeAsahikawaPatientsPDF(unittest.TestCase):
         )
         dfs = [df1, df2]
         mock_get_dataframe.return_value = dfs
-        downloaded_pdf = Mock(content=BytesIO())
+        mock_get_pdf.return_value = BytesIO()
+        dummy_url = "http://dummy.local"
         scraper = ScrapeAsahikawaPatientsPDF(
-            downloaded_pdf=downloaded_pdf, publication_date=date(2021, 8, 19)
+            pdf_url=dummy_url, publication_date=date(2021, 8, 19)
         )
         expect = [
             {
