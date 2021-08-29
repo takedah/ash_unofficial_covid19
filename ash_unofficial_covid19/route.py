@@ -175,13 +175,15 @@ def opendata_pages(page):
 @app.route("/medical_institutions")
 def medical_institutions():
     medical_institutions = get_medical_institutions()
-    area_list = medical_institutions.get_area_list()
+    above_16_area_list = medical_institutions.get_area_list()
+    below_15_area_list = medical_institutions.get_area_list(is_pediatric=True)
     return render_template(
         "medical_institutions.html",
         title="新型コロナワクチン接種医療機関一覧",
         gtag_id=Config.GTAG_ID,
         medical_institutions=medical_institutions,
-        area_list=area_list,
+        above_16_area_list=above_16_area_list,
+        below_15_area_list=below_15_area_list,
     )
 
 
@@ -193,16 +195,41 @@ def medical_institutions_areas(area):
     search_lengths = len(search_results)
     if search_lengths == 0:
         abort(404)
-    area_list = medical_institutions.get_area_list()
+    above_16_area_list = medical_institutions.get_area_list()
+    below_15_area_list = medical_institutions.get_area_list(is_pediatric=True)
     return render_template(
         "area.html",
-        title=area + "の新型コロナワクチン接種医療機関一覧",
+        title=area + "の新型コロナワクチン接種医療機関一覧（16歳以上）",
         gtag_id=Config.GTAG_ID,
         medical_institutions=medical_institutions,
         area=area,
         search_results=search_results,
         search_lengths=search_lengths,
-        area_list=area_list,
+        above_16_area_list=above_16_area_list,
+        below_15_area_list=below_15_area_list,
+    )
+
+
+@app.route("/medical_institutions/pediatrics/<area>")
+def pediatric_medical_institutions_areas(area):
+    medical_institutions = get_medical_institutions()
+    area = escape(area)
+    search_results = medical_institutions.get_locations(area=area, is_pediatric=True)
+    search_lengths = len(search_results)
+    if search_lengths == 0:
+        abort(404)
+    above_16_area_list = medical_institutions.get_area_list()
+    below_15_area_list = medical_institutions.get_area_list(is_pediatric=True)
+    return render_template(
+        "area.html",
+        title=area + "の新型コロナワクチン接種医療機関一覧（12歳から15歳まで）",
+        gtag_id=Config.GTAG_ID,
+        medical_institutions=medical_institutions,
+        area=area,
+        search_results=search_results,
+        search_lengths=search_lengths,
+        above_16_area_list=above_16_area_list,
+        below_15_area_list=below_15_area_list,
     )
 
 

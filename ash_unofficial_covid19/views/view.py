@@ -93,21 +93,30 @@ class MedicalInstitutionsView:
     def last_updated(self) -> str:
         return self.__last_updated
 
-    def get_locations(self, area: Optional[str] = None) -> list:
-        """位置情報付きで新型コロナワクチン接種医療機関一覧のデータを返す
+    def get_locations(
+        self, area: Optional[str] = None, is_pediatric: bool = False
+    ) -> list:
+        """新型コロナワクチン接種医療機関の位置情報一覧
+
+        指定した対象年齢の新型コロナワクチン接種医療機関の一覧に医療機関の位置情報を
+        付けて返す
 
         Args:
             area (str): 医療機関の地区
+            target_age (str): 対象年齢が16歳以上または12歳から15歳までのいずれか
 
         Returns:
-            locations (list of tuple): 位置情報付きの接種医療機関データリスト
+            locations (list of tuple): 位置情報付き医療機関一覧データ
                 新型コロナワクチン接種医療機関の情報に緯度経度を含めたタプルのリスト
 
         """
-        return self.__service.get_locations(area=area)
+        return self.__service.get_locations(area=area, is_pediatric=is_pediatric)
 
-    def get_area_list(self) -> list:
-        """新型コロナワクチン接種医療機関の地域全件のリストを返す
+    def get_area_list(self, is_pediatric: bool = False) -> list:
+        """指定した対象年齢の新型コロナワクチン接種医療機関の地域全件のリストを返す
+
+        Args:
+            is_pediatric (bool): 12歳から15歳までの接種医療機関の場合真を指定
 
         Returns:
             res (list of tuple): 医療機関の地域一覧リスト
@@ -115,7 +124,7 @@ class MedicalInstitutionsView:
 
         """
         area_list = list()
-        for area in self.__service.get_area_list():
+        for area in self.__service.get_area_list(is_pediatric):
             area_list.append((area, urllib.parse.quote(area)))
         return area_list
 

@@ -24,8 +24,15 @@ def import_medical_institutions(url: str) -> None:
         url (str): 旭川市公式ホームページのURL
 
     """
-    scraped_data = ScrapeMedicalInstitutions(url)
     medical_institution_factory = MedicalInstitutionFactory()
+
+    # 16歳以上
+    scraped_data = ScrapeMedicalInstitutions(html_url=url)
+    for row in scraped_data.lists:
+        medical_institution_factory.create(**row)
+
+    # 12歳から15歳まで
+    scraped_data = ScrapeMedicalInstitutions(html_url=url, is_pediatric=True)
     for row in scraped_data.lists:
         medical_institution_factory.create(**row)
 
@@ -98,6 +105,16 @@ def import_locations() -> None:
             "medical_institution_name": "旭川医科大学病院",
             "longitude": 142.38382199835564,
             "latitude": 43.73007572101459,
+        },
+        {
+            "medical_institution_name": "小児科くさのこどもクリニック",
+            "longitude": 142.39032599835747,
+            "latitude": 43.80567852167143,
+        },
+        {
+            "medical_institution_name": "独立行政法人国立病院機構旭川医療センター",
+            "longitude": 142.3815237271935,
+            "latitude": 43.798826491523464,
         },
     ]
     locations_factory = LocationFactory()
