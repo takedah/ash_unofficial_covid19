@@ -16,6 +16,7 @@ class TestMedicalInstitutionFactory(unittest.TestCase):
             "book_at_call_center": False,
             "area": "",
             "memo": "",
+            "target_age": "16歳以上",
         }
         factory = MedicalInstitutionFactory()
         # MedicalInstitutionクラスのオブジェクトが生成できるか確認する。

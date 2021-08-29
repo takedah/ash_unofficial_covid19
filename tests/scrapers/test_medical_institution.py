@@ -78,6 +78,54 @@ def medical_institution_html_content():
     return html_data
 
 
+def pediatric_medical_institution_html_content():
+    html_data = """
+<table cellspacing="1" cellpadding="1">
+    <caption>新型コロナワクチン接種医療機関（12歳から15歳）</caption>
+    <tbody>
+        <tr>
+            <td>医療機関名</td>
+            <td>住所</td>
+            <td>電話</td>
+            <td>かかりつけ医療機関</td>
+            <td>コールセンター、インターネット受付</td>
+        </tr>
+        <tr>
+            <td colspan="5">
+                <a id="22" name="22"></a><strong>東・金星町・各条17～26丁目</strong>
+            </td>
+        </tr>
+        <tr>
+            <td>市立旭川病院</td>
+            <td>金星町1</td>
+            <td>29-0202</td>
+            <td>○</td>
+            <td>－</td>
+        </tr>
+        <tr>
+            <td colspan="5">
+                <a id="23" name="23"></a><strong>花咲町・末広・末広東・永山</strong>
+            </td>
+        </tr>
+        <tr>
+            <td>
+               <p>独立行政法人国立病院機構</p>
+               <p>旭川医療センター</p>
+            </td>
+            <td>花咲町7</td>
+            <td>
+            <p>51-3910</p>
+            <p>予約専用</P>
+            </td>
+            <td>○</td>
+            <td>ー</td>
+        </tr>
+    </tbody>
+</table>
+"""
+    return html_data
+
+
 class TestScrapeMedicalInstitutionsPDF(unittest.TestCase):
     @patch(
         "ash_unofficial_covid19.scrapers.medical_institution"
@@ -175,16 +223,20 @@ class TestScrapeMedicalInstitutionsPDF(unittest.TestCase):
 class TestScrapeMedicalInstitutions(unittest.TestCase):
     def setUp(self):
         self.html_content = medical_institution_html_content()
+        self.pediatric_html_content = pediatric_medical_institution_html_content()
 
     def tearDown(self):
         pass
 
     @patch("ash_unofficial_covid19.scrapers.downloader.requests")
     def test_lists(self, mock_requests):
+        # 16歳以上の接種医療機関
         mock_requests.get.return_value = Mock(
             status_code=200, content=self.html_content
         )
-        scraper = ScrapeMedicalInstitutions("http://dummy.local")
+        scraper = ScrapeMedicalInstitutions(
+            html_url="http://dummy.local", is_pediatric=False
+        )
         expect = [
             {
                 "name": "市立旭川病院",
@@ -194,6 +246,7 @@ class TestScrapeMedicalInstitutions(unittest.TestCase):
                 "book_at_call_center": False,
                 "area": "新富・東・金星町",
                 "memo": "",
+                "target_age": "16歳以上",
             },
             {
                 "name": "旭川赤十字病院",
@@ -203,6 +256,7 @@ class TestScrapeMedicalInstitutions(unittest.TestCase):
                 "book_at_call_center": True,
                 "area": "西地区",
                 "memo": "備考テスト",
+                "target_age": "16歳以上",
             },
             {
                 "name": "道北勤医協一条通病院",
@@ -216,6 +270,38 @@ class TestScrapeMedicalInstitutions(unittest.TestCase):
                     + "予約専用番号(34-0015)に変更となります。 開始時期は、"
                     + "各医療機関のホームページ及び院内掲示をご覧ください。"
                 ),
+                "target_age": "16歳以上",
+            },
+        ]
+        self.assertEqual(scraper.lists, expect)
+
+        # 12歳から15歳までの接種医療機関
+        mock_requests.get.return_value = Mock(
+            status_code=200, content=self.pediatric_html_content
+        )
+        scraper = ScrapeMedicalInstitutions(
+            html_url="http://dummy.local", is_pediatric=True
+        )
+        expect = [
+            {
+                "name": "市立旭川病院",
+                "address": "旭川市金星町1",
+                "phone_number": "0166-29-0202",
+                "book_at_medical_institution": True,
+                "book_at_call_center": False,
+                "area": "東・金星町・各条17～26丁目",
+                "memo": "",
+                "target_age": "12歳から15歳まで",
+            },
+            {
+                "name": "独立行政法人国立病院機構旭川医療センター",
+                "address": "旭川市花咲町7",
+                "phone_number": "0166-51-3910 予約専用",
+                "book_at_medical_institution": True,
+                "book_at_call_center": False,
+                "area": "花咲町・末広・末広東・永山",
+                "memo": "",
+                "target_age": "12歳から15歳まで",
             },
         ]
         self.assertEqual(scraper.lists, expect)

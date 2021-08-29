@@ -31,6 +31,7 @@ class MedicalInstitutionService(Service):
             "book_at_call_center",
             "area",
             "memo",
+            "target_age",
             "updated_at",
         )
 
@@ -45,6 +46,7 @@ class MedicalInstitutionService(Service):
                     medical_institution.book_at_call_center,
                     medical_institution.area,
                     medical_institution.memo,
+                    medical_institution.target_age,
                     datetime.now(timezone(timedelta(hours=+9))),
                 ]
             )
@@ -52,7 +54,7 @@ class MedicalInstitutionService(Service):
         # データベースへ登録処理
         self.upsert(
             items=items,
-            primary_key="name",
+            primary_key="name,target_age",
             data_lists=data_lists,
         )
 
@@ -69,7 +71,7 @@ class MedicalInstitutionService(Service):
             "SELECT"
             + " "
             + "name,address,phone_number,book_at_medical_institution,"
-            + "book_at_call_center,area,memo"
+            + "book_at_call_center,area,target_age,memo"
             + " "
             + "FROM"
             + " "
@@ -103,6 +105,7 @@ class MedicalInstitutionService(Service):
                 "電話",
                 "かかりつけの医療機関で予約ができます",
                 "コールセンターやインターネットで予約ができます",
+                "対象年齢",
                 "備考",
             ]
         )
@@ -128,6 +131,7 @@ class MedicalInstitutionService(Service):
                         medical_institution.phone_number,
                         book_at_medical_institution,
                         book_at_call_center,
+                        medical_institution.target_age,
                         medical_institution.memo,
                     ]
                 ]
@@ -141,7 +145,7 @@ class MedicalInstitutionService(Service):
             res (list): 医療機関の名称一覧リスト
 
         """
-        state = "SELECT name FROM " + self.table_name + " ORDER BY id;"
+        state = "SELECT DISTINCT(name) FROM " + self.table_name + " ORDER BY name;"
         name_list = list()
         with self.get_connection() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
@@ -150,27 +154,47 @@ class MedicalInstitutionService(Service):
                     name_list.append(row["name"])
         return name_list
 
-    def get_area_list(self) -> list:
-        """新型コロナワクチン接種医療機関の地域全件のリストを返す
+    def get_area_list(self, is_pediatric: bool = False) -> list:
+        """指定した対象年齢の新型コロナワクチン接種医療機関の地域全件のリストを返す
+
+        Args:
+            is_pediatric (bool): 12歳から15歳までの接種医療機関の場合真を指定
 
         Returns:
             res (list): 医療機関の地域一覧リスト
 
         """
-        state = "SELECT DISTINCT(area) FROM " + self.table_name + " ORDER BY area;"
+        state = (
+            "SELECT DISTINCT(area) FROM "
+            + self.table_name
+            + " "
+            + "WHERE target_age=%s"
+            + " ORDER BY area;"
+        )
+        if is_pediatric:
+            target_age = "12歳から15歳まで"
+        else:
+            target_age = "16歳以上"
+
         area_list = list()
         with self.get_connection() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state)
+                cur.execute(state, (target_age,))
                 for row in cur.fetchall():
                     area_list.append(row["area"])
         return area_list
 
-    def get_locations(self, area: Optional[str] = None) -> list:
-        """新型コロナワクチン接種医療機関の一覧に医療機関の位置情報を付けて返す
+    def get_locations(
+        self, area: Optional[str] = None, is_pediatric: bool = False
+    ) -> list:
+        """新型コロナワクチン接種医療機関の位置情報一覧
+
+        指定した対象年齢の新型コロナワクチン接種医療機関の一覧に医療機関の位置情報を
+        付けて返す
 
         Args:
             area (str): 医療機関の地区
+            target_age (str): 対象年齢が16歳以上または12歳から15歳までのいずれか
 
         Returns:
             locations (list of tuple): 位置情報付き医療機関一覧データ
@@ -178,30 +202,35 @@ class MedicalInstitutionService(Service):
 
         """
         state = (
-            "SELECT"
-            + " "
+            "SELECT "
             + "name,address,phone_number,book_at_medical_institution,"
-            + "book_at_call_center,memo,latitude,longitude"
-            + " "
-            + "FROM"
-            + " "
+            + "book_at_call_center,memo,latitude,longitude "
+            + "FROM "
             + self.table_name
             + " "
-            + "LEFT JOIN locations ON"
-            + " "
+            + "LEFT JOIN locations ON "
             + self.table_name
-            + ".name = locations.medical_institution_name"
+            + ".name = locations.medical_institution_name "
+            + "WHERE "
+            + self.table_name
+            + ".target_age=%s"
         )
+        if is_pediatric:
+            target_age = "12歳から15歳まで"
+        else:
+            target_age = "16歳以上"
+
         if area:
-            state = state + " WHERE area=%s"
-        state = state + " ORDER BY " + self.table_name + ".id;"
+            state = state + " " + "AND area=%s"
+
+        state = state + " " + "ORDER BY " + self.table_name + ".id;"
         locations = list()
         with self.get_connection() as conn:
             with conn.cursor() as cur:
                 if area:
-                    cur.execute(state, (area,))
+                    cur.execute(state, (target_age, area))
                 else:
-                    cur.execute(state)
+                    cur.execute(state, (target_age,))
                 for row in cur.fetchall():
                     locations.append(row)
         return locations

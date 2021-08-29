@@ -11,6 +11,8 @@ class MedicalInstitution:
         book_at_medical_institution (bool): 医療機関で予約が可能か
         book_at_call_center (bool): コールセンターやインターネットで予約が可能か
         area (str): 医療機関の地区
+        memo (str): 備考
+        target_age (str): 対象年齢が16歳以上または12歳から15歳までのいずれか
 
     """
 
@@ -23,6 +25,7 @@ class MedicalInstitution:
         book_at_call_center: bool,
         area: str,
         memo: str,
+        target_age: str,
     ):
         """
         Args:
@@ -33,6 +36,7 @@ class MedicalInstitution:
             book_at_call_center (bool): コールセンターやインターネットで予約が可能か
             area (str): 医療機関の地区
             memo (str): 備考
+            target_age (str): 対象年齢が16歳以上または12歳から15歳までのいずれか
 
         """
         self.__name = name
@@ -42,6 +46,7 @@ class MedicalInstitution:
         self.__book_at_call_center = book_at_call_center
         self.__area = area
         self.__memo = memo
+        self.__target_age = target_age
 
     @property
     def name(self) -> str:
@@ -70,6 +75,10 @@ class MedicalInstitution:
     @property
     def memo(self) -> str:
         return self.__memo
+
+    @property
+    def target_age(self) -> str:
+        return self.__target_age
 
 
 class MedicalInstitutionFactory(Factory):
