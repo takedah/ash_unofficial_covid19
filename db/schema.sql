@@ -70,3 +70,10 @@ CREATE TABLE press_release_links(
     publication_date DATE NOT NULL,
     updated_at TIMESTAMPTZ NOT NULL
 );
+DROP TABLE IF EXISTS sapporo_patients_numbers;
+CREATE TABLE sapporo_patients_numbers(
+    id SERIAL PRIMARY KEY NOT NULL,
+    publication_date DATE UNIQUE NOT NULL,
+    patients_number INTEGER NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL
+);
