@@ -9,6 +9,9 @@ from ash_unofficial_covid19.models.patient import (
 from ash_unofficial_covid19.models.press_release_link import (
     PressReleaseLinkFactory
 )
+from ash_unofficial_covid19.models.sapporo_patients_number import (
+    SapporoPatientsNumberFactory
+)
 from ash_unofficial_covid19.scrapers.patient import (
     ScrapeAsahikawaPatients,
     ScrapeAsahikawaPatientsPDF,
@@ -17,12 +20,18 @@ from ash_unofficial_covid19.scrapers.patient import (
 from ash_unofficial_covid19.scrapers.press_release_link import (
     ScrapePressReleaseLink
 )
+from ash_unofficial_covid19.scrapers.sapporo_patients_number import (
+    ScrapeSapporoPatientsNumber
+)
 from ash_unofficial_covid19.services.patient import (
     AsahikawaPatientService,
     HokkaidoPatientService
 )
 from ash_unofficial_covid19.services.press_release_link import (
     PressReleaseLinkService
+)
+from ash_unofficial_covid19.services.sapporo_patients_number import (
+    SapporoPatientsNumberService
 )
 
 
@@ -142,6 +151,16 @@ def import_asahikawa_data_from_press_release(url: str, target_year: int) -> None
         service.create(patients_factory)
 
 
+def import_sapporo_patients_number(url: str) -> None:
+    scraped_data = ScrapeSapporoPatientsNumber(url)
+    service = SapporoPatientsNumberService()
+    sapporo_patients_number_factory = SapporoPatientsNumberFactory()
+    for row in scraped_data.lists:
+        sapporo_patients_number_factory.create(**row)
+
+    service.create(sapporo_patients_number_factory)
+
+
 if __name__ == "__main__":
     import_asahikawa_data_from_press_release(Config.OVERVIEW_URL, 2021)
     # import_hokkaido_patients(Config.HOKKAIDO_URL)
@@ -158,3 +177,4 @@ if __name__ == "__main__":
         (Config.LATEST_DATA_URL, 2021),
     ]
     import_asahikawa_patients(download_lists)
+    import_sapporo_patients_number(Config.SAPPORO_URL)

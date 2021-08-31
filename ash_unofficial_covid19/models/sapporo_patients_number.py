@@ -23,7 +23,7 @@ class SapporoPatientsNumber:
         self.__patients_number = patients_number
 
     @property
-    def publication_date(self) -> float:
+    def publication_date(self) -> date:
         return self.__publication_date
 
     @property
