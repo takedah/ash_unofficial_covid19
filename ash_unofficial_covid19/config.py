@@ -7,6 +7,9 @@ class Config:
     # 旭川市の人口
     POPULATION = 329033
 
+    # 札幌市の人口
+    SAPPORO_POPULATION = 1962417
+
     # 旭川市公式ホームページと北海道オープンデータポータルの設定
     DATABASE_URL = os.environ.get("DATABASE_URL")
     BASE_URL = "https://www.city.asahikawa.hokkaido.jp/"

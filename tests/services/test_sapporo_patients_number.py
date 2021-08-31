@@ -70,6 +70,18 @@ class TestSapporoPatientsNumberService(unittest.TestCase):
         ]
         self.assertEqual(result, expect)
 
+    def test_get_per_hundred_thousand_population_per_week(self):
+        from_date = date(2021, 8, 22)
+        to_date = date(2021, 8, 29)
+        result = self.service.get_per_hundred_thousand_population_per_week(
+            from_date=from_date, to_date=to_date
+        )
+        expect = [
+            (date(2021, 8, 29), 6.83),
+            (date(2021, 8, 22), 86.88),
+        ]
+        self.assertEqual(result, expect)
+
 
 if __name__ == "__main__":
     unittest.main()

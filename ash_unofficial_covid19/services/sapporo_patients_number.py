@@ -1,7 +1,9 @@
 from datetime import date, datetime, timedelta, timezone
+from decimal import ROUND_HALF_UP, Decimal
 
 from psycopg2.extras import DictCursor
 
+from ash_unofficial_covid19.config import Config
 from ash_unofficial_covid19.models.sapporo_patients_number import (
     SapporoPatientsNumberFactory
 )
@@ -114,3 +116,32 @@ class SapporoPatientsNumberService(Service):
                 for row in cur.fetchall():
                     aggregate_by_weeks.append((row["weeks"], row["patients"]))
         return aggregate_by_weeks
+
+    def get_per_hundred_thousand_population_per_week(
+        self, from_date: date, to_date: date
+    ) -> list:
+        """1週間の人口10万人あたりの新規陽性患者数の計算結果を返す
+
+        Args:
+            from_date (obj:`date`): 集計の始期
+            to_date (obj:`date`): 集計の終期
+
+        Returns:
+            per_hundred_thousand (list of tuple): 集計結果
+                1週間ごとの日付とその週の人口10万人あたり新規陽性患者数を要素とする
+                タプルのリスト
+        """
+        aggregate_by_weeks = self.get_aggregate_by_weeks(
+            from_date=from_date, to_date=to_date
+        )
+        per_hundred_thousand_population_per_week = list()
+        for patients_number in aggregate_by_weeks:
+            per_hundred_thousand_population = float(
+                Decimal(
+                    str(patients_number[1] / Config.SAPPORO_POPULATION * 100000)
+                ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            )
+            per_hundred_thousand_population_per_week.append(
+                (patients_number[0], per_hundred_thousand_population)
+            )
+        return per_hundred_thousand_population_per_week
