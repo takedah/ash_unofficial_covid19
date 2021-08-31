@@ -22,6 +22,9 @@ from ash_unofficial_covid19.services.patient import AsahikawaPatientService
 from ash_unofficial_covid19.services.press_release_link import (
     PressReleaseLinkService
 )
+from ash_unofficial_covid19.services.sapporo_patients_number import (
+    SapporoPatientsNumberService
+)
 
 
 class AsahikawaPatientsView:
@@ -616,9 +619,16 @@ class PerHundredThousandPopulationView(GraphView):
 
     def __init__(self):
         service = AsahikawaPatientService()
+        sapporo_service = SapporoPatientsNumberService()
         yesterday = self.get_yesterday()
         self.__per_hundred_thousand_population_data = (
             service.get_per_hundred_thousand_population_per_week(
+                from_date=yesterday - relativedelta(weeks=16, days=-1),
+                to_date=yesterday,
+            )
+        )
+        self.__sapporo_per_hundred_thousand_population_data = (
+            sapporo_service.get_per_hundred_thousand_population_per_week(
                 from_date=yesterday - relativedelta(weeks=16, days=-1),
                 to_date=yesterday,
             )
@@ -676,10 +686,9 @@ class PerHundredThousandPopulationView(GraphView):
             graph_image (BytesIO): グラフの画像データ
 
         """
-        font = FontProperties(
-            fname="./ash_unofficial_covid19/static/fonts/NotoSansCJKjp-Light.otf",
-            size=12,
-        )
+        font_file = "./ash_unofficial_covid19/static/fonts/NotoSansCJKjp-Light.otf"
+        font = FontProperties(fname=font_file, size=12)
+        legend_font = FontProperties(fname=font_file, size=10)
         if figsize:
             fig = plt.figure(figsize=figsize)
         else:
@@ -696,6 +705,20 @@ class PerHundredThousandPopulationView(GraphView):
             per_hundred_thousand_population_x,
             per_hundred_thousand_population_y,
             color="salmon",
+            label="旭川市",
+        )
+        sapporo_per_hundred_thousand_population_x = [
+            row[0].strftime("%m-%d") + "~"
+            for row in self.__sapporo_per_hundred_thousand_population_data
+        ]
+        sapporo_per_hundred_thousand_population_y = [
+            row[1] for row in self.__sapporo_per_hundred_thousand_population_data
+        ]
+        ax.plot(
+            sapporo_per_hundred_thousand_population_x,
+            sapporo_per_hundred_thousand_population_y,
+            color="lightgray",
+            label="札幌市",
         )
         ax.yaxis.set_major_locator(MultipleLocator(5))
         ax.grid(axis="y", color="lightgray")
@@ -723,6 +746,8 @@ class PerHundredThousandPopulationView(GraphView):
             font_properties=font,
         )
         ax.axhline(y=25, color="salmon", linewidth=1, linestyle="--")
+        ax.legend(prop=legend_font, loc=4)
+
         fig.tight_layout()
         canvas = FigureCanvasAgg(fig)
         im = BytesIO()

@@ -20,19 +20,6 @@
     </div>
     <div class="card">
       <div class="card-header">
-        1週間ごとの年代別新規陽性患者数の内訳
-      </div>
-      <div class="card-body">
-        <p><img src="./weekly_per_age.png" alt="{{ weekly_per_age.get_graph_alt() }}" title="1週間ごとの年代別新規陽性患者数の推移" class="img-fluid"></p>
-      </div>
-      <div class="card-footer text-muted bg-white">
-        <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted" target="_blank">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a> 最終更新: {{ asahikawa_patients.last_updated }}</p>
-      </div>
-    </div>
-  </div>
-  <div class="card-group mb-2">
-    <div class="card">
-      <div class="card-header">
         1週間の人口10万人あたり新規陽性患者数
       </div>
       <div class="card-body">
@@ -42,9 +29,11 @@
         <p class="card-text text-right">（先週 {{ per_hundred_thousand_population.increase_from_last_week }}人）</p>
       </div>
       <div class="card-footer text-muted bg-white">
-        <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted" target="_blank">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a> 最終更新: {{ asahikawa_patients.last_updated }}</p>
+        <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted" target="_blank">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a> <a href="https://ckan.pf-sapporo.jp/dataset/covid_19_patients" title="DATA-SMART CITY SAPPORO" class="text-muted" target="_blank">DATA-SMART CITY SAPPORO <i class="fas fa-external-link-alt"></i></a> 最終更新: {{ asahikawa_patients.last_updated }}</p>
       </div>
     </div>
+  </div>
+  <div class="card-group mb-2">
     <div class="card">
       <div class="card-header">
         新規陽性患者数に基づく市内の警戒ステージ
@@ -81,6 +70,17 @@
       </div>
       <div class="card-footer text-muted bg-white">
         <p class="card-text small">出典: <a href="https://www.pref.hokkaido.lg.jp/ss/ssa/singatakoronahaien.html" title="" class="text-muted" target="_blank">北海道公式ホームページ <i class="fas fa-external-link-alt"></i></a></p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        1週間ごとの年代別新規陽性患者数の内訳
+      </div>
+      <div class="card-body">
+        <p><img src="./weekly_per_age.png" alt="{{ weekly_per_age.get_graph_alt() }}" title="1週間ごとの年代別新規陽性患者数の推移" class="img-fluid"></p>
+      </div>
+      <div class="card-footer text-muted bg-white">
+        <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted" target="_blank">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a> 最終更新: {{ asahikawa_patients.last_updated }}</p>
       </div>
     </div>
   </div>

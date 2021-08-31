@@ -107,7 +107,8 @@ class SapporoPatientsNumberService(Service):
             + self.table_name
             + ".publication_date AND "
             + self.table_name
-            + ".publication_date < to_week GROUP BY from_week;"
+            + ".publication_date < to_week GROUP BY from_week "
+            + "ORDER BY weeks;"
         )
         aggregate_by_weeks = list()
         with self.get_connection() as conn:

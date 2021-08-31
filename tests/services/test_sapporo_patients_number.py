@@ -65,8 +65,8 @@ class TestSapporoPatientsNumberService(unittest.TestCase):
             from_date=from_date, to_date=to_date
         )
         expect = [
-            (date(2021, 8, 29), 134),
             (date(2021, 8, 22), 1705),
+            (date(2021, 8, 29), 134),
         ]
         self.assertEqual(result, expect)
 
@@ -77,8 +77,8 @@ class TestSapporoPatientsNumberService(unittest.TestCase):
             from_date=from_date, to_date=to_date
         )
         expect = [
-            (date(2021, 8, 29), 6.83),
             (date(2021, 8, 22), 86.88),
+            (date(2021, 8, 29), 6.83),
         ]
         self.assertEqual(result, expect)
 
