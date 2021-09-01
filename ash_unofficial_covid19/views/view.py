@@ -145,28 +145,38 @@ class MedicalInstitutionsView:
         return f
 
 
-class PressReleaseLinksView:
-    """旭川市新型コロナ報道発表資料データ
+class GraphView(metaclass=ABCMeta):
+    """グラフを出力するクラスの基底クラス"""
 
-    旭川市新型コロナの報道発表資料データをFlaskへ渡すデータにする
+    @abstractmethod
+    def get_graph_alt(self) -> str:
+        pass
 
-    Attributes:
-        latest_publication_date (str): 最新の報道発表日の文字列
+    @abstractmethod
+    def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
+        pass
 
-    """
+    def get_today(self) -> date:
+        """グラフの基準となる最新の報道発表日の日付を返す
 
-    def __init__(self):
-        self.__service = PressReleaseLinkService()
-        latest_publication_date = self.__service.get_latest_publication_date()
-        self.__latest_publication_date = self._format_date_style(
-            latest_publication_date
-        )
+        Returns:
+            today (date): 最新の報道発表日の日付データ
 
-    @property
-    def latest_publication_date(self) -> str:
-        return self.__latest_publication_date
+        """
+        now = datetime.now(timezone(timedelta(hours=+9), "JST"))
+        try:
+            press_release_link_service = PressReleaseLinkService()
+            today = press_release_link_service.get_latest_publication_date()
+        except DatabaseConnectionError:
+            # エラーが起きた場合現在日付を基準とする。
+            # このとき市の発表が16時になることが多いので16時より前なら前日を基準とする。
+            today = now.date()
+            if now.hour < 16:
+                today = today - relativedelta(days=1)
 
-    def _format_date_style(self, target_date: date) -> str:
+        return today
+
+    def format_date_style(self, target_date: date) -> str:
         """datetime.dateを曜日を含めた文字列に変換
 
         Args:
@@ -212,43 +222,11 @@ class PressReleaseLinksView:
         return date_string + " (" + day_of_week_kanji + ") "
 
 
-class GraphView(metaclass=ABCMeta):
-    """グラフを出力するクラスの基底クラス"""
-
-    @abstractmethod
-    def get_graph_alt(self) -> str:
-        pass
-
-    @abstractmethod
-    def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
-        pass
-
-    def get_yesterday(self) -> date:
-        """グラフの基準となる最新の報道発表日の前日の日付を返す
-
-        Returns:
-            yesterday (date): 前日の日付データ
-
-        """
-        now = datetime.now(timezone(timedelta(hours=+9), "JST"))
-        try:
-            press_release_link_service = PressReleaseLinkService()
-            today = press_release_link_service.get_latest_publication_date()
-        except DatabaseConnectionError:
-            # エラーが起きた場合現在日付を基準とする。
-            # このとき市の発表が16時になることが多いので16時より前なら前日を基準とする。
-            today = now.date()
-            if now.hour < 16:
-                today = today - relativedelta(days=1)
-
-        return today - relativedelta(days=1)
-
-
 class DailyTotalView(GraphView):
     """日別累計患者数グラフ
 
     Attributes:
-        yesterday (str): 直近の日付
+        today (str): 直近の日付
         most_recent (str): 直近の日別累積患者数
         day_before_most_recent (str): 直近の前日の日別累積患者数
         increase_from_day_before (str): 直近の前日からの増加数
@@ -257,11 +235,11 @@ class DailyTotalView(GraphView):
 
     def __init__(self):
         service = AsahikawaPatientService()
-        yesterday = self.get_yesterday()
+        today = self.get_today()
         self.__daily_total_data = service.get_aggregate_by_days(
-            from_date=yesterday - relativedelta(years=1), to_date=yesterday
+            from_date=today - relativedelta(years=1), to_date=today
         )
-        self.__yesterday = yesterday.strftime("%Y/%m/%d (%a)")
+        self.__today = self.format_date_style(today)
         most_recent = self.__daily_total_data[-1][1]
         seven_days_before_most_recent = self.__daily_total_data[-8][1]
         increase_from_seven_days_before = most_recent - seven_days_before_most_recent
@@ -274,8 +252,8 @@ class DailyTotalView(GraphView):
         )
 
     @property
-    def yesterday(self) -> str:
-        return self.__yesterday
+    def today(self) -> str:
+        return self.__today
 
     @property
     def most_recent(self) -> str:
@@ -347,7 +325,7 @@ class MonthTotalView(GraphView):
     """月別累計患者数グラフ
 
     Attributes:
-        yesterday (str): 直近の日付
+        today (str): 直近の日付
         this_month (str): 今月の月別累積患者数
         last_month (str): 前月の日別累積患者数
         increase_from_last_month (str): 前月からの増加数
@@ -356,11 +334,11 @@ class MonthTotalView(GraphView):
 
     def __init__(self):
         service = AsahikawaPatientService()
-        yesterday = self.get_yesterday()
+        today = self.get_today()
         self.__month_total_data = service.get_total_by_months(
-            from_date=date(2020, 1, 1), to_date=yesterday
+            from_date=date(2020, 1, 1), to_date=today
         )
-        self.__yesterday = yesterday.strftime("%Y/%m/%d (%a)")
+        self.__today = self.format_date_style(today)
         this_month = self.__month_total_data[-1][1]
         last_month = self.__month_total_data[-2][1]
         increase_from_last_month = this_month - last_month
@@ -369,8 +347,8 @@ class MonthTotalView(GraphView):
         self.__increase_from_last_month = "{:+,}".format(increase_from_last_month)
 
     @property
-    def yesterday(self) -> str:
-        return self.__yesterday
+    def today(self) -> str:
+        return self.__today
 
     @property
     def this_month(self) -> str:
@@ -514,7 +492,7 @@ class MovingAverageView(GraphView):
     """1日あたり患者数の7日間移動平均グラフ
 
     Attributes:
-        yesterday (str): 直近の日付
+        today (str): 直近の日付
         this_week (str): 今週の平均患者数
         last_week (str): 先週の平均患者数
         increase_from_last_week (str): 先週からの増加数
@@ -523,9 +501,9 @@ class MovingAverageView(GraphView):
 
     def __init__(self):
         service = AsahikawaPatientService()
-        yesterday = self.get_yesterday()
+        today = self.get_today()
         self.__moving_average_data = service.get_seven_days_moving_average(
-            from_date=yesterday - relativedelta(days=90), to_date=yesterday
+            from_date=today - relativedelta(days=90), to_date=today
         )
         this_week = self.__moving_average_data[-1][1]
         last_week = self.__moving_average_data[-2][1]
@@ -608,7 +586,7 @@ class PerHundredThousandPopulationView(GraphView):
     """1週間の人口10万人あたり患者数グラフ
 
     Attributes:
-        yesterday (str): 直近の日付
+        today (str): 直近の日付
         this_week (str): 今週の人口10万人あたり患者数
         last_week (str): 先週の人口10万人あたり患者数
         increase_from_last_week (str): 先週からの増加数
@@ -620,17 +598,17 @@ class PerHundredThousandPopulationView(GraphView):
     def __init__(self):
         service = AsahikawaPatientService()
         sapporo_service = SapporoPatientsNumberService()
-        yesterday = self.get_yesterday()
+        today = self.get_today()
         self.__per_hundred_thousand_population_data = (
             service.get_per_hundred_thousand_population_per_week(
-                from_date=yesterday - relativedelta(weeks=16, days=-1),
-                to_date=yesterday,
+                from_date=today - relativedelta(weeks=16, days=-1),
+                to_date=today,
             )
         )
         self.__sapporo_per_hundred_thousand_population_data = (
             sapporo_service.get_per_hundred_thousand_population_per_week(
-                from_date=yesterday - relativedelta(weeks=16, days=-1),
-                to_date=yesterday,
+                from_date=today - relativedelta(weeks=16, days=-1),
+                to_date=today,
             )
         )
         this_week = self.__per_hundred_thousand_population_data[-1][1]
@@ -783,9 +761,9 @@ class WeeklyPerAgeView(GraphView):
 
     def __init__(self):
         service = AsahikawaPatientService()
-        yesterday = self.get_yesterday()
+        today = self.get_today()
         df = service.get_aggregate_by_weeks_per_age(
-            from_date=yesterday - relativedelta(weeks=4, days=-1), to_date=yesterday
+            from_date=today - relativedelta(weeks=4, days=-1), to_date=today
         )
         self.__aggregate_by_weeks_per_age = df
 

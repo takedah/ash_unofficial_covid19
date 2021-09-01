@@ -163,7 +163,6 @@ def import_sapporo_patients_number(url: str) -> None:
 
 if __name__ == "__main__":
     import_asahikawa_data_from_press_release(Config.OVERVIEW_URL, 2021)
-    # import_hokkaido_patients(Config.HOKKAIDO_URL)
     download_lists = [
         (Config.NOV2020_OR_EARLIER_URL, 2020),
         (Config.DEC2020_DATA_URL, 2020),
@@ -174,7 +173,9 @@ if __name__ == "__main__":
         (Config.MAY2021_DATA_URL, 2021),
         (Config.JUN2021_DATA_URL, 2021),
         (Config.JUL2021_DATA_URL, 2021),
+        (Config.AUG2021_DATA_URL, 2021),
         (Config.LATEST_DATA_URL, 2021),
     ]
     import_asahikawa_patients(download_lists)
     import_sapporo_patients_number(Config.SAPPORO_URL)
+    import_hokkaido_patients(Config.HOKKAIDO_URL)

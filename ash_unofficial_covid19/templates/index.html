@@ -10,7 +10,7 @@
       </div>
       <div class="card-body">
         <p><img src="./daily_total.png" alt="{{ daily_total.get_graph_alt() }}" title="新規感染者数（日別）の推移" class="img-fluid"></p>
-        <p class="card-text text-right mb-0">{{ press_release_link.latest_publication_date }} 発表分の新規患者数</p>
+        <p class="card-text text-right mb-0">{{ daily_total.today }} 発表分の新規患者数</p>
         <p class="card-text text-right mb-0"><strong class="display-4">{{ daily_total.most_recent }}</strong>人</p>
         <p class="card-text text-right">（先週の同じ曜日と比べて {{ daily_total.increase_from_seven_days_before }}人）</p>
       </div>
@@ -103,7 +103,7 @@
       </div>
       <div class="card-body">
         <p><img src="./month_total.png" alt="{{ month_total.get_graph_alt() }}" title="累計感染者数（月別）の推移" class="img-fluid"></p>
-        <p class="card-text text-right mb-0">{{ month_total.yesterday }} までの累計患者数</p>
+        <p class="card-text text-right mb-0">{{ month_total.today }} までの累計患者数</p>
         <p class="card-text text-right mb-0"><strong class="display-4">{{ month_total.this_month }}</strong>人</p>
         <p class="card-text text-right">（先月 {{ month_total.increase_from_last_month }}人）</p>
       </div>

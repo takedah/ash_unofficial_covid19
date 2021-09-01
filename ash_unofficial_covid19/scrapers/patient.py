@@ -115,7 +115,7 @@ class ScrapeAsahikawaPatients(Scraper):
                 + ";"
             )
             publication_date = self.format_date(
-                    date_string=row[2], target_year=self.target_year
+                date_string=row[2], target_year=self.target_year
             )
             # 旭川市公式ホームページの陽性患者データの日付は判明日（前日）のため、
             # 公表日に修正する。
