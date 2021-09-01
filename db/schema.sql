@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS asahikawa_patients;
 CREATE TABLE asahikawa_patients(
-    id SERIAL PRIMARY KEY NOT NULL,
-    patient_number INTEGER UNIQUE NOT NULL,
+    id SERIAL NOT NULL,
+    patient_number INTEGER NOT NULL PRIMARY KEY,
     city_code CHAR(6),
     prefecture VARCHAR(16),
     city_name VARCHAR(16),
@@ -21,10 +21,11 @@ CREATE TABLE asahikawa_patients(
     close_contact TEXT,
     updated_at TIMESTAMPTZ NOT NULL
 );
+CREATE INDEX ON asahikawa_patients (publication_date);
 DROP TABLE IF EXISTS hokkaido_patients;
 CREATE TABLE hokkaido_patients(
-    id SERIAL PRIMARY KEY NOT NULL,
-    patient_number INTEGER UNIQUE NOT NULL,
+    id SERIAL NOT NULL,
+    patient_number INTEGER NOT NULL PRIMARY KEY,
     city_code CHAR(6),
     prefecture VARCHAR(16),
     city_name VARCHAR(16),
@@ -55,25 +56,26 @@ CREATE TABLE medical_institutions(
     updated_at TIMESTAMPTZ NOT NULL,
     PRIMARY KEY(name, target_age)
 );
+CREATE INDEX ON medical_institutions (area);
 DROP TABLE IF EXISTS locations;
 CREATE TABLE locations(
-    id SERIAL PRIMARY KEY NOT NULL,
-    medical_institution_name VARCHAR(128) UNIQUE NOT NULL,
+    id SERIAL NOT NULL,
+    medical_institution_name VARCHAR(128) NOT NULL PRIMARY KEY,
     longitude FLOAT,
     latitude FLOAT,
     updated_at TIMESTAMPTZ NOT NULL
 );
 DROP TABLE IF EXISTS press_release_links;
 CREATE TABLE press_release_links(
-    id SERIAL PRIMARY KEY NOT NULL,
-    url VARCHAR(2083) UNIQUE NOT NULL,
-    publication_date DATE NOT NULL,
+    id SERIAL NOT NULL,
+    url VARCHAR(2083) NOT NULL,
+    publication_date DATE NOT NULL PRIMARY KEY,
     updated_at TIMESTAMPTZ NOT NULL
 );
 DROP TABLE IF EXISTS sapporo_patients_numbers;
 CREATE TABLE sapporo_patients_numbers(
-    id SERIAL PRIMARY KEY NOT NULL,
-    publication_date DATE UNIQUE NOT NULL,
+    id SERIAL NOT NULL,
+    publication_date DATE NOT NULL PRIMARY KEY,
     patients_number INTEGER NOT NULL,
     updated_at TIMESTAMPTZ NOT NULL
 );

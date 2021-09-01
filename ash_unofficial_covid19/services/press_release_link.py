@@ -42,7 +42,7 @@ class PressReleaseLinkService(Service):
         # データベースへ登録処理
         self.upsert(
             items=items,
-            primary_key="url",
+            primary_key="publication_date",
             data_lists=data_lists,
         )
 
