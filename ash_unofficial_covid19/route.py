@@ -106,7 +106,7 @@ def get_weekly_per_age():
 def index():
     return render_template(
         "index.html",
-        title="旭川市内の最新感染動向",
+        title="旭川市内感染状況の最新動向",
         gtag_id=Config.GTAG_ID,
         asahikawa_patients=get_asahikawa_patients(),
         daily_total=get_daily_total(),
