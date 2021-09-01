@@ -2,8 +2,6 @@ import csv
 from datetime import date, datetime
 from typing import Optional
 
-from dateutil.relativedelta import relativedelta
-
 from ash_unofficial_covid19.scrapers.downloader import DownloadedCSV
 from ash_unofficial_covid19.scrapers.scraper import Scraper
 
@@ -75,10 +73,9 @@ class ScrapeSapporoPatientsNumber(Scraper):
         except (TypeError, ValueError):
             return None
 
-        # 陽性患者数CSVのデータの日付は発表日のため、実際の判明日である前日を返す
         return date(
             formatted_datetime.year, formatted_datetime.month, formatted_datetime.day
-        ) - relativedelta(days=1)
+        )
 
     def _extract_patients_number_data(self, row: list) -> Optional[dict]:
         """札幌市の新型コロナウイルス感染症日別患者数データへの変換

@@ -114,14 +114,20 @@ class ScrapeAsahikawaPatients(Scraper):
                 + row[7]
                 + ";"
             )
+            publication_date = self.format_date(
+                    date_string=row[2], target_year=self.target_year
+            )
+            # 旭川市公式ホームページの陽性患者データの日付は判明日（前日）のため、
+            # 公表日に修正する。
+            if publication_date:
+                publication_date = publication_date + relativedelta(days=1)
+
             patient_data = {
                 "patient_number": patient_number,
                 "city_code": "012041",  # 旭川市の総務省の全国地方公共団体コード
                 "prefecture": "北海道",
                 "city_name": "旭川市",
-                "publication_date": self.format_date(
-                    date_string=row[2], target_year=self.target_year
-                ),
+                "publication_date": publication_date,
                 "onset_date": None,  # 元データにないため空とする
                 "residence": row[5],
                 "age": self.format_age(row[3]),
@@ -392,7 +398,7 @@ class ScrapeAsahikawaPatientsPDF(Scraper):
             "city_code": "01241",
             "prefecture": "北海道",
             "city_name": "旭川市",
-            "publication_date": self.publication_date - relativedelta(days=1),
+            "publication_date": self.publication_date,
             "onset_date": None,
             "residence": row[4],
             "age": self.format_age(row[5]),

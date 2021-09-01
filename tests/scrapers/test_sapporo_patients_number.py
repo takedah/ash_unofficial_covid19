@@ -36,15 +36,15 @@ class TestScrapeSapporoPatientsNumber(unittest.TestCase):
         result = csv_data.lists
         expect = [
             {
-                "publication_date": date(2020, 2, 13),
+                "publication_date": date(2020, 2, 14),
                 "patients_number": 1,
             },
             {
-                "publication_date": date(2020, 2, 14),
+                "publication_date": date(2020, 2, 15),
                 "patients_number": 0,
             },
             {
-                "publication_date": date(2021, 8, 29),
+                "publication_date": date(2021, 8, 30),
                 "patients_number": 134,
             },
         ]
