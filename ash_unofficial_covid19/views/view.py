@@ -827,7 +827,7 @@ class WeeklyPerAgeView(GraphView):
             )
         ax.tick_params(labelsize=8)
         ax.set_title("旭川市年代別新規感染者数の推移（週別）", font_properties=font)
-        ax.legend(df.index.tolist(), prop=legend_font)
+        ax.legend(df.index.tolist(), prop=legend_font, loc=4)
         fig.tight_layout()
         canvas = FigureCanvasAgg(fig)
         im = BytesIO()
