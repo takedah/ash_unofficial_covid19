@@ -114,6 +114,7 @@ def index():
         per_hundred_thousand_population=get_per_hundred_thousand_population(),
         month_total=get_month_total(),
         by_age=get_by_age(),
+        leaflet=False,
     )
 
 
@@ -123,6 +124,7 @@ def about():
         "about.html",
         title="このサイトについて",
         gtag_id=Config.GTAG_ID,
+        leaflet=False,
     )
 
 
@@ -138,6 +140,7 @@ def opendata():
         rows=results[0].items,
         max_page=results[1],
         page=1,
+        leaflet=False,
     )
 
 
@@ -162,6 +165,7 @@ def opendata_pages(page):
         rows=results[0].items,
         max_page=max_page,
         page=page,
+        leaflet=False,
     )
 
 
@@ -177,6 +181,7 @@ def medical_institutions():
         medical_institutions=medical_institutions,
         above_16_area_list=above_16_area_list,
         below_15_area_list=below_15_area_list,
+        leaflet=False,
     )
 
 
@@ -200,6 +205,7 @@ def medical_institutions_areas(area):
         search_lengths=search_lengths,
         above_16_area_list=above_16_area_list,
         below_15_area_list=below_15_area_list,
+        leaflet=True,
     )
 
 
@@ -223,6 +229,7 @@ def pediatric_medical_institutions_areas(area):
         search_lengths=search_lengths,
         above_16_area_list=above_16_area_list,
         below_15_area_list=below_15_area_list,
+        leaflet=True,
     )
 
 
@@ -336,7 +343,15 @@ def get_weekly_per_age_graph():
 @app.errorhandler(404)
 def not_found(error):
     title = "404 Page Not Found."
-    return render_template("404.html", title=title, gtag_id=Config.GTAG_ID), 404
+    return (
+        render_template(
+            "404.html",
+            title=title,
+            gtag_id=Config.GTAG_ID,
+            leaflet=False,
+        ),
+        404,
+    )
 
 
 if __name__ == "__main__":
