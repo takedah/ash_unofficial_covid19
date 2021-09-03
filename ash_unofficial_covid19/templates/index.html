@@ -9,7 +9,7 @@
         新規感染者数（日別）
       </div>
       <div class="card-body">
-        <p><img src="./daily_total.png" alt="{{ daily_total.get_graph_alt() }}" title="新規感染者数（日別）の推移" class="img-fluid"></p>
+        <p><img src="./daily_total.png" alt="{{ daily_total.get_graph_alt() }}" title="新規感染者数（日別）の推移" class="img-fluid" decoding="async"></p>
         <p class="card-text text-right mb-0">{{ daily_total.today }} 発表分の新規感染者数</p>
         <p class="card-text text-right mb-0"><strong class="display-4">{{ daily_total.most_recent }}</strong>人</p>
         <p class="card-text text-right">（先週の同じ曜日と比べて {{ daily_total.increase_from_seven_days_before }}人）</p>
@@ -23,7 +23,7 @@
         1週間の人口10万人あたり新規感染者数
       </div>
       <div class="card-body">
-        <p><img src="./per_hundred_thousand_population.png" alt="{{ per_hundred_thousand_population.get_graph_alt() }}" title="1日あたり新規患者数の7日間移動平均の推移" class="img-fluid"></p>
+        <p><img src="./per_hundred_thousand_population.png" alt="{{ per_hundred_thousand_population.get_graph_alt() }}" title="1日あたり新規患者数の7日間移動平均の推移" class="img-fluid" decoding="async"></p>
         <p class="card-text text-right mb-0">1週間の人口10万人あたり新規感染者数</p>
         <p class="card-text text-right mb-0"><strong class="display-4">{{ per_hundred_thousand_population.this_week }}</strong>人</p>
         <p class="card-text text-right">（先週 {{ per_hundred_thousand_population.increase_from_last_week }}人）</p>
@@ -77,7 +77,7 @@
         1週間ごとの年代別新規感染者数の内訳
       </div>
       <div class="card-body">
-        <p><img src="./weekly_per_age.png" alt="{{ weekly_per_age.get_graph_alt() }}" title="1週間ごとの年代別新規感染者数の推移" class="img-fluid"></p>
+        <p><img src="./weekly_per_age.png" alt="{{ weekly_per_age.get_graph_alt() }}" title="1週間ごとの年代別新規感染者数の推移" class="img-fluid" decoding="async"></p>
       </div>
       <div class="card-footer text-muted bg-white">
         <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted" target="_blank">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a> 最終更新: {{ asahikawa_patients.last_updated }}</p>
@@ -90,7 +90,7 @@
         これまでの年代別感染者数の割合
       </div>
       <div class="card-body">
-        <p><img src="./by_age.png" alt="{{ by_age.get_graph_alt() }}" title="年代別感染者数の割合" class="img-fluid"></p>
+        <p><img src="./by_age.png" alt="{{ by_age.get_graph_alt() }}" title="年代別感染者数の割合" class="img-fluid" decoding="async"></p>
         <p class="card-text text-right">※年代非公表の人数を除く。</p>
       </div>
       <div class="card-footer text-muted bg-white">
@@ -102,7 +102,7 @@
         累計感染者数（月別）
       </div>
       <div class="card-body">
-        <p><img src="./month_total.png" alt="{{ month_total.get_graph_alt() }}" title="累計感染者数（月別）の推移" class="img-fluid"></p>
+        <p><img src="./month_total.png" alt="{{ month_total.get_graph_alt() }}" title="累計感染者数（月別）の推移" class="img-fluid" decoding="async"></p>
         <p class="card-text text-right mb-0">{{ month_total.today }} までの累計患者数</p>
         <p class="card-text text-right mb-0"><strong class="display-4">{{ month_total.this_month }}</strong>人</p>
         <p class="card-text text-right">（先月 {{ month_total.increase_from_last_month }}人）</p>
