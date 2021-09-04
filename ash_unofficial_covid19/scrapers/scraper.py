@@ -95,7 +95,7 @@ class Scraper(metaclass=ABCMeta):
             return ""
 
     @classmethod
-    def format_date(self, date_string: str, target_year: int) -> Optional[date]:
+    def format_date(cls, date_string: str, target_year: int) -> Optional[date]:
         """元データに年のデータがないためこれを加えてdatetime.dateに変換
 
         Args:
@@ -107,7 +107,7 @@ class Scraper(metaclass=ABCMeta):
 
         """
         try:
-            date_string = self.z2h_number(date_string.replace(" ", "").replace("　", ""))
+            date_string = cls.z2h_number(date_string.replace(" ", "").replace("　", ""))
             matched_texts = re.match("([0-9]+)月([0-9]+)日", date_string)
             if matched_texts is None:
                 return None
@@ -119,7 +119,7 @@ class Scraper(metaclass=ABCMeta):
             return None
 
     @classmethod
-    def format_age(self, age_string: str) -> str:
+    def format_age(cls, age_string: str) -> str:
         """患者の年代表記をオープンデータ定義書の仕様に合わせる。
 
         Args:
@@ -129,7 +129,7 @@ class Scraper(metaclass=ABCMeta):
             formatted_age (str): 修正後の患者の年代表記
 
         """
-        age_string = self.z2h_number(age_string)
+        age_string = cls.z2h_number(age_string)
         if age_string is None:
             return ""
         if age_string == "非公表" or age_string == "調査中":
@@ -148,8 +148,8 @@ class Scraper(metaclass=ABCMeta):
         else:
             return str(age) + "代"
 
-    @classmethod
-    def format_sex(self, sex_string: str) -> str:
+    @staticmethod
+    def format_sex(sex_string: str) -> str:
         """患者の性別表記をオープンデータ定義書の仕様に合わせる。
 
         Args:
