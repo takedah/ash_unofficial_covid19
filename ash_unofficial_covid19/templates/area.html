@@ -3,7 +3,7 @@
 <article>
   <h1 class="h4 py-3">{{ title }}</h1>
   <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <p class="mb-0">{{ medical_institutions.last_updated }}にダウンロードしたデータを元に表示しています。正確な情報は必ず<a class="alert-link" href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/146/149/d073389.html" title="旭川市公式ホームページ" target="_blank">旭川市公式ホームページ</a>を確認してください。</p>
+    <p class="mb-0">{{ last_updated }}にダウンロードしたデータを元に表示しています。正確な情報は必ず<a class="alert-link" href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/146/149/d073389.html" title="旭川市公式ホームページ" target="_blank">旭川市公式ホームページ</a>を確認してください。</p>
     <button type="button" class="close" data-dismiss="alert" aria-label="close">
       <span aria-hidden="true">&times;</span>
     </button>
@@ -24,14 +24,14 @@
               </tr>
             </thead>
             <tbody id="results" data-length="{{ search_lengths|tojson }}">
-              {% for row in search_results %}
-              <tr id="order{{ loop.index }}" data-latitude="{{ row[6]|tojson }}" data-longitude="{{ row[7]|tojson }}" data-name="{{ row[0]|safe }}">
-                <td class="text-nowrap">{{ row[0] }}</td>
-                <td class="text-nowrap">{{ row[1] }}</td>
-                <td class="text-nowrap">{{ row[2] }}</td>
-                <td>{{ "OK" if row[3] else "NG"}}</td>
-                <td>{{ "OK" if row[4] else "NG"}}</td>
-                <td class="text-nowrap">{{ row[5] }}</td>
+              {% for medical_institution in medical_institutions %}
+              <tr id="order{{ loop.index }}" data-latitude="{{ medical_institution[6]|tojson }}" data-longitude="{{ medical_institution[7]|tojson }}" data-name="{{ medical_institution[0]|safe }}">
+                <td class="text-nowrap">{{ medical_institution[0] }}</td>
+                <td class="text-nowrap">{{ medical_institution[1] }}</td>
+                <td class="text-nowrap">{{ medical_institution[2] }}</td>
+                <td>{{ "OK" if medical_institution[3] else "NG"}}</td>
+                <td>{{ "OK" if medical_institution[4] else "NG"}}</td>
+                <td class="text-nowrap">{{ medical_institution[5] }}</td>
               </tr>
               {% endfor %}
             </tbody>

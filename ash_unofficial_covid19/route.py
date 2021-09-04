@@ -9,6 +9,7 @@ from flask import (
     render_template,
     url_for
 )
+from flask_caching import Cache
 
 from ash_unofficial_covid19.config import Config
 from ash_unofficial_covid19.errors import ServiceError
@@ -23,7 +24,9 @@ from ash_unofficial_covid19.views.view import (
     WeeklyPerAgeView
 )
 
+cache = Cache(config={"CACHE_TYPE": "simple"})
 app = Flask(__name__)
+cache.init_app(app)
 
 
 @app.after_request
@@ -62,41 +65,49 @@ def dated_url_for(endpoint, **values):
     return url_for(endpoint, **values)
 
 
+@cache.cached(timeout=180, key_prefix="asahikawa_patients")
 def get_asahikawa_patients():
     g.asahikawa_patients = AsahikawaPatientsView()
     return g.asahikawa_patients
 
 
+@cache.cached(timeout=180, key_prefix="medical_institutions")
 def get_medical_institutions():
     g.medical_institutions = MedicalInstitutionsView()
     return g.medical_institutions
 
 
+@cache.cached(timeout=180, key_prefix="daily_total")
 def get_daily_total():
     g.daily_total = DailyTotalView()
     return g.daily_total
 
 
+@cache.cached(timeout=180, key_prefix="month_total")
 def get_month_total():
     g.month_total = MonthTotalView()
     return g.month_total
 
 
+@cache.cached(timeout=180, key_prefix="by_age")
 def get_by_age():
     g.by_age = ByAgeView()
     return g.by_age
 
 
+@cache.cached(timeout=180, key_prefix="moving_average")
 def get_moving_average():
     g.moving_average = MovingAverageView()
     return g.moving_average
 
 
+@cache.cached(timeout=180, key_prefix="per_hundred_thousand_population")
 def get_per_hundred_thousand_population():
     g.per_hundred_thousand_population = PerHundredThousandPopulationView()
     return g.per_hundred_thousand_population
 
 
+@cache.cached(timeout=180, key_prefix="weekly_per_age")
 def get_weekly_per_age():
     g.weekly_per_age = WeeklyPerAgeView()
     return g.weekly_per_age
@@ -136,8 +147,8 @@ def opendata():
         "opendata.html",
         title="感染者の状況（非公式オープンデータ）",
         gtag_id=Config.GTAG_ID,
-        asahikawa_patients=asahikawa_patients,
-        rows=results[0].items,
+        last_updated=asahikawa_patients.last_updated,
+        patients=results[0],
         max_page=results[1],
         page=1,
         leaflet=False,
@@ -155,15 +166,14 @@ def opendata_pages(page):
         results = asahikawa_patients.get_rows(page=page)
     except ServiceError:
         abort(404)
-    max_page = results[1]
-    title = "非公式オープンデータ（陽性者属性CSV）全" + str(max_page) + "ページ中" + str(page) + "ページ目"
+    title = "非公式オープンデータ（陽性者属性CSV）全" + str(results[1]) + "ページ中" + str(page) + "ページ目"
     return render_template(
         "opendata.html",
         title=title,
         gtag_id=Config.GTAG_ID,
-        asahikawa_patients=asahikawa_patients,
-        rows=results[0].items,
-        max_page=max_page,
+        last_updated=asahikawa_patients.last_updated,
+        patients=results[0],
+        max_page=results[1],
         page=page,
         leaflet=False,
     )
@@ -172,15 +182,13 @@ def opendata_pages(page):
 @app.route("/medical_institutions")
 def medical_institutions():
     medical_institutions = get_medical_institutions()
-    above_16_area_list = medical_institutions.get_area_list()
-    below_15_area_list = medical_institutions.get_area_list(is_pediatric=True)
     return render_template(
         "medical_institutions.html",
         title="新型コロナワクチン接種医療機関一覧",
         gtag_id=Config.GTAG_ID,
-        medical_institutions=medical_institutions,
-        above_16_area_list=above_16_area_list,
-        below_15_area_list=below_15_area_list,
+        last_updated=medical_institutions.last_updated,
+        above_16_area_list=medical_institutions.get_area_list(),
+        below_15_area_list=medical_institutions.get_area_list(is_pediatric=True),
         leaflet=False,
     )
 
@@ -188,23 +196,30 @@ def medical_institutions():
 @app.route("/medical_institutions/<area>")
 def medical_institutions_areas(area):
     medical_institutions = get_medical_institutions()
-    area = escape(area)
-    search_results = medical_institutions.get_locations(area=area)
+    try:
+        area = escape(area)
+    except ValueError:
+        abort(404)
+
+    try:
+        search_results = medical_institutions.get_locations(area=area)
+    except ServiceError:
+        abort(404)
+
     search_lengths = len(search_results)
     if search_lengths == 0:
         abort(404)
-    above_16_area_list = medical_institutions.get_area_list()
-    below_15_area_list = medical_institutions.get_area_list(is_pediatric=True)
+
     return render_template(
         "area.html",
         title=area + "の新型コロナワクチン接種医療機関一覧（16歳以上）",
         gtag_id=Config.GTAG_ID,
-        medical_institutions=medical_institutions,
+        last_updated=medical_institutions.last_updated,
         area=area,
-        search_results=search_results,
+        medical_institutions=search_results,
         search_lengths=search_lengths,
-        above_16_area_list=above_16_area_list,
-        below_15_area_list=below_15_area_list,
+        above_16_area_list=medical_institutions.get_area_list(),
+        below_15_area_list=medical_institutions.get_area_list(is_pediatric=True),
         leaflet=True,
     )
 
@@ -212,23 +227,32 @@ def medical_institutions_areas(area):
 @app.route("/medical_institutions/pediatrics/<area>")
 def pediatric_medical_institutions_areas(area):
     medical_institutions = get_medical_institutions()
-    area = escape(area)
-    search_results = medical_institutions.get_locations(area=area, is_pediatric=True)
+    try:
+        area = escape(area)
+    except ValueError:
+        abort(404)
+
+    try:
+        search_results = medical_institutions.get_locations(
+            area=area, is_pediatric=True
+        )
+    except ServiceError:
+        abort(404)
+
     search_lengths = len(search_results)
     if search_lengths == 0:
         abort(404)
-    above_16_area_list = medical_institutions.get_area_list()
-    below_15_area_list = medical_institutions.get_area_list(is_pediatric=True)
+
     return render_template(
         "area.html",
         title=area + "の新型コロナワクチン接種医療機関一覧（12歳から15歳まで）",
         gtag_id=Config.GTAG_ID,
-        medical_institutions=medical_institutions,
+        last_updated=medical_institutions.last_updated,
         area=area,
-        search_results=search_results,
+        medical_institutions=search_results,
         search_lengths=search_lengths,
-        above_16_area_list=above_16_area_list,
-        below_15_area_list=below_15_area_list,
+        above_16_area_list=medical_institutions.get_area_list(),
+        below_15_area_list=medical_institutions.get_area_list(is_pediatric=True),
         leaflet=True,
     )
 
@@ -260,6 +284,7 @@ def medical_institutions_csv():
 
 
 @app.route("/daily_total.png")
+@cache.cached(timeout=180)
 def get_daily_total_graph():
     daily_total = get_daily_total()
     graph_image = daily_total.get_graph_image()
@@ -271,6 +296,7 @@ def get_daily_total_graph():
 
 
 @app.route("/daily_total_for_card.png")
+@cache.cached(timeout=180)
 def get_daily_total_graph_for_card():
     daily_total = get_daily_total()
     graph_image = daily_total.get_graph_image(figsize=(6.0, 3.15))
@@ -284,6 +310,7 @@ def get_daily_total_graph_for_card():
 
 
 @app.route("/month_total.png")
+@cache.cached(timeout=180)
 def get_month_total_graph():
     month_total = get_month_total()
     graph_image = month_total.get_graph_image()
@@ -295,6 +322,7 @@ def get_month_total_graph():
 
 
 @app.route("/by_age.png")
+@cache.cached(timeout=180)
 def get_by_age_graph():
     by_age = get_by_age()
     graph_image = by_age.get_graph_image()
@@ -306,6 +334,7 @@ def get_by_age_graph():
 
 
 @app.route("/moving_average.png")
+@cache.cached(timeout=180)
 def get_moving_average_graph():
     moving_average = get_moving_average()
     graph_image = moving_average.get_graph_image()
@@ -317,6 +346,7 @@ def get_moving_average_graph():
 
 
 @app.route("/per_hundred_thousand_population.png")
+@cache.cached(timeout=180)
 def get_per_hundred_thousand_population_graph():
     per_hundred_thousand_population = get_per_hundred_thousand_population()
     graph_image = per_hundred_thousand_population.get_graph_image()
@@ -330,6 +360,7 @@ def get_per_hundred_thousand_population_graph():
 
 
 @app.route("/weekly_per_age.png")
+@cache.cached(timeout=180)
 def get_weekly_per_age_graph():
     weekly_per_age = get_weekly_per_age()
     graph_image = weekly_per_age.get_graph_image()

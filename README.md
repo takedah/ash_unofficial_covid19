@@ -24,6 +24,7 @@
 - Java Runtime (8 or later)
 - BeautifulSoup4
 - flask
+- Flask-Caching
 - gunicorn
 - psycopg2
 - requests
