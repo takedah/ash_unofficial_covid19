@@ -1,4 +1,6 @@
+import csv
 from datetime import datetime
+from io import StringIO
 
 import psycopg2
 from psycopg2.extras import DictCursor, execute_values
@@ -134,3 +136,19 @@ class Service:
             self.__logger.error(message)
         else:
             self.__logger.info("エラーメッセージの指定が正しくない")
+
+    @staticmethod
+    def get_csv(csv_rows) -> StringIO:
+        """グラフのデータをCSVで返す
+
+        Args:
+            csv_rows (list of list): CSVにしたいデータを二次元配列で指定
+
+        Returns:
+            csv_data (StringIO): グラフのCSVデータ
+
+        """
+        f = StringIO()
+        writer = csv.writer(f, quoting=csv.QUOTE_ALL, lineterminator="\n")
+        writer.writerows(csv_rows)
+        return f

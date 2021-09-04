@@ -1,4 +1,3 @@
-import csv
 import re
 import urllib.parse
 from abc import ABCMeta, abstractmethod
@@ -54,10 +53,7 @@ class AsahikawaPatientsView:
 
         """
         csv_rows = self.__service.get_csv_rows()
-        f = StringIO()
-        writer = csv.writer(f, quoting=csv.QUOTE_ALL, lineterminator="\n")
-        writer.writerows(csv_rows)
-        return f
+        return self.__service.get_csv(csv_rows)
 
     def get_rows(self, page: int = 1, desc: bool = True) -> tuple:
         """グラフのデータをオブジェクトデータのリストで返す
@@ -139,10 +135,7 @@ class MedicalInstitutionsView:
 
         """
         csv_rows = self.__service.get_csv_rows()
-        f = StringIO()
-        writer = csv.writer(f, quoting=csv.QUOTE_ALL, lineterminator="\n")
-        writer.writerows(csv_rows)
-        return f
+        return self.__service.get_csv(csv_rows)
 
 
 class GraphView(metaclass=ABCMeta):
