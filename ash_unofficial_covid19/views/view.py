@@ -156,7 +156,8 @@ class GraphView(metaclass=ABCMeta):
     def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
         pass
 
-    def get_today(self) -> date:
+    @staticmethod
+    def get_today() -> date:
         """グラフの基準となる最新の報道発表日の日付を返す
 
         Returns:
@@ -176,7 +177,8 @@ class GraphView(metaclass=ABCMeta):
 
         return today
 
-    def format_date_style(self, target_date: date) -> str:
+    @staticmethod
+    def format_date_style(target_date: date) -> str:
         """datetime.dateを曜日を含めた文字列に変換
 
         Args:
