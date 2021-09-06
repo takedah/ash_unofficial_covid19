@@ -346,14 +346,20 @@ class ScrapeAsahikawaPatientsPDF(Scraper):
             # データフレームが空の場合スキップ
             if df.empty:
                 continue
+
             df.dropna(how="all", inplace=True)
             df.drop_duplicates(inplace=True)
             df.fillna("", inplace=True)
             pdf_table = df.values.tolist()
+            # リスト化した結果空リストだった場合スキップ
+            if pdf_table == []:
+                continue
+
             header_row = pdf_table[0]
             # 見出し行かどうかまず要素数で判定
             if len(header_row) < 3:
                 continue
+
             # 見出し行が決まった文字列の場合のみデータ抽出
             if header_row[1] == "市内番号" and header_row[2] == "道内番号":
                 for row in pdf_table[1:]:
