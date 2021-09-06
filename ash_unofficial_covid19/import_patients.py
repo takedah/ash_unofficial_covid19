@@ -1,7 +1,13 @@
 from datetime import date
 
 from ash_unofficial_covid19.config import Config
-from ash_unofficial_covid19.errors import HTTPDownloadError
+from ash_unofficial_covid19.errors import (
+    DatabaseConnectionError,
+    DataModelError,
+    HTTPDownloadError,
+    ScrapeError,
+    ServiceError
+)
 from ash_unofficial_covid19.models.patient import (
     AsahikawaPatientFactory,
     HokkaidoPatientFactory
@@ -44,13 +50,26 @@ def import_hokkaido_patients(url: str) -> None:
         url (str): 旭川市公式ホームページのURL
 
     """
-    scraped_data = ScrapeHokkaidoPatients(url)
+    try:
+        scraped_data = ScrapeHokkaidoPatients(url)
+    except (HTTPDownloadError, ScrapeError) as e:
+        print(e.message)
+        return
+
     patients_factory = HokkaidoPatientFactory()
-    for row in scraped_data.lists:
-        patients_factory.create(**row)
+    try:
+        for row in scraped_data.lists:
+            patients_factory.create(**row)
+    except DataModelError as e:
+        print(e.message)
+        return
 
     service = HokkaidoPatientService()
-    service.create(patients_factory)
+    try:
+        service.create(patients_factory)
+    except (DatabaseConnectionError, ServiceError) as e:
+        print(e.message)
+        return
 
 
 def import_asahikawa_patients(download_lists: list) -> None:
@@ -71,10 +90,16 @@ def import_asahikawa_patients(download_lists: list) -> None:
             scraped_data = ScrapeAsahikawaPatients(
                 html_url=url, target_year=target_year
             )
-        except HTTPDownloadError:
+        except (HTTPDownloadError, ScrapeError) as e:
+            print(e.message)
             continue
-        for row in scraped_data.lists:
-            patients_factory.create(**row)
+
+        try:
+            for row in scraped_data.lists:
+                patients_factory.create(**row)
+        except DataModelError as e:
+            print(e.message)
+            continue
 
     # HTMLに市内番号489の掲載が抜けているので手動で追加する
     additional_data = {
@@ -100,7 +125,11 @@ def import_asahikawa_patients(download_lists: list) -> None:
     patients_factory.create(**additional_data)
 
     service = AsahikawaPatientService()
-    service.create(patients_factory)
+    try:
+        service.create(patients_factory)
+    except (DatabaseConnectionError, ServiceError) as e:
+        print(e.message)
+        return
 
 
 def _import_press_release_link(url: str, target_year: int) -> None:
@@ -134,31 +163,58 @@ def import_asahikawa_data_from_press_release(url: str, target_year: int) -> None
         target_year (int): 対象年
 
     """
-    _import_press_release_link(url, target_year)
-    press_release_link_service = PressReleaseLinkService()
-    press_release_links = press_release_link_service.find_all()
-    latest_press_release_link = press_release_links.items[0]
-    publication_date = latest_press_release_link.publication_date
-    pdf_url = latest_press_release_link.url
+    try:
+        _import_press_release_link(url, target_year)
+    except (HTTPDownloadError, ScrapeError, DatabaseConnectionError, ServiceError) as e:
+        print(e.message)
+        return
 
-    scraped_data = ScrapeAsahikawaPatientsPDF(
-        pdf_url=pdf_url, publication_date=publication_date
-    )
+    press_release_link_service = PressReleaseLinkService()
+    try:
+        press_release_links = press_release_link_service.find_all()
+        latest_press_release_link = press_release_links.items[0]
+        publication_date = latest_press_release_link.publication_date
+        pdf_url = latest_press_release_link.url
+    except (DatabaseConnectionError, ServiceError) as e:
+        print(e.message)
+        return
+
+    try:
+        scraped_data = ScrapeAsahikawaPatientsPDF(
+            pdf_url=pdf_url, publication_date=publication_date
+        )
+    except (HTTPDownloadError, ScrapeError) as e:
+        print(e.message)
+        return
+
     service = AsahikawaPatientService()
-    for row in scraped_data.lists:
-        patients_factory = AsahikawaPatientFactory()
-        patients_factory.create(**row)
-        service.create(patients_factory)
+    try:
+        for row in scraped_data.lists:
+            patients_factory = AsahikawaPatientFactory()
+            patients_factory.create(**row)
+            service.create(patients_factory)
+    except (DatabaseConnectionError, ServiceError, DataModelError) as e:
+        print(e.message)
+        return
 
 
 def import_sapporo_patients_number(url: str) -> None:
-    scraped_data = ScrapeSapporoPatientsNumber(url)
+    try:
+        scraped_data = ScrapeSapporoPatientsNumber(url)
+    except (HTTPDownloadError, ScrapeError) as e:
+        print(e.message)
+        return
+
     service = SapporoPatientsNumberService()
     sapporo_patients_number_factory = SapporoPatientsNumberFactory()
     for row in scraped_data.lists:
         sapporo_patients_number_factory.create(**row)
 
-    service.create(sapporo_patients_number_factory)
+    try:
+        service.create(sapporo_patients_number_factory)
+    except (DatabaseConnectionError, ServiceError) as e:
+        print(e.message)
+        return
 
 
 if __name__ == "__main__":

@@ -1,6 +1,12 @@
 import time
 
 from ash_unofficial_covid19.config import Config
+from ash_unofficial_covid19.errors import (
+    DatabaseConnectionError,
+    HTTPDownloadError,
+    ScrapeError,
+    ServiceError
+)
 from ash_unofficial_covid19.models.location import LocationFactory
 from ash_unofficial_covid19.models.medical_institution import (
     MedicalInstitutionFactory
@@ -27,17 +33,31 @@ def import_medical_institutions(url: str) -> None:
     medical_institution_factory = MedicalInstitutionFactory()
 
     # 16歳以上
-    scraped_data = ScrapeMedicalInstitutions(html_url=url)
+    try:
+        scraped_data = ScrapeMedicalInstitutions(html_url=url)
+    except (HTTPDownloadError, ScrapeError) as e:
+        print(e.message)
+        return
+
     for row in scraped_data.lists:
         medical_institution_factory.create(**row)
 
     # 12歳から15歳まで
-    scraped_data = ScrapeMedicalInstitutions(html_url=url, is_pediatric=True)
+    try:
+        scraped_data = ScrapeMedicalInstitutions(html_url=url, is_pediatric=True)
+    except (HTTPDownloadError, ScrapeError) as e:
+        print(e.message)
+        return
+
     for row in scraped_data.lists:
         medical_institution_factory.create(**row)
 
     service = MedicalInstitutionService()
-    service.create(medical_institution_factory)
+    try:
+        service.create(medical_institution_factory)
+    except (DatabaseConnectionError, ServiceError) as e:
+        print(e.message)
+        return
 
 
 def import_locations() -> None:
@@ -46,18 +66,29 @@ def import_locations() -> None:
 
     """
     medical_institution_service = MedicalInstitutionService()
-    medical_institution_names = medical_institution_service.get_name_list()
+    try:
+        medical_institution_names = medical_institution_service.get_name_list()
+    except ServiceError as e:
+        print(e.message)
+        return
 
     locations_factory = LocationFactory()
     for medical_institution_name in medical_institution_names:
-        scraped_data = ScrapeYOLPLocation(medical_institution_name)
+        try:
+            scraped_data = ScrapeYOLPLocation(medical_institution_name)
+        except (HTTPDownloadError, ScrapeError):
+            continue
+
         # 1番目の検索結果を採用する
         row = scraped_data.lists[0]
         locations_factory.create(**row)
         time.sleep(1)
 
     service = LocationService()
-    service.create(locations_factory)
+    try:
+        service.create(locations_factory)
+    except (DatabaseConnectionError, ServiceError):
+        pass
 
     # YOLPで緯度経度を取得できなかった医療機関に手動で情報を追加
     fix_data = [
@@ -120,7 +151,12 @@ def import_locations() -> None:
     locations_factory = LocationFactory()
     for row in fix_data:
         locations_factory.create(**row)
-    service.create(locations_factory)
+
+    try:
+        service.create(locations_factory)
+    except (DatabaseConnectionError, ServiceError) as e:
+        print(e.message)
+        return
 
 
 if __name__ == "__main__":

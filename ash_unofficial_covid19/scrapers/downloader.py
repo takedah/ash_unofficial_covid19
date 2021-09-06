@@ -3,7 +3,8 @@ from io import BytesIO, StringIO
 from json import JSONDecodeError
 
 import requests
-from requests import HTTPError, Timeout
+from requests import ConnectionError, HTTPError, Timeout
+from urllib3.exceptions import MaxRetryError
 
 from ash_unofficial_covid19.errors import HTTPDownloadError
 from ash_unofficial_covid19.logs import AppLog
@@ -95,7 +96,7 @@ class DownloadedHTML(Downloader):
             requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += "HIGH:!DH"
             response = requests.get(url)
             self.info_log("HTMLファイルのダウンロードに成功しました。")
-        except (ConnectionError, Timeout, HTTPError):
+        except (ConnectionError, MaxRetryError, Timeout, HTTPError):
             message = "cannot connect to web server."
             self.error_log(message)
             raise HTTPDownloadError(message)
@@ -151,7 +152,7 @@ class DownloadedCSV(Downloader):
             response = requests.get(url)
             csv_io = StringIO(response.content.decode(encoding))
             self.info_log("CSVファイルのダウンロードに成功しました。")
-        except (ConnectionError, Timeout, HTTPError):
+        except (ConnectionError, MaxRetryError, Timeout, HTTPError):
             message = "cannot connect to web server."
             self.error_log(message)
             raise HTTPDownloadError(message)
@@ -207,7 +208,7 @@ class DownloadedPDF(Downloader):
             requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += "HIGH:!DH"
             response = requests.get(url)
             self.info_log("PDFファイルのダウンロードに成功しました。")
-        except (ConnectionError, Timeout, HTTPError):
+        except (ConnectionError, MaxRetryError, Timeout, HTTPError):
             message = "cannot connect to web server."
             self.error_log(message)
             raise HTTPDownloadError(message)
@@ -262,7 +263,7 @@ class DownloadedJSON(Downloader):
         try:
             response = requests.get(url)
             self.info_log("JSONファイルのダウンロードに成功しました。")
-        except (ConnectionError, Timeout, HTTPError):
+        except (ConnectionError, MaxRetryError, Timeout, HTTPError):
             message = "cannot connect to web server."
             self.error_log(message)
             raise HTTPDownloadError(message)

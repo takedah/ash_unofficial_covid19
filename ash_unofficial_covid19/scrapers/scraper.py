@@ -159,6 +159,8 @@ class Scraper(metaclass=ABCMeta):
             formatted_sex (str): 修正後の患者の性別表記
 
         """
+        if type(sex_string) is not str:
+            return ""
         if sex_string == "非公表" or sex_string == "調査中":
             return ""
         if sex_string == "その他":

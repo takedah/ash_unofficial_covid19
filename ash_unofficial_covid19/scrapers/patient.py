@@ -8,6 +8,7 @@ import tabula
 from bs4 import BeautifulSoup
 from dateutil.relativedelta import relativedelta
 
+from ash_unofficial_covid19.errors import ScrapeError
 from ash_unofficial_covid19.scrapers.downloader import (
     DownloadedCSV,
     DownloadedHTML,
@@ -69,14 +70,17 @@ class ScrapeAsahikawaPatients(Scraper):
         """
         soup = BeautifulSoup(downloaded_html.content, "html.parser")
         table_values = list()
-        for table in soup.find_all("table"):
-            for tr in table.find_all("tr"):
-                row = list()
-                for td in tr.find_all("td"):
-                    val = td.text.strip()
-                    row.append(val)
-                row = list(map(lambda x: self.format_string(x), row))
-                table_values.append(row)
+        try:
+            for table in soup.find_all("table"):
+                for tr in table.find_all("tr"):
+                    row = list()
+                    for td in tr.find_all("td"):
+                        val = td.text.strip()
+                        row.append(val)
+                    row = list(map(lambda x: self.format_string(x), row))
+                    table_values.append(row)
+        except AttributeError as e:
+            raise ScrapeError(e.args[0])
 
         return table_values
 
@@ -188,7 +192,11 @@ class ScrapeHokkaidoPatients(Scraper):
 
         """
         table_values = list()
-        reader = csv.reader(downloaded_csv.content)
+        try:
+            reader = csv.reader(downloaded_csv.content)
+        except csv.Error as e:
+            raise ScrapeError(e.args[0])
+
         for row in reader:
             table_values.append(row)
 
@@ -380,43 +388,52 @@ class ScrapeAsahikawaPatientsPDF(Scraper):
                 引数のリストが新型コロナウイルス陽性患者情報なら辞書にして返す
 
         """
-        search_patient_number = re.match("^([0-9]{,4})$", row[1].strip())
-        search_hokkaido_patient_number = re.match("^([0-9]{,5})$", row[2].strip())
+        try:
+            search_patient_number = re.match("^([0-9]{,4})$", row[1].strip())
+            search_hokkaido_patient_number = re.match("^([0-9]{,5})$", row[2].strip())
+        except IndexError:
+            return None
+
         if search_patient_number is None or search_hokkaido_patient_number is None:
             return None
+
         patient_number = int(search_patient_number.group(1))
         hokkaido_patient_number = int(search_hokkaido_patient_number.group(1))
-        surrounding_status = str(row[8])
-        close_contact = str(row[9])
-        note = (
-            "北海道発表No.;"
-            + str(hokkaido_patient_number)
-            + ";"
-            + "周囲の患者の発生;"
-            + surrounding_status
-            + ";"
-            + "濃厚接触者の状況;"
-            + close_contact
-            + ";"
-        )
-        patient_data = {
-            "patient_number": patient_number,
-            "city_code": "01241",
-            "prefecture": "北海道",
-            "city_name": "旭川市",
-            "publication_date": self.publication_date,
-            "onset_date": None,
-            "residence": row[4],
-            "age": self.format_age(row[5]),
-            "sex": self.format_sex(row[6]),
-            "occupation": None,
-            "status": None,
-            "symptom": None,
-            "overseas_travel_history": None,
-            "be_discharged": None,
-            "note": note,
-            "hokkaido_patient_number": hokkaido_patient_number,
-            "surrounding_status": surrounding_status,
-            "close_contact": close_contact,
-        }
+        try:
+            surrounding_status = str(row[8])
+            close_contact = str(row[9])
+            note = (
+                "北海道発表No.;"
+                + str(hokkaido_patient_number)
+                + ";"
+                + "周囲の患者の発生;"
+                + surrounding_status
+                + ";"
+                + "濃厚接触者の状況;"
+                + close_contact
+                + ";"
+            )
+            patient_data = {
+                "patient_number": patient_number,
+                "city_code": "01241",
+                "prefecture": "北海道",
+                "city_name": "旭川市",
+                "publication_date": self.publication_date,
+                "onset_date": None,
+                "residence": row[4],
+                "age": self.format_age(row[5]),
+                "sex": self.format_sex(row[6]),
+                "occupation": None,
+                "status": None,
+                "symptom": None,
+                "overseas_travel_history": None,
+                "be_discharged": None,
+                "note": note,
+                "hokkaido_patient_number": hokkaido_patient_number,
+                "surrounding_status": surrounding_status,
+                "close_contact": close_contact,
+            }
+        except IndexError:
+            return None
+
         return patient_data

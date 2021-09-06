@@ -39,7 +39,7 @@ class ServiceError(Error):
 
 
 class HTTPDownloadError(Error):
-    """Webページのスクレイピングに関するエラー
+    """Webページのダウンロードに関するエラー
 
     Attributes:
         message (str): エラーメッセージ
@@ -52,6 +52,18 @@ class HTTPDownloadError(Error):
 
 class DataModelError(Error):
     """データモデルの生成に関するエラー
+
+    Attributes:
+        message (str): エラーメッセージ
+
+    """
+
+    def __init__(self, message):
+        Error.__init__(self, message)
+
+
+class ScrapeError(Error):
+    """スクレイピング処理に関するエラー
 
     Attributes:
         message (str): エラーメッセージ
