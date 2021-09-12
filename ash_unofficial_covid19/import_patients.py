@@ -72,36 +72,34 @@ def import_hokkaido_patients(url: str) -> None:
         return
 
 
-def import_asahikawa_patients(download_lists: list) -> None:
+def import_asahikawa_patients(url: str, target_year: int) -> None:
     """
     旭川市公式ホームページから新型コロナウイルス感染症の感染者情報を、
     データベースへ格納する。
 
     Args:
-        download_lists (list of tuple): スクレイピング対象URLとデータの対象年を要素に
-            持つタプルを要素としたリスト
+        url (str): 旭川市公式ホームページのURL
+        target_year (int): 対象年
 
     """
     patients_factory = AsahikawaPatientFactory()
-    for download_list in download_lists:
-        url = download_list[0]
-        target_year = download_list[1]
-        try:
-            scraped_data = ScrapeAsahikawaPatients(
-                html_url=url, target_year=target_year
-            )
-        except (HTTPDownloadError, ScrapeError) as e:
-            print(e.message)
-            continue
+    try:
+        scraped_data = ScrapeAsahikawaPatients(html_url=url, target_year=target_year)
+    except (HTTPDownloadError, ScrapeError) as e:
+        print(e.message)
+        return
 
-        try:
-            for row in scraped_data.lists:
-                patients_factory.create(**row)
-        except DataModelError as e:
-            print(e.message)
-            continue
+    try:
+        for row in scraped_data.lists:
+            patients_factory.create(**row)
+    except DataModelError as e:
+        print(e.message)
+        return
 
-    # HTMLに市内番号489の掲載が抜けているので手動で追加する
+
+def import_additional_asahikawa_patients() -> None:
+    """HTMLに市内番号489の掲載が抜けているので手動で追加する"""
+    patients_factory = AsahikawaPatientFactory()
     additional_data = {
         "patient_number": 489,
         "city_code": "012041",
@@ -218,7 +216,14 @@ def import_sapporo_patients_number(url: str) -> None:
 
 
 if __name__ == "__main__":
+    import_asahikawa_patients(url=Config.LATEST_DATA_URL, target_year=2021)
     import_asahikawa_data_from_press_release(Config.OVERVIEW_URL, 2021)
+    import_sapporo_patients_number(Config.SAPPORO_URL)
+
+    # 全件ダウンロードし直す場合コメントアウトする
+    """
+    import_hokkaido_patients(Config.HOKKAIDO_URL)
+
     download_lists = [
         (Config.NOV2020_OR_EARLIER_URL, 2020),
         (Config.DEC2020_DATA_URL, 2020),
@@ -230,8 +235,11 @@ if __name__ == "__main__":
         (Config.JUN2021_DATA_URL, 2021),
         (Config.JUL2021_DATA_URL, 2021),
         (Config.AUG2021_DATA_URL, 2021),
-        (Config.LATEST_DATA_URL, 2021),
     ]
-    import_asahikawa_patients(download_lists)
-    import_sapporo_patients_number(Config.SAPPORO_URL)
-    import_hokkaido_patients(Config.HOKKAIDO_URL)
+    for download_list in download_lists:
+        url = download_list[0]
+        target_year = download_list[1]
+        import_asahikawa_patients(url=url, target_year=target_year)
+
+    import_additional_asahikawa_patients()
+    """
