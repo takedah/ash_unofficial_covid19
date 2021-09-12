@@ -401,3 +401,17 @@ class ScrapeMedicalInstitutions(Scraper):
             return medical_institution_data
         except (ValueError, IndexError):
             return None
+
+    def get_name_lists(self) -> list:
+        """スクレイピング結果から主キーとなる医療機関名と対象年齢のタプルのリストを取得
+
+        Returns:
+            name_list (list of tuple): スクレイピングした医療機関名と対象年齢のタプルのリスト
+
+        """
+        name_lists = list()
+        for medical_institution in self.lists:
+            name_lists.append(
+                (medical_institution["name"], medical_institution["target_age"])
+            )
+        return name_lists

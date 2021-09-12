@@ -9,7 +9,6 @@ from ash_unofficial_covid19.services.medical_institution import (
 
 
 class TestMedicalInstitutionService(unittest.TestCase):
-    @classmethod
     def setUp(self):
         test_data = [
             {
@@ -63,10 +62,14 @@ class TestMedicalInstitutionService(unittest.TestCase):
         self.service = MedicalInstitutionService()
         self.service.create(self.factory)
 
+    def test_delete(self):
+        results = self.service.delete(("市立旭川病院", "16歳以上"))
+        self.assertEqual(results, 1)
+
     def test_find_all(self):
         results = self.service.find_all()
         medical_institution = results.items[0]
-        self.assertEqual(medical_institution.name, "市立旭川病院")
+        self.assertEqual(medical_institution.name, "独立行政法人国立病院機構旭川医療センター")
         self.assertEqual(medical_institution.book_at_medical_institution, True)
         self.assertEqual(medical_institution.book_at_call_center, False)
 
@@ -82,6 +85,16 @@ class TestMedicalInstitutionService(unittest.TestCase):
                 "コールセンターやインターネットで予約ができます",
                 "対象年齢",
                 "備考",
+            ],
+            [
+                "花咲町・末広・末広東・永山",
+                "独立行政法人国立病院機構旭川医療センター",
+                "旭川市花咲町7",
+                "0166-51-3910 予約専用",
+                "1",
+                "0",
+                "12歳から15歳まで",
+                "",
             ],
             [
                 "新富・東・金星町",
@@ -117,22 +130,17 @@ class TestMedicalInstitutionService(unittest.TestCase):
                 "12歳から15歳まで",
                 "",
             ],
-            [
-                "花咲町・末広・末広東・永山",
-                "独立行政法人国立病院機構旭川医療センター",
-                "旭川市花咲町7",
-                "0166-51-3910 予約専用",
-                "1",
-                "0",
-                "12歳から15歳まで",
-                "",
-            ],
         ]
         self.assertEqual(results, expect)
 
-    def test_get_name_list(self):
-        results = self.service.get_name_list()
-        expect = ["市立旭川病院", "道北勤医協一条通病院", "独立行政法人国立病院機構旭川医療センター"]
+    def test_get_name_lists(self):
+        results = self.service.get_name_lists()
+        expect = [
+            ("市立旭川病院", "12歳から15歳まで"),
+            ("市立旭川病院", "16歳以上"),
+            ("道北勤医協一条通病院", "16歳以上"),
+            ("独立行政法人国立病院機構旭川医療センター", "12歳から15歳まで"),
+        ]
         self.assertEqual(results, expect)
 
     def test_get_area_list(self):

@@ -306,6 +306,17 @@ class TestScrapeMedicalInstitutions(unittest.TestCase):
         ]
         self.assertEqual(scraper.lists, expect)
 
+    @patch("ash_unofficial_covid19.scrapers.downloader.requests")
+    def test_get_name_lists(self, mock_requests):
+        mock_requests.get.return_value = Mock(
+            status_code=200, content=self.html_content
+        )
+        scraper = ScrapeMedicalInstitutions(
+            html_url="http://dummy.local", is_pediatric=False
+        )
+        expect = [("市立旭川病院", "16歳以上"), ("旭川赤十字病院", "16歳以上"), ("道北勤医協一条通病院", "16歳以上")]
+        self.assertEqual(scraper.get_name_lists(), expect)
+
 
 if __name__ == "__main__":
     unittest.main()

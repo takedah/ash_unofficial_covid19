@@ -67,13 +67,20 @@ def import_locations() -> None:
     """
     medical_institution_service = MedicalInstitutionService()
     try:
-        medical_institution_names = medical_institution_service.get_name_list()
+        medical_institutions = medical_institution_service.get_name_lists()
     except ServiceError as e:
         print(e.message)
         return
 
+    medical_institution_name_list = list()
+    for medical_institution in medical_institutions:
+        medical_institution_name_list.append(medical_institution[0])
+    medical_institution_name_list = sorted(
+        set(medical_institution_name_list), key=medical_institution_name_list.index
+    )
+
     locations_factory = LocationFactory()
-    for medical_institution_name in medical_institution_names:
+    for medical_institution_name in medical_institution_name_list:
         try:
             scraped_data = ScrapeYOLPLocation(medical_institution_name)
         except (HTTPDownloadError, ScrapeError):
@@ -159,6 +166,27 @@ def import_locations() -> None:
         return
 
 
+def delete_non_exist_data(html_url: str) -> None:
+    """スクレイピングしたデータに存在しない登録済み医療機関データを削除する
+
+    Args:
+        html_url (str): ワクチン接種医療機関一覧HTMLページのURL
+
+    """
+    scraped_data = ScrapeMedicalInstitutions(html_url)
+    scraped_pediatric_data = ScrapeMedicalInstitutions(
+        html_url=html_url, is_pediatric=True
+    )
+    new_name_list = scraped_data.get_name_lists()
+    new_name_list.extend(scraped_pediatric_data.get_name_lists())
+    service = MedicalInstitutionService()
+    current_name_list = service.get_name_lists()
+    non_exist_names = list(set(current_name_list) - set(new_name_list))
+    for non_exist_name in non_exist_names:
+        service.delete(non_exist_name)
+
+
 if __name__ == "__main__":
     import_medical_institutions(Config.MEDICAL_INSTITUTIONS_URL)
     import_locations()
+    delete_non_exist_data(Config.MEDICAL_INSTITUTIONS_URL)

@@ -1,8 +1,10 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
+import psycopg2
 from psycopg2.extras import DictCursor
 
+from ash_unofficial_covid19.errors import ServiceError
 from ash_unofficial_covid19.models.medical_institution import (
     MedicalInstitutionFactory
 )
@@ -58,6 +60,50 @@ class MedicalInstitutionService(Service):
             data_lists=data_lists,
         )
 
+    def delete(self, target_value: tuple) -> int:
+        """指定した主キーの値を持つデータを削除する
+
+        Args:
+            target_value (tuple): 削除対象の医療機関名と対象年齢を要素とするタプル
+
+        Returns:
+            result (int): 削除したレコード件数
+
+        """
+        state = (
+            "DELETE FROM "
+            + self.table_name
+            + " "
+            + "WHERE name = %s AND target_age = %s;"
+        )
+        log_message = (
+            self.table_name
+            + "テーブルから "
+            + str(target_value[0])
+            + ", "
+            + str(target_value[1])
+            + " "
+            + "を"
+        )
+        with self.get_connection() as conn:
+            try:
+                with conn.cursor(cursor_factory=DictCursor) as cur:
+                    cur.execute(state, target_value)
+                    result = cur.rowcount
+                conn.commit()
+                if result == 0:
+                    self.info_log(log_message + "削除できませんでした。")
+                else:
+                    self.info_log(log_message + str(result) + "件削除しました。")
+                return result
+            except (
+                psycopg2.DataError,
+                psycopg2.IntegrityError,
+                psycopg2.InternalError,
+            ) as e:
+                self.error_log(log_message + "削除できませんでした。")
+                raise ServiceError(e.args[0])
+
     def find_all(self) -> MedicalInstitutionFactory:
         """新型コロナワクチン接種医療機関の全件リストを返す
 
@@ -77,7 +123,7 @@ class MedicalInstitutionService(Service):
             + " "
             + self.table_name
             + " "
-            + "ORDER BY id"
+            + "ORDER BY area,id"
             + ";"
         )
         factory = MedicalInstitutionFactory()
@@ -138,21 +184,26 @@ class MedicalInstitutionService(Service):
             )
         return rows
 
-    def get_name_list(self) -> list:
-        """新型コロナワクチン接種医療機関の名称全件のリストを返す
+    def get_name_lists(self) -> list:
+        """新型コロナワクチン接種医療機関の名称と対象年齢全件のリストを返す
 
         Returns:
-            res (list): 医療機関の名称一覧リスト
+            res (list of tuple): 医療機関の名称と対象年齢一覧リスト
 
         """
-        state = "SELECT DISTINCT(name) FROM " + self.table_name + " ORDER BY name;"
-        name_list = list()
+        state = (
+            "SELECT DISTINCT ON (name,target_age) name, target_age FROM "
+            + self.table_name
+            + " "
+            + "ORDER BY name;"
+        )
+        name_lists = list()
         with self.get_connection() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
                 cur.execute(state)
                 for row in cur.fetchall():
-                    name_list.append(row["name"])
-        return name_list
+                    name_lists.append((row["name"], row["target_age"]))
+        return name_lists
 
     def get_area_list(self, is_pediatric: bool = False) -> list:
         """指定した対象年齢の新型コロナワクチン接種医療機関の地域全件のリストを返す
