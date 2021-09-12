@@ -32,7 +32,6 @@ document.addEventListener("DOMContentLoaded", function() {
     locationData["centerLongitude"] = longitudeSum / resultsLength
   }
 
-  // 中心地を1番目の検索結果の場所にセットする
   map.setView([locationData["centerLatitude"], locationData["centerLongitude"]], 15);
 
   for (var i = 0; i < resultsLength; i++) {
