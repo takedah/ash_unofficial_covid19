@@ -68,4 +68,4 @@ class ScrapePressReleaseLink(Scraper):
                 }
                 press_release_link.append(values)
 
-        return sorted(press_release_link)
+        return sorted(press_release_link, key=lambda x: x["publication_date"])

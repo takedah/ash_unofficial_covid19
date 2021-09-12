@@ -125,7 +125,8 @@ class AsahikawaPatientService(Service):
             + " "
             + "a.patient_number,a.city_code,a.prefecture,a.city_name,"
             + "a.publication_date,"
-            + "h.onset_date,a.residence,a.age,a.sex,h.occupation,h.status,h.symptom,"
+            + "h.onset_date,a.residence,a.age,a.sex,h.occupation as h_occupation,"
+            + "a.occupation as a_occupation,h.status,h.symptom,"
             + "h.overseas_travel_history,h.be_discharged,a.note,"
             + "a.hokkaido_patient_number,a.surrounding_status,a.close_contact"
             + " "
@@ -145,7 +146,14 @@ class AsahikawaPatientService(Service):
         with self.get_connection() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
                 cur.execute(state)
-                for row in cur.fetchall():
+                for dict_cursor in cur.fetchall():
+                    row = dict(dict_cursor)
+                    # 北海道データがない場合、職業は旭川データの値をセット
+                    if row["h_occupation"] is None:
+                        row["occupation"] = row["a_occupation"]
+                    else:
+                        row["occupation"] = row["h_occupation"]
+                    del row["h_occupation"], row["a_occupation"]
                     factory.create(**row)
         return factory
 

@@ -3,7 +3,7 @@ from io import BytesIO, StringIO
 from json import JSONDecodeError
 
 import requests
-from requests import ConnectionError, HTTPError, Timeout
+from requests import HTTPError, Timeout
 from urllib3.exceptions import MaxRetryError
 
 from ash_unofficial_covid19.errors import HTTPDownloadError

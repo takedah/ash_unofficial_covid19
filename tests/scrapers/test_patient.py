@@ -450,7 +450,7 @@ class TestScrapeAsahikawaPatientsPDF(unittest.TestCase):
                 "residence": "旭川市",
                 "age": "40代",
                 "sex": "男性",
-                "occupation": None,
+                "occupation": "非公表",
                 "status": None,
                 "symptom": None,
                 "overseas_travel_history": None,

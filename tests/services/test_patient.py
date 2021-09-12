@@ -131,7 +131,7 @@ class TestAsahikawaPatientService(unittest.TestCase):
                 "residence": "旭川市",
                 "age": "90歳以上",
                 "sex": "女性",
-                "occupation": "",
+                "occupation": "非公表",
                 "status": "",
                 "symptom": "",
                 "overseas_travel_history": None,
@@ -218,6 +218,7 @@ class TestAsahikawaPatientService(unittest.TestCase):
         self.assertEqual(patient.publication_date, date(2021, 12, 9))
         self.assertEqual(patient.age, "90歳以上")
         self.assertEqual(patient.sex, "女性")
+        self.assertEqual(patient.occupation, "非公表")
 
     def test_find(self):
         results = self.service.find(page=1, desc=False)
@@ -257,7 +258,7 @@ class TestAsahikawaPatientService(unittest.TestCase):
                 "旭川市",
                 "90歳以上",
                 "女性",
-                "",
+                "非公表",
                 "",
                 "",
                 "",

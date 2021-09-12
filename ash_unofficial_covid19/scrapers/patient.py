@@ -397,6 +397,10 @@ class ScrapeAsahikawaPatientsPDF(Scraper):
         if search_patient_number is None or search_hokkaido_patient_number is None:
             return None
 
+        # 2021年8月のPDFに余計な列が入っている行があったので長さで判断して余計な要素を削除
+        if len(row) == 11:
+            row.pop(6)
+
         patient_number = int(search_patient_number.group(1))
         hokkaido_patient_number = int(search_hokkaido_patient_number.group(1))
         try:
@@ -423,7 +427,7 @@ class ScrapeAsahikawaPatientsPDF(Scraper):
                 "residence": row[4],
                 "age": self.format_age(row[5]),
                 "sex": self.format_sex(row[6]),
-                "occupation": None,
+                "occupation": row[7],
                 "status": None,
                 "symptom": None,
                 "overseas_travel_history": None,
