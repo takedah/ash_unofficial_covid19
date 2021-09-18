@@ -193,7 +193,7 @@ def medical_institutions():
     )
 
 
-@app.route("/medical_institutions/<area>")
+@app.route("/medical_institutions/areas/<area>")
 def medical_institutions_areas(area):
     medical_institutions = get_medical_institutions()
     try:
@@ -202,29 +202,30 @@ def medical_institutions_areas(area):
         abort(404)
 
     try:
-        search_results = medical_institutions.find(area=area)
+        search_results = medical_institutions.find_area(area=area)
     except ServiceError:
         abort(404)
 
-    search_lengths = len(search_results.items)
+    search_lengths = len(search_results)
     if search_lengths == 0:
         abort(404)
 
     return render_template(
         "area.html",
-        title=area + "の新型コロナワクチン接種医療機関一覧（16歳以上）",
+        title="【旭川市】" + area + "の新型コロナワクチン接種医療機関一覧（16歳以上）",
         gtag_id=Config.GTAG_ID,
         last_updated=medical_institutions.last_updated,
         area=area,
-        medical_institutions=search_results.items,
+        search_results=search_results,
         search_lengths=search_lengths,
         above_16_area_list=medical_institutions.get_area_list(),
         below_15_area_list=medical_institutions.get_area_list(is_pediatric=True),
+        is_pediatric=False,
         leaflet=True,
     )
 
 
-@app.route("/medical_institutions/pediatrics/<area>")
+@app.route("/medical_institutions/areas/pediatrics/<area>")
 def pediatric_medical_institutions_areas(area):
     medical_institutions = get_medical_institutions()
     try:
@@ -233,22 +234,73 @@ def pediatric_medical_institutions_areas(area):
         abort(404)
 
     try:
-        search_results = medical_institutions.find(area=area, is_pediatric=True)
+        search_results = medical_institutions.find_area(area=area, is_pediatric=True)
     except ServiceError:
         abort(404)
 
-    search_lengths = len(search_results.items)
+    search_lengths = len(search_results)
     if search_lengths == 0:
         abort(404)
 
     return render_template(
         "area.html",
-        title=area + "の新型コロナワクチン接種医療機関一覧（12歳から15歳まで）",
+        title="【旭川市】" + area + "の新型コロナワクチン接種医療機関一覧（12歳から15歳まで）",
         gtag_id=Config.GTAG_ID,
         last_updated=medical_institutions.last_updated,
         area=area,
-        medical_institutions=search_results.items,
+        search_results=search_results,
         search_lengths=search_lengths,
+        above_16_area_list=medical_institutions.get_area_list(),
+        below_15_area_list=medical_institutions.get_area_list(is_pediatric=True),
+        is_pediatric=True,
+        leaflet=True,
+    )
+
+
+@app.route("/medical_institution/<name>")
+def medical_institution(name):
+    medical_institutions = get_medical_institutions()
+    try:
+        name = escape(name)
+    except ValueError:
+        abort(404)
+
+    try:
+        medical_institution = medical_institutions.find(name=name)
+    except ServiceError:
+        abort(404)
+
+    return render_template(
+        "medical_institution.html",
+        title="【旭川市のワクチン接種医療機関】" + name + "（16歳以上）",
+        gtag_id=Config.GTAG_ID,
+        last_updated=medical_institutions.last_updated,
+        medical_institution=medical_institution,
+        above_16_area_list=medical_institutions.get_area_list(),
+        below_15_area_list=medical_institutions.get_area_list(is_pediatric=True),
+        leaflet=True,
+    )
+
+
+@app.route("/medical_institution/pediatrics/<name>")
+def pediatric_medical_institution(name):
+    medical_institutions = get_medical_institutions()
+    try:
+        name = escape(name)
+    except ValueError:
+        abort(404)
+
+    try:
+        medical_institution = medical_institutions.find(name=name, is_pediatric=True)
+    except ServiceError:
+        abort(404)
+
+    return render_template(
+        "medical_institution.html",
+        title="【旭川市のワクチン接種医療機関】" + name + "（12歳から15歳まで）",
+        gtag_id=Config.GTAG_ID,
+        last_updated=medical_institutions.last_updated,
+        medical_institution=medical_institution,
         above_16_area_list=medical_institutions.get_area_list(),
         below_15_area_list=medical_institutions.get_area_list(is_pediatric=True),
         leaflet=True,

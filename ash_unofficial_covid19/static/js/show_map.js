@@ -18,9 +18,11 @@ document.addEventListener("DOMContentLoaded", function() {
       document.getElementById("order" + currentOrder).dataset.longitude);
     var locationName = JSON.parse(JSON.stringify(
       document.getElementById("order" + currentOrder).dataset.name));
+    var url = JSON.parse(JSON.stringify(
+      document.getElementById("order" + currentOrder).dataset.url));
     locationData["latitude" + currentOrder] = latitude
     locationData["longitude" + currentOrder] = longitude
-    locationData["locationName" + currentOrder] = locationName
+    locationData["locationName" + currentOrder] = "<a href='/medical_institution/" + url + "'>" + locationName + "</a>"
     latitudeSum += latitude
     longitudeSum += longitude
   }

@@ -2,7 +2,9 @@ from typing import Optional
 
 from psycopg2.extras import DictCursor
 
+from ash_unofficial_covid19.errors import ServiceError
 from ash_unofficial_covid19.models.medical_institution_location import (
+    MedicalInstitutionLocation,
     MedicalInstitutionLocationFactory
 )
 from ash_unofficial_covid19.services.service import Service
@@ -14,7 +16,50 @@ class MedicalInstitutionLocationService(Service):
     def __init__(self):
         Service.__init__(self, "medical_institutions")
 
-    def find(self, area: Optional[str] = None, is_pediatric: bool = False) -> list:
+    def find(self, name: str, is_pediatric: bool = False) -> MedicalInstitutionLocation:
+        """新型コロナワクチン接種医療機関の個別情報
+
+        指定した新型コロナワクチン接種医療機関の情報を返す
+
+        Args:
+            name (str): 医療機関の名称
+            target_age (bool): 対象年齢フラグ
+                真の場合は対象年齢が12歳から15歳まで、偽の場合16歳以上を表す
+
+        Returns:
+            results (:obj:`MedicalInstitutionLocation`): 位置情報付き医療機関一覧データ
+                新型コロナワクチン接種医療機関の情報に緯度経度を含めたデータオブジェクト
+
+        """
+        state = (
+            "SELECT "
+            + "name,address,phone_number,book_at_medical_institution,"
+            + "book_at_call_center,area,memo,target_age,latitude,longitude "
+            + "FROM "
+            + self.table_name
+            + " "
+            + "AS med LEFT JOIN locations ON med.name = "
+            + "locations.medical_institution_name "
+            + "WHERE med.name=%s AND "
+        )
+        if is_pediatric:
+            target_age = "12歳から15歳まで"
+        else:
+            target_age = "16歳以上"
+        state = state + "med.target_age=%s;"
+
+        factory = MedicalInstitutionLocationFactory()
+        with self.get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(state, (name, target_age))
+                res = cur.fetchone()
+                if res is None:
+                    raise ServiceError("指定した名称の医療機関はありませんでした。")
+                return factory.create(**dict(res))
+
+    def find_area(
+        self, area: Optional[str] = None, is_pediatric: bool = False
+    ) -> MedicalInstitutionLocationFactory:
         """新型コロナワクチン接種医療機関の位置情報一覧
 
         指定した対象年齢の新型コロナワクチン接種医療機関の一覧に医療機関の位置情報を
@@ -22,10 +67,11 @@ class MedicalInstitutionLocationService(Service):
 
         Args:
             area (str): 医療機関の地区
-            target_age (str): 対象年齢が16歳以上または12歳から15歳までのいずれか
+            target_age (bool): 対象年齢フラグ
+                真の場合は対象年齢が12歳から15歳まで、偽の場合16歳以上を表す
 
         Returns:
-            locations (list of tuple): 位置情報付き医療機関一覧データ
+            results (:obj:`MedicalInstitutionLocationFactory`): 位置情報付き医療機関一覧データ
                 新型コロナワクチン接種医療機関の情報に緯度経度を含めたタプルのリスト
 
         """
@@ -36,12 +82,8 @@ class MedicalInstitutionLocationService(Service):
             + "FROM "
             + self.table_name
             + " "
-            + "LEFT JOIN locations ON "
-            + self.table_name
-            + ".name = locations.medical_institution_name "
-            + "WHERE "
-            + self.table_name
-            + ".target_age=%s"
+            + "AS med LEFT JOIN locations ON med.name = "
+            + "locations.medical_institution_name WHERE med.target_age=%s"
         )
         if is_pediatric:
             target_age = "12歳から15歳まで"
@@ -51,7 +93,7 @@ class MedicalInstitutionLocationService(Service):
         if area:
             state = state + " " + "AND area=%s"
 
-        state = state + " " + "ORDER BY " + self.table_name + ".id;"
+        state = state + " " + "ORDER BY med.id;"
         factory = MedicalInstitutionLocationFactory()
         with self.get_connection() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
@@ -59,7 +101,9 @@ class MedicalInstitutionLocationService(Service):
                     cur.execute(state, (target_age, area))
                 else:
                     cur.execute(state, (target_age,))
-                for row in cur.fetchall():
-                    medical_institution_location = dict(row)
-                    factory.create(**medical_institution_location)
+                res = cur.fetchall()
+                if cur.rownumber == 0:
+                    raise ServiceError("指定した地域の医療機関はありませんでした。")
+                for row in res:
+                    factory.create(**dict(row))
         return factory

@@ -14,6 +14,9 @@ from matplotlib.font_manager import FontProperties
 from matplotlib.ticker import MultipleLocator
 
 from ash_unofficial_covid19.errors import DatabaseConnectionError
+from ash_unofficial_covid19.models.medical_institution_location import (
+    MedicalInstitutionLocation
+)
 from ash_unofficial_covid19.services.medical_institution import (
     MedicalInstitutionService
 )
@@ -96,7 +99,25 @@ class MedicalInstitutionsView:
     def last_updated(self) -> str:
         return self.__last_updated
 
-    def find(self, area: Optional[str] = None, is_pediatric: bool = False) -> list:
+    def find(self, name: str, is_pediatric: bool = False) -> MedicalInstitutionLocation:
+        """新型コロナワクチン接種医療機関の位置情報一覧
+
+        指定した対象年齢の新型コロナワクチン接種医療機関の一覧に医療機関の位置情報を
+        付けて返す
+
+        Args:
+            name (str): 医療機関の名称
+            target_age (bool): 対象年齢フラグ
+                真の場合は対象年齢が12歳から15歳まで、偽の場合16歳以上を表す
+
+        Returns:
+            results (:obj:`MedicalInstitutionLocation`): 位置情報付き医療機関一覧データ
+                新型コロナワクチン接種医療機関の情報に緯度経度を含めたデータオブジェクト
+
+        """
+        return self.__location_service.find(name=name, is_pediatric=is_pediatric)
+
+    def find_area(self, area: Optional[str] = None, is_pediatric: bool = False) -> list:
         """新型コロナワクチン接種医療機関の位置情報一覧
 
         指定した対象年齢の新型コロナワクチン接種医療機関の一覧に医療機関の位置情報を
@@ -104,14 +125,26 @@ class MedicalInstitutionsView:
 
         Args:
             area (str): 医療機関の地区
-            target_age (str): 対象年齢が16歳以上または12歳から15歳までのいずれか
+            target_age (bool): 対象年齢フラグ
+                真の場合は対象年齢が12歳から15歳まで、偽の場合16歳以上を表す
 
         Returns:
-            locations (list of tuple): 位置情報付き医療機関一覧データ
+            response (list of tuple): 位置情報付き医療機関一覧データ
                 新型コロナワクチン接種医療機関の情報に緯度経度を含めたタプルのリスト
 
         """
-        return self.__location_service.find(area=area, is_pediatric=is_pediatric)
+        response = list()
+        medical_institution_locations = self.__location_service.find_area(
+            area=area, is_pediatric=is_pediatric
+        )
+        for medical_institution_location in medical_institution_locations.items:
+            response.append(
+                (
+                    medical_institution_location,
+                    urllib.parse.quote(medical_institution_location.name),
+                )
+            )
+        return response
 
     def get_area_list(self, is_pediatric: bool = False) -> list:
         """指定した対象年齢の新型コロナワクチン接種医療機関の地域全件のリストを返す
