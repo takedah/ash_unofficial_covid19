@@ -44,6 +44,7 @@
           <table class="table table-striped table-bordered table-hover table-sm">
             <thead>
               <tr>
+                <th class="text-nowrap">市内番号</th>
                 <th class="text-nowrap">公表日</th>
                 <th class="text-nowrap">居住地</th>
                 <th class="text-nowrap">年代</th>
@@ -54,6 +55,7 @@
             <tbody>
               {% for patient in patients.items %}
               <tr>
+                <td class="text-nowrap">{{ patient.patient_number }}</a></td>
                 <td class="text-nowrap">{{ patient.publication_date }}</a></td>
                 <td class="text-nowrap">{{ "非公表" if patient.residence == "" else patient.residence}}</td>
                 <td class="text-nowrap">{{ "非公表" if patient.age == "" else patient.age}}</td>
