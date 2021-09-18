@@ -268,10 +268,9 @@ if __name__ == "__main__":
     # 最新の報道発表資料PDFファイルのURLと報道発表日をデータベースへ登録
     import_press_release_link(Config.OVERVIEW_URL, 2021)
 
-    # 報道発表資料PDFファイルのURLと報道発表日を取得
+    # 最新の報道発表資料PDFファイルから新規陽性患者データをデータベースへ更新登録
     press_release_links = get_press_release_links()
     if press_release_links:
-        # 最新の報道発表資料PDFファイルから新規陽性患者データをデータベースへ更新登録
         latest_press_release_link = press_release_links.items[0]
         import_asahikawa_data_from_press_release(
             pdf_url=latest_press_release_link.url,
@@ -280,6 +279,18 @@ if __name__ == "__main__":
 
     # 札幌市の日別新規陽性患者数データをデータベースへ登録
     import_sapporo_patients_number(Config.SAPPORO_URL)
+
+    # 報道発表資料PDFファイルから新規陽性患者データをデータベースへ更新登録
+    import_press_release_link(url=Config.LATEST_DATA_URL, target_year=2021)
+    press_release_links = get_press_release_links()
+    if press_release_links:
+        for press_release_link in press_release_links.items:
+            publication_date = press_release_link.publication_date
+            if publication_date.year == 2021 and publication_date.month == 9:
+                import_asahikawa_data_from_press_release(
+                    pdf_url=press_release_link.url,
+                    publication_date=press_release_link.publication_date,
+                )
 
     # 過去の新規陽性患者数データを全件取得する処理
     # 全件ダウンロードし直す場合コメントアウトを解除する
