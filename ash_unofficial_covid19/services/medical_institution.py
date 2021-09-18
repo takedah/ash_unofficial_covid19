@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta, timezone
-from typing import Optional
 
 import psycopg2
 from psycopg2.extras import DictCursor
@@ -234,54 +233,3 @@ class MedicalInstitutionService(Service):
                 for row in cur.fetchall():
                     area_list.append(row["area"])
         return area_list
-
-    def get_locations(
-        self, area: Optional[str] = None, is_pediatric: bool = False
-    ) -> list:
-        """新型コロナワクチン接種医療機関の位置情報一覧
-
-        指定した対象年齢の新型コロナワクチン接種医療機関の一覧に医療機関の位置情報を
-        付けて返す
-
-        Args:
-            area (str): 医療機関の地区
-            target_age (str): 対象年齢が16歳以上または12歳から15歳までのいずれか
-
-        Returns:
-            locations (list of tuple): 位置情報付き医療機関一覧データ
-                新型コロナワクチン接種医療機関の情報に緯度経度を含めたタプルのリスト
-
-        """
-        state = (
-            "SELECT "
-            + "name,address,phone_number,book_at_medical_institution,"
-            + "book_at_call_center,memo,latitude,longitude "
-            + "FROM "
-            + self.table_name
-            + " "
-            + "LEFT JOIN locations ON "
-            + self.table_name
-            + ".name = locations.medical_institution_name "
-            + "WHERE "
-            + self.table_name
-            + ".target_age=%s"
-        )
-        if is_pediatric:
-            target_age = "12歳から15歳まで"
-        else:
-            target_age = "16歳以上"
-
-        if area:
-            state = state + " " + "AND area=%s"
-
-        state = state + " " + "ORDER BY " + self.table_name + ".id;"
-        locations = list()
-        with self.get_connection() as conn:
-            with conn.cursor() as cur:
-                if area:
-                    cur.execute(state, (target_age, area))
-                else:
-                    cur.execute(state, (target_age,))
-                for row in cur.fetchall():
-                    locations.append(row)
-        return locations

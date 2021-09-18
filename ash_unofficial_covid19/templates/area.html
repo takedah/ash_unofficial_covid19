@@ -25,13 +25,13 @@
             </thead>
             <tbody id="results" data-length="{{ search_lengths|tojson }}">
               {% for medical_institution in medical_institutions %}
-              <tr id="order{{ loop.index }}" data-latitude="{{ medical_institution[6]|tojson }}" data-longitude="{{ medical_institution[7]|tojson }}" data-name="{{ medical_institution[0]|safe }}">
-                <td class="text-nowrap">{{ medical_institution[0] }}</td>
-                <td class="text-nowrap">{{ medical_institution[1] }}</td>
-                <td class="text-nowrap">{{ medical_institution[2] }}</td>
-                <td>{{ "OK" if medical_institution[3] else "NG"}}</td>
-                <td>{{ "OK" if medical_institution[4] else "NG"}}</td>
-                <td class="text-nowrap">{{ medical_institution[5] }}</td>
+              <tr id="order{{ loop.index }}" data-latitude="{{ medical_institution.latitude|tojson }}" data-longitude="{{ medical_institution.longitude|tojson }}" data-name="{{ medical_institution.name|safe }}">
+                <td class="text-nowrap">{{ medical_institution.name }}</td>
+                <td class="text-nowrap">{{ medical_institution.address }}</td>
+                <td class="text-nowrap">{{ medical_institution.phone_number }}</td>
+                <td>{{ "OK" if medical_institution.book_at_medical_institution else "NG"}}</td>
+                <td>{{ "OK" if medical_institution.book_at_call_center else "NG"}}</td>
+                <td class="text-nowrap">{{ medical_institution.memo }}</td>
               </tr>
               {% endfor %}
             </tbody>

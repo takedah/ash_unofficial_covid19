@@ -202,11 +202,11 @@ def medical_institutions_areas(area):
         abort(404)
 
     try:
-        search_results = medical_institutions.get_locations(area=area)
+        search_results = medical_institutions.find(area=area)
     except ServiceError:
         abort(404)
 
-    search_lengths = len(search_results)
+    search_lengths = len(search_results.items)
     if search_lengths == 0:
         abort(404)
 
@@ -216,7 +216,7 @@ def medical_institutions_areas(area):
         gtag_id=Config.GTAG_ID,
         last_updated=medical_institutions.last_updated,
         area=area,
-        medical_institutions=search_results,
+        medical_institutions=search_results.items,
         search_lengths=search_lengths,
         above_16_area_list=medical_institutions.get_area_list(),
         below_15_area_list=medical_institutions.get_area_list(is_pediatric=True),
@@ -233,13 +233,11 @@ def pediatric_medical_institutions_areas(area):
         abort(404)
 
     try:
-        search_results = medical_institutions.get_locations(
-            area=area, is_pediatric=True
-        )
+        search_results = medical_institutions.find(area=area, is_pediatric=True)
     except ServiceError:
         abort(404)
 
-    search_lengths = len(search_results)
+    search_lengths = len(search_results.items)
     if search_lengths == 0:
         abort(404)
 
@@ -249,7 +247,7 @@ def pediatric_medical_institutions_areas(area):
         gtag_id=Config.GTAG_ID,
         last_updated=medical_institutions.last_updated,
         area=area,
-        medical_institutions=search_results,
+        medical_institutions=search_results.items,
         search_lengths=search_lengths,
         above_16_area_list=medical_institutions.get_area_list(),
         below_15_area_list=medical_institutions.get_area_list(is_pediatric=True),

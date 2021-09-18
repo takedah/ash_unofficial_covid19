@@ -17,6 +17,9 @@ from ash_unofficial_covid19.errors import DatabaseConnectionError
 from ash_unofficial_covid19.services.medical_institution import (
     MedicalInstitutionService
 )
+from ash_unofficial_covid19.services.medical_institution_location import (
+    MedicalInstitutionLocationService
+)
 from ash_unofficial_covid19.services.patient import AsahikawaPatientService
 from ash_unofficial_covid19.services.press_release_link import (
     PressReleaseLinkService
@@ -85,6 +88,7 @@ class MedicalInstitutionsView:
 
     def __init__(self):
         self.__service = MedicalInstitutionService()
+        self.__location_service = MedicalInstitutionLocationService()
         last_updated = self.__service.get_last_updated()
         self.__last_updated = last_updated.strftime("%Y/%m/%d %H:%M")
 
@@ -92,9 +96,7 @@ class MedicalInstitutionsView:
     def last_updated(self) -> str:
         return self.__last_updated
 
-    def get_locations(
-        self, area: Optional[str] = None, is_pediatric: bool = False
-    ) -> list:
+    def find(self, area: Optional[str] = None, is_pediatric: bool = False) -> list:
         """新型コロナワクチン接種医療機関の位置情報一覧
 
         指定した対象年齢の新型コロナワクチン接種医療機関の一覧に医療機関の位置情報を
@@ -109,7 +111,7 @@ class MedicalInstitutionsView:
                 新型コロナワクチン接種医療機関の情報に緯度経度を含めたタプルのリスト
 
         """
-        return self.__service.get_locations(area=area, is_pediatric=is_pediatric)
+        return self.__location_service.find(area=area, is_pediatric=is_pediatric)
 
     def get_area_list(self, is_pediatric: bool = False) -> list:
         """指定した対象年齢の新型コロナワクチン接種医療機関の地域全件のリストを返す

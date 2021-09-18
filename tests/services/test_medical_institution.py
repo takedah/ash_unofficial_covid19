@@ -154,39 +154,6 @@ class TestMedicalInstitutionService(unittest.TestCase):
         expect = ["花咲町・末広・末広東・永山", "東・金星町・各条17〜26丁目"]
         self.assertEqual(results, expect)
 
-    def test_get_locations(self):
-        # 対象年齢を指定しない場合16歳以上の医療機関を返す
-        results = self.service.get_locations(area="新富・東・金星町")
-        expect = [
-            (
-                "市立旭川病院",
-                "旭川市金星町1",
-                "0166-29-0202",
-                True,
-                False,
-                "",
-                43.778422777778,
-                142.365976388889,
-            )
-        ]
-        self.assertEqual(results, expect)
-
-        # 対象年齢を指定する場合
-        results = self.service.get_locations(area="東・金星町・各条17〜26丁目", is_pediatric=True)
-        expect = [
-            (
-                "市立旭川病院",
-                "旭川市金星町1",
-                "0166-29-0202",
-                True,
-                False,
-                "",
-                43.778422777778,
-                142.365976388889,
-            )
-        ]
-        self.assertEqual(results, expect)
-
 
 if __name__ == "__main__":
     unittest.main()
