@@ -16,7 +16,7 @@
         <div class="card-group mt-3">
           <div class="card">
             <div class="card-body">
-              <h3 class="h6 card-title">16歳以上が対象の医療機関</h2>
+              <h3 class="h6 card-title">16歳以上が対象の医療機関</h3>
               <div class="list-group-flush">
                 {% for area in above_16_area_list %}
                 <a href="/medical_institutions/areas/{{ area[1] }}" title="{{ area[0] }}の新型コロナワクチン接種医療機関一覧（16歳以上）へ" class="list-group-item list-group-item-action text-primary">{{ area[0] }}</a>
@@ -26,7 +26,7 @@
           </div>
           <div class="card">
             <div class="card-body">
-              <h3 class="h6 card-title">12歳から15歳までが対象の医療機関</h2>
+              <h3 class="h6 card-title">12歳から15歳までが対象の医療機関</h3>
               <div class="list-group-flush">
                 {% for area in below_15_area_list %}
                 <a href="/medical_institutions/areas/pediatrics/{{ area[1] }}" title="{{ area[0] }}の新型コロナワクチン接種医療機関一覧（12歳から15歳まで）へ" class="list-group-item list-group-item-action text-primary">{{ area[0] }}</a>
@@ -41,12 +41,12 @@
   <div class="card mt-3">
     <div class="card-body">
       <section>
-        <h4 class="h5 card-title">医療機関名一覧</h2>
+        <h4 class="h5 card-title">医療機関名一覧</h4>
         <p class="card-text">以下のリンクから新型コロナワクチン接種医療機関の詳細情報を確認できます。</p>
         <div class="card-group mt-3">
           <div class="card">
             <div class="card-body">
-              <h3 class="h6 card-title">16歳以上が対象の医療機関</h2>
+              <h5 class="h6 card-title">16歳以上が対象の医療機関</h5>
               <div id="results" data-length="{{ above_16_medical_institutions_number|tojson }}" class="list-group-flush">
                 {% for medical_institution in above_16_medical_institutions %}
                 <a href="/medical_institution/{{ medical_institution[1] }}" title="{{ medical_institution[0].name }}（16歳以上）の詳細へ" id="order{{ loop.index }}" data-latitude="{{ medical_institution[0].latitude|tojson }}" data-longitude="{{ medical_institution[0].longitude|tojson }}" data-name="{{ medical_institution[0].name|safe }}" data-url="{{ medical_institution[1]|safe }}" class="list-group-item list-group-item-action text-primary">{{ medical_institution[0].name }}</a>
@@ -56,7 +56,7 @@
           </div>
           <div class="card">
             <div class="card-body">
-              <h3 class="h6 card-title">12歳から15歳までが対象の医療機関</h2>
+              <h5 class="h6 card-title">12歳から15歳までが対象の医療機関</h5>
               <div id="pediatrics_results" data-length="{{ below_15_medical_institutions_number|tojson }}" class="list-group-flush">
                 {% for medical_institution in below_15_medical_institutions %}
                 <a href="/medical_institution/pediatrics/{{ medical_institution[1] }}" title="{{ medical_institution[0].name }}（12歳から15歳まで）の詳細へ" id="pediatrics_order{{ loop.index }}" data-latitude="{{ medical_institution[0].latitude|tojson }}" data-longitude="{{ medical_institution[0].longitude|tojson }}" data-name="{{ medical_institution[0].name|safe }}" data-url="/pediatrics/{{ medical_institution[1]|safe }}" class="list-group-item list-group-item-action text-primary">{{ medical_institution[0].name }}</a>
@@ -80,7 +80,7 @@
   <div class="card mt-3">
     <div class="card-body">
       <section>
-        <h2 class="h5 card-title">新型コロナワクチン接種医療機関一覧CSVファイルのURL</h2>
+        <h3 class="h5 card-title">新型コロナワクチン接種医療機関一覧CSVファイルのURL</h3>
         <div class="input-group">
           <input id="csv-url" type="text" class="form-control" value="https://ash-unofficial-covid19.herokuapp.com/012041_asahikawa_covid19_medical_institutions.csv">
         </div>

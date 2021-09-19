@@ -55,12 +55,12 @@
             <tbody>
               {% for patient in patients.items %}
               <tr>
-                <td class="text-nowrap">{{ patient.patient_number }}</a></td>
-                <td class="text-nowrap">{{ patient.publication_date }}</a></td>
+                <td class="text-nowrap">{{ patient.patient_number }}</td>
+                <td class="text-nowrap">{{ patient.publication_date }}</td>
                 <td class="text-nowrap">{{ "非公表" if patient.residence == "" else patient.residence}}</td>
                 <td class="text-nowrap">{{ "非公表" if patient.age == "" else patient.age}}</td>
                 <td class="text-nowrap">{{ "非公表" if patient.sex == "" else patient.sex}}</td>
-                <td class="text-nowrap">{{ patient.close_contact }}</a></td>
+                <td class="text-nowrap">{{ patient.close_contact }}</td>
               </tr>
               {% endfor %}
             </tbody>
