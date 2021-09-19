@@ -410,8 +410,8 @@ class TestScrapeAsahikawaPatientsPDF(unittest.TestCase):
     def test_lists(self, mock_requests, mock_get_dataframe, mock_get_pdf):
         mock_requests.get.return_value = Mock(
             status_code=200,
-            content=csv_content(),
-            headers={"content-type": "text/csv"},
+            content="".encode("utf-8"),
+            headers={"content-type": "application/pdf"},
         )
         dfs = list()
         df1 = pd.DataFrame([[]])
