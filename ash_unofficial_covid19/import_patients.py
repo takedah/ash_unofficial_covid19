@@ -294,7 +294,6 @@ if __name__ == "__main__":
 
     # 過去の新規陽性患者数データを全件取得する処理
     # 全件ダウンロードし直す場合コメントアウトを解除する
-    """
     # 北海道の新規陽性患者データをデータベースへ登録
     import_hokkaido_patients(Config.HOKKAIDO_URL)
 
@@ -317,4 +316,3 @@ if __name__ == "__main__":
             )
 
     import_additional_asahikawa_patients()
-    """

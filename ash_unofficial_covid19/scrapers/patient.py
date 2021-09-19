@@ -404,8 +404,8 @@ class ScrapeAsahikawaPatientsPDF(Scraper):
         patient_number = int(search_patient_number.group(1))
         hokkaido_patient_number = int(search_hokkaido_patient_number.group(1))
         try:
-            surrounding_status = str(row[8])
-            close_contact = str(row[9])
+            surrounding_status = self.format_string((row[8]))
+            close_contact = self.format_string((row[9]))
             note = (
                 "北海道発表No.;"
                 + str(hokkaido_patient_number)
@@ -424,10 +424,10 @@ class ScrapeAsahikawaPatientsPDF(Scraper):
                 "city_name": "旭川市",
                 "publication_date": self.publication_date,
                 "onset_date": None,
-                "residence": row[4],
+                "residence": self.format_string(row[4]),
                 "age": self.format_age(row[5]),
                 "sex": self.format_sex(row[6]),
-                "occupation": row[7],
+                "occupation": self.format_string(row[7]),
                 "status": None,
                 "symptom": None,
                 "overseas_travel_history": None,
