@@ -67,6 +67,62 @@ class TestScrapeReservationStatus(unittest.TestCase):
         ]
         self.assertEqual(scraper.lists, expect)
 
+    @patch(
+        "ash_unofficial_covid19.scrapers.reservation_status"
+        + ".ScrapeReservationStatus.get_pdf"
+    )
+    @patch(
+        "ash_unofficial_covid19.scrapers.reservation_status"
+        + ".ScrapeReservationStatus._get_dataframe"
+    )
+    @patch("ash_unofficial_covid19.scrapers.downloader.requests")
+    def test_get_name_list(self, mock_requests, mock_get_dataframe, mock_get_pdf):
+        mock_requests.get.return_value = Mock(
+            status_code=200,
+            content="".encode("utf-8"),
+            headers={"content-type": "application/pdf"},
+        )
+        dfs = list()
+        df1 = pd.DataFrame([[]])
+        df2 = pd.DataFrame(
+            [
+                [
+                    "医療機関名",
+                    "住　　所",
+                    "電話番号",
+                    "予約受付状況又は受付開始時間",
+                    "対　象　者",
+                    "摂取期間・時期",
+                    "備　　　考",
+                ],
+                [
+                    "市立旭川病院",
+                    "金星町１丁目",
+                    "29-0202\r予約専用",
+                    "―",
+                    "―",
+                    "―",
+                    "詳細は病院のホームページで確認してください。",
+                ],
+                [
+                    "独立行政法人国立病院機構旭川医療センター",
+                    "花咲町7",
+                    "51-3910 予約専用",
+                    "受付中",
+                    "かかりつけの方",
+                    "１０月１日〜火・木曜日午後",
+                    "",
+                ],
+            ]
+        )
+        dfs = [df1, df2]
+        mock_get_dataframe.return_value = dfs
+        mock_get_pdf.return_value = BytesIO()
+        dummy_url = "http://dummy.local"
+        scraper = ScrapeReservationStatus(dummy_url)
+        expect = ["市立旭川病院", "独立行政法人国立病院機構旭川医療センター"]
+        self.assertEqual(scraper.get_name_list(), expect)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -4,11 +4,11 @@ import os
 class Config:
     """パッケージ全体で使用する定数をまとめる"""
 
-    # 旭川市の人口
-    POPULATION = 329033
+    # 旭川市の人口（2021年1月1日現在）
+    POPULATION = 331397
 
-    # 札幌市の人口
-    SAPPORO_POPULATION = 1962417
+    # 札幌市の人口（2021年1月1日現在）
+    SAPPORO_POPULATION = 1961575
 
     # 旭川市公式ホームページと北海道オープンデータポータルの設定
     DATABASE_URL = os.environ.get("DATABASE_URL")
@@ -27,6 +27,9 @@ class Config:
     NOV2020_OR_EARLIER_URL = BASE_URL + "kurashi/135/136/150/d072303.html"
     PDF_URL = BASE_URL + "kurashi/135/146/149/d072466_d/fil/iryoukikan.pdf"
     MEDICAL_INSTITUTIONS_URL = BASE_URL + "kurashi/135/146/149/d073389.html"
+    RESERVATION_STATUSES_URL = (
+        BASE_URL + "kurashi/135/146/149/d072466_d/fil/" + "yoyakuzyoukyou.pdf"
+    )
 
     # 北海道オープンデータポータルの設定
     HOKKAIDO_URL = (

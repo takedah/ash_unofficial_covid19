@@ -120,3 +120,15 @@ class ScrapeReservationStatus(Scraper):
             return None
 
         return status_data
+
+    def get_name_list(self) -> list:
+        """スクレイピング結果から主キーとなる医療機関名のリストを取得
+
+        Returns:
+            name_list (list): スクレイピングした医療機関名のリスト
+
+        """
+        name_list = list()
+        for reservation_status in self.lists:
+            name_list.append(reservation_status["medical_institution_name"])
+        return name_list
