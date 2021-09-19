@@ -1,3 +1,5 @@
+from typing import Optional
+
 from ash_unofficial_covid19.models.factory import Factory
 
 
@@ -34,10 +36,10 @@ class MedicalInstitutionLocationReservationStatus:
         target_age: str,
         latitude: float,
         longitude: float,
-        status: str,
-        target_person: str,
-        inoculation_time: str,
-        reservation_status_memo: str,
+        status: Optional[str],
+        target_person: Optional[str],
+        inoculation_time: Optional[str],
+        reservation_status_memo: Optional[str],
     ):
         """
         Args:
@@ -67,10 +69,22 @@ class MedicalInstitutionLocationReservationStatus:
         self.__target_age = target_age
         self.__latitude = latitude
         self.__longitude = longitude
-        self.__status = status
-        self.__target_person = target_person
-        self.__inoculation_time = inoculation_time
-        self.__reservation_status_memo = reservation_status_memo
+        if status is None:
+            self.__status = ""
+        else:
+            self.__status = status
+        if target_person is None:
+            self.__target_person = ""
+        else:
+            self.__target_person = target_person
+        if inoculation_time is None:
+            self.__inoculation_time = ""
+        else:
+            self.__inoculation_time = inoculation_time
+        if reservation_status_memo is None:
+            self.__reservation_status_memo = ""
+        else:
+            self.__reservation_status_memo = reservation_status_memo
 
     @property
     def name(self) -> str:

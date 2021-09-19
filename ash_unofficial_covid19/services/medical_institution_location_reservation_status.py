@@ -12,7 +12,7 @@ class MedicalInstitutionLocationReservationStatusService(Service):
     """旭川市新型コロナ接種医療機関に位置情報と予約受付状況を付けたデータを扱うサービス"""
 
     def __init__(self):
-        Service.__init__(self, "medical_institutions")
+        Service.__init__(self, "reservation_statuses")
 
     def find(
         self, name: str, is_pediatric: bool = False
@@ -35,16 +35,15 @@ class MedicalInstitutionLocationReservationStatusService(Service):
         state = (
             "SELECT "
             + "name,med.address,med.phone_number,book_at_medical_institution,"
-            + "book_at_call_center,area,med.memo,target_age,latitude,longitude,status,"
-            + "reserve.target AS target_person,inoculation_time,reserve.memo "
+            + "book_at_call_center,area,med.memo,target_age,latitude,longitude,"
+            + "status,reserve.target AS target_person,inoculation_time,reserve.memo "
             + "AS reservation_status_memo "
-            + "FROM "
+            + "FROM medical_institutions AS med LEFT JOIN locations AS loc ON med.name="
+            + "loc.medical_institution_name "
+            + "LEFT JOIN "
             + self.table_name
             + " "
-            + "AS med LEFT JOIN locations ON med.name="
-            + "locations.medical_institution_name "
-            + "LEFT JOIN reservation_statuses AS reserve ON med.name="
-            + "reserve.medical_institution_name "
+            + "AS reserve ON med.name=reserve.medical_institution_name "
             + "WHERE med.name=%s AND "
         )
         if is_pediatric:
