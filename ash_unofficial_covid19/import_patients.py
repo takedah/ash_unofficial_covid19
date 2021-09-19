@@ -42,7 +42,7 @@ from ash_unofficial_covid19.services.sapporo_patients_number import (
 )
 
 
-def get_download_lists() -> list:
+def _get_download_lists() -> list:
     """
     旭川市公式ホームページの前月分以前の感染者情報一覧のページURLをリストで返す。
 
@@ -64,7 +64,7 @@ def get_download_lists() -> list:
     ]
 
 
-def import_hokkaido_patients(url: str) -> None:
+def _import_hokkaido_patients(url: str) -> None:
     """
     旭川市公式ホームページから新型コロナウイルス感染症の感染者情報一覧を取得し、
     データベースへ格納する。
@@ -95,7 +95,7 @@ def import_hokkaido_patients(url: str) -> None:
         return
 
 
-def import_asahikawa_patients(url: str, target_year: int) -> None:
+def _import_asahikawa_patients(url: str, target_year: int) -> None:
     """
     旭川市公式ホームページから新型コロナウイルス感染症の感染者情報を、
     データベースへ格納する。
@@ -127,7 +127,7 @@ def import_asahikawa_patients(url: str, target_year: int) -> None:
         return
 
 
-def import_additional_asahikawa_patients() -> None:
+def _import_additional_asahikawa_patients() -> None:
     """HTMLに市内番号489の掲載が抜けているので手動で追加する"""
     patients_factory = AsahikawaPatientFactory()
     additional_data = {
@@ -160,7 +160,7 @@ def import_additional_asahikawa_patients() -> None:
         return
 
 
-def import_press_release_link(url: str, target_year: int) -> None:
+def _import_press_release_link(url: str, target_year: int) -> None:
     """
     旭川市公式ホームページから新型コロナウイルス感染症の感染者情報を、
     報道発表資料のPDFから抽出し、データベースへ格納するため、
@@ -193,7 +193,7 @@ def import_press_release_link(url: str, target_year: int) -> None:
         return
 
 
-def get_press_release_links() -> Optional[PressReleaseLinkFactory]:
+def _get_press_release_links() -> Optional[PressReleaseLinkFactory]:
     """報道発表資料PDFファイルのURLと報道発表日を要素に持つオブジェクトのリストを返す
 
     Returns:
@@ -210,7 +210,7 @@ def get_press_release_links() -> Optional[PressReleaseLinkFactory]:
         return None
 
 
-def import_asahikawa_data_from_press_release(
+def _import_asahikawa_data_from_press_release(
     pdf_url: str, publication_date: date
 ) -> None:
     """
@@ -242,7 +242,13 @@ def import_asahikawa_data_from_press_release(
         return
 
 
-def import_sapporo_patients_number(url: str) -> None:
+def _import_sapporo_patients_number(url: str) -> None:
+    """DATA-SMART CITY SAPPOROから札幌市の1日の新規陽性患者数をインポートする
+
+    Args:
+        url (str): DATA-SMART CITY SAPPOROのCSVファイルのパス
+
+    """
     try:
         scraped_data = ScrapeSapporoPatientsNumber(url)
     except (HTTPDownloadError, ScrapeError) as e:
@@ -261,58 +267,64 @@ def import_sapporo_patients_number(url: str) -> None:
         return
 
 
-if __name__ == "__main__":
+def import_latest():
+    """今月の旭川市の新規陽性患者データを取得"""
     # 先にHTMLページから新規陽性患者データをデータベースへ登録
-    import_asahikawa_patients(url=Config.LATEST_DATA_URL, target_year=2021)
+    _import_asahikawa_patients(url=Config.LATEST_DATA_URL, target_year=2021)
 
     # 最新の報道発表資料PDFファイルのURLと報道発表日をデータベースへ登録
-    import_press_release_link(Config.OVERVIEW_URL, 2021)
+    _import_press_release_link(Config.OVERVIEW_URL, 2021)
 
     # 最新の報道発表資料PDFファイルから新規陽性患者データをデータベースへ更新登録
-    press_release_links = get_press_release_links()
+    press_release_links = _get_press_release_links()
     if press_release_links:
         latest_press_release_link = press_release_links.items[0]
-        import_asahikawa_data_from_press_release(
+        _import_asahikawa_data_from_press_release(
             pdf_url=latest_press_release_link.url,
             publication_date=latest_press_release_link.publication_date,
         )
 
     # 札幌市の日別新規陽性患者数データをデータベースへ登録
-    import_sapporo_patients_number(Config.SAPPORO_URL)
+    _import_sapporo_patients_number(Config.SAPPORO_URL)
 
     # 報道発表資料PDFファイルから新規陽性患者データをデータベースへ更新登録
-    import_press_release_link(url=Config.LATEST_DATA_URL, target_year=2021)
-    press_release_links = get_press_release_links()
+    _import_press_release_link(url=Config.LATEST_DATA_URL, target_year=2021)
+    press_release_links = _get_press_release_links()
     if press_release_links:
         for press_release_link in press_release_links.items:
             publication_date = press_release_link.publication_date
             if publication_date.year == 2021 and publication_date.month == 9:
-                import_asahikawa_data_from_press_release(
+                _import_asahikawa_data_from_press_release(
                     pdf_url=press_release_link.url,
                     publication_date=press_release_link.publication_date,
                 )
 
-    # 過去の新規陽性患者数データを全件取得する処理
-    # 全件ダウンロードし直す場合コメントアウトを解除する
-    # 北海道の新規陽性患者データをデータベースへ登録
-    import_hokkaido_patients(Config.HOKKAIDO_URL)
 
-    for download_list in get_download_lists():
+def import_past():
+    """先月以前の全ての新規陽性患者データを取得"""
+    # 北海道の新規陽性患者データをデータベースへ登録
+    _import_hokkaido_patients(Config.HOKKAIDO_URL)
+
+    for download_list in _get_download_lists():
         url = download_list[0]
         target_year = download_list[1]
         # 先にHTMLページから新規陽性患者データをデータベースへ登録
-        import_asahikawa_patients(url=url, target_year=target_year)
+        _import_asahikawa_patients(url=url, target_year=target_year)
         # 過去の報道発表資料PDFファイルのURLと報道発表日を取得
-        import_press_release_link(url=url, target_year=target_year)
+        _import_press_release_link(url=url, target_year=target_year)
 
     # 報道発表資料PDFファイルのURLと報道発表日を取得
-    past_press_release_links = get_press_release_links()
+    past_press_release_links = _get_press_release_links()
     if past_press_release_links:
         # 報道発表資料PDFファイルから新規陽性患者データをデータベースへ更新登録
         for press_release_link in past_press_release_links.items:
-            import_asahikawa_data_from_press_release(
+            _import_asahikawa_data_from_press_release(
                 pdf_url=press_release_link.url,
                 publication_date=press_release_link.publication_date,
             )
 
-    import_additional_asahikawa_patients()
+    _import_additional_asahikawa_patients()
+
+
+if __name__ == "__main__":
+    import_latest()
