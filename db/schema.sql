@@ -79,3 +79,15 @@ CREATE TABLE sapporo_patients_numbers(
     patients_number INTEGER NOT NULL,
     updated_at TIMESTAMPTZ NOT NULL
 );
+DROP TABLE IF EXISTS reservation_statuses;
+CREATE TABLE reservation_statuses(
+    id SERIAL NOT NULL,
+    medical_institution_name VARCHAR(128) NOT NULL PRIMARY KEY,
+    address TEXT,
+    phone_number TEXT,
+    status TEXT,
+    target TEXT,
+    inoculation_time TEXT,
+    memo TEXT,
+    updated_at TIMESTAMPTZ NOT NULL
+);
