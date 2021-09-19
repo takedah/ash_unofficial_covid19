@@ -182,11 +182,17 @@ def opendata_pages(page):
 @app.route("/medical_institutions")
 def medical_institutions():
     medical_institutions = get_medical_institutions()
+    above_16_medical_institutions = medical_institutions.find_area()
+    below_15_medical_institutions = medical_institutions.find_area(is_pediatric=True)
     return render_template(
         "medical_institutions.html",
         title="新型コロナワクチン接種医療機関一覧",
         gtag_id=Config.GTAG_ID,
         last_updated=medical_institutions.last_updated,
+        above_16_medical_institutions=above_16_medical_institutions,
+        above_16_medical_institutions_number=len(above_16_medical_institutions),
+        below_15_medical_institutions=below_15_medical_institutions,
+        below_15_medical_institutions_number=len(below_15_medical_institutions),
         above_16_area_list=medical_institutions.get_area_list(),
         below_15_area_list=medical_institutions.get_area_list(is_pediatric=True),
         leaflet=False,
