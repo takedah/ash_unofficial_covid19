@@ -41,7 +41,12 @@ document.addEventListener("DOMContentLoaded", function() {
     L.marker([
       locationData["latitude" + currentReversedOrder],
       locationData["longitude" + currentReversedOrder]
-    ]).addTo(map)
+    ], { icon: L.divIcon({
+          html: "<i class='fas fa-clinic-medical fa-2x'></i>",
+          className: "map_icon",
+          iconSize: [0, 0]
+      })
+    }).addTo(map)
       .bindPopup(locationData["locationName" + currentReversedOrder], {autoClose:
         false})
       .openPopup();
