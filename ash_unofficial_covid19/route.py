@@ -31,20 +31,23 @@ cache.init_app(app)
 
 @app.after_request
 def add_security_headers(response):
-    response.headers.add(
-        "Content-Security-Policy",
-        "default-src 'self'; style-src 'self' 'unsafe-inline' \
-                stackpath.bootstrapcdn.com unpkg.com kit.fontawesome.com; \
-                script-src 'self' code.jquery.com cdnjs.cloudflare.com \
-                stackpath.bootstrapcdn.com unpkg.com kit.fontawesome.com \
-                www.googletagmanager.com \
-                'nonce-Pbq-X7F-632oxHhPe6mzMC-LHYE'; \
-                connect-src ka-f.fontawesome.com \
-                www.google-analytics.com; \
-                font-src ka-f.fontawesome.com; \
-                img-src 'self' i.creativecommons.org licensebuttons.net \
-                data: https:;",
+    csp = (
+        "default-src 'self'; "
+        + "style-src 'self' "
+        + "stackpath.bootstrapcdn.com unpkg.com kit.fontawesome.com "
+        + "'sha256-JdCH8SP11p44kp0La4MPFI5qR9musjNwAg5WtqgDI4o=' "
+        + "'sha256-Ni2urx9+Bf7ppgnlSfFIqsvlGMFm+9lurWkFfilXQq8=' "
+        + "'sha256-mCk+PuH4k8s22RWyQ0yVST1TXl6y5diityhSgV9XfOc='; "
+        + "script-src 'self' "
+        + "code.jquery.com cdnjs.cloudflare.com stackpath.bootstrapcdn.com "
+        + "unpkg.com kit.fontawesome.com www.googletagmanager.com minmoji.ucda.jp "
+        + "'nonce-Pbq-X7F-632oxHhPe6mzMC-LHYE'; "
+        + "connect-src ka-f.fontawesome.com www.google-analytics.com; "
+        + "font-src ka-f.fontawesome.com minmoji.ucda.jp; "
+        + "img-src 'self' i.creativecommons.org licensebuttons.net "
+        + "data: https:"
     )
+    response.headers.add("Content-Security-Policy", csp)
     response.headers.add("X-Content-Type-Options", "nosniff")
     response.headers.add("X-Frame-Options", "DENY")
     response.headers.add("X-XSS-Protection", "1;mode=block")

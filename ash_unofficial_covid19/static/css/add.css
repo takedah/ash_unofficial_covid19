@@ -1,4 +1,14 @@
-body {
-    padding-top: 96px;
+@font-face {
+  font-family: minmoji;
+  src: url('https://minmoji.ucda.jp/fontseot/https%3A__ash-unofficial-covid19.herokuapp.com_');
+  src: local('minmoji'),
+  url('https://minmoji.ucda.jp/fontswoff/https%3A__ash-unofficial-covid19.herokuapp.com_') format('woff'),
+  url('https://minmoji.ucda.jp/fonts/https%3A__ash-unofficial-covid19.herokuapp.com_') format('opentype');
 }
-#mapid { height: 480px }
+body {
+  font-family: minmoji;
+  padding-top: 96px;
+}
+#mapid {
+  height: 480px;
+}
