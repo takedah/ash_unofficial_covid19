@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 {% block content %}
 <article>
-  <h1 class="h4">旭川市新型コロナワクチン接種医療機関一覧</h1>
+  <h1 class="h4">旭川市の新型コロナワクチン接種医療機関一覧</h1>
   <div class="alert alert-danger alert-dismissible fade show" role="alert">
     <p class="mb-0">{{ last_updated }}にダウンロードしたデータを元に表示しています。正確な情報は必ず<a class="alert-link" href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/146/149/d073389.html" title="旭川市公式ホームページ" target="_blank">旭川市公式ホームページ</a>を確認してください。</p>
     <button type="button" class="close" data-dismiss="alert" aria-label="close">
@@ -11,8 +11,8 @@
   <div class="card">
     <div class="card-body">
       <section>
-        <h2 class="h5 card-title">地域を選択</h2>
-        <p class="card-text">以下のリンクから地域ごとの新型コロナワクチン接種医療機関の一覧と地図を確認できます。</p>
+        <h2 class="h5 card-title">地区から探す</h2>
+        <p class="card-text">以下のリンクから地区ごとの新型コロナワクチン接種医療機関の一覧と地図を確認できます。</p>
         <div class="card-group mt-3">
           <div class="card">
             <div class="card-body">
@@ -41,7 +41,35 @@
   <div class="card mt-3">
     <div class="card-body">
       <section>
-        <h4 class="h5 card-title">医療機関名一覧</h4>
+        <h2 class="h5 card-title">場所から探す</h2>
+        <p class="card-text">地図のポップアップのリンクから新型コロナワクチン接種医療機関の詳細情報を確認できます。（地図の表示はあくまで目安ですので、正確な場所の情報は各医療機関のホームページ等でご確認ください。）</p>
+        <div class="card-group my-3">
+          <div class="card">
+            <div class="card-header">16歳以上が対象の医療機関</div>
+            <div class="card-body">
+              <div id="mapid" class="mb-3"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">12歳から15歳までが対象の医療機関</div>
+            <div class="card-body">
+              <div id="pediatrics_mapid" class="mb-3"></div>
+            </div>
+          </div>
+        </div>
+        <p class="card-text small">医療機関の位置情報は、<a href="https://developer.yahoo.co.jp/webapi/map/" title="Yahoo! Open Local Platform" target="_blank">Yahoo! Open Local Platform (YOLP) </a>のYahoo!ローカルサーチAPIを使用して取得しています。
+          <!-- Begin Yahoo! JAPAN Web Services Attribution Snippet -->
+          <a href="https://developer.yahoo.co.jp/sitemap/">
+            <img src="https://s.yimg.jp/images/yjdn/yjdn_attbtn1_125_17.gif" title="Webサービス by Yahoo! JAPAN" alt="Web Services by Yahoo! JAPAN" width="125" height="17" border="0"></a>
+          <!-- End Yahoo! JAPAN Web Services Attribution Snippet -->
+        </p>
+      </section>
+    </div>
+  </div>
+  <div class="card mt-3">
+    <div class="card-body">
+      <section>
+        <h4 class="h5 card-title">医療機関名から探す</h4>
         <p class="card-text">以下のリンクから新型コロナワクチン接種医療機関の詳細情報を確認できます。</p>
         <div class="card-group mt-3">
           <div class="card">
@@ -59,7 +87,7 @@
               <h5 class="h6 card-title">12歳から15歳までが対象の医療機関</h5>
               <div id="pediatrics_results" data-length="{{ below_15_medical_institutions_number|tojson }}" class="list-group-flush">
                 {% for medical_institution in below_15_medical_institutions %}
-                <a href="/medical_institution/pediatrics/{{ medical_institution[1] }}" title="{{ medical_institution[0].name }}（12歳から15歳まで）の詳細へ" id="pediatrics_order{{ loop.index }}" data-latitude="{{ medical_institution[0].latitude|tojson }}" data-longitude="{{ medical_institution[0].longitude|tojson }}" data-name="{{ medical_institution[0].name|safe }}" data-url="/pediatrics/{{ medical_institution[1]|safe }}" class="list-group-item list-group-item-action text-primary">{{ medical_institution[0].name }}</a>
+                <a href="/medical_institution/pediatrics/{{ medical_institution[1] }}" title="{{ medical_institution[0].name }}（12歳から15歳まで）の詳細へ" id="pediatrics_order{{ loop.index }}" data-latitude="{{ medical_institution[0].latitude|tojson }}" data-longitude="{{ medical_institution[0].longitude|tojson }}" data-name="{{ medical_institution[0].name|safe }}" data-url="{{ medical_institution[1]|safe }}" class="list-group-item list-group-item-action text-primary">{{ medical_institution[0].name }}</a>
                 {% endfor %}
               </div>
             </div>
@@ -96,5 +124,7 @@
     </div>
   </div>
 </article>
+<script charset="utf-8" src="{{ url_for('static', filename='js/show_map_all.js') }}"></script>
+<script charset="utf-8" src="{{ url_for('static', filename='js/show_map_pediatrics_all.js') }}"></script>
 <script charset="utf-8" src="{{ url_for('static', filename='js/select_input.js') }}"></script>
 {% endblock %}

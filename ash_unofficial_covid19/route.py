@@ -198,7 +198,7 @@ def medical_institutions():
         below_15_medical_institutions_number=len(below_15_medical_institutions),
         above_16_area_list=medical_institutions.get_area_list(),
         below_15_area_list=medical_institutions.get_area_list(is_pediatric=True),
-        leaflet=False,
+        leaflet=True,
     )
 
 
