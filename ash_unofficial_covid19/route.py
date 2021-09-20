@@ -223,7 +223,7 @@ def medical_institutions_areas(area):
         "area.html",
         title="【旭川市】" + area + "の新型コロナワクチン接種医療機関一覧（16歳以上）",
         gtag_id=Config.GTAG_ID,
-        last_updated=medical_institutions.last_updated,
+        reservation_status_updated=medical_institutions.reservation_status_updated,
         area=area,
         search_results=search_results,
         search_lengths=search_lengths,
@@ -255,7 +255,7 @@ def pediatric_medical_institutions_areas(area):
         "area.html",
         title="【旭川市】" + area + "の新型コロナワクチン接種医療機関一覧（12歳から15歳まで）",
         gtag_id=Config.GTAG_ID,
-        last_updated=medical_institutions.last_updated,
+        reservation_status_updated=medical_institutions.reservation_status_updated,
         area=area,
         search_results=search_results,
         search_lengths=search_lengths,
@@ -287,6 +287,7 @@ def medical_institution(name):
         medical_institution=medical_institution,
         above_16_area_list=medical_institutions.get_area_list(),
         below_15_area_list=medical_institutions.get_area_list(is_pediatric=True),
+        is_pediatric=False,
         leaflet=True,
     )
 
@@ -312,6 +313,7 @@ def pediatric_medical_institution(name):
         medical_institution=medical_institution,
         above_16_area_list=medical_institutions.get_area_list(),
         below_15_area_list=medical_institutions.get_area_list(is_pediatric=True),
+        is_pediatric=True,
         leaflet=True,
     )
 

@@ -134,6 +134,47 @@ class TestMedicalInstitutionLocationReservationStatusService(unittest.TestCase):
         with self.assertRaises(ServiceError):
             self.service.find(name="hoge")
 
+    def test_find_area(self):
+        # 対象年齢を指定しない場合16歳以上の医療機関を返す
+        results = self.service.find_area(area="新富・東・金星町")
+        result = results.items[0]
+        self.assertEqual(result.name, "市立旭川病院")
+        self.assertEqual(result.address, "旭川市金星町1")
+        self.assertEqual(result.phone_number, "0166-29-0202")
+        self.assertEqual(result.book_at_medical_institution, True)
+        self.assertEqual(result.book_at_call_center, False)
+        self.assertEqual(result.area, "新富・東・金星町")
+        self.assertEqual(result.memo, "")
+        self.assertEqual(result.target_age, "16歳以上")
+        self.assertEqual(result.latitude, 43.778422777778)
+        self.assertEqual(result.longitude, 142.365976388889)
+        self.assertEqual(result.status, "―")
+        self.assertEqual(result.target_person, "―")
+        self.assertEqual(result.inoculation_time, "―")
+        self.assertEqual(result.reservation_status_memo, "詳細は病院のホームページで確認してください。")
+
+        # 対象年齢を指定する場合
+        results = self.service.find_area(area="東・金星町・各条17〜26丁目", is_pediatric=True)
+        result = results.items[0]
+        self.assertEqual(result.name, "市立旭川病院")
+        self.assertEqual(result.address, "旭川市金星町1")
+        self.assertEqual(result.phone_number, "0166-29-0202")
+        self.assertEqual(result.book_at_medical_institution, True)
+        self.assertEqual(result.book_at_call_center, False)
+        self.assertEqual(result.area, "東・金星町・各条17〜26丁目")
+        self.assertEqual(result.memo, "")
+        self.assertEqual(result.target_age, "12歳から15歳まで")
+        self.assertEqual(result.latitude, 43.778422777778)
+        self.assertEqual(result.longitude, 142.365976388889)
+        self.assertEqual(result.status, "―")
+        self.assertEqual(result.target_person, "―")
+        self.assertEqual(result.inoculation_time, "―")
+        self.assertEqual(result.reservation_status_memo, "詳細は病院のホームページで確認してください。")
+
+        # 存在しない地域を指定
+        with self.assertRaises(ServiceError):
+            self.service.find_area(area="fuga")
+
 
 if __name__ == "__main__":
     unittest.main()

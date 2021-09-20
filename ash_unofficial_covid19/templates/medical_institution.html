@@ -60,7 +60,13 @@
               </tr>
               <tr>
                 <th>地区</th>
-                <td><a href="/medical_institutions/areas/{{ medical_institution.area }}">{{ medical_institution.area }}（{{ medical_institution.target_age }}）</a></td>
+                <td>
+                  {%if is_pediatric %}
+                  <a href="/medical_institutions/areas/pediatrics/{{ medical_institution.area }}">{{ medical_institution.area }}（{{ medical_institution.target_age }}）</a>
+                  {% else %}
+                  <a href="/medical_institutions/areas/{{ medical_institution.area }}">{{ medical_institution.area }}（{{ medical_institution.target_age }}）</a>
+                  {% endif %}
+                </td>
               </tr>
             </tbody>
           </table>

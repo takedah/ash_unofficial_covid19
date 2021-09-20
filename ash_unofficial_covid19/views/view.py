@@ -155,7 +155,7 @@ class MedicalInstitutionsView:
 
         """
         response = list()
-        medical_institution_locations = self.__location_service.find_area(
+        medical_institution_locations = self.__reservation_status_service.find_area(
             area=area, is_pediatric=is_pediatric
         )
         for medical_institution_location in medical_institution_locations.items:
