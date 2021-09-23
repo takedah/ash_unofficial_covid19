@@ -210,6 +210,8 @@ class TestAsahikawaPatientService(unittest.TestCase):
 
     def test_delete(self):
         self.assertTrue(self.service.delete(patient_number=1121))
+        with self.assertRaises(ServiceError):
+            self.service.delete("not-exist-number")
 
     def test_find_all(self):
         results = self.service.find_all()

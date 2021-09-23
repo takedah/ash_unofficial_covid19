@@ -103,12 +103,14 @@ class AsahikawaPatientService(Service):
                     if cur.statusmessage == "DELETE 1":
                         result = True
                 conn.commit()
+                self.info_log("市内番号" + str(patient_number) + "を削除しました。")
             except (
                 psycopg2.DataError,
                 psycopg2.IntegrityError,
                 psycopg2.InternalError,
             ) as e:
                 self.error_log(e.args[0])
+                raise ServiceError("陽性患者データを削除できませんでした。")
         return result
 
     def find_all(self) -> AsahikawaPatientFactory:

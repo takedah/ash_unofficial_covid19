@@ -326,5 +326,24 @@ def import_past():
     _import_additional_asahikawa_patients()
 
 
+def delete_patients(patient_number: int):
+    """
+    指定した番号の新規陽性患者データを削除
+
+    Args:
+        patient_number (int): 削除したい番号
+
+    """
+    service = AsahikawaPatientService()
+    try:
+        service.delete(patient_number)
+    except (DatabaseConnectionError, ServiceError) as e:
+        print(e.message)
+        return
+
+
 if __name__ == "__main__":
     import_latest()
+    # 2021年9月22日報道発表データに訂正があったため1件陽性患者データを削除
+    # https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529_d/fil/09232.pdf
+    delete_patients(3401)
