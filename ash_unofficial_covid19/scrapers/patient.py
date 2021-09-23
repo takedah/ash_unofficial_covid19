@@ -363,17 +363,12 @@ class ScrapeAsahikawaPatientsPDF(Scraper):
             if pdf_table == []:
                 continue
 
-            header_row = pdf_table[0]
-            # 見出し行かどうかまず要素数で判定
-            if len(header_row) < 3:
-                continue
-
-            # 見出し行が決まった文字列の場合のみデータ抽出
-            if header_row[1] == "市内番号" and header_row[2] == "道内番号":
-                for row in pdf_table[1:]:
-                    extracted_data = self._extract_patient_data(row)
-                    if extracted_data:
-                        patients_data.append(extracted_data)
+            for row in pdf_table:
+                if len(row) < 10:
+                    continue
+                extracted_data = self._extract_patient_data(row)
+                if extracted_data:
+                    patients_data.append(extracted_data)
 
         return patients_data
 
@@ -389,8 +384,10 @@ class ScrapeAsahikawaPatientsPDF(Scraper):
 
         """
         try:
-            search_patient_number = re.match("^([0-9]{,4})$", row[1].strip())
-            search_hokkaido_patient_number = re.match("^([0-9]{,5})$", row[2].strip())
+            search_patient_number = re.match("^([0-9]{,4})$", str(row[1]).strip())
+            search_hokkaido_patient_number = re.match(
+                "^([0-9]{,5})$", str(row[2]).strip()
+            )
         except IndexError:
             return None
 
