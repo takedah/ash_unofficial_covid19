@@ -33,11 +33,8 @@ cache.init_app(app)
 def add_security_headers(response):
     csp = (
         "default-src 'self'; "
-        + "style-src 'self' "
-        + "stackpath.bootstrapcdn.com unpkg.com kit.fontawesome.com "
-        + "'sha256-JdCH8SP11p44kp0La4MPFI5qR9musjNwAg5WtqgDI4o=' "
-        + "'sha256-Ni2urx9+Bf7ppgnlSfFIqsvlGMFm+9lurWkFfilXQq8=' "
-        + "'sha256-mCk+PuH4k8s22RWyQ0yVST1TXl6y5diityhSgV9XfOc='; "
+        + "style-src 'self' 'unsafe-inline' "
+        + "stackpath.bootstrapcdn.com unpkg.com kit.fontawesome.com; "
         + "script-src 'self' "
         + "code.jquery.com cdnjs.cloudflare.com stackpath.bootstrapcdn.com "
         + "unpkg.com kit.fontawesome.com www.googletagmanager.com minmoji.ucda.jp "
