@@ -324,6 +324,11 @@ def import_past():
             )
 
     _import_additional_asahikawa_patients()
+    # 重複事例5例を削除する
+    # https://www.pref.hokkaido.lg.jp/fs/4/0/4/0/0/1/8/_/hokkaido_z0519.pdf
+    duplicate_patient_numbers = [7354, 9147, 9182, 11058, 30909]
+    for patient_number in duplicate_patient_numbers:
+        delete_patients(patient_number)
 
 
 def delete_patients(patient_number: int):
