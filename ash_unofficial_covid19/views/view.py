@@ -775,7 +775,7 @@ class PerHundredThousandPopulationView(GraphView):
             font_properties=font,
         )
         ax.axhline(y=25, color="salmon", linewidth=1, linestyle="--")
-        ax.legend(prop=legend_font, loc=4)
+        ax.legend(prop=legend_font, loc=0)
 
         fig.tight_layout()
         canvas = FigureCanvasAgg(fig)
