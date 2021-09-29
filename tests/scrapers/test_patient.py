@@ -9,7 +9,7 @@ from numpy import nan
 from ash_unofficial_covid19.scrapers.patient import (
     ScrapeAsahikawaPatients,
     ScrapeAsahikawaPatientsPDF,
-    ScrapeHokkaidoPatients
+    ScrapeHokkaidoPatients,
 )
 
 

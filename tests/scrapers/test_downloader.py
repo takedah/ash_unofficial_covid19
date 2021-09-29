@@ -7,7 +7,7 @@ from ash_unofficial_covid19.errors import HTTPDownloadError
 from ash_unofficial_covid19.scrapers.downloader import (
     DownloadedCSV,
     DownloadedHTML,
-    DownloadedPDF
+    DownloadedPDF,
 )
 
 

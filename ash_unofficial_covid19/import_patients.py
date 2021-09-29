@@ -7,7 +7,7 @@ from .errors import (
     DataModelError,
     HTTPDownloadError,
     ScrapeError,
-    ServiceError
+    ServiceError,
 )
 from .models.patient import AsahikawaPatientFactory, HokkaidoPatientFactory
 from .models.press_release_link import PressReleaseLinkFactory
@@ -15,7 +15,7 @@ from .models.sapporo_patients_number import SapporoPatientsNumberFactory
 from .scrapers.patient import (
     ScrapeAsahikawaPatients,
     ScrapeAsahikawaPatientsPDF,
-    ScrapeHokkaidoPatients
+    ScrapeHokkaidoPatients,
 )
 from .scrapers.press_release_link import ScrapePressReleaseLink
 from .scrapers.sapporo_patients_number import ScrapeSapporoPatientsNumber

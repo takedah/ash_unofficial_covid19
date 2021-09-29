@@ -2,7 +2,7 @@ import unittest
 
 from ash_unofficial_covid19.models.medical_institution_location_reservation_status import (
     MedicalInstitutionLocationReservationStatus,
-    MedicalInstitutionLocationReservationStatusFactory
+    MedicalInstitutionLocationReservationStatusFactory,
 )
 
 

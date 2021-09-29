@@ -6,7 +6,7 @@ from ash_unofficial_covid19.models.patient import (
     AsahikawaPatient,
     AsahikawaPatientFactory,
     HokkaidoPatient,
-    HokkaidoPatientFactory
+    HokkaidoPatientFactory,
 )
 
 

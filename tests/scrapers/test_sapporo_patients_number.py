@@ -3,7 +3,7 @@ from datetime import date
 from unittest.mock import Mock, patch
 
 from ash_unofficial_covid19.scrapers.sapporo_patients_number import (
-    ScrapeSapporoPatientsNumber
+    ScrapeSapporoPatientsNumber,
 )
 
 

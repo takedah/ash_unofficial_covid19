@@ -5,7 +5,7 @@ from .errors import (
     DatabaseConnectionError,
     HTTPDownloadError,
     ScrapeError,
-    ServiceError
+    ServiceError,
 )
 from .models.location import LocationFactory
 from .models.medical_institution import MedicalInstitutionFactory

@@ -6,7 +6,7 @@ import pandas as pd
 
 from ash_unofficial_covid19.scrapers.medical_institution import (
     ScrapeMedicalInstitutions,
-    ScrapeMedicalInstitutionsPDF
+    ScrapeMedicalInstitutionsPDF,
 )
 
 

@@ -7,11 +7,11 @@ from pandas._testing import assert_frame_equal
 from ash_unofficial_covid19.errors import ServiceError
 from ash_unofficial_covid19.models.patient import (
     AsahikawaPatientFactory,
-    HokkaidoPatientFactory
+    HokkaidoPatientFactory,
 )
 from ash_unofficial_covid19.services.patient import (
     AsahikawaPatientService,
-    HokkaidoPatientService
+    HokkaidoPatientService,
 )
 
 

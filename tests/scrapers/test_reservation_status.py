@@ -4,9 +4,7 @@ from unittest.mock import Mock, patch
 
 import pandas as pd
 
-from ash_unofficial_covid19.scrapers.reservation_status import (
-    ScrapeReservationStatus
-)
+from ash_unofficial_covid19.scrapers.reservation_status import ScrapeReservationStatus
 
 
 class TestScrapeReservationStatus(unittest.TestCase):

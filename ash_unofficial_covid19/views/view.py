@@ -15,14 +15,12 @@ from matplotlib.ticker import MultipleLocator
 
 from ..errors import DatabaseConnectionError
 from ..models.medical_institution_location_reservation_status import (
-    MedicalInstitutionLocationReservationStatus
+    MedicalInstitutionLocationReservationStatus,
 )
 from ..services.medical_institution import MedicalInstitutionService
-from ..services.medical_institution_location import (
-    MedicalInstitutionLocationService
-)
+from ..services.medical_institution_location import MedicalInstitutionLocationService
 from ..services.medical_institution_location_reservation_status import (
-    MedicalInstitutionLocationReservationStatusService
+    MedicalInstitutionLocationReservationStatusService,
 )
 from ..services.patient import AsahikawaPatientService
 from ..services.press_release_link import PressReleaseLinkService

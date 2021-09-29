@@ -1,11 +1,7 @@
 import unittest
 
-from ash_unofficial_covid19.models.reservation_status import (
-    ReservationStatusFactory
-)
-from ash_unofficial_covid19.services.reservation_status import (
-    ReservationStatusService
-)
+from ash_unofficial_covid19.models.reservation_status import ReservationStatusFactory
+from ash_unofficial_covid19.services.reservation_status import ReservationStatusService
 
 
 class TestReservationStatusService(unittest.TestCase):

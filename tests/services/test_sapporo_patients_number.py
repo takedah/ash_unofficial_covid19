@@ -2,10 +2,10 @@ import unittest
 from datetime import date
 
 from ash_unofficial_covid19.models.sapporo_patients_number import (
-    SapporoPatientsNumberFactory
+    SapporoPatientsNumberFactory,
 )
 from ash_unofficial_covid19.services.sapporo_patients_number import (
-    SapporoPatientsNumberService
+    SapporoPatientsNumberService,
 )
 
 

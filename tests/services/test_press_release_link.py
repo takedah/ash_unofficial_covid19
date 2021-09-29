@@ -1,12 +1,8 @@
 import unittest
 from datetime import date
 
-from ash_unofficial_covid19.models.press_release_link import (
-    PressReleaseLinkFactory
-)
-from ash_unofficial_covid19.services.press_release_link import (
-    PressReleaseLinkService
-)
+from ash_unofficial_covid19.models.press_release_link import PressReleaseLinkFactory
+from ash_unofficial_covid19.services.press_release_link import PressReleaseLinkService
 
 
 class TestPressReleaseLinkService(unittest.TestCase):

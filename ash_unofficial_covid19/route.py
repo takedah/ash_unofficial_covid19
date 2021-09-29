@@ -1,14 +1,6 @@
 import os
 
-from flask import (
-    Flask,
-    abort,
-    escape,
-    g,
-    make_response,
-    render_template,
-    url_for
-)
+from flask import Flask, abort, escape, g, make_response, render_template, url_for
 from flask_caching import Cache
 
 from .config import Config
@@ -21,7 +13,7 @@ from .views.view import (
     MonthTotalView,
     MovingAverageView,
     PerHundredThousandPopulationView,
-    WeeklyPerAgeView
+    WeeklyPerAgeView,
 )
 
 cache = Cache(config={"CACHE_TYPE": "simple"})

@@ -2,9 +2,7 @@ import unittest
 from datetime import date
 from unittest.mock import Mock, patch
 
-from ash_unofficial_covid19.scrapers.press_release_link import (
-    ScrapePressReleaseLink
-)
+from ash_unofficial_covid19.scrapers.press_release_link import ScrapePressReleaseLink
 
 
 def html_content():

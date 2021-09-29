@@ -2,7 +2,7 @@ import unittest
 
 from ash_unofficial_covid19.models.reservation_status import (
     ReservationStatus,
-    ReservationStatusFactory
+    ReservationStatusFactory,
 )
 
 

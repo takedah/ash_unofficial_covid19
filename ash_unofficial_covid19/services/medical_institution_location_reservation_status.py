@@ -5,7 +5,7 @@ from psycopg2.extras import DictCursor
 from ..errors import ServiceError
 from ..models.medical_institution_location_reservation_status import (
     MedicalInstitutionLocationReservationStatus,
-    MedicalInstitutionLocationReservationStatusFactory
+    MedicalInstitutionLocationReservationStatusFactory,
 )
 from ..services.service import Service
 
