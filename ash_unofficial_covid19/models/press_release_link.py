@@ -1,6 +1,6 @@
 from datetime import date
 
-from ash_unofficial_covid19.models.factory import Factory
+from ..models.factory import Factory
 
 
 class PressReleaseLink:

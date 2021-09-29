@@ -2,12 +2,12 @@ from typing import Optional
 
 from psycopg2.extras import DictCursor
 
-from ash_unofficial_covid19.errors import ServiceError
-from ash_unofficial_covid19.models.medical_institution_location import (
+from ..errors import ServiceError
+from ..models.medical_institution_location import (
     MedicalInstitutionLocation,
     MedicalInstitutionLocationFactory
 )
-from ash_unofficial_covid19.services.service import Service
+from ..services.service import Service
 
 
 class MedicalInstitutionLocationService(Service):

@@ -3,11 +3,9 @@ from decimal import ROUND_HALF_UP, Decimal
 
 from psycopg2.extras import DictCursor
 
-from ash_unofficial_covid19.config import Config
-from ash_unofficial_covid19.models.sapporo_patients_number import (
-    SapporoPatientsNumberFactory
-)
-from ash_unofficial_covid19.services.service import Service
+from ..config import Config
+from ..models.sapporo_patients_number import SapporoPatientsNumberFactory
+from ..services.service import Service
 
 
 class SapporoPatientsNumberService(Service):

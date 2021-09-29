@@ -6,8 +6,8 @@ import requests
 from requests import HTTPError, Timeout
 from urllib3.exceptions import MaxRetryError
 
-from ash_unofficial_covid19.errors import HTTPDownloadError
-from ash_unofficial_covid19.logs import AppLog
+from ..errors import HTTPDownloadError
+from ..logs import AppLog
 
 
 class Downloader(metaclass=ABCMeta):

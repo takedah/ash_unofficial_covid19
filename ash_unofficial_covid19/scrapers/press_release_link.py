@@ -3,8 +3,8 @@ import urllib.parse
 
 from bs4 import BeautifulSoup
 
-from ash_unofficial_covid19.scrapers.downloader import DownloadedHTML
-from ash_unofficial_covid19.scrapers.scraper import Scraper
+from ..scrapers.downloader import DownloadedHTML
+from ..scrapers.scraper import Scraper
 
 
 class ScrapePressReleaseLink(Scraper):

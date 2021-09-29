@@ -2,9 +2,9 @@ import urllib.parse
 
 from flask import escape
 
-from ash_unofficial_covid19.config import Config
-from ash_unofficial_covid19.scrapers.downloader import DownloadedJSON
-from ash_unofficial_covid19.scrapers.scraper import Scraper
+from ..config import Config
+from ..scrapers.downloader import DownloadedJSON
+from ..scrapers.scraper import Scraper
 
 
 class ScrapeYOLPLocation(Scraper):

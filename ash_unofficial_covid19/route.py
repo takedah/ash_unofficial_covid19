@@ -11,9 +11,9 @@ from flask import (
 )
 from flask_caching import Cache
 
-from ash_unofficial_covid19.config import Config
-from ash_unofficial_covid19.errors import ServiceError
-from ash_unofficial_covid19.views.view import (
+from .config import Config
+from .errors import ServiceError
+from .views.view import (
     AsahikawaPatientsView,
     ByAgeView,
     DailyTotalView,

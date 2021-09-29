@@ -2,8 +2,8 @@ import csv
 from datetime import date, datetime
 from typing import Optional
 
-from ash_unofficial_covid19.scrapers.downloader import DownloadedCSV
-from ash_unofficial_covid19.scrapers.scraper import Scraper
+from ..scrapers.downloader import DownloadedCSV
+from ..scrapers.scraper import Scraper
 
 
 class ScrapeSapporoPatientsNumber(Scraper):

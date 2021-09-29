@@ -2,10 +2,8 @@ from datetime import date, datetime, timedelta, timezone
 
 from psycopg2.extras import DictCursor
 
-from ash_unofficial_covid19.models.press_release_link import (
-    PressReleaseLinkFactory
-)
-from ash_unofficial_covid19.services.service import Service
+from ..models.press_release_link import PressReleaseLinkFactory
+from ..services.service import Service
 
 
 class PressReleaseLinkService(Service):

@@ -3,11 +3,9 @@ from datetime import datetime, timedelta, timezone
 import psycopg2
 from psycopg2.extras import DictCursor
 
-from ash_unofficial_covid19.errors import ServiceError
-from ash_unofficial_covid19.models.reservation_status import (
-    ReservationStatusFactory
-)
-from ash_unofficial_covid19.services.service import Service
+from ..errors import ServiceError
+from ..models.reservation_status import ReservationStatusFactory
+from ..services.service import Service
 
 
 class ReservationStatusService(Service):

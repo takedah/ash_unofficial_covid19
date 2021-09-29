@@ -5,11 +5,8 @@ import pandas as pd
 import tabula
 from bs4 import BeautifulSoup
 
-from ash_unofficial_covid19.scrapers.downloader import (
-    DownloadedHTML,
-    DownloadedPDF
-)
-from ash_unofficial_covid19.scrapers.scraper import Scraper
+from ..scrapers.downloader import DownloadedHTML, DownloadedPDF
+from ..scrapers.scraper import Scraper
 
 
 class ScrapeMedicalInstitutionsPDF(Scraper):

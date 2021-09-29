@@ -1,18 +1,8 @@
-from ash_unofficial_covid19.config import Config
-from ash_unofficial_covid19.errors import (
-    DatabaseConnectionError,
-    HTTPDownloadError,
-    ServiceError
-)
-from ash_unofficial_covid19.models.reservation_status import (
-    ReservationStatusFactory
-)
-from ash_unofficial_covid19.scrapers.reservation_status import (
-    ScrapeReservationStatus
-)
-from ash_unofficial_covid19.services.reservation_status import (
-    ReservationStatusService
-)
+from .config import Config
+from .errors import DatabaseConnectionError, HTTPDownloadError, ServiceError
+from .models.reservation_status import ReservationStatusFactory
+from .scrapers.reservation_status import ScrapeReservationStatus
+from .services.reservation_status import ReservationStatusService
 
 
 def import_reservation_statuses(url: str) -> None:

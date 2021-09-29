@@ -1,8 +1,8 @@
 from datetime import date
 from typing import Optional
 
-from ash_unofficial_covid19.errors import DataModelError
-from ash_unofficial_covid19.models.factory import Factory
+from ..errors import DataModelError
+from ..models.factory import Factory
 
 
 class Patient:

@@ -3,8 +3,8 @@ from typing import Optional
 import pandas as pd
 import tabula
 
-from ash_unofficial_covid19.scrapers.downloader import DownloadedPDF
-from ash_unofficial_covid19.scrapers.scraper import Scraper
+from ..scrapers.downloader import DownloadedPDF
+from ..scrapers.scraper import Scraper
 
 
 class ScrapeReservationStatus(Scraper):

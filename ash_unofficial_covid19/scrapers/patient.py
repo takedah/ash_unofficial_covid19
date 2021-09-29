@@ -8,13 +8,9 @@ import tabula
 from bs4 import BeautifulSoup
 from dateutil.relativedelta import relativedelta
 
-from ash_unofficial_covid19.errors import ScrapeError
-from ash_unofficial_covid19.scrapers.downloader import (
-    DownloadedCSV,
-    DownloadedHTML,
-    DownloadedPDF
-)
-from ash_unofficial_covid19.scrapers.scraper import Scraper
+from ..errors import ScrapeError
+from ..scrapers.downloader import DownloadedCSV, DownloadedHTML, DownloadedPDF
+from ..scrapers.scraper import Scraper
 
 
 class ScrapeAsahikawaPatients(Scraper):

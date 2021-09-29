@@ -2,8 +2,8 @@ from datetime import datetime, timedelta, timezone
 
 from psycopg2.extras import DictCursor
 
-from ash_unofficial_covid19.models.location import LocationFactory
-from ash_unofficial_covid19.services.service import Service
+from ..models.location import LocationFactory
+from ..services.service import Service
 
 
 class LocationService(Service):

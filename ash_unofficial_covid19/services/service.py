@@ -5,9 +5,9 @@ from io import StringIO
 import psycopg2
 from psycopg2.extras import DictCursor, execute_values
 
-from ash_unofficial_covid19.config import Config
-from ash_unofficial_covid19.errors import DatabaseConnectionError, ServiceError
-from ash_unofficial_covid19.logs import AppLog
+from ..config import Config
+from ..errors import DatabaseConnectionError, ServiceError
+from ..logs import AppLog
 
 
 class Service:

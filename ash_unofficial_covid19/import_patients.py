@@ -1,45 +1,27 @@
 from datetime import date
 from typing import Optional
 
-from ash_unofficial_covid19.config import Config
-from ash_unofficial_covid19.errors import (
+from .config import Config
+from .errors import (
     DatabaseConnectionError,
     DataModelError,
     HTTPDownloadError,
     ScrapeError,
     ServiceError
 )
-from ash_unofficial_covid19.models.patient import (
-    AsahikawaPatientFactory,
-    HokkaidoPatientFactory
-)
-from ash_unofficial_covid19.models.press_release_link import (
-    PressReleaseLinkFactory
-)
-from ash_unofficial_covid19.models.sapporo_patients_number import (
-    SapporoPatientsNumberFactory
-)
-from ash_unofficial_covid19.scrapers.patient import (
+from .models.patient import AsahikawaPatientFactory, HokkaidoPatientFactory
+from .models.press_release_link import PressReleaseLinkFactory
+from .models.sapporo_patients_number import SapporoPatientsNumberFactory
+from .scrapers.patient import (
     ScrapeAsahikawaPatients,
     ScrapeAsahikawaPatientsPDF,
     ScrapeHokkaidoPatients
 )
-from ash_unofficial_covid19.scrapers.press_release_link import (
-    ScrapePressReleaseLink
-)
-from ash_unofficial_covid19.scrapers.sapporo_patients_number import (
-    ScrapeSapporoPatientsNumber
-)
-from ash_unofficial_covid19.services.patient import (
-    AsahikawaPatientService,
-    HokkaidoPatientService
-)
-from ash_unofficial_covid19.services.press_release_link import (
-    PressReleaseLinkService
-)
-from ash_unofficial_covid19.services.sapporo_patients_number import (
-    SapporoPatientsNumberService
-)
+from .scrapers.press_release_link import ScrapePressReleaseLink
+from .scrapers.sapporo_patients_number import ScrapeSapporoPatientsNumber
+from .services.patient import AsahikawaPatientService, HokkaidoPatientService
+from .services.press_release_link import PressReleaseLinkService
+from .services.sapporo_patients_number import SapporoPatientsNumberService
 
 
 def _get_download_lists() -> list:

@@ -3,11 +3,7 @@ from abc import ABCMeta, abstractmethod
 from datetime import date
 from typing import Optional
 
-from ash_unofficial_covid19.scrapers.downloader import (
-    DownloadedCSV,
-    DownloadedHTML,
-    DownloadedPDF
-)
+from ..scrapers.downloader import DownloadedCSV, DownloadedHTML, DownloadedPDF
 
 
 class Scraper(metaclass=ABCMeta):

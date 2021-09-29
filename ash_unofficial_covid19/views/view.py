@@ -13,26 +13,20 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.font_manager import FontProperties
 from matplotlib.ticker import MultipleLocator
 
-from ash_unofficial_covid19.errors import DatabaseConnectionError
-from ash_unofficial_covid19.models.medical_institution_location_reservation_status import (
+from ..errors import DatabaseConnectionError
+from ..models.medical_institution_location_reservation_status import (
     MedicalInstitutionLocationReservationStatus
 )
-from ash_unofficial_covid19.services.medical_institution import (
-    MedicalInstitutionService
-)
-from ash_unofficial_covid19.services.medical_institution_location import (
+from ..services.medical_institution import MedicalInstitutionService
+from ..services.medical_institution_location import (
     MedicalInstitutionLocationService
 )
-from ash_unofficial_covid19.services.medical_institution_location_reservation_status import (
+from ..services.medical_institution_location_reservation_status import (
     MedicalInstitutionLocationReservationStatusService
 )
-from ash_unofficial_covid19.services.patient import AsahikawaPatientService
-from ash_unofficial_covid19.services.press_release_link import (
-    PressReleaseLinkService
-)
-from ash_unofficial_covid19.services.sapporo_patients_number import (
-    SapporoPatientsNumberService
-)
+from ..services.patient import AsahikawaPatientService
+from ..services.press_release_link import PressReleaseLinkService
+from ..services.sapporo_patients_number import SapporoPatientsNumberService
 
 
 class AsahikawaPatientsView:

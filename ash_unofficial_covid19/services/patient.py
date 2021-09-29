@@ -5,13 +5,10 @@ import pandas as pd
 import psycopg2
 from psycopg2.extras import DictCursor
 
-from ash_unofficial_covid19.config import Config
-from ash_unofficial_covid19.errors import ServiceError
-from ash_unofficial_covid19.models.patient import (
-    AsahikawaPatientFactory,
-    HokkaidoPatientFactory
-)
-from ash_unofficial_covid19.services.service import Service
+from ..config import Config
+from ..errors import ServiceError
+from ..models.patient import AsahikawaPatientFactory, HokkaidoPatientFactory
+from ..services.service import Service
 
 
 class AsahikawaPatientService(Service):
