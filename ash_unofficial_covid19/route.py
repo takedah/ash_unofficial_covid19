@@ -158,7 +158,7 @@ def opendata_pages(page):
         results = asahikawa_patients.get_rows(page=page)
     except ServiceError:
         abort(404)
-    title = "非公式オープンデータ（陽性者属性CSV）全" + str(results[1]) + "ページ中" + str(page) + "ページ目"
+    title = "感染者の状況（非公式オープンデータ）全" + str(results[1]) + "ページ中" + str(page) + "ページ目"
     return render_template(
         "opendata.html",
         title=title,
@@ -314,9 +314,7 @@ def patients_csv():
     res = make_response()
     res.data = f.getvalue()
     res.headers["Content-Type"] = "text/csv"
-    res.headers["Content-Disposition"] = (
-        "attachment: filename=" + "012041_asahikawa_covid19_patients.csv"
-    )
+    res.headers["Content-Disposition"] = "attachment: filename=" + "012041_asahikawa_covid19_patients.csv"
     return res
 
 
@@ -327,9 +325,7 @@ def medical_institutions_csv():
     res = make_response()
     res.data = f.getvalue()
     res.headers["Content-Type"] = "text/csv"
-    res.headers["Content-Disposition"] = (
-        "attachment: filename=" + "012041_asahikawa_covid19_medical_institutions.csv"
-    )
+    res.headers["Content-Disposition"] = "attachment: filename=" + "012041_asahikawa_covid19_medical_institutions.csv"
     return res
 
 
@@ -353,9 +349,7 @@ def get_daily_total_graph_for_card():
     res = make_response()
     res.data = graph_image.getvalue()
     res.headers["Content-Type"] = "img/png"
-    res.headers["Content-Disposition"] = (
-        "attachment: filename=" + "daily_total_for_card.png"
-    )
+    res.headers["Content-Disposition"] = "attachment: filename=" + "daily_total_for_card.png"
     return res
 
 
@@ -403,9 +397,7 @@ def get_per_hundred_thousand_population_graph():
     res = make_response()
     res.data = graph_image.getvalue()
     res.headers["Content-Type"] = "img/png"
-    res.headers["Content-Disposition"] = (
-        "attachment: filename=" + "per_hundred_thousand_population.png"
-    )
+    res.headers["Content-Disposition"] = "attachment: filename=" + "per_hundred_thousand_population.png"
     return res
 
 

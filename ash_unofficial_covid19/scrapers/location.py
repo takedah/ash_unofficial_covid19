@@ -49,9 +49,7 @@ class ScrapeYOLPLocation(Scraper):
         downloaded_json = self.get_json(json_url)
         for search_result in self._get_search_results(downloaded_json):
             location_data = self._extract_location_data(search_result)
-            location_data["medical_institution_name"] = urllib.parse.unquote(
-                facility_name
-            )
+            location_data["medical_institution_name"] = urllib.parse.unquote(facility_name)
             self.__lists.append(location_data)
 
     @property

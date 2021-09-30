@@ -16,9 +16,7 @@ class MedicalInstitutionLocationReservationStatusService(Service):
     def __init__(self):
         Service.__init__(self, "reservation_statuses")
 
-    def find(
-        self, name: str, is_pediatric: bool = False
-    ) -> MedicalInstitutionLocationReservationStatus:
+    def find(self, name: str, is_pediatric: bool = False) -> MedicalInstitutionLocationReservationStatus:
         """新型コロナワクチン接種医療機関の個別情報
 
         指定した新型コロナワクチン接種医療機関の情報を返す

@@ -3,12 +3,7 @@ from datetime import date
 import pytest
 import requests
 
-from ash_unofficial_covid19.scrapers.downloader import (
-    DownloadedCSV,
-    DownloadedHTML,
-    DownloadedJSON,
-    DownloadedPDF,
-)
+from ash_unofficial_covid19.scrapers.downloader import DownloadedCSV, DownloadedHTML, DownloadedJSON, DownloadedPDF
 from ash_unofficial_covid19.scrapers.scraper import Scraper
 
 

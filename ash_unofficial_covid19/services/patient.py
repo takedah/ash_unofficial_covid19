@@ -175,16 +175,7 @@ class AsahikawaPatientService(Service):
         pagenation_option = ""
         max_page = 1
 
-        count_state = (
-            "SELECT"
-            + " "
-            + "count(patient_number)"
-            + " "
-            + "FROM"
-            + " "
-            + self.table_name
-            + ";"
-        )
+        count_state = "SELECT" + " " + "count(patient_number)" + " " + "FROM" + " " + self.table_name + ";"
         with self.get_connection() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
                 cur.execute(count_state)
@@ -388,9 +379,7 @@ class AsahikawaPatientService(Service):
                     aggregate_by_weeks.append((row[0], row[1]))
         return aggregate_by_weeks
 
-    def get_aggregate_by_weeks_per_age(
-        self, from_date: date, to_date: date
-    ) -> pd.DataFrame:
+    def get_aggregate_by_weeks_per_age(self, from_date: date, to_date: date) -> pd.DataFrame:
         """指定した期間の1週間ごとの年代別の陽性患者数の集計結果を返す
 
         Args:
@@ -457,22 +446,16 @@ class AsahikawaPatientService(Service):
                 1週間ごとの日付とその週の1日あたり平均新規陽性患者数を要素とする
                 タプルのリスト
         """
-        aggregate_by_weeks = self.get_aggregate_by_weeks(
-            from_date=from_date, to_date=to_date
-        )
+        aggregate_by_weeks = self.get_aggregate_by_weeks(from_date=from_date, to_date=to_date)
         seven_days_moving_average = list()
         for patients_number in aggregate_by_weeks:
             moving_average = float(
-                Decimal(str(patients_number[1] / 7)).quantize(
-                    Decimal("0.01"), rounding=ROUND_HALF_UP
-                )
+                Decimal(str(patients_number[1] / 7)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
             )
             seven_days_moving_average.append((patients_number[0], moving_average))
         return seven_days_moving_average
 
-    def get_per_hundred_thousand_population_per_week(
-        self, from_date: date, to_date: date
-    ) -> list:
+    def get_per_hundred_thousand_population_per_week(self, from_date: date, to_date: date) -> list:
         """1週間の人口10万人あたりの新規陽性患者数の計算結果を返す
 
         Args:
@@ -484,9 +467,7 @@ class AsahikawaPatientService(Service):
                 1週間ごとの日付とその週の人口10万人あたり新規陽性患者数を要素とする
                 タプルのリスト
         """
-        aggregate_by_weeks = self.get_aggregate_by_weeks(
-            from_date=from_date, to_date=to_date
-        )
+        aggregate_by_weeks = self.get_aggregate_by_weeks(from_date=from_date, to_date=to_date)
         per_hundred_thousand_population_per_week = list()
         for patients_number in aggregate_by_weeks:
             per_hundred_thousand_population = float(
@@ -494,9 +475,7 @@ class AsahikawaPatientService(Service):
                     Decimal("0.01"), rounding=ROUND_HALF_UP
                 )
             )
-            per_hundred_thousand_population_per_week.append(
-                (patients_number[0], per_hundred_thousand_population)
-            )
+            per_hundred_thousand_population_per_week.append((patients_number[0], per_hundred_thousand_population))
         return per_hundred_thousand_population_per_week
 
     def get_total_by_months(self, from_date: date, to_date: date) -> list:
@@ -546,9 +525,7 @@ class AsahikawaPatientService(Service):
                 年代別の陽性患者数を要素とするタプルのリスト
 
         """
-        state = (
-            "SELECT age,COUNT(age) FROM asahikawa_patients GROUP BY age ORDER BY age;"
-        )
+        state = "SELECT age,COUNT(age) FROM asahikawa_patients GROUP BY age ORDER BY age;"
         patients_number_by_age = list()
         with self.get_connection() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
@@ -570,13 +547,7 @@ class AsahikawaPatientService(Service):
             patients_number (int): 対象年月日の陽性患者数
 
         """
-        state = (
-            "SELECT COUNT(patient_number) FROM"
-            + " "
-            + self.table_name
-            + " "
-            + "WHERE publication_date = %s;"
-        )
+        state = "SELECT COUNT(patient_number) FROM" + " " + self.table_name + " " + "WHERE publication_date = %s;"
         with self.get_connection() as conn:
             with conn.cursor() as cur:
                 cur.execute(state, (target_date,))

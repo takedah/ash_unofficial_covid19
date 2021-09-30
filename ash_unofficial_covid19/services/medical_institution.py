@@ -67,21 +67,8 @@ class MedicalInstitutionService(Service):
             result (int): 削除したレコード件数
 
         """
-        state = (
-            "DELETE FROM "
-            + self.table_name
-            + " "
-            + "WHERE name = %s AND target_age = %s;"
-        )
-        log_message = (
-            self.table_name
-            + "テーブルから "
-            + str(target_value[0])
-            + ", "
-            + str(target_value[1])
-            + " "
-            + "を"
-        )
+        state = "DELETE FROM " + self.table_name + " " + "WHERE name = %s AND target_age = %s;"
+        log_message = self.table_name + "テーブルから " + str(target_value[0]) + ", " + str(target_value[1]) + " " + "を"
         with self.get_connection() as conn:
             try:
                 with conn.cursor(cursor_factory=DictCursor) as cur:
@@ -156,9 +143,7 @@ class MedicalInstitutionService(Service):
             if medical_institution.book_at_medical_institution is None:
                 book_at_medical_institution = ""
             else:
-                book_at_medical_institution = str(
-                    int(medical_institution.book_at_medical_institution)
-                )
+                book_at_medical_institution = str(int(medical_institution.book_at_medical_institution))
             if medical_institution.book_at_call_center is None:
                 book_at_call_center = ""
             else:
@@ -189,10 +174,7 @@ class MedicalInstitutionService(Service):
 
         """
         state = (
-            "SELECT DISTINCT ON (name,target_age) name, target_age FROM "
-            + self.table_name
-            + " "
-            + "ORDER BY name;"
+            "SELECT DISTINCT ON (name,target_age) name, target_age FROM " + self.table_name + " " + "ORDER BY name;"
         )
         name_lists = list()
         with self.get_connection() as conn:
@@ -212,13 +194,7 @@ class MedicalInstitutionService(Service):
             res (list): 医療機関の地域一覧リスト
 
         """
-        state = (
-            "SELECT DISTINCT(area) FROM "
-            + self.table_name
-            + " "
-            + "WHERE target_age=%s"
-            + " ORDER BY area;"
-        )
+        state = "SELECT DISTINCT(area) FROM " + self.table_name + " " + "WHERE target_age=%s" + " ORDER BY area;"
         if is_pediatric:
             target_age = "12歳から15歳まで"
         else:

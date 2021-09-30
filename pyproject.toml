@@ -1,0 +1,44 @@
+[tool.poetry]
+name = "ash_unofficial_covid19"
+version = "0.1.0"
+description = "旭川市公式ホームページの新型コロナウイルスの情報を機械判読しやすい形に変換したデータを公開しています。また、データを使って最新の感染状況を集計したり、ワクチン接種医療機関の情報を表示したりできるようにしています。"
+authors = ["Hiroki Takeda <takedahiroki@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+beautifulsoup4 = "^4.9.3"
+flask = "^2.0.1"
+Flask-Caching = "^1.10.1"
+gunicorn = "^20.1.0"
+psycopg2 = "^2.9.1"
+requests = "^2.26.0"
+matplotlib = "^3.4.3"
+pandas = "^1.3.1"
+tabula-py = "^2.2.0"
+types-requests = "^2.25.6"
+types-python-dateutil = "^0.1.6"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.5"
+pytest-mock = "^3.6.1"
+black = "^21.9b0"
+autoflake = "^1.4"
+isort = "^5.9.3"
+flake8 = "^3.9.2"
+mypy = "^0.910"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 119
+
+[tool.flake8]
+max-line-length = 119
+ignore = "E203,W503,W504"
+
+[tool.isort]
+profile = "black"
+line_length = 119

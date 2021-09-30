@@ -1,9 +1,7 @@
 import pytest
 
 from ash_unofficial_covid19.models.medical_institution import MedicalInstitutionFactory
-from ash_unofficial_covid19.services.medical_institution import (
-    MedicalInstitutionService,
-)
+from ash_unofficial_covid19.services.medical_institution import MedicalInstitutionService
 
 
 @pytest.fixture()
@@ -26,11 +24,7 @@ def service():
             "book_at_medical_institution": True,
             "book_at_call_center": False,
             "area": "大成",
-            "memo": (
-                "道北勤医協一条通病院及び道北勤医協一条クリニックは、"
-                + "予約専用番号(34-0015)に変更となります。 開始時期は、"
-                + "各医療機関のホームページ及び院内掲示をご覧ください。"
-            ),
+            "memo": "道北勤医協一条通病院及び道北勤医協一条クリニックは、予約専用番号(34-0015)に変更となります。 開始時期は、各医療機関のホームページ及び院内掲示をご覧ください。",
             "target_age": "16歳以上",
         },
         {
@@ -68,8 +62,7 @@ def test_delete(service):
 
 
 @pytest.mark.parametrize(
-    "name,address,phone_number,book_at_medical_institution,"
-    + "book_at_call_center,area,memo,target_age",
+    "name,address,phone_number,book_at_medical_institution," + "book_at_call_center,area,memo,target_age",
     [
         (
             "独立行政法人国立病院機構旭川医療センター",
@@ -99,9 +92,7 @@ def test_find_all(
     assert medical_institution.name == name
     assert medical_institution.address == address
     assert medical_institution.phone_number == phone_number
-    assert (
-        medical_institution.book_at_medical_institution == book_at_medical_institution
-    )
+    assert medical_institution.book_at_medical_institution == book_at_medical_institution
     assert medical_institution.book_at_call_center == book_at_call_center
     assert medical_institution.area == area
     assert medical_institution.memo == memo
@@ -159,11 +150,7 @@ def test_get_csv_rows(service):
             "1",
             "0",
             "16歳以上",
-            (
-                "道北勤医協一条通病院及び道北勤医協一条クリニックは、"
-                + "予約専用番号(34-0015)に変更となります。 開始時期は、"
-                + "各医療機関のホームページ及び院内掲示をご覧ください。"
-            ),
+            "道北勤医協一条通病院及び道北勤医協一条クリニックは、予約専用番号(34-0015)に変更となります。 開始時期は、各医療機関のホームページ及び院内掲示をご覧ください。",
         ],
     ]
     assert results == expect

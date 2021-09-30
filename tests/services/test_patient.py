@@ -5,14 +5,8 @@ import pytest
 from pandas._testing import assert_frame_equal
 
 from ash_unofficial_covid19.errors import ServiceError
-from ash_unofficial_covid19.models.patient import (
-    AsahikawaPatientFactory,
-    HokkaidoPatientFactory,
-)
-from ash_unofficial_covid19.services.patient import (
-    AsahikawaPatientService,
-    HokkaidoPatientService,
-)
+from ash_unofficial_covid19.models.patient import AsahikawaPatientFactory, HokkaidoPatientFactory
+from ash_unofficial_covid19.services.patient import AsahikawaPatientService, HokkaidoPatientService
 
 
 class TestAsahikawaPatientService:
@@ -95,8 +89,7 @@ class TestAsahikawaPatientService:
                 "symptom": "",
                 "overseas_travel_history": None,
                 "be_discharged": None,
-                "note": "北海道発表NO.: 1 周囲の患者の発生: "
-                + "No.1072 No.1094 No.1107 No.1108 濃厚接触者の状況: 0人",
+                "note": "北海道発表NO.: 1 周囲の患者の発生: No.1072 No.1094 No.1107 No.1108 濃厚接触者の状況: 0人",
                 "hokkaido_patient_number": 1,
                 "surrounding_status": "No.1072 No.1094 No.1107 No.1108",
                 "close_contact": "0人",
@@ -136,8 +129,7 @@ class TestAsahikawaPatientService:
                 "symptom": "",
                 "overseas_travel_history": None,
                 "be_discharged": None,
-                "note": "北海道発表NO.: 3 周囲の患者の発生: No.1092             "
-                + "No.1093 濃厚接触者の状況: 1人",
+                "note": "北海道発表NO.: 3 周囲の患者の発生: No.1092             No.1093 濃厚接触者の状況: 1人",
                 "hokkaido_patient_number": 3,
                 "surrounding_status": "No.1092             No.1093",
                 "close_contact": "1人",
@@ -319,7 +311,7 @@ class TestAsahikawaPatientService:
                 "倦怠感;筋肉痛;関節痛;発熱;咳",
                 "0",
                 "",
-                "北海道発表NO.: 3 周囲の患者の発生: No.1092             " + "No.1093 濃厚接触者の状況: 1人",
+                "北海道発表NO.: 3 周囲の患者の発生: No.1092             No.1093 濃厚接触者の状況: 1人",
             ],
             [
                 "1120",
@@ -353,8 +345,7 @@ class TestAsahikawaPatientService:
                 "発熱",
                 "1",
                 "",
-                "北海道発表NO.: 1 周囲の患者の発生: "
-                + "No.1072 No.1094 No.1107 No.1108 濃厚接触者の状況: 0人",
+                "北海道発表NO.: 1 周囲の患者の発生: No.1072 No.1094 No.1107 No.1108 濃厚接触者の状況: 0人",
             ],
         ]
         assert results == expect
@@ -390,9 +381,7 @@ class TestAsahikawaPatientService:
     def test_get_aggregate_by_weeks_per_age(self, service):
         from_date = date(2021, 1, 25)
         to_date = date(2021, 2, 28)
-        result = service.get_aggregate_by_weeks_per_age(
-            from_date=from_date, to_date=to_date
-        )
+        result = service.get_aggregate_by_weeks_per_age(from_date=from_date, to_date=to_date)
         expect = pd.DataFrame(
             [
                 [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
@@ -427,9 +416,7 @@ class TestAsahikawaPatientService:
     def test_get_seven_days_moving_average(self, service):
         from_date = date(2021, 1, 25)
         to_date = date(2021, 2, 28)
-        result = service.get_seven_days_moving_average(
-            from_date=from_date, to_date=to_date
-        )
+        result = service.get_seven_days_moving_average(from_date=from_date, to_date=to_date)
         expect = [
             (date(2021, 1, 25), 0.14),
             (date(2021, 2, 1), 0),
@@ -442,9 +429,7 @@ class TestAsahikawaPatientService:
     def test_get_per_hundred_thousand_population_per_week(self, service):
         from_date = date(2021, 1, 25)
         to_date = date(2021, 2, 28)
-        result = service.get_per_hundred_thousand_population_per_week(
-            from_date=from_date, to_date=to_date
-        )
+        result = service.get_per_hundred_thousand_population_per_week(from_date=from_date, to_date=to_date)
         expect = [
             (date(2021, 1, 25), 0.30),
             (date(2021, 2, 1), 0),

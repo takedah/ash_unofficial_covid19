@@ -2,21 +2,11 @@ from datetime import date
 from typing import Optional
 
 from .config import Config
-from .errors import (
-    DatabaseConnectionError,
-    DataModelError,
-    HTTPDownloadError,
-    ScrapeError,
-    ServiceError,
-)
+from .errors import DatabaseConnectionError, DataModelError, HTTPDownloadError, ScrapeError, ServiceError
 from .models.patient import AsahikawaPatientFactory, HokkaidoPatientFactory
 from .models.press_release_link import PressReleaseLinkFactory
 from .models.sapporo_patients_number import SapporoPatientsNumberFactory
-from .scrapers.patient import (
-    ScrapeAsahikawaPatients,
-    ScrapeAsahikawaPatientsPDF,
-    ScrapeHokkaidoPatients,
-)
+from .scrapers.patient import ScrapeAsahikawaPatients, ScrapeAsahikawaPatientsPDF, ScrapeHokkaidoPatients
 from .scrapers.press_release_link import ScrapePressReleaseLink
 from .scrapers.sapporo_patients_number import ScrapeSapporoPatientsNumber
 from .services.patient import AsahikawaPatientService, HokkaidoPatientService
@@ -192,9 +182,7 @@ def _get_press_release_links() -> Optional[PressReleaseLinkFactory]:
         return None
 
 
-def _import_asahikawa_data_from_press_release(
-    pdf_url: str, publication_date: date
-) -> None:
+def _import_asahikawa_data_from_press_release(pdf_url: str, publication_date: date) -> None:
     """
     旭川市公式ホームページから新型コロナウイルス感染症の感染者情報を、
     報道発表資料のPDFから抽出し、データベースへ格納する。
@@ -206,9 +194,7 @@ def _import_asahikawa_data_from_press_release(
 
     """
     try:
-        scraped_data = ScrapeAsahikawaPatientsPDF(
-            pdf_url=pdf_url, publication_date=publication_date
-        )
+        scraped_data = ScrapeAsahikawaPatientsPDF(pdf_url=pdf_url, publication_date=publication_date)
     except (HTTPDownloadError, ScrapeError) as e:
         print(e.message)
         return

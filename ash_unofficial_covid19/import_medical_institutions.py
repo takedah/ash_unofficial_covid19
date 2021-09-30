@@ -1,12 +1,7 @@
 import time
 
 from .config import Config
-from .errors import (
-    DatabaseConnectionError,
-    HTTPDownloadError,
-    ScrapeError,
-    ServiceError,
-)
+from .errors import DatabaseConnectionError, HTTPDownloadError, ScrapeError, ServiceError
 from .models.location import LocationFactory
 from .models.medical_institution import MedicalInstitutionFactory
 from .scrapers.location import ScrapeYOLPLocation
@@ -69,9 +64,7 @@ def import_locations() -> None:
     medical_institution_name_list = list()
     for medical_institution in medical_institutions:
         medical_institution_name_list.append(medical_institution[0])
-    medical_institution_name_list = sorted(
-        set(medical_institution_name_list), key=medical_institution_name_list.index
-    )
+    medical_institution_name_list = sorted(set(medical_institution_name_list), key=medical_institution_name_list.index)
 
     locations_factory = LocationFactory()
     for medical_institution_name in medical_institution_name_list:
@@ -168,9 +161,7 @@ def delete_non_exist_data(html_url: str) -> None:
 
     """
     scraped_data = ScrapeMedicalInstitutions(html_url)
-    scraped_pediatric_data = ScrapeMedicalInstitutions(
-        html_url=html_url, is_pediatric=True
-    )
+    scraped_pediatric_data = ScrapeMedicalInstitutions(html_url=html_url, is_pediatric=True)
     new_name_list = scraped_data.get_name_lists()
     new_name_list.extend(scraped_pediatric_data.get_name_lists())
     service = MedicalInstitutionService()

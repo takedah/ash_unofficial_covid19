@@ -4,12 +4,8 @@ from ash_unofficial_covid19.errors import ServiceError
 from ash_unofficial_covid19.models.location import LocationFactory
 from ash_unofficial_covid19.models.medical_institution import MedicalInstitutionFactory
 from ash_unofficial_covid19.services.location import LocationService
-from ash_unofficial_covid19.services.medical_institution import (
-    MedicalInstitutionService,
-)
-from ash_unofficial_covid19.services.medical_institution_location import (
-    MedicalInstitutionLocationService,
-)
+from ash_unofficial_covid19.services.medical_institution import MedicalInstitutionService
+from ash_unofficial_covid19.services.medical_institution_location import MedicalInstitutionLocationService
 
 
 @pytest.fixture()
@@ -33,11 +29,7 @@ def service():
             "book_at_medical_institution": True,
             "book_at_call_center": False,
             "area": "大成",
-            "memo": (
-                "道北勤医協一条通病院及び道北勤医協一条クリニックは、"
-                + "予約専用番号(34-0015)に変更となります。 開始時期は、"
-                + "各医療機関のホームページ及び院内掲示をご覧ください。"
-            ),
+            "memo": "道北勤医協一条通病院及び道北勤医協一条クリニックは、予約専用番号(34-0015)に変更となります。 開始時期は、各医療機関のホームページ及び院内掲示をご覧ください。",
             "target_age": "16歳以上",
         },
         {

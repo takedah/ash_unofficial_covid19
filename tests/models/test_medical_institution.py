@@ -1,7 +1,4 @@
-from ash_unofficial_covid19.models.medical_institution import (
-    MedicalInstitution,
-    MedicalInstitutionFactory,
-)
+from ash_unofficial_covid19.models.medical_institution import MedicalInstitution, MedicalInstitutionFactory
 
 
 def test_create():

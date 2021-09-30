@@ -11,9 +11,7 @@ class AppLog:
             for exist_handler in logger.handlers:
                 logger.removeHandler(exist_handler)
         console_handler = logging.StreamHandler()
-        formatter = logging.Formatter(
-            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-        )
+        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
         console_handler.setFormatter(formatter)
         self.__logger = logger
         self.__logger.addHandler(console_handler)

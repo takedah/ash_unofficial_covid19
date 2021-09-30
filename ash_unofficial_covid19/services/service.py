@@ -84,9 +84,7 @@ class Service:
                     execute_values(cur, state, data_lists)
                 conn.commit()
                 data_number = len(data_lists)
-                self.info_log(
-                    self.table_name + "テーブルへ" + str(data_number) + "件データを登録しました。"
-                )
+                self.info_log(self.table_name + "テーブルへ" + str(data_number) + "件データを登録しました。")
             except (
                 psycopg2.DataError,
                 psycopg2.IntegrityError,

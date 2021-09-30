@@ -1,7 +1,4 @@
-from ash_unofficial_covid19.models.reservation_status import (
-    ReservationStatus,
-    ReservationStatusFactory,
-)
+from ash_unofficial_covid19.models.reservation_status import ReservationStatus, ReservationStatusFactory
 
 
 def test_create():

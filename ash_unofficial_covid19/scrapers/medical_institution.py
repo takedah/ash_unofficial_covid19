@@ -35,9 +35,7 @@ class ScrapeMedicalInstitutions(Scraper):
         rows = table_values[0]
         memos = table_values[1]
         for row in rows:
-            extracted_data = self._extract_medical_institution_data(
-                row=row, memos=memos, is_pediatric=is_pediatric
-            )
+            extracted_data = self._extract_medical_institution_data(row=row, memos=memos, is_pediatric=is_pediatric)
             if extracted_data is not None:
                 self.__lists.append(extracted_data)
 
@@ -163,9 +161,7 @@ class ScrapeMedicalInstitutions(Scraper):
 
         return table_values, memos
 
-    def _extract_medical_institution_data(
-        self, row: list, memos: dict, is_pediatric: bool = False
-    ) -> Optional[dict]:
+    def _extract_medical_institution_data(self, row: list, memos: dict, is_pediatric: bool = False) -> Optional[dict]:
         """新型コロナワクチン接種医療機関データへの変換
 
         旭川市公式ホームページのワクチン接種医療機関一覧HTMLから抽出した行データの
@@ -238,7 +234,5 @@ class ScrapeMedicalInstitutions(Scraper):
         """
         name_lists = list()
         for medical_institution in self.lists:
-            name_lists.append(
-                (medical_institution["name"], medical_institution["target_age"])
-            )
+            name_lists.append((medical_institution["name"], medical_institution["target_age"]))
         return name_lists

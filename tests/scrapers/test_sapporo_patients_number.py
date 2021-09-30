@@ -3,9 +3,7 @@ from datetime import date
 import pytest
 import requests
 
-from ash_unofficial_covid19.scrapers.sapporo_patients_number import (
-    ScrapeSapporoPatientsNumber,
-)
+from ash_unofficial_covid19.scrapers.sapporo_patients_number import ScrapeSapporoPatientsNumber
 
 
 @pytest.fixture()

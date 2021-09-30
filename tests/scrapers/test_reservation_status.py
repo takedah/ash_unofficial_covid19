@@ -48,9 +48,7 @@ def test_lists(pdf_dataframe, mocker):
     responce_mock.content = "".encode("utf-8")
     responce_mock.headers = {"content-type": "application/pdf"}
     mocker.patch.object(requests, "get", return_value=responce_mock)
-    mocker.patch.object(
-        ScrapeReservationStatus, "_get_dataframe", return_value=pdf_dataframe
-    )
+    mocker.patch.object(ScrapeReservationStatus, "_get_dataframe", return_value=pdf_dataframe)
     scraper = ScrapeReservationStatus("http://dummy.local")
     expect = [
         {
@@ -81,9 +79,7 @@ def test_get_name_list(pdf_dataframe, mocker):
     responce_mock.content = "".encode("utf-8")
     responce_mock.headers = {"content-type": "application/pdf"}
     mocker.patch.object(requests, "get", return_value=responce_mock)
-    mocker.patch.object(
-        ScrapeReservationStatus, "_get_dataframe", return_value=pdf_dataframe
-    )
+    mocker.patch.object(ScrapeReservationStatus, "_get_dataframe", return_value=pdf_dataframe)
     scraper = ScrapeReservationStatus("http://dummy.local")
     expect = ["市立旭川病院", "独立行政法人国立病院機構旭川医療センター"]
     result = scraper.get_name_list()

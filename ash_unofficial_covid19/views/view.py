@@ -14,9 +14,7 @@ from matplotlib.font_manager import FontProperties
 from matplotlib.ticker import MultipleLocator
 
 from ..errors import DatabaseConnectionError
-from ..models.medical_institution_location_reservation_status import (
-    MedicalInstitutionLocationReservationStatus,
-)
+from ..models.medical_institution_location_reservation_status import MedicalInstitutionLocationReservationStatus
 from ..services.medical_institution import MedicalInstitutionService
 from ..services.medical_institution_location import MedicalInstitutionLocationService
 from ..services.medical_institution_location_reservation_status import (
@@ -87,17 +85,11 @@ class MedicalInstitutionsView:
     def __init__(self):
         self.__service = MedicalInstitutionService()
         self.__location_service = MedicalInstitutionLocationService()
-        self.__reservation_status_service = (
-            MedicalInstitutionLocationReservationStatusService()
-        )
+        self.__reservation_status_service = MedicalInstitutionLocationReservationStatusService()
         last_updated = self.__service.get_last_updated()
-        reservation_status_updated = (
-            self.__reservation_status_service.get_last_updated()
-        )
+        reservation_status_updated = self.__reservation_status_service.get_last_updated()
         self.__last_updated = last_updated.strftime("%Y/%m/%d %H:%M")
-        self.__reservation_status_updated = reservation_status_updated.strftime(
-            "%Y/%m/%d %H:%M"
-        )
+        self.__reservation_status_updated = reservation_status_updated.strftime("%Y/%m/%d %H:%M")
 
     @property
     def last_updated(self) -> str:
@@ -107,9 +99,7 @@ class MedicalInstitutionsView:
     def reservation_status_updated(self) -> str:
         return self.__reservation_status_updated
 
-    def find(
-        self, name: str, is_pediatric: bool = False
-    ) -> MedicalInstitutionLocationReservationStatus:
+    def find(self, name: str, is_pediatric: bool = False) -> MedicalInstitutionLocationReservationStatus:
         """位置情報、予約受付情報付き新型コロナワクチン接種医療機関情報
 
         指定した対象年齢の新型コロナワクチン接種医療機関の一覧に医療機関の位置情報と
@@ -126,9 +116,7 @@ class MedicalInstitutionsView:
                 データオブジェクト
 
         """
-        return self.__reservation_status_service.find(
-            name=name, is_pediatric=is_pediatric
-        )
+        return self.__reservation_status_service.find(name=name, is_pediatric=is_pediatric)
 
     def find_area(self, area: Optional[str] = None, is_pediatric: bool = False) -> list:
         """新型コロナワクチン接種医療機関の位置情報一覧
@@ -287,12 +275,8 @@ class DailyTotalView(GraphView):
         seven_days_before_most_recent = self.__daily_total_data[-8][1]
         increase_from_seven_days_before = most_recent - seven_days_before_most_recent
         self.__most_recent = "{:,}".format(most_recent)
-        self.__seven_days_before_most_recent = "{:,}".format(
-            seven_days_before_most_recent
-        )
-        self.__increase_from_seven_days_before = "{:+,}".format(
-            increase_from_seven_days_before
-        )
+        self.__seven_days_before_most_recent = "{:,}".format(seven_days_before_most_recent)
+        self.__increase_from_seven_days_before = "{:+,}".format(increase_from_seven_days_before)
 
     @property
     def today(self) -> str:
@@ -318,10 +302,7 @@ class DailyTotalView(GraphView):
 
         """
         return ", ".join(
-            [
-                "{0} {1}人".format(row[0].strftime("%Y年%m月%d日"), row[1])
-                for row in self.__daily_total_data[-14:]
-            ]
+            ["{0} {1}人".format(row[0].strftime("%Y年%m月%d日"), row[1]) for row in self.__daily_total_data[-14:]]
         )
 
     def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
@@ -378,9 +359,7 @@ class MonthTotalView(GraphView):
     def __init__(self):
         service = AsahikawaPatientService()
         today = self.get_today()
-        self.__month_total_data = service.get_total_by_months(
-            from_date=date(2020, 1, 1), to_date=today
-        )
+        self.__month_total_data = service.get_total_by_months(from_date=date(2020, 1, 1), to_date=today)
         self.__today = self.format_date_style(today)
         this_month = self.__month_total_data[-1][1]
         last_month = self.__month_total_data[-2][1]
@@ -412,12 +391,7 @@ class MonthTotalView(GraphView):
             graph_alt (str): グラフの代替テキスト
 
         """
-        return ", ".join(
-            [
-                "{0} {1}人".format(row[0].strftime("%Y年%m月"), row[1])
-                for row in self.__month_total_data
-            ]
-        )
+        return ", ".join(["{0} {1}人".format(row[0].strftime("%Y年%m月"), row[1]) for row in self.__month_total_data])
 
     def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
         """グラフの画像を生成
@@ -473,9 +447,7 @@ class ByAgeView(GraphView):
             graph_alt (str): グラフの代替テキスト
 
         """
-        return ", ".join(
-            ["{0} {1}人".format(row[0], row[1]) for row in self.__by_age_data]
-        )
+        return ", ".join(["{0} {1}人".format(row[0], row[1]) for row in self.__by_age_data])
 
     def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
         """グラフの画像を生成
@@ -551,9 +523,7 @@ class MovingAverageView(GraphView):
         this_week = self.__moving_average_data[-1][1]
         last_week = self.__moving_average_data[-2][1]
         increase_from_last_week = float(
-            Decimal(str(this_week - last_week)).quantize(
-                Decimal("0.01"), rounding=ROUND_HALF_UP
-            )
+            Decimal(str(this_week - last_week)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
         )
         self.__this_week = "{:,}".format(this_week)
         self.__last_week = "{:,}".format(last_week)
@@ -579,10 +549,7 @@ class MovingAverageView(GraphView):
 
         """
         return ", ".join(
-            [
-                "{0} {1}人".format(row[0].strftime("%Y年%m月%d日"), row[1])
-                for row in self.__moving_average_data
-            ]
+            ["{0} {1}人".format(row[0].strftime("%Y年%m月%d日"), row[1]) for row in self.__moving_average_data]
         )
 
     def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
@@ -604,9 +571,7 @@ class MovingAverageView(GraphView):
         else:
             fig = plt.figure()
         ax = fig.add_subplot()
-        moving_average_x = [
-            row[0].strftime("%m-%d") + "~" for row in self.__moving_average_data
-        ]
+        moving_average_x = [row[0].strftime("%m-%d") + "~" for row in self.__moving_average_data]
         moving_average_y = [row[1] for row in self.__moving_average_data]
         ax.plot(moving_average_x, moving_average_y, color="salmon")
         ax.yaxis.set_major_locator(MultipleLocator(5))
@@ -642,11 +607,9 @@ class PerHundredThousandPopulationView(GraphView):
         service = AsahikawaPatientService()
         sapporo_service = SapporoPatientsNumberService()
         today = self.get_today()
-        self.__per_hundred_thousand_population_data = (
-            service.get_per_hundred_thousand_population_per_week(
-                from_date=today - relativedelta(weeks=16, days=-1),
-                to_date=today,
-            )
+        self.__per_hundred_thousand_population_data = service.get_per_hundred_thousand_population_per_week(
+            from_date=today - relativedelta(weeks=16, days=-1),
+            to_date=today,
         )
         self.__sapporo_per_hundred_thousand_population_data = (
             sapporo_service.get_per_hundred_thousand_population_per_week(
@@ -657,9 +620,7 @@ class PerHundredThousandPopulationView(GraphView):
         this_week = self.__per_hundred_thousand_population_data[-1][1]
         last_week = self.__per_hundred_thousand_population_data[-2][1]
         increase_from_last_week = float(
-            Decimal(str(this_week - last_week)).quantize(
-                Decimal("0.01"), rounding=ROUND_HALF_UP
-            )
+            Decimal(str(this_week - last_week)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
         )
         alert_level = self._get_alert_level(this_week)
         self.__this_week = "{:,}".format(this_week)
@@ -716,12 +677,9 @@ class PerHundredThousandPopulationView(GraphView):
             fig = plt.figure()
         ax = fig.add_subplot()
         per_hundred_thousand_population_x = [
-            row[0].strftime("%m-%d") + "~"
-            for row in self.__per_hundred_thousand_population_data
+            row[0].strftime("%m-%d") + "~" for row in self.__per_hundred_thousand_population_data
         ]
-        per_hundred_thousand_population_y = [
-            row[1] for row in self.__per_hundred_thousand_population_data
-        ]
+        per_hundred_thousand_population_y = [row[1] for row in self.__per_hundred_thousand_population_data]
         ax.plot(
             per_hundred_thousand_population_x,
             per_hundred_thousand_population_y,
@@ -729,8 +687,7 @@ class PerHundredThousandPopulationView(GraphView):
             label="旭川市",
         )
         sapporo_per_hundred_thousand_population_x = [
-            row[0].strftime("%m-%d") + "~"
-            for row in self.__sapporo_per_hundred_thousand_population_data
+            row[0].strftime("%m-%d") + "~" for row in self.__sapporo_per_hundred_thousand_population_data
         ]
         sapporo_per_hundred_thousand_population_y = [
             row[1] for row in self.__sapporo_per_hundred_thousand_population_data
@@ -805,9 +762,7 @@ class WeeklyPerAgeView(GraphView):
     def __init__(self):
         service = AsahikawaPatientService()
         today = self.get_today()
-        df = service.get_aggregate_by_weeks_per_age(
-            from_date=today - relativedelta(weeks=4, days=-1), to_date=today
-        )
+        df = service.get_aggregate_by_weeks_per_age(from_date=today - relativedelta(weeks=4, days=-1), to_date=today)
         self.__aggregate_by_weeks_per_age = df
 
     def get_graph_alt(self) -> str:

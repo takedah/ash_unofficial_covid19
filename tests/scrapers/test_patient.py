@@ -129,9 +129,7 @@ class TestScrapeAsahikawaPatients:
         responce_mock.status_code = 200
         responce_mock.content = html_content
         mocker.patch.object(requests, "get", return_value=responce_mock)
-        scraper = ScrapeAsahikawaPatients(
-            html_url="http://dummy.local", target_year=2021
-        )
+        scraper = ScrapeAsahikawaPatients(html_url="http://dummy.local", target_year=2021)
         expect = [
             {
                 "patient_number": 1121,
@@ -148,8 +146,7 @@ class TestScrapeAsahikawaPatients:
                 "symptom": "",
                 "overseas_travel_history": None,
                 "be_discharged": None,
-                "note": "北海道発表No.;19080;周囲の患者の発生;"
-                + "No.1072 No.1094 No.1107 No.1108;濃厚接触者の状況;0人;",
+                "note": "北海道発表No.;19080;周囲の患者の発生;No.1072 No.1094 No.1107 No.1108;濃厚接触者の状況;0人;",
                 "hokkaido_patient_number": 19080,
                 "surrounding_status": "No.1072 No.1094 No.1107 No.1108",
                 "close_contact": "0人",
@@ -271,9 +268,7 @@ class TestScrapeAsahikawaPatients:
         responce_mock.status_code = 200
         responce_mock.content = dummy_table
         mocker.patch.object(requests, "get", return_value=responce_mock)
-        scraper = ScrapeAsahikawaPatients(
-            html_url="http://dummy.local", target_year=2021
-        )
+        scraper = ScrapeAsahikawaPatients(html_url="http://dummy.local", target_year=2021)
         assert scraper.lists == []
 
     def test_target_year_error(self, html_content, mocker):
@@ -388,12 +383,8 @@ class TestScrapeAsahikawaPatientsPDF:
         responce_mock.content = "".encode("utf-8")
         responce_mock.headers = {"content-type": "application/pdf"}
         mocker.patch.object(requests, "get", return_value=responce_mock)
-        mocker.patch.object(
-            ScrapeAsahikawaPatientsPDF, "_get_dataframe", return_value=pdf_dataframe
-        )
-        scraper = ScrapeAsahikawaPatientsPDF(
-            pdf_url="http://dummy.local", publication_date=date(2021, 8, 19)
-        )
+        mocker.patch.object(ScrapeAsahikawaPatientsPDF, "_get_dataframe", return_value=pdf_dataframe)
+        scraper = ScrapeAsahikawaPatientsPDF(pdf_url="http://dummy.local", publication_date=date(2021, 8, 19))
         expect = [
             {
                 "patient_number": 6,

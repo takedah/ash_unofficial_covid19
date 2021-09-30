@@ -1,9 +1,6 @@
 from datetime import date
 
-from ash_unofficial_covid19.models.sapporo_patients_number import (
-    SapporoPatientsNumber,
-    SapporoPatientsNumberFactory,
-)
+from ash_unofficial_covid19.models.sapporo_patients_number import SapporoPatientsNumber, SapporoPatientsNumberFactory
 
 
 def test_create():

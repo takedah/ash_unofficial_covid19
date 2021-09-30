@@ -5,12 +5,7 @@ import requests
 from requests import HTTPError, Timeout
 
 from ash_unofficial_covid19.errors import HTTPDownloadError
-from ash_unofficial_covid19.scrapers.downloader import (
-    DownloadedCSV,
-    DownloadedHTML,
-    DownloadedJSON,
-    DownloadedPDF,
-)
+from ash_unofficial_covid19.scrapers.downloader import DownloadedCSV, DownloadedHTML, DownloadedJSON, DownloadedPDF
 
 
 class TestDownloadedHTML:

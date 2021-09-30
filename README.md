@@ -6,7 +6,7 @@
 
 そこで、旭川市公式ホームページからスクレイピングして新型コロナウイルス感染症の情報を取得し、新型コロナウイルス感染症対策に関するオープンデータ項目定義書のうち、陽性患者属性データセットに基づいたCSV形式のテキストファイルを、非公式のオープンデータとしてダウンロードできるようにしたWebアプリです。Flaskで動作します。
 
-ただし、以下のデータ項目は旭川市公式ホームページからスクレイピングで取得することが困難だったため、北海道オープンデータポータルの陽性患者属性CSVから値を逆輸入？して取得しています。（北海道オープンデータポータルの陽性患者属性CSVの更新が2021年6月19日で停止したため、同日以降以下のデータは全て空にしています。）
+ただし、以下のデータ項目は旭川市公式ホームページからスクレイピングで取得することが困難だったため、北海道オープンデータポータルの陽性患者属性CSVから値を逆輸入？して取得しています。（北海道オープンデータポータルの陽性患者属性CSVの更新が2021年6月19日で停止したため、同日以降以下のデータのうち患者_職業以外は全て空にしています。）
 
 | No.   | Item                    |
 |:-----:|:-----------------------:|
@@ -22,7 +22,7 @@
 
 - PostgreSQL
 - Java Runtime (8 or later)
-- BeautifulSoup4
+- beautifulsoup4
 - flask
 - Flask-Caching
 - gunicorn
@@ -31,11 +31,15 @@
 - matplotlib
 - pandas
 - tabula-py
+- pytest
 
 ## Install
 
+位置情報の取得に [Yahoo! Open Local Platform (YOLP)](https://developer.yahoo.co.jp/webapi/map/) を使用しています。
+
 ```bash
 $ export DATABASE_URL=postgresql://{user_name}:{password}@{host_name}/{db_name}
+$ export YOLP_APP_ID={your_yolp_app_id}
 $ psql -f db/schema.sql -U {user_name} -d {db_name} -h {host_name}
 $ make init
 ```

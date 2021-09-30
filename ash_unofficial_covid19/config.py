@@ -27,14 +27,11 @@ class Config:
     NOV2020_OR_EARLIER_URL = BASE_URL + "kurashi/135/136/150/d072303.html"
     PDF_URL = BASE_URL + "kurashi/135/146/149/d072466_d/fil/iryoukikan.pdf"
     MEDICAL_INSTITUTIONS_URL = BASE_URL + "kurashi/135/146/149/d073389.html"
-    RESERVATION_STATUSES_URL = (
-        BASE_URL + "kurashi/135/146/149/d072466_d/fil/" + "yoyakuzyoukyou.pdf"
-    )
+    RESERVATION_STATUSES_URL = BASE_URL + "kurashi/135/146/149/d072466_d/fil/" + "yoyakuzyoukyou.pdf"
 
     # 北海道オープンデータポータルの設定
     HOKKAIDO_URL = (
-        "https://www.harp.lg.jp/opendata/dataset/"
-        + "1369/resource/3132/010006_hokkaido_covid19_patients.csv"
+        "https://www.harp.lg.jp/opendata/dataset/" + "1369/resource/3132/010006_hokkaido_covid19_patients.csv"
     )
 
     # DATA-SMART CITY SAPPOROの設定

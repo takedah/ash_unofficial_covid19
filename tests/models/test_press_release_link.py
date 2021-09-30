@@ -1,9 +1,6 @@
 from datetime import date
 
-from ash_unofficial_covid19.models.press_release_link import (
-    PressReleaseLink,
-    PressReleaseLinkFactory,
-)
+from ash_unofficial_covid19.models.press_release_link import PressReleaseLink, PressReleaseLinkFactory
 
 
 def test_create():

@@ -3,10 +3,7 @@ from typing import Optional
 from psycopg2.extras import DictCursor
 
 from ..errors import ServiceError
-from ..models.medical_institution_location import (
-    MedicalInstitutionLocation,
-    MedicalInstitutionLocationFactory,
-)
+from ..models.medical_institution_location import MedicalInstitutionLocation, MedicalInstitutionLocationFactory
 from ..services.service import Service
 
 
@@ -57,9 +54,7 @@ class MedicalInstitutionLocationService(Service):
                     raise ServiceError("指定した名称の医療機関はありませんでした。")
                 return factory.create(**dict(res))
 
-    def find_area(
-        self, area: Optional[str] = None, is_pediatric: bool = False
-    ) -> MedicalInstitutionLocationFactory:
+    def find_area(self, area: Optional[str] = None, is_pediatric: bool = False) -> MedicalInstitutionLocationFactory:
         """新型コロナワクチン接種医療機関の位置情報一覧
 
         指定した対象年齢の新型コロナワクチン接種医療機関の一覧に医療機関の位置情報を

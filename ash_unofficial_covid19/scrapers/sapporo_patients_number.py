@@ -73,9 +73,7 @@ class ScrapeSapporoPatientsNumber(Scraper):
         except (TypeError, ValueError):
             return None
 
-        return date(
-            formatted_datetime.year, formatted_datetime.month, formatted_datetime.day
-        )
+        return date(formatted_datetime.year, formatted_datetime.month, formatted_datetime.day)
 
     def _extract_patients_number_data(self, row: list) -> Optional[dict]:
         """札幌市の新型コロナウイルス感染症日別患者数データへの変換

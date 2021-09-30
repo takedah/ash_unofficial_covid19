@@ -100,23 +100,8 @@ class ScrapeAsahikawaPatients(Scraper):
             hokkaido_patient_number = int(row[1])
             # 旭川市公式サイトにあるがオープンデータ定義書にない項目は半角スペース区切りで
             # 全て備考に入れる。
-            note = (
-                "北海道発表No."
-                + ";"
-                + row[1]
-                + ";"
-                + "周囲の患者の発生"
-                + ";"
-                + row[6]
-                + ";"
-                + "濃厚接触者の状況"
-                + ";"
-                + row[7]
-                + ";"
-            )
-            publication_date = self.format_date(
-                date_string=row[2], target_year=self.target_year
-            )
+            note = "北海道発表No." + ";" + row[1] + ";" + "周囲の患者の発生" + ";" + row[6] + ";" + "濃厚接触者の状況" + ";" + row[7] + ";"
+            publication_date = self.format_date(date_string=row[2], target_year=self.target_year)
             # 旭川市公式ホームページの陽性患者データの日付は判明日（前日）のため、
             # 公表日に修正する。
             if publication_date:
@@ -217,9 +202,7 @@ class ScrapeHokkaidoPatients(Scraper):
         except (TypeError, ValueError):
             return None
 
-        return date(
-            formatted_datetime.year, formatted_datetime.month, formatted_datetime.day
-        )
+        return date(formatted_datetime.year, formatted_datetime.month, formatted_datetime.day)
 
     @staticmethod
     def _format_bool(bool_string: str) -> Optional[bool]:
@@ -381,9 +364,7 @@ class ScrapeAsahikawaPatientsPDF(Scraper):
         """
         try:
             search_patient_number = re.match("^([0-9]{,4})$", str(row[1]).strip())
-            search_hokkaido_patient_number = re.match(
-                "^([0-9]{,5})$", str(row[2]).strip()
-            )
+            search_hokkaido_patient_number = re.match("^([0-9]{,5})$", str(row[2]).strip())
         except IndexError:
             return None
 

@@ -65,12 +65,7 @@ class ReservationStatusService(Service):
             result (int): 削除したレコード件数
 
         """
-        state = (
-            "DELETE FROM "
-            + self.table_name
-            + " "
-            + "WHERE medical_institution_name=%s;"
-        )
+        state = "DELETE FROM " + self.table_name + " " + "WHERE medical_institution_name=%s;"
         log_message = self.table_name + "テーブルから " + target_value + " " + "を"
         with self.get_connection() as conn:
             try:

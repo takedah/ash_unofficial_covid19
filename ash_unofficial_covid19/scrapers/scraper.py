@@ -3,12 +3,7 @@ from abc import ABCMeta, abstractmethod
 from datetime import date
 from typing import Optional
 
-from ..scrapers.downloader import (
-    DownloadedCSV,
-    DownloadedHTML,
-    DownloadedJSON,
-    DownloadedPDF,
-)
+from ..scrapers.downloader import DownloadedCSV, DownloadedHTML, DownloadedJSON, DownloadedPDF
 
 
 class Scraper(metaclass=ABCMeta):
@@ -84,9 +79,7 @@ class Scraper(metaclass=ABCMeta):
 
         """
         if isinstance(value, str):
-            return re.sub(
-                "( +)", " ", value.replace("\r", " ").replace("\n", " ").strip()
-            )
+            return re.sub("( +)", " ", value.replace("\r", " ").replace("\n", " ").strip())
         else:
             return ""
 
