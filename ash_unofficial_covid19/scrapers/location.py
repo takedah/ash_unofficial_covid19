@@ -46,7 +46,7 @@ class ScrapeYOLPLocation(Scraper):
             + industry_code
             + "&sort=-match&detail=simple&output=json"
         )
-        downloaded_json = self._get_json(json_url)
+        downloaded_json = self.get_json(json_url)
         for search_result in self._get_search_results(downloaded_json):
             location_data = self._extract_location_data(search_result)
             location_data["medical_institution_name"] = urllib.parse.unquote(
@@ -57,21 +57,6 @@ class ScrapeYOLPLocation(Scraper):
     @property
     def lists(self) -> list:
         return self.__lists
-
-    def _get_json(self, json_url: str) -> DownloadedJSON:
-        """JSONデータを要素に持つオブジェクトを返す
-
-        Args:
-            json_url (str): YOLP Web APIのURL
-
-        Returns:
-            downloaded_json (:obj:`DownloadedJSON`): JSONデータを要素に持つオブジェクト
-
-        """
-        if isinstance(json_url, str):
-            return DownloadedJSON(json_url)
-        else:
-            raise TypeError("Web API URLの指定が正しくありません。")
 
     def _get_search_results(self, downloaded_json: DownloadedJSON) -> list:
         """YOLP Web APIの返すJSONデータから検索結果データを抽出

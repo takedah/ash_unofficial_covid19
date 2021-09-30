@@ -120,7 +120,7 @@ class MedicalInstitutionService(Service):
             + " "
             + self.table_name
             + " "
-            + "ORDER BY area,id"
+            + "ORDER BY target_age,area,address"
             + ";"
         )
         factory = MedicalInstitutionFactory()

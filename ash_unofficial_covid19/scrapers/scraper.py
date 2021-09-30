@@ -3,7 +3,12 @@ from abc import ABCMeta, abstractmethod
 from datetime import date
 from typing import Optional
 
-from ..scrapers.downloader import DownloadedCSV, DownloadedHTML, DownloadedPDF
+from ..scrapers.downloader import (
+    DownloadedCSV,
+    DownloadedHTML,
+    DownloadedJSON,
+    DownloadedPDF,
+)
 
 
 class Scraper(metaclass=ABCMeta):
@@ -21,6 +26,9 @@ class Scraper(metaclass=ABCMeta):
         Args:
             html_url (str): HTMLファイルのURL
 
+        Returns:
+            downloaded_html (:obj:`DownloadedHTML`): HTMLデータを要素に持つオブジェクト
+
         """
         return DownloadedHTML(html_url)
 
@@ -32,6 +40,9 @@ class Scraper(metaclass=ABCMeta):
             csv_url (str): CSVファイルのURL
             encoding (str): CSVファイルの文字コード
 
+        Returns:
+            downloaded_csv (:obj:`DownloadedCSV`): CSVデータを要素に持つオブジェクト
+
         """
         return DownloadedCSV(url=csv_url, encoding=encoding)
 
@@ -42,8 +53,24 @@ class Scraper(metaclass=ABCMeta):
         Args:
             pdf_url (url): PDFファイルのURL
 
+        Returns:
+            downloaded_pdf (:obj:`DownloadedPDF`): PDFデータを要素に持つオブジェクト
+
         """
         return DownloadedPDF(pdf_url)
+
+    @staticmethod
+    def get_json(json_url: str) -> DownloadedJSON:
+        """JSONデータを要素に持つオブジェクトを返す
+
+        Args:
+            json_url (str): YOLP Web APIのURL
+
+        Returns:
+            downloaded_json (:obj:`DownloadedJSON`): JSONデータを要素に持つオブジェクト
+
+        """
+        return DownloadedJSON(json_url)
 
     @staticmethod
     def format_string(value: str) -> str:

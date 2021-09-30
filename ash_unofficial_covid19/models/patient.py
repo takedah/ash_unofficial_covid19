@@ -66,8 +66,8 @@ class Patient:
         """
         try:
             self.__patient_number = int(patient_number)
-        except ValueError as e:
-            raise DataModelError("識別番号が正しくありません。: " + e.args[0])
+        except ValueError:
+            raise DataModelError("識別番号が正しくありません。")
 
         self.__city_code = city_code
         self.__prefecture = prefecture

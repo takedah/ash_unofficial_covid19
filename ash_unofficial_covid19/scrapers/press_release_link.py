@@ -3,6 +3,7 @@ import urllib.parse
 
 from bs4 import BeautifulSoup
 
+from ..errors import ScrapeError
 from ..scrapers.downloader import DownloadedHTML
 from ..scrapers.scraper import Scraper
 
@@ -26,7 +27,7 @@ class ScrapePressReleaseLink(Scraper):
         if 2020 <= target_year:
             self.__target_year = target_year
         else:
-            raise TypeError("対象年の指定が正しくありません。")
+            raise ScrapeError("対象年の指定が正しくありません。")
 
         Scraper.__init__(self)
         downloaded_html = DownloadedHTML(html_url)

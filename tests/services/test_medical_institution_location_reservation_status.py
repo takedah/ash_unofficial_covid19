@@ -3,13 +3,15 @@ import pytest
 from ash_unofficial_covid19.errors import ServiceError
 from ash_unofficial_covid19.models.location import LocationFactory
 from ash_unofficial_covid19.models.medical_institution import MedicalInstitutionFactory
+from ash_unofficial_covid19.models.reservation_status import ReservationStatusFactory
 from ash_unofficial_covid19.services.location import LocationService
 from ash_unofficial_covid19.services.medical_institution import (
     MedicalInstitutionService,
 )
-from ash_unofficial_covid19.services.medical_institution_location import (
-    MedicalInstitutionLocationService,
+from ash_unofficial_covid19.services.medical_institution_location_reservation_status import (
+    MedicalInstitutionLocationReservationStatusService,
 )
+from ash_unofficial_covid19.services.reservation_status import ReservationStatusService
 
 
 @pytest.fixture()
@@ -24,20 +26,6 @@ def service():
             "book_at_call_center": False,
             "area": "新富・東・金星町",
             "memo": "",
-            "target_age": "16歳以上",
-        },
-        {
-            "name": "道北勤医協一条通病院",
-            "address": "旭川市東光1の1",
-            "phone_number": "0166-34-0015 予約専用",
-            "book_at_medical_institution": True,
-            "book_at_call_center": False,
-            "area": "大成",
-            "memo": (
-                "道北勤医協一条通病院及び道北勤医協一条クリニックは、"
-                + "予約専用番号(34-0015)に変更となります。 開始時期は、"
-                + "各医療機関のホームページ及び院内掲示をご覧ください。"
-            ),
             "target_age": "16歳以上",
         },
         {
@@ -81,7 +69,25 @@ def service():
     location_service = LocationService()
     location_service.create(location_factory)
 
-    service = MedicalInstitutionLocationService()
+    # 予約受付状況のセットアップ
+    test_reservation_status_data = [
+        {
+            "medical_institution_name": "市立旭川病院",
+            "address": "旭川市金星町1",
+            "phone_number": "29-0202 予約専用",
+            "status": "―",
+            "target": "―",
+            "inoculation_time": "―",
+            "memo": "詳細は病院のホームページで確認してください。",
+        },
+    ]
+    reservation_status_factory = ReservationStatusFactory()
+    for row in test_reservation_status_data:
+        reservation_status_factory.create(**row)
+    reservation_status_service = ReservationStatusService()
+    reservation_status_service.create(reservation_status_factory)
+
+    service = MedicalInstitutionLocationReservationStatusService()
     yield service
 
 
@@ -97,6 +103,10 @@ def test_find(service):
     assert result.target_age == "16歳以上"
     assert result.latitude == 43.778422777778
     assert result.longitude == 142.365976388889
+    assert result.status == "―"
+    assert result.target_person == "―"
+    assert result.inoculation_time == "―"
+    assert result.reservation_status_memo == "詳細は病院のホームページで確認してください。"
 
 
 def test_find_pediatric(service):
@@ -111,6 +121,10 @@ def test_find_pediatric(service):
     assert result.target_age == "12歳から15歳まで"
     assert result.latitude == 43.778422777778
     assert result.longitude == 142.365976388889
+    assert result.status == "―"
+    assert result.target_person == "―"
+    assert result.inoculation_time == "―"
+    assert result.reservation_status_memo == "詳細は病院のホームページで確認してください。"
 
 
 def test_not_exist_medical_institution(service):
@@ -131,6 +145,10 @@ def test_find_area(service):
     assert result.target_age == "16歳以上"
     assert result.latitude == 43.778422777778
     assert result.longitude == 142.365976388889
+    assert result.status == "―"
+    assert result.target_person == "―"
+    assert result.inoculation_time == "―"
+    assert result.reservation_status_memo == "詳細は病院のホームページで確認してください。"
 
 
 def test_find_area_pediatric(service):
@@ -146,6 +164,10 @@ def test_find_area_pediatric(service):
     assert result.target_age == "12歳から15歳まで"
     assert result.latitude == 43.778422777778
     assert result.longitude == 142.365976388889
+    assert result.status == "―"
+    assert result.target_person == "―"
+    assert result.inoculation_time == "―"
+    assert result.reservation_status_memo == "詳細は病院のホームページで確認してください。"
 
 
 def test_not_exist_area(service):

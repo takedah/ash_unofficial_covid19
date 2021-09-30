@@ -1,3 +1,4 @@
+import json
 from abc import ABCMeta, abstractmethod
 from io import BytesIO, StringIO
 from json import JSONDecodeError
@@ -95,7 +96,6 @@ class DownloadedHTML(Downloader):
             # 回避する
             requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += "HIGH:!DH"
             response = requests.get(url)
-            self.info_log("HTMLファイルのダウンロードに成功しました。")
         except (ConnectionError, MaxRetryError, Timeout, HTTPError):
             message = "cannot connect to web server."
             self.error_log(message)
@@ -104,6 +104,8 @@ class DownloadedHTML(Downloader):
             message = "cannot get HTML contents."
             self.error_log(message)
             raise HTTPDownloadError(message)
+
+        self.info_log("HTMLファイルのダウンロードに成功しました。")
         return response.content
 
 
@@ -150,8 +152,6 @@ class DownloadedCSV(Downloader):
         """
         try:
             response = requests.get(url)
-            csv_io = StringIO(response.content.decode(encoding))
-            self.info_log("CSVファイルのダウンロードに成功しました。")
         except (ConnectionError, MaxRetryError, Timeout, HTTPError):
             message = "cannot connect to web server."
             self.error_log(message)
@@ -160,6 +160,15 @@ class DownloadedCSV(Downloader):
             message = "cannot get CSV contents."
             self.error_log(message)
             raise HTTPDownloadError(message)
+
+        try:
+            csv_io = StringIO(response.content.decode(encoding))
+        except TypeError:
+            message = "ダウンロードしたコンテンツがテキストデータではありません。"
+            self.error_log(message)
+            raise HTTPDownloadError(message)
+
+        self.info_log("CSVファイルのダウンロードに成功しました。")
         return csv_io
 
 
@@ -269,12 +278,12 @@ class DownloadedJSON(Downloader):
             raise HTTPDownloadError(message)
 
         if response.status_code != 200:
-            message = "cannot get HTML contents."
+            message = "cannot get JSON contents."
             self.error_log(message)
             raise HTTPDownloadError(message)
 
         try:
-            json_res = response.json()
+            json_res = json.loads(response.content)
         except JSONDecodeError:
             message = "cannot decode json response."
             self.error_log(message)

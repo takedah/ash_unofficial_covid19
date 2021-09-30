@@ -35,7 +35,7 @@ class ScrapeAsahikawaPatients(Scraper):
         if 2020 <= target_year:
             self.__target_year = target_year
         else:
-            raise TypeError("対象年の指定が正しくありません。")
+            raise ScrapeError("対象年の指定が正しくありません。")
 
         Scraper.__init__(self)
         downloaded_html = self.get_html(html_url)

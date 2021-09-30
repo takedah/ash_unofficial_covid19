@@ -1,11 +1,11 @@
-import unittest
 from datetime import date
-from io import BytesIO
-from unittest.mock import Mock, patch
 
 import pandas as pd
+import pytest
+import requests
 from numpy import nan
 
+from ash_unofficial_covid19.errors import ScrapeError
 from ash_unofficial_covid19.scrapers.patient import (
     ScrapeAsahikawaPatients,
     ScrapeAsahikawaPatientsPDF,
@@ -13,177 +13,125 @@ from ash_unofficial_covid19.scrapers.patient import (
 )
 
 
-def html_content():
-    return """
-<table cellspacing="1" cellpadding="1" style="width: 660px;">
-    <caption>新型コロナウイルス感染症の市内発生状況</caption>
-    <tbody>
-        <tr>
-            <th nowrap="nowrap">NO.</th>
-            <th nowrap="nowrap">
-            <p>北海道発表</p>
-            <p>NO.</p>
-            </th>
-            <th nowrap="nowrap">判明日</th>
-            <th nowrap="nowrap">年代</th>
-            <th nowrap="nowrap">性別 </th>
-            <th nowrap="nowrap">居住地</th>
-            <th>周囲の患者の発生</th>
-            <th>
-            <p>濃厚接触者の状況</p>
-            </th>
-        </tr>
-        <tr>
-            <td nowrap="nowrap">1121</td>
-            <td>19080</td>
-            <td nowrap="nowrap">2月27日</td>
-            <td nowrap="nowrap">30代</td>
-            <td nowrap="nowrap">男性</td>
-            <td>旭川市</td>
-            <td>
-            <p>No.1072</p>
-            <p>No.1094</p>
-            <p>No.1107</p>
-            <p>No.1108</p>
-            </td>
-            <td>0人</td>
-        </tr>
-        <tr>
-            <td nowrap="nowrap">1120</td>
-            <td>19050</td>
-            <td nowrap="nowrap">2 月26日</td>
-            <td nowrap="nowrap">50代</td>
-            <td nowrap="nowrap">女性</td>
-            <td>旭川市</td>
-            <td>調査中</td>
-            <td>2人</td>
-        </tr>
-        <tr>
-            <td nowrap="nowrap">1119</td>
-            <td>19004</td>
-            <td nowrap="nowrap">２月２５日</td>
-            <td nowrap="nowrap">非公表</td>
-            <td nowrap="nowrap">非公表</td>
-            <td>旭川市</td>
-            <td>
-            <p>No.1092</p>
-            No.1093</td>
-            <td>1人</td>
-        </tr>
-        <tr>
-            <td nowrap="nowrap">1112</td>
-            <td>18891</td>
-            <td nowrap="nowrap">2月22日</td>
-            <td nowrap="nowrap">10代未満</td>
-            <td nowrap="nowrap">女性</td>
-            <td>旭川市</td>
-            <td>No.1074</td>
-            <td>0人</td>
-        </tr>
-        <tr>
-            <td nowrap="nowrap">1032</td>
-            <td>17511</td>
-            <td nowrap="nowrap">1月31日</td>
-            <td nowrap="nowrap">90代</td>
-            <td nowrap="nowrap">男性</td>
-            <td>
-            <p>旭川市</p>
-            </td>
-            <td>調査中</td>
-            <td>8人</td>
-        </tr>
-        <tr>
-            <th nowrap="nowrap">NO.</th>
-            <th nowrap="nowrap">
-            <p>北海道発表</p>
-            <p>NO.</p>
-            </th>
-            <th nowrap="nowrap">判明日</th>
-            <th nowrap="nowrap">年代</th>
-            <th nowrap="nowrap">性別 </th>
-            <th nowrap="nowrap">居住地</th>
-            <th>周囲の患者の発生</th>
-            <th>
-            <p>濃厚接触者の状況</p>
-            </th>
-        </tr>
-        <tr>
-            <td nowrap="nowrap">715</td>
-            <td>10716</td>
-            <td nowrap="nowrap">12月9日</td>
-            <td nowrap="nowrap">100代</td>
-            <td nowrap="nowrap">女性</td>
-            <td>旭川市</td>
-            <td>あり</td>
-            <td>調査中</td>
-        </tr>
-    </tbody>
-</table>
-<p><a href="test.html">新型コロナウイルス感染症の発生状況（令和3年8月19日発表分）（PDF形式90キロバイト）</a></p>
-"""
+class TestScrapeAsahikawaPatients:
+    @pytest.fixture()
+    def html_content(self):
+        return """
+    <table cellspacing="1" cellpadding="1" style="width: 660px;">
+        <caption>新型コロナウイルス感染症の市内発生状況</caption>
+        <tbody>
+            <tr>
+                <th nowrap="nowrap">NO.</th>
+                <th nowrap="nowrap">
+                <p>北海道発表</p>
+                <p>NO.</p>
+                </th>
+                <th nowrap="nowrap">判明日</th>
+                <th nowrap="nowrap">年代</th>
+                <th nowrap="nowrap">性別 </th>
+                <th nowrap="nowrap">居住地</th>
+                <th>周囲の患者の発生</th>
+                <th>
+                <p>濃厚接触者の状況</p>
+                </th>
+            </tr>
+            <tr>
+                <td nowrap="nowrap">1121</td>
+                <td>19080</td>
+                <td nowrap="nowrap">2月27日</td>
+                <td nowrap="nowrap">30代</td>
+                <td nowrap="nowrap">男性</td>
+                <td>旭川市</td>
+                <td>
+                <p>No.1072</p>
+                <p>No.1094</p>
+                <p>No.1107</p>
+                <p>No.1108</p>
+                </td>
+                <td>0人</td>
+            </tr>
+            <tr>
+                <td nowrap="nowrap">1120</td>
+                <td>19050</td>
+                <td nowrap="nowrap">2 月26日</td>
+                <td nowrap="nowrap">50代</td>
+                <td nowrap="nowrap">女性</td>
+                <td>旭川市</td>
+                <td>調査中</td>
+                <td>2人</td>
+            </tr>
+            <tr>
+                <td nowrap="nowrap">1119</td>
+                <td>19004</td>
+                <td nowrap="nowrap">２月２５日</td>
+                <td nowrap="nowrap">非公表</td>
+                <td nowrap="nowrap">非公表</td>
+                <td>旭川市</td>
+                <td>
+                <p>No.1092</p>
+                No.1093</td>
+                <td>1人</td>
+            </tr>
+            <tr>
+                <td nowrap="nowrap">1112</td>
+                <td>18891</td>
+                <td nowrap="nowrap">2月22日</td>
+                <td nowrap="nowrap">10代未満</td>
+                <td nowrap="nowrap">女性</td>
+                <td>旭川市</td>
+                <td>No.1074</td>
+                <td>0人</td>
+            </tr>
+            <tr>
+                <td nowrap="nowrap">1032</td>
+                <td>17511</td>
+                <td nowrap="nowrap">1月31日</td>
+                <td nowrap="nowrap">90代</td>
+                <td nowrap="nowrap">男性</td>
+                <td>
+                <p>旭川市</p>
+                </td>
+                <td>調査中</td>
+                <td>8人</td>
+            </tr>
+            <tr>
+                <th nowrap="nowrap">NO.</th>
+                <th nowrap="nowrap">
+                <p>北海道発表</p>
+                <p>NO.</p>
+                </th>
+                <th nowrap="nowrap">判明日</th>
+                <th nowrap="nowrap">年代</th>
+                <th nowrap="nowrap">性別 </th>
+                <th nowrap="nowrap">居住地</th>
+                <th>周囲の患者の発生</th>
+                <th>
+                <p>濃厚接触者の状況</p>
+                </th>
+            </tr>
+            <tr>
+                <td nowrap="nowrap">715</td>
+                <td>10716</td>
+                <td nowrap="nowrap">12月9日</td>
+                <td nowrap="nowrap">100代</td>
+                <td nowrap="nowrap">女性</td>
+                <td>旭川市</td>
+                <td>あり</td>
+                <td>調査中</td>
+            </tr>
+        </tbody>
+    </table>
+    <p><a href="test.html">新型コロナウイルス感染症の発生状況（令和3年8月19日発表分）（PDF形式90キロバイト）</a></p>
+    """
 
-
-def csv_content():
-    csv_data = """
-No,全国地方公共団体コード,都道府県名,市区町村名,公表_年月日,発症_年月日,患者_居住地,患者_年代,患者_性別,患者_職業,患者_状態,患者_症状,患者_渡航歴の有無フラグ,患者_再陽性フラグ,患者_退院済フラグ,備考
-1,10006,北海道,,2020-01-28,2020-01-21,中国武漢市,40代,女性,−,−,発熱,1,0,,海外渡航先：中国武漢
-2,10006,北海道,,2020-02-14,2020-01-31,石狩振興局管内,50代,男性,自営業,−,発熱;咳;倦怠感,0,0,,
-3,10006,北海道,,2020-02-19,2020-02-08,石狩振興局管内,40代,男性,会社員,−,倦怠感;筋肉痛;関節痛;発熱;咳,0,0,,
-"""
-    return csv_data.encode("cp932")
-
-
-class TestScrapeAsahikawaPatients(unittest.TestCase):
-    def setUp(self):
-        self.html_content = html_content()
-
-    def tearDown(self):
-        pass
-
-    def test_format_date(self):
-        self.assertEqual(
-            ScrapeAsahikawaPatients.format_date(date_string="3月6日", target_year=2021),
-            date(2021, 3, 6),
+    def test_lists(self, html_content, mocker):
+        responce_mock = mocker.Mock()
+        responce_mock.status_code = 200
+        responce_mock.content = html_content
+        mocker.patch.object(requests, "get", return_value=responce_mock)
+        scraper = ScrapeAsahikawaPatients(
+            html_url="http://dummy.local", target_year=2021
         )
-
-        # 全角数字が含まれている場合でも正しく変換する
-        self.assertEqual(
-            ScrapeAsahikawaPatients.format_date(date_string="３月６日", target_year=2021),
-            date(2021, 3, 6),
-        )
-
-        # 日付ではない数字の場合Noneを返す
-        self.assertEqual(
-            ScrapeAsahikawaPatients.format_date(date_string="13月6日", target_year=2021),
-            None,
-        )
-
-    def test_format_age(self):
-        self.assertEqual(ScrapeAsahikawaPatients.format_age("20代"), "20代")
-        self.assertEqual(ScrapeAsahikawaPatients.format_age("調査中"), "")
-        self.assertEqual(ScrapeAsahikawaPatients.format_age("10代未満"), "10歳未満")
-        self.assertEqual(ScrapeAsahikawaPatients.format_age("100代"), "90歳以上")
-
-        # 全角数字が含まれている場合でも正しく変換する
-        self.assertEqual(ScrapeAsahikawaPatients.format_age("２０代"), "20代")
-
-    def test_format_sex(self):
-        self.assertEqual(ScrapeAsahikawaPatients.format_sex("男性"), "男性")
-        self.assertEqual(ScrapeAsahikawaPatients.format_sex("非公表"), "")
-        self.assertEqual(ScrapeAsahikawaPatients.format_sex("その他"), "その他")
-        self.assertEqual(ScrapeAsahikawaPatients.format_sex("women"), "")
-
-    @patch("ash_unofficial_covid19.scrapers.downloader.requests")
-    def test_data_list(self, mock_requests):
-        mock_requests.get.return_value = Mock(
-            status_code=200, content=self.html_content
-        )
-        dummy_url = "http://dummy.local"
-        # 年指定が正しくない場合エラーを返す
-        with self.assertRaises(TypeError):
-            ScrapeAsahikawaPatients(html_url=dummy_url, target_year=2019)
-
-        scraper = ScrapeAsahikawaPatients(html_url=dummy_url, target_year=2021)
         expect = [
             {
                 "patient_number": 1121,
@@ -307,9 +255,9 @@ class TestScrapeAsahikawaPatients(unittest.TestCase):
                 "close_contact": "調査中",
             },
         ]
-        self.assertEqual(scraper.lists, expect)
+        assert scraper.lists == expect
 
-        # 想定外のテーブル要素があった場合は空リストを返す。
+    def test_unexpect_table(self, mocker):
         dummy_table = """
         <table>
           <tbody>
@@ -319,28 +267,42 @@ class TestScrapeAsahikawaPatients(unittest.TestCase):
           </tbody>
         </table>
         """
-        mock_requests.get.return_value = Mock(status_code=200, content=dummy_table)
-        scraper = ScrapeAsahikawaPatients(html_url=dummy_url, target_year=2021)
-        self.assertEqual(scraper.lists, [])
-
-
-class TestScrapeHokkaidoPatients(unittest.TestCase):
-    def setUp(self):
-        self.csv_content = csv_content()
-
-    def tearDown(self):
-        pass
-
-    @patch("ash_unofficial_covid19.scrapers.downloader.requests")
-    def test_lists(self, mock_requests):
-        mock_requests.get.return_value = Mock(
-            status_code=200,
-            content=csv_content(),
-            headers={"content-type": "text/csv"},
+        responce_mock = mocker.Mock()
+        responce_mock.status_code = 200
+        responce_mock.content = dummy_table
+        mocker.patch.object(requests, "get", return_value=responce_mock)
+        scraper = ScrapeAsahikawaPatients(
+            html_url="http://dummy.local", target_year=2021
         )
-        dummy_url = "http://dummy.local"
-        csv_data = ScrapeHokkaidoPatients(dummy_url)
-        result = csv_data.lists
+        assert scraper.lists == []
+
+    def test_target_year_error(self, html_content, mocker):
+        responce_mock = mocker.Mock()
+        responce_mock.status_code = 200
+        responce_mock.content = html_content
+        mocker.patch.object(requests, "get", return_value=responce_mock)
+        with pytest.raises(ScrapeError, match="対象年の指定が正しくありません。"):
+            ScrapeAsahikawaPatients(html_url="http://dummy.local", target_year=2019)
+
+
+class TestScrapeHokkaidoPatients:
+    @pytest.fixture()
+    def csv_content(self):
+        csv_content = """
+    No,全国地方公共団体コード,都道府県名,市区町村名,公表_年月日,発症_年月日,患者_居住地,患者_年代,患者_性別,患者_職業,患者_状態,患者_症状,患者_渡航歴の有無フラグ,患者_再陽性フラグ,患者_退院済フラグ,備考
+    1,10006,北海道,,2020-01-28,2020-01-21,中国武漢市,40代,女性,−,−,発熱,1,0,,海外渡航先：中国武漢
+    2,10006,北海道,,2020-02-14,2020-01-31,石狩振興局管内,50代,男性,自営業,−,発熱;咳;倦怠感,0,0,,
+    3,10006,北海道,,2020-02-19,2020-02-08,石狩振興局管内,40代,男性,会社員,−,倦怠感;筋肉痛;関節痛;発熱;咳,0,0,,
+    """
+        return csv_content.encode("cp932")
+
+    def test_lists(self, csv_content, mocker):
+        responce_mock = mocker.Mock()
+        responce_mock.status_code = 200
+        responce_mock.content = csv_content
+        responce_mock.headers = {"content-type": "text/csv"}
+        mocker.patch.object(requests, "get", return_value=responce_mock)
+        csv_data = ScrapeHokkaidoPatients("http://dummy.local")
         expect = [
             {
                 "patient_number": 1,
@@ -394,26 +356,12 @@ class TestScrapeHokkaidoPatients(unittest.TestCase):
                 "note": "",
             },
         ]
-        self.assertEqual(result, expect)
+        assert csv_data.lists == expect
 
 
-class TestScrapeAsahikawaPatientsPDF(unittest.TestCase):
-    @patch(
-        "ash_unofficial_covid19.scrapers.patient"
-        + ".ScrapeAsahikawaPatientsPDF.get_pdf"
-    )
-    @patch(
-        "ash_unofficial_covid19.scrapers.patient"
-        + ".ScrapeAsahikawaPatientsPDF._get_dataframe"
-    )
-    @patch("ash_unofficial_covid19.scrapers.downloader.requests")
-    def test_lists(self, mock_requests, mock_get_dataframe, mock_get_pdf):
-        mock_requests.get.return_value = Mock(
-            status_code=200,
-            content="".encode("utf-8"),
-            headers={"content-type": "application/pdf"},
-        )
-        dfs = list()
+class TestScrapeAsahikawaPatientsPDF:
+    @pytest.fixture()
+    def pdf_dataframe(self):
         df1 = pd.DataFrame([[]])
         df2 = pd.DataFrame(
             [
@@ -432,12 +380,19 @@ class TestScrapeAsahikawaPatientsPDF(unittest.TestCase):
                 [1.0, "6", "66", "日本", "旭川市", "40代", "男性", "非公表", "有り", "3人"],
             ]
         )
-        dfs = [df1, df2]
-        mock_get_dataframe.return_value = dfs
-        mock_get_pdf.return_value = BytesIO()
-        dummy_url = "http://dummy.local"
+        return [df1, df2]
+
+    def test_lists(self, pdf_dataframe, mocker):
+        responce_mock = mocker.Mock()
+        responce_mock.status_code = 200
+        responce_mock.content = "".encode("utf-8")
+        responce_mock.headers = {"content-type": "application/pdf"}
+        mocker.patch.object(requests, "get", return_value=responce_mock)
+        mocker.patch.object(
+            ScrapeAsahikawaPatientsPDF, "_get_dataframe", return_value=pdf_dataframe
+        )
         scraper = ScrapeAsahikawaPatientsPDF(
-            pdf_url=dummy_url, publication_date=date(2021, 8, 19)
+            pdf_url="http://dummy.local", publication_date=date(2021, 8, 19)
         )
         expect = [
             {
@@ -461,8 +416,4 @@ class TestScrapeAsahikawaPatientsPDF(unittest.TestCase):
                 "close_contact": "3人",
             },
         ]
-        self.assertEqual(scraper.lists, expect)
-
-
-if __name__ == "__main__":
-    unittest.main()
+        assert scraper.lists == expect
