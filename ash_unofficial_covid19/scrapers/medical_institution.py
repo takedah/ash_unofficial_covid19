@@ -212,7 +212,7 @@ class ScrapeMedicalInstitutions(Scraper):
                 target_age = "12歳から15歳まで"
 
             medical_institution_data = {
-                "name": name,
+                "name": self._translate_name(name),
                 "address": address,
                 "phone_number": phone_number,
                 "book_at_medical_institution": book_at_medical_institution,
@@ -224,6 +224,27 @@ class ScrapeMedicalInstitutions(Scraper):
             return medical_institution_data
         except (ValueError, IndexError):
             return None
+
+    @staticmethod
+    def _translate_name(medical_institution_name: str) -> str:
+        """
+        医療機関名の表記揺れをHTMLページの方の名称に揃える
+
+        Args:
+            medical_institution_name (str): 医療機関名
+
+        Returns:
+            translated_name (str): 変換後の医療機関名
+                変換対象ではない医療機関名を指定した場合はそのまま変換せず返す
+
+        """
+        if not isinstance(medical_institution_name, str):
+            return ""
+
+        translate_table = {
+            "旭川医療センター": "独立行政法人国立病院機構旭川医療センター",
+        }
+        return translate_table.get(medical_institution_name, medical_institution_name)
 
     def get_name_lists(self) -> list:
         """スクレイピング結果から主キーとなる医療機関名と対象年齢のタプルのリストを取得

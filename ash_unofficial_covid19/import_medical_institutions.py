@@ -112,11 +112,6 @@ def import_locations() -> None:
             "latitude": 43.777870139580855,
         },
         {
-            "medical_institution_name": "旭川医療センター",
-            "longitude": 142.3815237271935,
-            "latitude": 43.798826491523464,
-        },
-        {
             "medical_institution_name": "フクダクリニック",
             "longitude": 142.38243298115825,
             "latitude": 43.81521459576975,

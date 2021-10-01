@@ -108,7 +108,7 @@ class ScrapeReservationStatus(Scraper):
                 return None
 
             status_data = {
-                "medical_institution_name": medical_institution_name,
+                "medical_institution_name": self._translate_name(medical_institution_name),
                 "address": row[1],
                 "phone_number": row[2],
                 "status": row[3],
@@ -120,6 +120,27 @@ class ScrapeReservationStatus(Scraper):
             return None
 
         return status_data
+
+    @staticmethod
+    def _translate_name(medical_institution_name: str) -> str:
+        """
+        医療機関名の表記揺れをHTMLページの方の名称に揃える
+
+        Args:
+            medical_institution_name (str): 医療機関名
+
+        Returns:
+            translated_name (str): 変換後の医療機関名
+                変換対象ではない医療機関名を指定した場合はそのまま変換せず返す
+
+        """
+        if not isinstance(medical_institution_name, str):
+            return ""
+
+        translate_table = {
+            "くさのこどもクリニック": "小児科くさのこどもクリニック",
+        }
+        return translate_table.get(medical_institution_name, medical_institution_name)
 
     def get_name_list(self) -> list:
         """スクレイピング結果から主キーとなる医療機関名のリストを取得
