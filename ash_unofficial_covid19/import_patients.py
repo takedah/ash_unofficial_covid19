@@ -33,6 +33,7 @@ def _get_download_lists() -> list:
         (Config.JUN2021_DATA_URL, 2021),
         (Config.JUL2021_DATA_URL, 2021),
         (Config.AUG2021_DATA_URL, 2021),
+        (Config.SEP2021_DATA_URL, 2021),
     ]
 
 
@@ -261,7 +262,7 @@ def import_latest():
     if press_release_links:
         for press_release_link in press_release_links.items:
             publication_date = press_release_link.publication_date
-            if publication_date.year == 2021 and publication_date.month == 9:
+            if publication_date.year == 2021 and publication_date.month == 10:
                 _import_asahikawa_data_from_press_release(
                     pdf_url=press_release_link.url,
                     publication_date=press_release_link.publication_date,
@@ -317,6 +318,3 @@ def delete_patients(patient_number: int):
 
 if __name__ == "__main__":
     import_latest()
-    # 2021年9月22日報道発表データに訂正があったため1件陽性患者データを削除
-    # https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529_d/fil/09232.pdf
-    delete_patients(3401)
