@@ -13,6 +13,9 @@ class MedicalInstitutionLocationService(Service):
     def __init__(self):
         Service.__init__(self, "medical_institutions")
 
+    def upsert(self):
+        pass
+
     def find(self, name: str, is_pediatric: bool = False) -> MedicalInstitutionLocation:
         """新型コロナワクチン接種医療機関の個別情報
 
@@ -88,7 +91,7 @@ class MedicalInstitutionLocationService(Service):
         if area:
             state = state + " " + "AND area=%s"
 
-        state = state + " " + "ORDER BY med.id;"
+        state = state + " " + "ORDER BY med.area,med.address;"
         factory = MedicalInstitutionLocationFactory()
         with self.get_connection() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:

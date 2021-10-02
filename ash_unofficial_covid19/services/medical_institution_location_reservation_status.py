@@ -16,6 +16,9 @@ class MedicalInstitutionLocationReservationStatusService(Service):
     def __init__(self):
         Service.__init__(self, "reservation_statuses")
 
+    def upsert(self):
+        pass
+
     def find(self, name: str, is_pediatric: bool = False) -> MedicalInstitutionLocationReservationStatus:
         """新型コロナワクチン接種医療機関の個別情報
 
@@ -100,7 +103,7 @@ class MedicalInstitutionLocationReservationStatusService(Service):
         if area:
             state = state + " " + "AND area=%s"
 
-        state = state + " " + "ORDER BY med.id;"
+        state = state + " " + "ORDER BY med.area,med.address;"
 
         factory = MedicalInstitutionLocationReservationStatusFactory()
         with self.get_connection() as conn:

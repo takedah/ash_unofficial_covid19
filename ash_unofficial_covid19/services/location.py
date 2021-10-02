@@ -62,7 +62,7 @@ class LocationService(Service):
             + " "
             + self.table_name
             + " "
-            + "ORDER BY id"
+            + "ORDER BY longitude,latitude"
             + ";"
         )
         factory = LocationFactory()

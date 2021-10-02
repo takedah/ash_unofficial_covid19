@@ -65,6 +65,9 @@ class ReservationStatusService(Service):
             result (int): 削除したレコード件数
 
         """
+        if not isinstance(target_value, str):
+            raise ServiceError("削除対象の指定が文字列になっていません。")
+
         state = "DELETE FROM " + self.table_name + " " + "WHERE medical_institution_name=%s;"
         log_message = self.table_name + "テーブルから " + target_value + " " + "を"
         with self.get_connection() as conn:

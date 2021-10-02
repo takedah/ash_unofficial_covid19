@@ -4,6 +4,7 @@ from decimal import ROUND_HALF_UP, Decimal
 from psycopg2.extras import DictCursor
 
 from ..config import Config
+from ..errors import ServiceError
 from ..models.sapporo_patients_number import SapporoPatientsNumberFactory
 from ..services.service import Service
 
@@ -87,16 +88,15 @@ class SapporoPatientsNumberService(Service):
                 1週間ごとの日付とその週の新規陽性患者数を要素とするタプルのリスト
 
         """
+        if not isinstance(from_date, date) or not isinstance(to_date, date):
+            raise ServiceError("期間の範囲指定が日付になっていません。")
+
         state = (
             "SELECT date(from_week) AS weeks, "
             + "SUM(patients_number) AS patients FROM "
             + "(SELECT generate_series AS from_week, "
             + "generate_series + '7 days'::interval AS to_week FROM "
-            + "generate_series('"
-            + from_date.strftime("%Y-%m-%d")
-            + "'::DATE, '"
-            + to_date.strftime("%Y-%m-%d")
-            + "'::DATE, '7 days')) "
+            + "generate_series(%s::DATE, %s::DATE, '7 days')) "
             + "AS week_ranges "
             + "LEFT JOIN "
             + self.table_name
@@ -111,7 +111,7 @@ class SapporoPatientsNumberService(Service):
         aggregate_by_weeks = list()
         with self.get_connection() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state)
+                cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
                 for row in cur.fetchall():
                     aggregate_by_weeks.append((row["weeks"], row["patients"]))
         return aggregate_by_weeks

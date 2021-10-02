@@ -323,16 +323,15 @@ class AsahikawaPatientService(Service):
                 1日ごとの日付とその週の新規陽性患者数を要素とするタプル
 
         """
+        if not isinstance(from_date, date) or not isinstance(to_date, date):
+            raise ServiceError("期間の範囲指定が日付になっていません。")
+
         state = (
             "SELECT date(from_day) AS days, "
             + "COUNT(DISTINCT patient_number) AS patients FROM "
             + "(SELECT generate_series AS from_day, "
             + "generate_series + '1 day'::interval AS to_day FROM "
-            + "generate_series('"
-            + from_date.strftime("%Y-%m-%d")
-            + "'::DATE, '"
-            + to_date.strftime("%Y-%m-%d")
-            + "'::DATE, '1 day')) "
+            + "generate_series(%s::DATE, %s::DATE, '1 day')) "
             + "AS day_ranges LEFT JOIN asahikawa_patients ON "
             + "from_day <= asahikawa_patients.publication_date AND "
             + "asahikawa_patients.publication_date < to_day GROUP BY from_day;"
@@ -340,7 +339,7 @@ class AsahikawaPatientService(Service):
         aggregate_by_days = list()
         with self.get_connection() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state)
+                cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
                 for row in cur.fetchall():
                     aggregate_by_days.append((row[0], row[1]))
         return aggregate_by_days
@@ -357,16 +356,15 @@ class AsahikawaPatientService(Service):
                 1週間ごとの日付とその週の新規陽性患者数を要素とするタプルのリスト
 
         """
+        if not isinstance(from_date, date) or not isinstance(to_date, date):
+            raise ServiceError("期間の範囲指定が日付になっていません。")
+
         state = (
             "SELECT date(from_week) AS weeks, "
             + "COUNT(DISTINCT patient_number) AS patients FROM "
             + "(SELECT generate_series AS from_week, "
             + "generate_series + '7 days'::interval AS to_week FROM "
-            + "generate_series('"
-            + from_date.strftime("%Y-%m-%d")
-            + "'::DATE, '"
-            + to_date.strftime("%Y-%m-%d")
-            + "'::DATE, '7 days')) "
+            + "generate_series(%s::DATE, %s::DATE, '7 days')) "
             + "AS week_ranges LEFT JOIN asahikawa_patients ON "
             + "from_week <= asahikawa_patients.publication_date AND "
             + "asahikawa_patients.publication_date < to_week GROUP BY from_week;"
@@ -374,7 +372,7 @@ class AsahikawaPatientService(Service):
         aggregate_by_weeks = list()
         with self.get_connection() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state)
+                cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
                 for row in cur.fetchall():
                     aggregate_by_weeks.append((row[0], row[1]))
         return aggregate_by_weeks
@@ -391,16 +389,15 @@ class AsahikawaPatientService(Service):
                 1週間ごとの日付とその週の年代別新規陽性患者数をpandasのDataFrameで返す
 
         """
+        if not isinstance(from_date, date) or not isinstance(to_date, date):
+            raise ServiceError("期間の範囲指定が日付になっていません。")
+
         state = (
             "SELECT date(from_week) AS weeks, age, "
             + "COUNT(DISTINCT patient_number) AS patients FROM "
             + "(SELECT generate_series AS from_week, "
             + "generate_series + '7 days'::interval AS to_week FROM "
-            + "generate_series('"
-            + from_date.strftime("%Y-%m-%d")
-            + "'::DATE, '"
-            + to_date.strftime("%Y-%m-%d")
-            + "'::DATE, '7 days')) "
+            + "generate_series(%s::DATE, %s::DATE, '7 days')) "
             + "AS week_ranges LEFT JOIN asahikawa_patients ON "
             + "from_week <= asahikawa_patients.publication_date AND "
             + "asahikawa_patients.publication_date < to_week GROUP BY from_week, age "
@@ -423,7 +420,7 @@ class AsahikawaPatientService(Service):
         )
         with self.get_connection() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state)
+                cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
                 for row in cur.fetchall():
                     if row["age"] is None:
                         df.loc[row["weeks"]] = 0
@@ -490,6 +487,9 @@ class AsahikawaPatientService(Service):
                 1か月ごとの年月とその週までの累計陽性患者数を要素とするタプルのリスト
 
         """
+        if not isinstance(from_date, date) or not isinstance(to_date, date):
+            raise ServiceError("期間の範囲指定が日付になっていません。")
+
         state = (
             "SELECT date(aggregate_patients.from_month), "
             + "SUM(aggregate_patients.patients) OVER("
@@ -498,11 +498,7 @@ class AsahikawaPatientService(Service):
             + "SELECT from_month, COUNT(DISTINCT patient_number) as patients FROM "
             + "("
             + "SELECT generate_series AS from_month, generate_series + "
-            + "'1 months'::interval AS to_month FROM generate_series('"
-            + from_date.strftime("%Y-%m-%d")
-            + "'::DATE, '"
-            + to_date.strftime("%Y-%m-%d")
-            + "'::DATE, '1 months')"
+            + "'1 months'::interval AS to_month FROM generate_series(%s::DATE, %s::DATE, '1 months')"
             + ") AS month_ranges "
             + "LEFT JOIN asahikawa_patients "
             + "ON from_month <= asahikawa_patients.publication_date AND "
@@ -512,7 +508,7 @@ class AsahikawaPatientService(Service):
         total_by_months = list()
         with self.get_connection() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state)
+                cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
                 for row in cur.fetchall():
                     total_by_months.append((row[0], row[1]))
         return total_by_months

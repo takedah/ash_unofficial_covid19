@@ -111,9 +111,9 @@ class ScrapeReservationStatus(Scraper):
                 "medical_institution_name": self._translate_name(medical_institution_name),
                 "address": row[1],
                 "phone_number": row[2],
-                "status": row[3],
-                "target": row[4],
-                "inoculation_time": row[5],
+                "status": row[3].replace("―", ""),
+                "target": row[4].replace("―", ""),
+                "inoculation_time": row[5].replace("―", ""),
                 "memo": row[6],
             }
         except IndexError:
