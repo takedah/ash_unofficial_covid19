@@ -438,7 +438,13 @@ class ByAgeView(GraphView):
 
     def __init__(self):
         service = AsahikawaPatientService()
+        today = self.get_today()
         self.__by_age_data = service.get_patients_number_by_age()
+        self.__today = self.format_date_style(today)
+
+    @property
+    def today(self) -> str:
+        return self.__today
 
     def get_graph_alt(self) -> str:
         """グラフの代替テキストを生成
@@ -762,8 +768,19 @@ class WeeklyPerAgeView(GraphView):
     def __init__(self):
         service = AsahikawaPatientService()
         today = self.get_today()
-        df = service.get_aggregate_by_weeks_per_age(from_date=today - relativedelta(weeks=4, days=-1), to_date=today)
+        from_date = today - relativedelta(weeks=4, days=-1)
+        df = service.get_aggregate_by_weeks_per_age(from_date=from_date, to_date=today)
         self.__aggregate_by_weeks_per_age = df
+        self.__today = self.format_date_style(today)
+        self.__from_date = self.format_date_style(from_date)
+
+    @property
+    def today(self) -> str:
+        return self.__today
+
+    @property
+    def from_date(self) -> str:
+        return self.__from_date
 
     def get_graph_alt(self) -> str:
         """グラフの代替テキストを生成
