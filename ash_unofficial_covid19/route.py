@@ -5,16 +5,16 @@ from flask_caching import Cache
 
 from .config import Config
 from .errors import ServiceError
-from .views.view import (
-    AsahikawaPatientsView,
+from .views.graph import (
     ByAgeView,
     DailyTotalView,
-    MedicalInstitutionsView,
     MonthTotalView,
     MovingAverageView,
     PerHundredThousandPopulationView,
     WeeklyPerAgeView,
 )
+from .views.medical_institution import MedicalInstitutionsView
+from .views.patient import AsahikawaPatientsView
 
 cache = Cache(config={"CACHE_TYPE": "simple"})
 app = Flask(__name__)
