@@ -49,7 +49,7 @@ class ScrapePressReleaseLink(Scraper):
                 ダウンロードしたHTMLファイルのbytesデータを要素に持つオブジェクト
 
         Returns:
-            press_release_link (list of tuple): tableの内容で構成される二次元配列
+            press_release_link (list of dict): tableの内容で構成される二次元配列
 
         """
         soup = BeautifulSoup(downloaded_html.content, "html.parser")

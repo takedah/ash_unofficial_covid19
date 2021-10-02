@@ -45,31 +45,31 @@ class ReservationStatus:
         self.__memo = memo
 
     @property
-    def medical_institution_name(self) -> str:
+    def medical_institution_name(self):
         return self.__medical_institution_name
 
     @property
-    def address(self) -> str:
+    def address(self):
         return self.__address
 
     @property
-    def phone_number(self) -> str:
+    def phone_number(self):
         return self.__phone_number
 
     @property
-    def status(self) -> str:
+    def status(self):
         return self.__status
 
     @property
-    def target(self) -> str:
+    def target(self):
         return self.__target
 
     @property
-    def inoculation_time(self) -> str:
+    def inoculation_time(self):
         return self.__inoculation_time
 
     @property
-    def memo(self) -> str:
+    def memo(self):
         return self.__memo
 
 
@@ -86,7 +86,7 @@ class ReservationStatusFactory(Factory):
         self.__items = list()
 
     @property
-    def items(self) -> list:
+    def items(self):
         return self.__items
 
     def _create_item(self, **row) -> ReservationStatus:

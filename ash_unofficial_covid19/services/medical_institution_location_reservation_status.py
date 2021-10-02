@@ -59,9 +59,11 @@ class MedicalInstitutionLocationReservationStatusService(Service):
             with conn.cursor(cursor_factory=DictCursor) as cur:
                 cur.execute(state, (name, target_age))
                 res = cur.fetchone()
-                if res is None:
-                    raise ServiceError("指定した名称の医療機関はありませんでした。")
-                return factory.create(**dict(res))
+
+        if res is None:
+            raise ServiceError("指定した名称の医療機関はありませんでした。")
+
+        return factory.create(**dict(res))
 
     def find_area(
         self, area: Optional[str] = None, is_pediatric: bool = False

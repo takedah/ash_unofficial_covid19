@@ -106,10 +106,15 @@ class Service:
             with conn.cursor(cursor_factory=DictCursor) as cur:
                 cur.execute(state)
                 result = cur.fetchone()
+
         if result["max"] is None:
             return datetime(1970, 1, 1, 0, 0, 0)
+
+        last_updated = result["max"]
+        if isinstance(last_updated, datetime):
+            return last_updated
         else:
-            return result["max"]
+            return datetime(1970, 1, 1, 0, 0, 0)
 
     def info_log(self, message: str) -> None:
         """AppLogオブジェクトのinfoメソッドのラッパー

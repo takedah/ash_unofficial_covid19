@@ -123,19 +123,19 @@ class DailyTotalView(GraphView):
         self.__increase_from_seven_days_before = "{:+,}".format(increase_from_seven_days_before)
 
     @property
-    def today(self) -> str:
+    def today(self):
         return self.__today
 
     @property
-    def most_recent(self) -> str:
+    def most_recent(self):
         return self.__most_recent
 
     @property
-    def seven_days_before_most_recent(self) -> str:
+    def seven_days_before_most_recent(self):
         return self.__seven_days_before_most_recent
 
     @property
-    def increase_from_seven_days_before(self) -> str:
+    def increase_from_seven_days_before(self):
         return self.__increase_from_seven_days_before
 
     def get_graph_alt(self) -> str:
@@ -213,19 +213,19 @@ class MonthTotalView(GraphView):
         self.__increase_from_last_month = "{:+,}".format(increase_from_last_month)
 
     @property
-    def today(self) -> str:
+    def today(self):
         return self.__today
 
     @property
-    def this_month(self) -> str:
+    def this_month(self):
         return self.__this_month
 
     @property
-    def last_month(self) -> str:
+    def last_month(self):
         return self.__last_month
 
     @property
-    def increase_from_last_month(self) -> str:
+    def increase_from_last_month(self):
         return self.__increase_from_last_month
 
     def get_graph_alt(self) -> str:
@@ -287,7 +287,7 @@ class ByAgeView(GraphView):
         self.__today = self.format_date_style(today)
 
     @property
-    def today(self) -> str:
+    def today(self):
         return self.__today
 
     def get_graph_alt(self) -> str:
@@ -380,15 +380,15 @@ class MovingAverageView(GraphView):
         self.__increase_from_last_week = "{:+,}".format(increase_from_last_week)
 
     @property
-    def this_week(self) -> str:
+    def this_week(self):
         return self.__this_week
 
     @property
-    def last_week(self) -> str:
+    def last_week(self):
         return self.__last_week
 
     @property
-    def increase_from_last_week(self) -> str:
+    def increase_from_last_week(self):
         return self.__increase_from_last_week
 
     def get_graph_alt(self) -> str:
@@ -479,19 +479,19 @@ class PerHundredThousandPopulationView(GraphView):
         self.__alert_level = alert_level
 
     @property
-    def this_week(self) -> str:
+    def this_week(self):
         return self.__this_week
 
     @property
-    def last_week(self) -> str:
+    def last_week(self):
         return self.__last_week
 
     @property
-    def increase_from_last_week(self) -> str:
+    def increase_from_last_week(self):
         return self.__increase_from_last_week
 
     @property
-    def alert_level(self) -> str:
+    def alert_level(self):
         return self.__alert_level
 
     def get_graph_alt(self) -> str:
@@ -619,11 +619,11 @@ class WeeklyPerAgeView(GraphView):
         self.__from_date = self.format_date_style(from_date)
 
     @property
-    def today(self) -> str:
+    def today(self):
         return self.__today
 
     @property
-    def from_date(self) -> str:
+    def from_date(self):
         return self.__from_date
 
     def get_graph_alt(self) -> str:

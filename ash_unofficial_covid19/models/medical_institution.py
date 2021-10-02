@@ -49,35 +49,35 @@ class MedicalInstitution:
         self.__target_age = target_age
 
     @property
-    def name(self) -> str:
+    def name(self):
         return self.__name
 
     @property
-    def address(self) -> str:
+    def address(self):
         return self.__address
 
     @property
-    def phone_number(self) -> str:
+    def phone_number(self):
         return self.__phone_number
 
     @property
-    def book_at_medical_institution(self) -> bool:
+    def book_at_medical_institution(self):
         return self.__book_at_medical_institution
 
     @property
-    def book_at_call_center(self) -> bool:
+    def book_at_call_center(self):
         return self.__book_at_call_center
 
     @property
-    def area(self) -> str:
+    def area(self):
         return self.__area
 
     @property
-    def memo(self) -> str:
+    def memo(self):
         return self.__memo
 
     @property
-    def target_age(self) -> str:
+    def target_age(self):
         return self.__target_age
 
 
@@ -94,7 +94,7 @@ class MedicalInstitutionFactory(Factory):
         self.__items = list()
 
     @property
-    def items(self) -> list:
+    def items(self):
         return self.__items
 
     def _create_item(self, **row) -> MedicalInstitution:

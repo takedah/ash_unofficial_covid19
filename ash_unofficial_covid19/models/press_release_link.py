@@ -30,11 +30,11 @@ class PressReleaseLink:
         self.__publication_date = publication_date
 
     @property
-    def url(self) -> str:
+    def url(self):
         return self.__url
 
     @property
-    def publication_date(self) -> date:
+    def publication_date(self):
         return self.__publication_date
 
 
@@ -51,7 +51,7 @@ class PressReleaseLinkFactory(Factory):
         self.__items = list()
 
     @property
-    def items(self) -> list:
+    def items(self):
         return self.__items
 
     def _create_item(self, **row) -> PressReleaseLink:

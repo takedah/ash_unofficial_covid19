@@ -76,7 +76,7 @@ class ReservationStatusService(Service):
                     cur.execute(state, (target_value,))
                     result = cur.rowcount
                 conn.commit()
-                if result == 0:
+                if result == 0 or result is None:
                     self.info_log(log_message + "削除できませんでした。")
                 else:
                     self.info_log(log_message + str(result) + "件削除しました。")

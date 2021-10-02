@@ -87,59 +87,59 @@ class MedicalInstitutionLocationReservationStatus:
             self.__reservation_status_memo = reservation_status_memo
 
     @property
-    def name(self) -> str:
+    def name(self):
         return self.__name
 
     @property
-    def address(self) -> str:
+    def address(self):
         return self.__address
 
     @property
-    def phone_number(self) -> str:
+    def phone_number(self):
         return self.__phone_number
 
     @property
-    def book_at_medical_institution(self) -> bool:
+    def book_at_medical_institution(self):
         return self.__book_at_medical_institution
 
     @property
-    def book_at_call_center(self) -> bool:
+    def book_at_call_center(self):
         return self.__book_at_call_center
 
     @property
-    def area(self) -> str:
+    def area(self):
         return self.__area
 
     @property
-    def memo(self) -> str:
+    def memo(self):
         return self.__memo
 
     @property
-    def target_age(self) -> str:
+    def target_age(self):
         return self.__target_age
 
     @property
-    def longitude(self) -> float:
+    def longitude(self):
         return self.__longitude
 
     @property
-    def latitude(self) -> float:
+    def latitude(self):
         return self.__latitude
 
     @property
-    def status(self) -> str:
+    def status(self):
         return self.__status
 
     @property
-    def target_person(self) -> str:
+    def target_person(self):
         return self.__target_person
 
     @property
-    def inoculation_time(self) -> str:
+    def inoculation_time(self):
         return self.__inoculation_time
 
     @property
-    def reservation_status_memo(self) -> str:
+    def reservation_status_memo(self):
         return self.__reservation_status_memo
 
 
@@ -156,7 +156,7 @@ class MedicalInstitutionLocationReservationStatusFactory(Factory):
         self.__items = list()
 
     @property
-    def items(self) -> list:
+    def items(self):
         return self.__items
 
     def _create_item(self, **row) -> MedicalInstitutionLocationReservationStatus:

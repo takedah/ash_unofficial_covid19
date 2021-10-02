@@ -156,7 +156,7 @@ class AsahikawaPatientService(Service):
                     factory.create(**row)
         return factory
 
-    def find(self, page: int = 1, desc: bool = True) -> tuple:
+    def find(self, page: int = 1, desc: bool = True) -> tuple[AsahikawaPatientFactory, int]:
         """新型コロナウイルス感染症患者データのリストをページネーション用に分割して返す
 
         Args:
@@ -543,7 +543,7 @@ class AsahikawaPatientService(Service):
                     patients_number_by_age.append((row[0], row[1]))
         return patients_number_by_age
 
-    def get_patients_number(self, target_date: date) -> list:
+    def get_patients_number(self, target_date: date) -> int:
         """指定した日の陽性患者数を返す
 
         Args:
@@ -557,8 +557,13 @@ class AsahikawaPatientService(Service):
         with self.get_connection() as conn:
             with conn.cursor() as cur:
                 cur.execute(state, (target_date,))
-                patients_number = cur.fetchone()
-        return patients_number[0]
+                res = cur.fetchone()
+
+        patients_number = res[0]
+        if isinstance(patients_number, int):
+            return patients_number
+        else:
+            return 0
 
 
 class HokkaidoPatientService(Service):

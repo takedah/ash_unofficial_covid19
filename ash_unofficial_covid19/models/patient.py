@@ -1,5 +1,4 @@
 from datetime import date
-from typing import Optional
 
 from ..errors import DataModelError
 from ..models.factory import Factory
@@ -103,63 +102,63 @@ class Patient:
         self.__note = note
 
     @property
-    def patient_number(self) -> int:
+    def patient_number(self):
         return self.__patient_number
 
     @property
-    def city_code(self) -> str:
+    def city_code(self):
         return self.__city_code
 
     @property
-    def prefecture(self) -> str:
+    def prefecture(self):
         return self.__prefecture
 
     @property
-    def city_name(self) -> str:
+    def city_name(self):
         return self.__city_name
 
     @property
-    def publication_date(self) -> Optional[date]:
+    def publication_date(self):
         return self.__publication_date
 
     @property
-    def onset_date(self) -> Optional[date]:
+    def onset_date(self):
         return self.__onset_date
 
     @property
-    def residence(self) -> str:
+    def residence(self):
         return self.__residence
 
     @property
-    def age(self) -> str:
+    def age(self):
         return self.__age
 
     @property
-    def sex(self) -> str:
+    def sex(self):
         return self.__sex
 
     @property
-    def occupation(self) -> str:
+    def occupation(self):
         return self.__occupation
 
     @property
-    def status(self) -> str:
+    def status(self):
         return self.__status
 
     @property
-    def symptom(self) -> str:
+    def symptom(self):
         return self.__symptom
 
     @property
-    def overseas_travel_history(self) -> Optional[bool]:
+    def overseas_travel_history(self):
         return self.__overseas_travel_history
 
     @property
-    def be_discharged(self) -> Optional[bool]:
+    def be_discharged(self):
         return self.__be_discharged
 
     @property
-    def note(self) -> str:
+    def note(self):
         return self.__note
 
 
@@ -258,15 +257,15 @@ class AsahikawaPatient(Patient):
         self.__close_contact = close_contact
 
     @property
-    def hokkaido_patient_number(self) -> int:
+    def hokkaido_patient_number(self):
         return self.__hokkaido_patient_number
 
     @property
-    def surrounding_status(self) -> str:
+    def surrounding_status(self):
         return self.__surrounding_status
 
     @property
-    def close_contact(self) -> str:
+    def close_contact(self):
         return self.__close_contact
 
 
@@ -283,7 +282,7 @@ class AsahikawaPatientFactory(Factory):
         self.__items = list()
 
     @property
-    def items(self) -> list:
+    def items(self):
         return self.__items
 
     def _create_item(self, **row) -> AsahikawaPatient:
@@ -401,7 +400,7 @@ class HokkaidoPatientFactory(Factory):
         self.__items = list()
 
     @property
-    def items(self) -> list:
+    def items(self):
         return self.__items
 
     def _create_item(self, **row) -> HokkaidoPatient:

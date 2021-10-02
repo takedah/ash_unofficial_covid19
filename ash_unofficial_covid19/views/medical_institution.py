@@ -29,11 +29,11 @@ class MedicalInstitutionsView:
         self.__reservation_status_updated = reservation_status_updated.strftime("%Y/%m/%d %H:%M")
 
     @property
-    def last_updated(self) -> str:
+    def last_updated(self):
         return self.__last_updated
 
     @property
-    def reservation_status_updated(self) -> str:
+    def reservation_status_updated(self):
         return self.__reservation_status_updated
 
     def find(self, name: str, is_pediatric: bool = False) -> MedicalInstitutionLocationReservationStatus:

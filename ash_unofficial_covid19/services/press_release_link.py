@@ -85,7 +85,9 @@ class PressReleaseLinkService(Service):
             with conn.cursor(cursor_factory=DictCursor) as cur:
                 cur.execute(state)
                 result = cur.fetchone()
-        if result["max"] is None:
-            return date(1970, 1, 1)
+
+        latest_publication_date = result["max"]
+        if isinstance(latest_publication_date, date):
+            return latest_publication_date
         else:
-            return result["max"]
+            return date(1970, 1, 1)

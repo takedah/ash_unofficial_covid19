@@ -29,15 +29,15 @@ class Location:
         self.__latitude = latitude
 
     @property
-    def medical_institution_name(self) -> str:
+    def medical_institution_name(self):
         return self.__medical_institution_name
 
     @property
-    def longitude(self) -> float:
+    def longitude(self):
         return self.__longitude
 
     @property
-    def latitude(self) -> float:
+    def latitude(self):
         return self.__latitude
 
 
@@ -54,7 +54,7 @@ class LocationFactory(Factory):
         self.__items = list()
 
     @property
-    def items(self) -> list:
+    def items(self):
         return self.__items
 
     def _create_item(self, **row) -> Location:

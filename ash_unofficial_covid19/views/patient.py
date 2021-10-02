@@ -1,3 +1,4 @@
+from ..models.patient import AsahikawaPatientFactory
 from ..services.patient import AsahikawaPatientService
 
 
@@ -17,7 +18,7 @@ class AsahikawaPatientsView:
         self.__last_updated = last_updated.strftime("%Y/%m/%d %H:%M")
 
     @property
-    def last_updated(self) -> str:
+    def last_updated(self):
         return self.__last_updated
 
     def get_csv(self) -> str:
@@ -29,7 +30,7 @@ class AsahikawaPatientsView:
         """
         return self.__service.get_csv()
 
-    def get_rows(self, page: int = 1, desc: bool = True) -> tuple:
+    def get_rows(self, page: int = 1, desc: bool = True) -> tuple[AsahikawaPatientFactory, int]:
         """グラフのデータをオブジェクトデータのリストで返す
 
         ページネーションできるよう指定したページ番号分のデータのみ返す

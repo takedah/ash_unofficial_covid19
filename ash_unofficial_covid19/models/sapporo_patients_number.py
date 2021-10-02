@@ -23,11 +23,11 @@ class SapporoPatientsNumber:
         self.__patients_number = patients_number
 
     @property
-    def publication_date(self) -> date:
+    def publication_date(self):
         return self.__publication_date
 
     @property
-    def patients_number(self) -> float:
+    def patients_number(self):
         return self.__patients_number
 
 
@@ -44,7 +44,7 @@ class SapporoPatientsNumberFactory(Factory):
         self.__items = list()
 
     @property
-    def items(self) -> list:
+    def items(self):
         return self.__items
 
     def _create_item(self, **row) -> SapporoPatientsNumber:

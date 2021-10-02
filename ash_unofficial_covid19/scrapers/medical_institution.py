@@ -126,7 +126,7 @@ class ScrapeMedicalInstitutions(Scraper):
         """
         soup = BeautifulSoup(downloaded_html.content, "html.parser")
         table_values = list()
-        memos = dict()  # 現在備考はないが今後備考が追加された時用に一応残す
+        memos: dict[str, str] = dict()  # 現在備考はないが今後備考が追加された時用に一応残す
         for table in soup.find_all("table"):
             if table.find("caption") is not None:
                 table_caption = table.find("caption").text.strip().replace("\n", "")
