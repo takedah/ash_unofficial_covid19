@@ -236,7 +236,17 @@ class AsahikawaPatientService(Service):
                     factory.create(**row)
         return (factory, max_page)
 
-    def get_csv_rows(self) -> list:
+    def get_csv(self) -> str:
+        """陽性患者属性CSVファイルの文字列データを返す
+
+        Returns:
+            csv_data (str): 陽性患者属性CSVファイルの文字列データ
+
+        """
+        csv_data = self._get_csv_rows()
+        return self.list_to_csv(csv_data)
+
+    def _get_csv_rows(self) -> list:
         """陽性患者属性CSVファイルを出力するためのリストを返す
 
         Returns:

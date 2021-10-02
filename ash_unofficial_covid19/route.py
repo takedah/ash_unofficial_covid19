@@ -310,9 +310,9 @@ def pediatric_medical_institution(name):
 @app.route("/012041_asahikawa_covid19_patients.csv")
 def patients_csv():
     asahikawa_patient = get_asahikawa_patients()
-    f = asahikawa_patient.get_csv()
+    csv_data = asahikawa_patient.get_csv()
     res = make_response()
-    res.data = f.getvalue()
+    res.data = csv_data
     res.headers["Content-Type"] = "text/csv"
     res.headers["Content-Disposition"] = "attachment: filename=" + "012041_asahikawa_covid19_patients.csv"
     return res
@@ -321,9 +321,9 @@ def patients_csv():
 @app.route("/012041_asahikawa_covid19_medical_institutions.csv")
 def medical_institutions_csv():
     medical_institution = get_medical_institutions()
-    f = medical_institution.get_csv()
+    csv_data = medical_institution.get_csv()
     res = make_response()
-    res.data = f.getvalue()
+    res.data = csv_data
     res.headers["Content-Type"] = "text/csv"
     res.headers["Content-Disposition"] = "attachment: filename=" + "012041_asahikawa_covid19_medical_institutions.csv"
     return res

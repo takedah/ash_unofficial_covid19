@@ -118,7 +118,17 @@ class MedicalInstitutionService(Service):
                     factory.create(**row)
         return factory
 
-    def get_csv_rows(self) -> list:
+    def get_csv(self) -> str:
+        """新型コロナワクチン接種医療機関一覧CSVファイルの文字列データを返す
+
+        Returns:
+            csv_data (str): 新型コロナワクチン接種医療機関一覧CSVファイルの文字列データ
+
+        """
+        csv_rows = self._get_csv_rows()
+        return self.list_to_csv(csv_rows)
+
+    def _get_csv_rows(self) -> list:
         """新型コロナワクチン接種医療機関一覧CSVファイルを出力するためのリストを返す
 
         Returns:

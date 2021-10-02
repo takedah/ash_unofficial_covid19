@@ -1,5 +1,4 @@
 import urllib.parse
-from io import StringIO
 from typing import Optional
 
 from ..models.medical_institution_location_reservation_status import MedicalInstitutionLocationReservationStatus
@@ -101,12 +100,11 @@ class MedicalInstitutionsView:
             area_list.append((area, urllib.parse.quote(area)))
         return area_list
 
-    def get_csv(self) -> StringIO:
+    def get_csv(self) -> str:
         """新型コロナワクチン接種医療機関一覧のデータをCSVで返す
 
         Returns:
-            csv_data (StringIO): 新型コロナワクチン接種医療機関一覧のCSVデータ
+            csv_data (str): 新型コロナワクチン接種医療機関一覧のCSVデータ
 
         """
-        csv_rows = self.__service.get_csv_rows()
-        return self.__service.get_csv(csv_rows)
+        return self.__service.get_csv()

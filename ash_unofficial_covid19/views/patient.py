@@ -1,5 +1,3 @@
-from io import StringIO
-
 from ..services.patient import AsahikawaPatientService
 
 
@@ -22,15 +20,14 @@ class AsahikawaPatientsView:
     def last_updated(self) -> str:
         return self.__last_updated
 
-    def get_csv(self) -> StringIO:
+    def get_csv(self) -> str:
         """グラフのデータをCSVで返す
 
         Returns:
-            csv_data (StringIO): グラフのCSVデータ
+            csv_data (str): グラフのCSVデータ
 
         """
-        csv_rows = self.__service.get_csv_rows()
-        return self.__service.get_csv(csv_rows)
+        return self.__service.get_csv()
 
     def get_rows(self, page: int = 1, desc: bool = True) -> tuple:
         """グラフのデータをオブジェクトデータのリストで返す
