@@ -10,3 +10,4 @@ tabula-py
 types-requests
 types-python-dateutil
 pytest
+pytest-mock

@@ -375,8 +375,12 @@ class ScrapeAsahikawaPatientsPDF(Scraper):
         if len(row) == 11:
             row.pop(6)
 
-        patient_number = int(search_patient_number.group(1))
-        hokkaido_patient_number = int(search_hokkaido_patient_number.group(1))
+        try:
+            patient_number = int(search_patient_number.group(1))
+            hokkaido_patient_number = int(search_hokkaido_patient_number.group(1))
+        except ValueError:
+            return None
+
         try:
             surrounding_status = self.format_string((row[8]))
             close_contact = self.format_string((row[9]))
