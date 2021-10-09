@@ -1,8 +1,11 @@
 version: "3"
 
 services:
-  flask:
-    build: .
+  app:
+    container_name: app
+    build:
+      context: .
+      dockerfile: dockerfiles/app/Dockerfile
     ports:
       - "8000:8000"
     volumes:

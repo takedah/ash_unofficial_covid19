@@ -51,9 +51,53 @@ $ export GTAG_ID={google_analytics_id}
 ```
 
 ## Usage
+### サービス起動
 
 ```bash
 $ gunicorn ash_unofficial_covid19.run:app
+```
+
+### 感染者情報の取得
+
+```bash
+$ python -m ash_unofficial_covid19.import_patients
+```
+
+### 医療機関情報の取得
+
+```bash
+$ python -m ash_unofficial_covid19.import_medical_institutions
+```
+
+### ワクチン接種予約状況の取得
+
+```bash
+$ python -m ash_unofficial_covid19.import_reservation_statuses
+```
+
+### Dockerでのサービス起動
+
+Dockerでも使用できるようにしています。
+
+#### サービス起動
+
+```bash
+# docker-compose build
+# docker-compose up -d
+```
+
+#### データ取得
+
+```bash
+# docker-compose exec app python -m ash_unofficial_covid19.import_patients
+# docker-compose exec app python -m ash_unofficial_covid19.import_medical_institutions
+# docker-compose exec app python -m ash_unofficial_covid19.import_reservation_statuses
+```
+
+#### サービス停止
+
+```bash
+# docker-compose down
 ```
 
 ## Lisence
