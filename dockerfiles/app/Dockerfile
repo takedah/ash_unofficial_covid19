@@ -10,4 +10,4 @@ RUN pip install -r requirements.txt
 
 RUN apt update && apt install -y openjdk-11-jdk curl
 
-CMD ["gunicorn", "ash_unofficial_covid19.run:app", "-c", "dockerfiles/gunicorn.conf.py"]
+CMD ["gunicorn", "ash_unofficial_covid19.run:app", "-c", "gunicorn.conf.py"]
