@@ -8,6 +8,7 @@ services:
       dockerfile: dockerfiles/app/Dockerfile
     volumes:
       - "./:/projects"
+      - "./dockerfiles/tmp:/tmp"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
@@ -23,6 +24,8 @@ services:
     build:
       context: .
       dockerfile: dockerfiles/web/Dockerfile
+    volumes:
+      - "./dockerfiles/tmp:/tmp"
     ports:
       - "80:49152"
     depends_on:
