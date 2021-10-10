@@ -6,8 +6,6 @@ services:
     build:
       context: .
       dockerfile: dockerfiles/app/Dockerfile
-    ports:
-      - "8000:8000"
     volumes:
       - "./:/projects"
     extra_hosts:
@@ -15,3 +13,25 @@ services:
     environment:
       - DATABASE_URL=$DATABASE_URL
       - YOLP_APP_ID=$YOLP_APP_ID
+    networks:
+      virtual_hub:
+          aliases:
+            - gunicorn
+
+  web:
+    container_name: web
+    build:
+      context: .
+      dockerfile: dockerfiles/web/Dockerfile
+    ports:
+      - "80:$PORT"
+    depends_on:
+      - app
+    networks:
+      virtual_hub:
+        aliases:
+          - nginx
+
+networks:
+  virtual_hub:
+    driver: bridge
