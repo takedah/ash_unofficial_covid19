@@ -1,41 +1,47 @@
-user nginx;
-worker_processes auto;
-
-error_log /var/log/nginx/error.log warn;
-pid /var/run/nginx.pid;
-
+daemon off;
+worker_processes <%= ENV['NGINX_WORKERS'] || 4 %>;
 
 events {
-    worker_connections 1024;
+    use epoll;
+    accept_mutex on;
+    worker_connections <%= ENV['NGINX_WORKER_CONNECTIONS'] || 1024 %>;
 }
 
-
 http {
-    include /etc/nginx/mime.types;
-    default_type application/octet-stream;
+    gzip on;
+    gzip_comp_level 2;
+    gzip_min_length 512;
+    gzip_proxied any;
+
     server_tokens off;
-    log_format main '$remote_addr - $remote_user [$time_local] "$request" '
-                    '$status $body_bytes_sent "$http_referer" '
-                    '"$http_user_agent" "$http_x_forwarded_for"';
-    access_log off;
+    log_format l2met 'measure#nginx.service=$request_time request_id=$http_x_request_id';
+    access_log <%= ENV['NGINX_ACCESS_LOG_PATH'] || 'logs/nginx/access.log' %> l2met;
+    error_log <%= ENV['NGINX_ERROR_LOG_PATH'] || 'logs/nginx/error.log' %>;
+
+    include mime.types;
+    default_type application/octet-stream;
     sendfile on;
+
     tcp_nopush on;
     keepalive_timeout 65;
-    gzip on;
 
-    upstream gunicorn-flask {
+    upstream app_server {
         server unix:///tmp/nginx.socket fail_timeout=0;
     }
 
     server {
         listen <%= ENV["PORT"] %>;
+
         location / {
-            proxy_pass http://gunicorn-flask;
+            proxy_redirect off;
+            proxy_pass http://app_server;
         }
         location ~* \.(jpg|png|gif|ico|svg)$ {
-            proxy_pass http://gunicorn-flask;
             expires 10m;
+            proxy_redirect off;
+            proxy_pass http://app_server;
         }
+
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-Host $host;
