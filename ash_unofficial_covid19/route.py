@@ -1,7 +1,6 @@
 import os
 
 from flask import Flask, abort, escape, g, make_response, render_template, url_for
-from flask_caching import Cache
 
 from .config import Config
 from .errors import ServiceError
@@ -16,9 +15,7 @@ from .views.graph import (
 from .views.medical_institution import MedicalInstitutionsView
 from .views.patient import AsahikawaPatientsView
 
-cache = Cache(config={"CACHE_TYPE": "simple"})
 app = Flask(__name__)
-cache.init_app(app)
 
 
 @app.after_request
@@ -57,49 +54,41 @@ def dated_url_for(endpoint, **values):
     return url_for(endpoint, **values)
 
 
-@cache.cached(timeout=180, key_prefix="asahikawa_patients")
 def get_asahikawa_patients():
     g.asahikawa_patients = AsahikawaPatientsView()
     return g.asahikawa_patients
 
 
-@cache.cached(timeout=180, key_prefix="medical_institutions")
 def get_medical_institutions():
     g.medical_institutions = MedicalInstitutionsView()
     return g.medical_institutions
 
 
-@cache.cached(timeout=180, key_prefix="daily_total")
 def get_daily_total():
     g.daily_total = DailyTotalView()
     return g.daily_total
 
 
-@cache.cached(timeout=180, key_prefix="month_total")
 def get_month_total():
     g.month_total = MonthTotalView()
     return g.month_total
 
 
-@cache.cached(timeout=180, key_prefix="by_age")
 def get_by_age():
     g.by_age = ByAgeView()
     return g.by_age
 
 
-@cache.cached(timeout=180, key_prefix="moving_average")
 def get_moving_average():
     g.moving_average = MovingAverageView()
     return g.moving_average
 
 
-@cache.cached(timeout=180, key_prefix="per_hundred_thousand_population")
 def get_per_hundred_thousand_population():
     g.per_hundred_thousand_population = PerHundredThousandPopulationView()
     return g.per_hundred_thousand_population
 
 
-@cache.cached(timeout=180, key_prefix="weekly_per_age")
 def get_weekly_per_age():
     g.weekly_per_age = WeeklyPerAgeView()
     return g.weekly_per_age
@@ -330,7 +319,6 @@ def medical_institutions_csv():
 
 
 @app.route("/daily_total.png")
-@cache.cached(timeout=180)
 def get_daily_total_graph():
     daily_total = get_daily_total()
     graph_image = daily_total.get_graph_image()
@@ -342,7 +330,6 @@ def get_daily_total_graph():
 
 
 @app.route("/daily_total_for_card.png")
-@cache.cached(timeout=180)
 def get_daily_total_graph_for_card():
     daily_total = get_daily_total()
     graph_image = daily_total.get_graph_image(figsize=(6.0, 3.15))
@@ -354,7 +341,6 @@ def get_daily_total_graph_for_card():
 
 
 @app.route("/month_total.png")
-@cache.cached(timeout=180)
 def get_month_total_graph():
     month_total = get_month_total()
     graph_image = month_total.get_graph_image()
@@ -366,7 +352,6 @@ def get_month_total_graph():
 
 
 @app.route("/by_age.png")
-@cache.cached(timeout=180)
 def get_by_age_graph():
     by_age = get_by_age()
     graph_image = by_age.get_graph_image()
@@ -378,7 +363,6 @@ def get_by_age_graph():
 
 
 @app.route("/moving_average.png")
-@cache.cached(timeout=180)
 def get_moving_average_graph():
     moving_average = get_moving_average()
     graph_image = moving_average.get_graph_image()
@@ -390,7 +374,6 @@ def get_moving_average_graph():
 
 
 @app.route("/per_hundred_thousand_population.png")
-@cache.cached(timeout=180)
 def get_per_hundred_thousand_population_graph():
     per_hundred_thousand_population = get_per_hundred_thousand_population()
     graph_image = per_hundred_thousand_population.get_graph_image()
@@ -402,7 +385,6 @@ def get_per_hundred_thousand_population_graph():
 
 
 @app.route("/weekly_per_age.png")
-@cache.cached(timeout=180)
 def get_weekly_per_age_graph():
     weekly_per_age = get_weekly_per_age()
     graph_image = weekly_per_age.get_graph_image()

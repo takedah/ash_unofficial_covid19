@@ -1,6 +1,5 @@
 BeautifulSoup4
 flask
-Flask-Caching
 gunicorn
 psycopg2
 requests
