@@ -1,4 +1,4 @@
-# 旭川市新型コロナウイルス感染症非公式オープンデータ
+# 旭川市新型コロナウイルスまとめサイト
 
 ## Description
 
@@ -31,7 +31,9 @@
 - matplotlib
 - pandas
 - tabula-py
+- camelot-py[cv]
 - pytest
+- pytest-mock
 
 ## Install
 

@@ -1,7 +1,7 @@
+import pathlib
 from typing import Optional
 
-import pandas as pd
-import tabula
+import camelot
 
 from ..scrapers.downloader import DownloadedPDF
 from ..scrapers.scraper import Scraper
@@ -35,24 +35,31 @@ class ScrapeReservationStatus(Scraper):
     def lists(self) -> list:
         return self.__lists
 
-    def _get_dataframe(self, downloaded_pdf: DownloadedPDF) -> pd.DataFrame:
+    def _get_dataframe(self, downloaded_pdf: DownloadedPDF) -> list:
         """
         Args:
             downloaded_pdf (BytesIO): PDFファイルデータ
                 ダウンロードしたPDFファイルのBytesIOデータを要素に持つオブジェクト
 
         Returns:
-            table_data (obj:`pd.DataFrame`): 医療機関予約受付状況PDFデータ
+            table_data (list of obj:`pd.DataFrame`): 医療機関予約受付状況PDFデータ
                 旭川市の新型コロナワクチン接種医療機関予約受付状況PDFデータから抽出した
-                表データを、pandas DataFrameで返す
+                表データを、pandas DataFrameのリストで返す
 
         """
-        return tabula.read_pdf(
-            downloaded_pdf.content,
-            lattice=True,
-            pages="all",
-            pandas_options={"header": None},
-        )
+        tmp_dir = "tmp"
+        pathlib.Path(tmp_dir).mkdir(exist_ok=True)
+        tmp_file = pathlib.Path(tmp_dir + "/" + "reservation_status.pdf")
+        tmp_file.write_bytes(downloaded_pdf.content.getbuffer())
+        tables = camelot.read_pdf(str(tmp_file), pages="1-end", backend="poppler")
+        dfs = list()
+        for table in tables:
+            dfs.append(table.df)
+
+        if tmp_file.exists():
+            tmp_file.unlink()
+
+        return dfs
 
     def _get_status_data(self, pdf_df: list) -> list:
         """

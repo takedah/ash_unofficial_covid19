@@ -3,7 +3,6 @@ import re
 from datetime import date, datetime
 from typing import Optional
 
-import pandas as pd
 import tabula
 from bs4 import BeautifulSoup
 from dateutil.relativedelta import relativedelta
@@ -303,16 +302,16 @@ class ScrapeAsahikawaPatientsPDF(Scraper):
     def publication_date(self) -> date:
         return self.__publication_date
 
-    def _get_dataframe(self, downloaded_pdf: DownloadedPDF) -> pd.DataFrame:
+    def _get_dataframe(self, downloaded_pdf: DownloadedPDF) -> list:
         """
         Args:
             downloaded_pdf (BytesIO): PDFファイルデータ
                 ダウンロードしたPDFファイルのBytesIOデータを要素に持つオブジェクト
 
         Returns:
-            table_data (obj:`pd.DataFrame`): 旭川市の新型コロナウイルス陽性患者PDFデータ
+            table_data (list of obj:`pd.DataFrame`): 旭川市の新型コロナウイルス陽性患者PDFデータ
                 旭川市の新型コロナウイルス陽性患者PDFデータから抽出した表データを、
-                pandas DataFrameで返す
+                pandas DataFrameのリストで返す
 
         """
         return tabula.read_pdf(downloaded_pdf.content, lattice=True, pages="all")
