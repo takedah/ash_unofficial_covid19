@@ -57,14 +57,14 @@ class MedicalInstitutionService(Service):
             data_lists=data_lists,
         )
 
-    def delete(self, target_value: tuple) -> int:
+    def delete(self, target_value: tuple) -> bool:
         """指定した主キーの値を持つデータを削除する
 
         Args:
             target_value (tuple): 削除対象の医療機関名と対象年齢を要素とするタプル
 
         Returns:
-            result (int): 削除したレコード件数
+            result (bool): 削除に成功したら真を返す
 
         """
         state = "DELETE FROM " + self.table_name + " " + "WHERE name = %s AND target_age = %s;"
@@ -74,12 +74,13 @@ class MedicalInstitutionService(Service):
                 with conn.cursor(cursor_factory=DictCursor) as cur:
                     cur.execute(state, target_value)
                     result = cur.rowcount
-                conn.commit()
-                if result == 0 or result is None:
-                    self.info_log(log_message + "削除できませんでした。")
+                if result:
+                    conn.commit()
+                    self.info_log(log_message + "削除しました。")
+                    return True
                 else:
-                    self.info_log(log_message + str(result) + "件削除しました。")
-                return result
+                    self.info_log(log_message + "削除できませんでした。")
+                    return False
             except (
                 psycopg2.DataError,
                 psycopg2.IntegrityError,

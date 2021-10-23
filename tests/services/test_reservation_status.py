@@ -36,7 +36,7 @@ def service():
 
 def test_delete(service):
     results = service.delete("市立旭川病院")
-    assert results == 1
+    assert results
 
 
 def test_find_all(service):

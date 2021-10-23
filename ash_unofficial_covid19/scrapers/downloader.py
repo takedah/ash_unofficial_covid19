@@ -284,9 +284,8 @@ class DownloadedJSON(Downloader):
 
         try:
             json_res = json.loads(response.content)
+            return json_res
         except JSONDecodeError:
             message = "cannot decode json response."
             self.error_log(message)
             raise HTTPDownloadError(message)
-
-        return json_res

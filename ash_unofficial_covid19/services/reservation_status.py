@@ -55,14 +55,14 @@ class ReservationStatusService(Service):
             data_lists=data_lists,
         )
 
-    def delete(self, target_value: str) -> int:
+    def delete(self, target_value: str) -> bool:
         """指定した主キーの値を持つデータを削除する
 
         Args:
             target_value (str): 削除対象の医療機関名
 
         Returns:
-            result (int): 削除したレコード件数
+            result (bool): 削除に成功したら真を返す
 
         """
         if not isinstance(target_value, str):
@@ -75,12 +75,13 @@ class ReservationStatusService(Service):
                 with conn.cursor(cursor_factory=DictCursor) as cur:
                     cur.execute(state, (target_value,))
                     result = cur.rowcount
-                conn.commit()
-                if result == 0 or result is None:
-                    self.info_log(log_message + "削除できませんでした。")
+                if result:
+                    conn.commit()
+                    self.info_log(log_message + "削除しました。")
+                    return True
                 else:
-                    self.info_log(log_message + str(result) + "件削除しました。")
-                return result
+                    self.info_log(log_message + "削除できませんでした。")
+                    return False
             except (
                 psycopg2.DataError,
                 psycopg2.IntegrityError,
