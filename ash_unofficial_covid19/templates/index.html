@@ -39,10 +39,8 @@
         新規感染者数に基づく市内の警戒ステージ及び実効再生産数
       </div>
       <div class="card-body">
-        <p class="card-text">現在<strong class="h4">{{ per_hundred_thousand_population.alert_level }}</strong>です。</p>
-        <p class="card-text">実行再生産数の簡易推定値は<strong class="h4">{{ daily_total.reproduction_number }}</strong>で、{{ daily_total.reproduction_status }}と見られます。</p>
+        <p class="card-text">現在 <strong class="h5">{{ per_hundred_thousand_population.alert_level }}</strong> です。実効再生産数の簡易推定値は <strong class="h5">{{ daily_total.reproduction_number }}</strong> で、{{ daily_total.reproduction_status }}と見られます。</p>
         <table class="table table-bordered table-hover">
-          <caption>北海道の警戒ステージ</caption>
           <thead>
             <tr>
               <th class="text-nowrap">ステージ</th>
@@ -68,10 +66,10 @@
             </tr>
           </tbody>
         </table>
-        <p class="card-text">実行再生産数の簡易推定値は国立感染症研究所の<a href="https://www.niid.go.jp/niid/ja/diseases/ka/corona-virus/2019-ncov/2502-idsc/iasr-in/10465-496d04.html" title="国立感染症研究所">COVID-19感染報告者数に基づく簡易実効再生産数推定方法</a>に基づき、「直近7日間の新規感染者数 / 5日間前7日間の新規感染者数」で計算しています。</p>
+        <p class="card-text small">実効再生産数の簡易推定値は国立感染症研究所の<a href="https://www.niid.go.jp/niid/ja/diseases/ka/corona-virus/2019-ncov/2502-idsc/iasr-in/10465-496d04.html" title="国立感染症研究所">COVID-19感染報告者数に基づく簡易実効再生産数推定方法</a>に基づき、「直近7日間の新規感染者数 / 5日間前7日間の新規感染者数」で計算しています。</p>
       </div>
       <div class="card-footer text-muted bg-white">
-        <p class="card-text small">出典: <a href="https://www.pref.hokkaido.lg.jp/ss/ssa/singatakoronahaien.html" title="北海道公式ホームページ" class="text-muted" target="_blank">北海道公式ホームページ <i class="fas fa-external-link-alt"></i></a> <a href="https://www.niid.go.jp/niid/ja/diseases/ka/corona-virus/2019-ncov/2502-idsc/iasr-in/10465-496d04.html" title="国立感染症研究所" class="text-muted" target="_blank">国立感染症研究所<i class="fas fa-external-link-alt"></i></a></p>
+        <p class="card-text text-small">出典: <a href="https://www.pref.hokkaido.lg.jp/ss/ssa/singatakoronahaien.html" title="北海道公式ホームページ" class="text-muted" target="_blank">北海道公式ホームページ <i class="fas fa-external-link-alt"></i></a> <a href="https://www.niid.go.jp/niid/ja/diseases/ka/corona-virus/2019-ncov/2502-idsc/iasr-in/10465-496d04.html" title="国立感染症研究所" class="text-muted" target="_blank">国立感染症研究所 <i class="fas fa-external-link-alt"></i></a></p>
       </div>
     </div>
     <div class="card">
