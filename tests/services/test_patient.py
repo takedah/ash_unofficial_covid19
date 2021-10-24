@@ -348,6 +348,12 @@ class TestAsahikawaPatientService:
         ]
         assert result == expect
 
+    def test_get_reproduction_number(self, service):
+        to_date = date(2021, 2, 28)
+        result = service.get_reproduction_number(to_date)
+        expect = 4.0
+        assert result == expect
+
     def test_get_total_by_months(self, service):
         from_date = date(2021, 1, 1)
         to_date = date(2021, 2, 28)

@@ -388,7 +388,7 @@ class TestScrapeAsahikawaPatientsPDF:
         expect = [
             {
                 "patient_number": 6,
-                "city_code": "01241",
+                "city_code": "012041",
                 "prefecture": "北海道",
                 "city_name": "旭川市",
                 "publication_date": date(2021, 8, 19),

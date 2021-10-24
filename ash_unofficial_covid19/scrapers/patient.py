@@ -396,7 +396,7 @@ class ScrapeAsahikawaPatientsPDF(Scraper):
             )
             patient_data = {
                 "patient_number": patient_number,
-                "city_code": "01241",
+                "city_code": "012041",
                 "prefecture": "北海道",
                 "city_name": "旭川市",
                 "publication_date": self.publication_date,

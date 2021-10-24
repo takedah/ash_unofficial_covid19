@@ -3,6 +3,7 @@ from decimal import ROUND_HALF_UP, Decimal
 
 import pandas as pd
 import psycopg2
+from dateutil.relativedelta import relativedelta
 from psycopg2.extras import DictCursor
 
 from ..config import Config
@@ -484,6 +485,44 @@ class AsahikawaPatientService(Service):
             )
             per_hundred_thousand_population_per_week.append((patients_number[0], per_hundred_thousand_population))
         return per_hundred_thousand_population_per_week
+
+    def get_reproduction_number(self, to_date: date) -> float:
+        """指定した日時点の実効再生産数の簡易推定値を算出
+
+        国立感染症研究所の「COVID-19感染報告者数に基づく簡易実効再生産数推定方法」に基づき計算している。
+        https://www.niid.go.jp/niid/ja/diseases/ka/corona-virus/2019-ncov/2502-idsc/iasr-in/10465-496d04.html
+
+        Args:
+            to_date (obj:`date`): 集計の終期
+
+        Returns:
+            reproduction_number (float): 実効再生産数
+
+        """
+        generation_time = 5
+        from_date = to_date - relativedelta(days=6 + generation_time)
+        aggregate_by_days = self.get_aggregate_by_days(from_date=from_date, to_date=to_date)
+        latest_number = 0
+        generation_time_before_number = 0
+        i = 0
+        for patients_number in aggregate_by_days:
+            if i < 5:
+                generation_time_before_number += patients_number[1]
+            elif 5 <= i and i < 7:
+                generation_time_before_number += patients_number[1]
+                latest_number += patients_number[1]
+            else:
+                latest_number += patients_number[1]
+            i += 1
+
+        if generation_time_before_number == 0:
+            return 0
+
+        return float(
+            Decimal(str(latest_number / generation_time_before_number)).quantize(
+                Decimal("0.01"), rounding=ROUND_HALF_UP
+            )
+        )
 
     def get_total_by_months(self, from_date: date, to_date: date) -> list:
         """指定した期間の1か月ごとの陽性患者数の累計結果を返す

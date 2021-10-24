@@ -105,6 +105,7 @@ class DailyTotalView(GraphView):
         most_recent (str): 直近の日別累積患者数
         day_before_most_recent (str): 直近の前日の日別累積患者数
         increase_from_day_before (str): 直近の前日からの増加数
+        reproduction_number (str): 実行再生産数の簡易推定値
 
     """
 
@@ -121,6 +122,12 @@ class DailyTotalView(GraphView):
         self.__most_recent = "{:,}".format(most_recent)
         self.__seven_days_before_most_recent = "{:,}".format(seven_days_before_most_recent)
         self.__increase_from_seven_days_before = "{:+,}".format(increase_from_seven_days_before)
+        reproduction_number = service.get_reproduction_number(today)
+        if reproduction_number < 1:
+            self.__reproduction_status = "1を下回っており感染減少傾向にある"
+        else:
+            self.__reproduction_status = "1以上であり感染拡大傾向にある"
+        self.__reproduction_number = str(reproduction_number)
 
     @property
     def today(self):
@@ -137,6 +144,14 @@ class DailyTotalView(GraphView):
     @property
     def increase_from_seven_days_before(self):
         return self.__increase_from_seven_days_before
+
+    @property
+    def reproduction_number(self):
+        return self.__reproduction_number
+
+    @property
+    def reproduction_status(self):
+        return self.__reproduction_status
 
     def get_graph_alt(self) -> str:
         """グラフの代替テキストを生成
