@@ -1,7 +1,7 @@
-import pathlib
+import re
 from typing import Optional
 
-import camelot
+import tabula
 
 from ..scrapers.downloader import DownloadedPDF
 from ..scrapers.scraper import Scraper
@@ -47,19 +47,12 @@ class ScrapeReservationStatus(Scraper):
                 表データを、pandas DataFrameのリストで返す
 
         """
-        tmp_dir = "tmp"
-        pathlib.Path(tmp_dir).mkdir(exist_ok=True)
-        tmp_file = pathlib.Path(tmp_dir + "/" + "reservation_status.pdf")
-        tmp_file.write_bytes(downloaded_pdf.content.getbuffer())
-        tables = camelot.read_pdf(str(tmp_file), pages="1-end", backend="poppler")
-        dfs = list()
-        for table in tables:
-            dfs.append(table.df)
-
-        if tmp_file.exists():
-            tmp_file.unlink()
-
-        return dfs
+        return tabula.read_pdf(
+            downloaded_pdf.content,
+            lattice=True,
+            pages="all",
+            pandas_options={"header": None},
+        )
 
     def _get_status_data(self, pdf_df: list) -> list:
         """
@@ -106,27 +99,97 @@ class ScrapeReservationStatus(Scraper):
         """
         status_data = dict()
         try:
-            if len(row) < 7:
+            if len(row) < 9:
                 return None
 
+            if not isinstance(row[0], str):
+                return None
+
+            # 一つの列に医療機関名、住所、電話番号が改行で区切られてまとめられてしまっているため分解する
+            tmp = row[0].split("\r")
+            tmp_length = len(tmp)
+            if tmp_length < 3:
+                return None
+
+            phone_number = tmp[-1]
+            address = tmp[-2]
+            i = 0
+            medical_institution_name = ""
+            while i < tmp_length - 2:
+                medical_institution_name += tmp[i]
+                i += 1
+
             row = list(map(lambda x: self.format_string(x), row))
-            medical_institution_name = row[0].replace(" ", "").replace("　", "")
-            if medical_institution_name == "" or medical_institution_name == "医療機関名":
+
+            # 対象者の詳細を結合する
+            target = row[3].replace("―", "")
+            if target:
+                target = "年齢" + target
+
+            target_detail = ""
+            family = self._get_available(row[4])
+            if family["available"]:
+                target_detail += "かかりつけの方" + family["text"]
+
+            not_family = self._get_available(row[5])
+            if not_family["available"]:
+                if target_detail:
+                    target_detail += "、"
+
+                target_detail += "かかりつけ以外の方" + family["text"]
+
+            if target_detail:
+                if target:
+                    target_detail = "で" + target_detail
+
+            if row[6].replace("―", ""):
+                target_detail = target_detail + "（" + row[6].replace("―", "") + "）"
+
+            target += target_detail
+            target = target
+
+            medical_institution_name = medical_institution_name.replace(" ", "").replace("　", "")
+            if (
+                medical_institution_name == ""
+                or medical_institution_name == "医療機関名"
+                or medical_institution_name == "電話番号"
+            ):
                 return None
 
             status_data = {
                 "medical_institution_name": self._translate_name(medical_institution_name),
-                "address": row[1],
-                "phone_number": row[2],
-                "status": row[3].replace("―", ""),
-                "target": row[4].replace("―", ""),
-                "inoculation_time": row[5].replace("―", ""),
-                "memo": row[6],
+                "address": address,
+                "phone_number": phone_number,
+                "status": row[1].replace("―", ""),
+                "target": target,
+                "inoculation_time": row[2].replace("―", ""),
+                "memo": row[8],
             }
+            return {k: v.replace("　", "") for k, v in status_data.items()}
         except IndexError:
             return None
 
-        return status_data
+    @staticmethod
+    def _get_available(target_string: str) -> dict:
+        """かかりつけ、かかりつけ以外の文字列から対象なのかどうかを判定し、付記があればその文字列を取得
+
+        Args:
+            target_string (str): ○を含む可能性のある文字列
+
+        Returns:
+            result (dict): ○が含まれてたらavailableキーに真をセット、textキーに付記文字列があればセット
+
+        """
+        if not isinstance(target_string, str):
+            return {"available": False, "text": ""}
+
+        family_match = re.search("^(.*)○(.*)$", target_string)
+        family_text = ""
+        if family_match:
+            family_text = family_match.group(1) + family_match.group(2)
+            return {"available": True, "text": family_text}
+        else:
+            return {"available": False, "text": ""}
 
     @staticmethod
     def _translate_name(medical_institution_name: str) -> str:

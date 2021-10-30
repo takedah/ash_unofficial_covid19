@@ -6,7 +6,6 @@ requests
 matplotlib
 pandas
 tabula-py
-camelot-py[cv]
 types-requests
 types-python-dateutil
 pytest

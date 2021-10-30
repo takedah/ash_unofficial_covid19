@@ -30,7 +30,6 @@
 - matplotlib
 - pandas
 - tabula-py
-- camelot-py[cv]
 - pytest
 - pytest-mock
 
