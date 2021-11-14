@@ -119,37 +119,15 @@ class MedicalInstitutionService(Service):
                     factory.create(**row)
         return factory
 
-    def get_csv(self) -> str:
-        """新型コロナワクチン接種医療機関一覧CSVファイルの文字列データを返す
+    def get_rows(self) -> list:
+        """新型コロナワクチン接種医療機関一覧データをリストを返す
 
         Returns:
-            csv_data (str): 新型コロナワクチン接種医療機関一覧CSVファイルの文字列データ
-
-        """
-        csv_rows = self._get_csv_rows()
-        return self.list_to_csv(csv_rows)
-
-    def _get_csv_rows(self) -> list:
-        """新型コロナワクチン接種医療機関一覧CSVファイルを出力するためのリストを返す
-
-        Returns:
-            rows (list of list): CSVファイルの元となる二次元配列
+            rows (list of list): 新型コロナワクチン接種医療機関一覧データの二次元配列
 
         """
         medical_institutions = self.find_all()
         rows = list()
-        rows.append(
-            [
-                "地区",
-                "医療機関名",
-                "住所",
-                "電話",
-                "かかりつけの医療機関で予約ができます",
-                "コールセンターやインターネットで予約ができます",
-                "対象年齢",
-                "備考",
-            ]
-        )
         for medical_institution in medical_institutions.items:
             if medical_institution.book_at_medical_institution is None:
                 book_at_medical_institution = ""

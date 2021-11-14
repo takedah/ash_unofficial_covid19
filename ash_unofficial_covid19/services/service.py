@@ -1,6 +1,5 @@
-import csv
+from abc import ABCMeta
 from datetime import datetime
-from io import StringIO
 
 import psycopg2
 from psycopg2.extras import DictCursor, execute_values
@@ -10,7 +9,7 @@ from ..errors import DatabaseConnectionError, ServiceError
 from ..logs import AppLog
 
 
-class Service:
+class Service(metaclass=ABCMeta):
     """新型コロナウイルス関連データを扱うサービスクラス"""
 
     def __init__(self, table_name: str):
@@ -139,21 +138,3 @@ class Service:
             self.__logger.error(message)
         else:
             self.__logger.info("エラーメッセージの指定が正しくない")
-
-    @staticmethod
-    def list_to_csv(csv_rows) -> str:
-        """グラフのデータをCSVで返す
-
-        Args:
-            csv_rows (list of list): CSVにしたいデータを二次元配列で指定
-
-        Returns:
-            csv_data (str): グラフのCSVデータ
-
-        """
-        f = StringIO()
-        writer = csv.writer(f, quoting=csv.QUOTE_ALL, lineterminator="\n")
-        writer.writerows(csv_rows)
-        csv_data = f.getvalue()
-        f.close()
-        return csv_data

@@ -12,8 +12,8 @@ from .views.graph import (
     PerHundredThousandPopulationView,
     WeeklyPerAgeView,
 )
-from .views.medical_institution import MedicalInstitutionsView
-from .views.patient import AsahikawaPatientsView
+from .views.medical_institution import MedicalInstitutionView
+from .views.patient import AsahikawaPatientView
 
 app = Flask(__name__)
 
@@ -55,12 +55,12 @@ def dated_url_for(endpoint, **values):
 
 
 def get_asahikawa_patients():
-    g.asahikawa_patients = AsahikawaPatientsView()
+    g.asahikawa_patients = AsahikawaPatientView()
     return g.asahikawa_patients
 
 
 def get_medical_institutions():
-    g.medical_institutions = MedicalInstitutionsView()
+    g.medical_institutions = MedicalInstitutionView()
     return g.medical_institutions
 
 
@@ -123,7 +123,7 @@ def about():
 @app.route("/opendata")
 def opendata():
     asahikawa_patients = get_asahikawa_patients()
-    results = asahikawa_patients.get_rows()
+    results = asahikawa_patients.find()
     return render_template(
         "opendata.html",
         title="感染者の状況（非公式オープンデータ）",
@@ -144,7 +144,7 @@ def opendata_pages(page):
         abort(404)
     try:
         asahikawa_patients = get_asahikawa_patients()
-        results = asahikawa_patients.get_rows(page=page)
+        results = asahikawa_patients.find(page=page)
     except ServiceError:
         abort(404)
     title = "感染者の状況（非公式オープンデータ）全" + str(results[1]) + "ページ中" + str(page) + "ページ目"
