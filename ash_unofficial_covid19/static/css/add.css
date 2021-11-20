@@ -1,12 +1,4 @@
-@font-face {
-  font-family: minmoji;
-  src: url('https://minmoji.ucda.jp/fontseot/https%3A__ash-unofficial-covid19.herokuapp.com_');
-  src: local('minmoji'),
-  url('https://minmoji.ucda.jp/fontswoff/https%3A__ash-unofficial-covid19.herokuapp.com_') format('woff'),
-  url('https://minmoji.ucda.jp/fonts/https%3A__ash-unofficial-covid19.herokuapp.com_') format('opentype');
-}
 body {
-  font-family: minmoji;
   padding-top: 96px;
 }
 #mapid {
@@ -14,11 +6,4 @@ body {
 }
 #pediatrics_mapid {
   height: 480px;
-}
-.map_icon {
-  color: #CC0000;
-  background-color: #CC0000;
-  position:absolute;
-  top:-0.3em;
-  left:-0.3em;
 }

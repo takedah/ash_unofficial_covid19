@@ -20,12 +20,7 @@ document.addEventListener("DOMContentLoaded", function() {
   L.marker([
     locationData["latitude"],
     locationData["longitude"]
-  ], { icon: L.divIcon({
-          html: "<i class='fas fa-clinic-medical fa-3x'></i>",
-          className: "map_icon",
-          iconSize: [0, 0]
-      })
-    }).addTo(map)
+  ]).addTo(map)
     .bindPopup(locationData["locationName"], {autoClose:
       false})
     .openPopup();

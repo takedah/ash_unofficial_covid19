@@ -1,6 +1,4 @@
-import os
-
-from flask import Flask, abort, escape, g, make_response, render_template, url_for
+from flask import Flask, abort, escape, g, make_response, render_template
 
 from .config import Config
 from .errors import ServiceError
@@ -38,20 +36,6 @@ def add_security_headers(response):
     response.headers.add("X-Frame-Options", "DENY")
     response.headers.add("X-XSS-Protection", "1;mode=block")
     return response
-
-
-@app.context_processor
-def override_url_for():
-    return dict(url_for=dated_url_for)
-
-
-def dated_url_for(endpoint, **values):
-    if endpoint == "static":
-        filename = values.get("filename", None)
-        if filename:
-            file_path = os.path.join(app.root_path, endpoint, filename)
-            values["q"] = int(os.stat(file_path).st_mtime)
-    return url_for(endpoint, **values)
 
 
 def get_asahikawa_patients():
@@ -329,14 +313,14 @@ def get_daily_total_graph():
     return res
 
 
-@app.route("/daily_total_for_card.png")
-def get_daily_total_graph_for_card():
-    daily_total = get_daily_total()
-    graph_image = daily_total.get_graph_image(figsize=(6.0, 3.15))
+@app.route("/month_total_for_card.png")
+def get_month_total_graph_for_card():
+    month_total = get_month_total()
+    graph_image = month_total.get_graph_image(figsize=(6.0, 3.15))
     res = make_response()
     res.data = graph_image.getvalue()
     res.headers["Content-Type"] = "img/png"
-    res.headers["Content-Disposition"] = "attachment: filename=" + "daily_total_for_card.png"
+    res.headers["Content-Disposition"] = "attachment: filename=" + "month_total_for_card.png"
     return res
 
 
