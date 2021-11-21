@@ -313,14 +313,14 @@ def get_daily_total_graph():
     return res
 
 
-@app.route("/month_total_for_card.png")
-def get_month_total_graph_for_card():
-    month_total = get_month_total()
-    graph_image = month_total.get_graph_image(figsize=(6.0, 3.15))
+@app.route("/daily_total_for_card.png")
+def get_daily_total_graph_for_card():
+    daily_total = get_daily_total()
+    graph_image = daily_total.get_graph_image(figsize=(6.0, 3.15))
     res = make_response()
     res.data = graph_image.getvalue()
     res.headers["Content-Type"] = "img/png"
-    res.headers["Content-Disposition"] = "attachment: filename=" + "month_total_for_card.png"
+    res.headers["Content-Disposition"] = "attachment: filename=" + "daily_total_for_card.png"
     return res
 
 
