@@ -2,6 +2,7 @@ from flask import Flask, abort, escape, g, make_response, render_template
 
 from .config import Config
 from .errors import ServiceError
+from .views.atom import AtomView
 from .views.graph import (
     ByAgeView,
     DailyTotalView,
@@ -76,6 +77,11 @@ def get_per_hundred_thousand_population():
 def get_weekly_per_age():
     g.weekly_per_age = WeeklyPerAgeView()
     return g.weekly_per_age
+
+
+def get_atom():
+    g.atom = AtomView()
+    return g.atom
 
 
 @app.route("/")
@@ -391,6 +397,17 @@ def not_found(error):
         ),
         404,
     )
+
+
+@app.route("/atom.xml")
+def atom_xml():
+    atom = get_atom()
+    xml_data = atom.get_feed()
+    res = make_response()
+    res.data = xml_data
+    res.headers["Content-Type"] = "application/atom+xml"
+    res.headers["Content-Disposition"] = "attachment: filename=" + "atom.xml"
+    return res
 
 
 if __name__ == "__main__":

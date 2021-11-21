@@ -49,3 +49,6 @@ class Config:
 
     # Google Analyticsの設定
     GTAG_ID = os.environ.get("GTAG_ID")
+
+    # 公開ドメインの設定
+    MY_DOMAIN = "ash-unofficial-covid19.herokuapp.com"
