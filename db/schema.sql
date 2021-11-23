@@ -80,7 +80,7 @@ CREATE TABLE sapporo_patients_numbers(
     updated_at TIMESTAMPTZ NOT NULL
 );
 DROP TABLE IF EXISTS reservation_statuses;
-CREATE TABLE reservation_statuses_new(
+CREATE TABLE reservation_statuses(
     id SERIAL NOT NULL,
     medical_institution_name VARCHAR(128) NOT NULL PRIMARY KEY,
     address TEXT,
