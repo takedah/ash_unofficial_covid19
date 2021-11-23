@@ -27,8 +27,12 @@ class ReservationStatusService(Service):
             "address",
             "phone_number",
             "status",
-            "target",
             "inoculation_time",
+            "target_age",
+            "target_family",
+            "target_not_family",
+            "target_suberbs",
+            "target_other",
             "memo",
             "updated_at",
         )
@@ -41,8 +45,12 @@ class ReservationStatusService(Service):
                     reservation_status.address,
                     reservation_status.phone_number,
                     reservation_status.status,
-                    reservation_status.target,
                     reservation_status.inoculation_time,
+                    reservation_status.target_age,
+                    reservation_status.target_family,
+                    reservation_status.target_not_family,
+                    reservation_status.target_suberbs,
+                    reservation_status.target_other,
                     reservation_status.memo,
                     datetime.now(timezone(timedelta(hours=+9))),
                 ]
@@ -102,8 +110,8 @@ class ReservationStatusService(Service):
         state = (
             "SELECT"
             + " "
-            + "medical_institution_name,address,phone_number,status,target,"
-            + "inoculation_time,memo"
+            + "medical_institution_name,address,phone_number,status,inoculation_time,"
+            + "target_age,target_family,target_not_family,target_suberbs,target_other,memo"
             + " "
             + "FROM"
             + " "

@@ -17,8 +17,12 @@ def test_create():
         "longitude": 142.365976388889,
         "latitude": 43.778422777778,
         "status": "―",
-        "target_person": "―",
         "inoculation_time": "―",
+        "reservation_status_target_age": "―",
+        "target_family": False,
+        "target_not_family": False,
+        "target_suberbs": False,
+        "target_other": "",
         "reservation_status_memo": "詳細は病院のホームページで確認してください。",
     }
     factory = MedicalInstitutionLocationReservationStatusFactory()

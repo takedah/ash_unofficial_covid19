@@ -120,33 +120,15 @@ class ScrapeReservationStatus(Scraper):
                 i += 1
 
             row = list(map(lambda x: self.format_string(x), row))
-
-            # 対象者の詳細を結合する
-            target = row[3].replace("―", "")
-            if target:
-                target = "年齢" + target
-
-            target_detail = ""
+            status = row[1].replace("―", "")
+            inoculation_time = row[2].replace("―", "")
+            target_age = row[3].replace("―", "")
             family = self._get_available(row[4])
-            if family["available"]:
-                target_detail += "かかりつけの方" + family["text"]
-
+            target_family = family["available"]
             not_family = self._get_available(row[5])
-            if not_family["available"]:
-                if target_detail:
-                    target_detail += "、"
-
-                target_detail += "かかりつけ以外の方" + family["text"]
-
-            if target_detail:
-                if target:
-                    target_detail = "で" + target_detail
-
-            if row[6].replace("―", ""):
-                target_detail = target_detail + "（" + row[6].replace("―", "") + "）"
-
-            target += target_detail
-            target = target
+            target_not_family = not_family["available"]
+            target_other = row[6].replace("―", "")
+            memo = family["text"] + not_family["text"] + row[8]
 
             medical_institution_name = medical_institution_name.replace(" ", "").replace("　", "")
             if (
@@ -160,12 +142,16 @@ class ScrapeReservationStatus(Scraper):
                 "medical_institution_name": self._translate_name(medical_institution_name),
                 "address": address,
                 "phone_number": phone_number,
-                "status": row[1].replace("―", ""),
-                "target": target,
-                "inoculation_time": row[2].replace("―", ""),
-                "memo": row[8],
+                "status": status,
+                "inoculation_time": inoculation_time,
+                "target_age": target_age,
+                "target_family": target_family,
+                "target_not_family": target_not_family,
+                "target_suberbs": False,
+                "target_other": target_other,
+                "memo": memo,
             }
-            return {k: v.replace("　", "") for k, v in status_data.items()}
+            return {k: v.replace("　", "") if isinstance(v, str) else v for k, v in status_data.items()}
         except IndexError:
             return None
 

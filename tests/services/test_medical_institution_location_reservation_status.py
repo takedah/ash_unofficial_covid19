@@ -74,8 +74,12 @@ def service():
             "address": "旭川市金星町1",
             "phone_number": "29-0202 予約専用",
             "status": "―",
-            "target": "―",
             "inoculation_time": "―",
+            "target_age": "",
+            "target_family": False,
+            "target_not_family": False,
+            "target_suberbs": False,
+            "target_other": "",
             "memo": "詳細は病院のホームページで確認してください。",
         },
     ]
@@ -102,7 +106,7 @@ def test_find(service):
     assert result.latitude == 43.778422777778
     assert result.longitude == 142.365976388889
     assert result.status == "―"
-    assert result.target_person == "―"
+    assert result.target_person == ""
     assert result.inoculation_time == "―"
     assert result.reservation_status_memo == "詳細は病院のホームページで確認してください。"
 
@@ -120,7 +124,7 @@ def test_find_pediatric(service):
     assert result.latitude == 43.778422777778
     assert result.longitude == 142.365976388889
     assert result.status == "―"
-    assert result.target_person == "―"
+    assert result.target_person == ""
     assert result.inoculation_time == "―"
     assert result.reservation_status_memo == "詳細は病院のホームページで確認してください。"
 
@@ -144,7 +148,7 @@ def test_find_area(service):
     assert result.latitude == 43.778422777778
     assert result.longitude == 142.365976388889
     assert result.status == "―"
-    assert result.target_person == "―"
+    assert result.target_person == ""
     assert result.inoculation_time == "―"
     assert result.reservation_status_memo == "詳細は病院のホームページで確認してください。"
 
@@ -163,7 +167,7 @@ def test_find_area_pediatric(service):
     assert result.latitude == 43.778422777778
     assert result.longitude == 142.365976388889
     assert result.status == "―"
-    assert result.target_person == "―"
+    assert result.target_person == ""
     assert result.inoculation_time == "―"
     assert result.reservation_status_memo == "詳細は病院のホームページで確認してください。"
 

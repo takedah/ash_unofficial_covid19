@@ -17,9 +17,9 @@ class MedicalInstitutionLocationReservationStatus:
         target_age (str): 対象年齢が16歳以上または12歳から15歳までのいずれか
         latitude (float): 医療機関のある緯度
         longitude (float): 医療機関のある経度
-        status (str): 予約受付状況または受付開始時期
-        target_person (str): 対象者
+        status (str): 予約受付状況
         inoculation_time (str): 接種期間・時期
+        target_person (str): 対象者
         reservation_status_memo (str): 予約受付状況の備考
 
     """
@@ -37,8 +37,12 @@ class MedicalInstitutionLocationReservationStatus:
         latitude: float,
         longitude: float,
         status: Optional[str],
-        target_person: Optional[str],
         inoculation_time: Optional[str],
+        reservation_status_target_age: Optional[str],
+        target_family: Optional[bool],
+        target_not_family: Optional[bool],
+        target_suberbs: Optional[bool],
+        target_other: Optional[str],
         reservation_status_memo: Optional[str],
     ):
         """
@@ -53,9 +57,13 @@ class MedicalInstitutionLocationReservationStatus:
             target_age (str): 対象年齢が16歳以上または12歳から15歳までのいずれか
             latitude (float): 医療機関のある緯度
             longitude (float): 医療機関のある経度
-            status (str): 予約受付状況または受付開始時期
-            target_person (str): 対象者
+            status (str): 予約受付状況
             inoculation_time (str): 接種期間・時期
+            reservation_status_target_age (str): 対象年齢
+            target_family (bool): かかりつけの方が対象か
+            target_not_family (bool): かかりつけ以外の方が対象か
+            target_suberbs (bool): 市外の方が対象か
+            target_other (str): その他
             reservation_status_memo (str): 予約受付状況の備考
 
         """
@@ -73,10 +81,6 @@ class MedicalInstitutionLocationReservationStatus:
             self.__status = ""
         else:
             self.__status = status
-        if target_person is None:
-            self.__target_person = ""
-        else:
-            self.__target_person = target_person
         if inoculation_time is None:
             self.__inoculation_time = ""
         else:
@@ -85,6 +89,32 @@ class MedicalInstitutionLocationReservationStatus:
             self.__reservation_status_memo = ""
         else:
             self.__reservation_status_memo = reservation_status_memo
+
+        # 対象者の詳細を結合する
+        target_person = ""
+        if reservation_status_target_age:
+            if not reservation_status_target_age == "":
+                target_person = "年齢" + reservation_status_target_age
+
+        target_detail = ""
+        if target_family:
+            target_detail += "かかりつけの方"
+
+        if target_not_family:
+            if target_detail:
+                target_detail += "、"
+
+            target_detail += "かかりつけ以外の方"
+
+        if target_detail:
+            if target_person:
+                target_detail = "で" + target_detail
+
+        if target_other:
+            target_detail = target_detail + "（" + target_other + "）"
+
+        target_person += target_detail
+        self.__target_person = target_person
 
     @property
     def name(self):
@@ -131,12 +161,12 @@ class MedicalInstitutionLocationReservationStatus:
         return self.__status
 
     @property
-    def target_person(self):
-        return self.__target_person
-
-    @property
     def inoculation_time(self):
         return self.__inoculation_time
+
+    @property
+    def target_person(self):
+        return self.__target_person
 
     @property
     def reservation_status_memo(self):

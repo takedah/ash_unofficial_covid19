@@ -6,9 +6,13 @@ def test_create():
         "medical_institution_name": "市立旭川病院",
         "address": "金星町１丁目",
         "phone_number": "29-0202 予約専用",
-        "status": "―",
-        "target": "―",
         "inoculation_time": "―",
+        "status": "―",
+        "target_age": "",
+        "target_family": False,
+        "target_not_family": False,
+        "target_suberbs": False,
+        "target_other": "",
         "memo": "詳細は病院のホームページで確認してください。",
     }
     factory = ReservationStatusFactory()

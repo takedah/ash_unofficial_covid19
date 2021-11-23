@@ -80,14 +80,18 @@ CREATE TABLE sapporo_patients_numbers(
     updated_at TIMESTAMPTZ NOT NULL
 );
 DROP TABLE IF EXISTS reservation_statuses;
-CREATE TABLE reservation_statuses(
+CREATE TABLE reservation_statuses_new(
     id SERIAL NOT NULL,
     medical_institution_name VARCHAR(128) NOT NULL PRIMARY KEY,
     address TEXT,
     phone_number TEXT,
     status TEXT,
-    target TEXT,
     inoculation_time TEXT,
+    target_age TEXT,
+    target_family BOOLEAN,
+    target_not_family BOOLEAN,
+    target_suberbs BOOLEAN,
+    target_other TEXT,
     memo TEXT,
     updated_at TIMESTAMPTZ NOT NULL
 );

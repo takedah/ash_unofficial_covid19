@@ -80,8 +80,12 @@ def view():
             "address": "旭川市金星町1",
             "phone_number": "29-0202 予約専用",
             "status": "―",
-            "target": "―",
             "inoculation_time": "―",
+            "target_age": "",
+            "target_family": False,
+            "target_not_family": False,
+            "target_suberbs": False,
+            "target_other": "",
             "memo": "詳細は病院のホームページで確認してください。",
         },
         {
@@ -89,8 +93,12 @@ def view():
             "address": "旭川市花咲町7",
             "phone_number": "0166-51-3910 予約専用",
             "status": "受付中",
-            "target": "かかりつけの方",
             "inoculation_time": "１０月１日〜火・木曜日午後",
+            "target_age": "",
+            "target_family": True,
+            "target_not_family": False,
+            "target_suberbs": False,
+            "target_other": "",
             "memo": "",
         },
     ]
@@ -117,7 +125,7 @@ def test_find(view):
     assert result.latitude == 43.778422777778
     assert result.longitude == 142.365976388889
     assert result.status == "―"
-    assert result.target_person == "―"
+    assert result.target_person == ""
     assert result.inoculation_time == "―"
     assert result.reservation_status_memo == "詳細は病院のホームページで確認してください。"
 
@@ -136,7 +144,7 @@ def test_find_area(view):
     assert result[0].latitude == 43.778422777778
     assert result[0].longitude == 142.365976388889
     assert result[0].status == "―"
-    assert result[0].target_person == "―"
+    assert result[0].target_person == ""
     assert result[0].inoculation_time == "―"
     assert result[0].reservation_status_memo == "詳細は病院のホームページで確認してください。"
     assert result[1] == "%E5%B8%82%E7%AB%8B%E6%97%AD%E5%B7%9D%E7%97%85%E9%99%A2"

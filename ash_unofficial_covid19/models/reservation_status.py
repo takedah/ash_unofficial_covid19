@@ -9,8 +9,11 @@ class ReservationStatus:
         address (str): 住所
         phone_number (str): 電話番号
         status (str): 予約受付状況または受付開始時期
-        target (str): 対象者
         inoculation_time (str): 接種期間・時期
+        target_age (str): 対象年齢
+        target_family (bool): かかりつけの方が対象か
+        target_not_family (bool): かかりつけ以外の方が対象か
+        target_suberbs (bool): 市外の方が対象か
         memo (str): 備考
 
     """
@@ -21,8 +24,12 @@ class ReservationStatus:
         address: str,
         phone_number: str,
         status: str,
-        target: str,
         inoculation_time: str,
+        target_age: str,
+        target_family: bool,
+        target_not_family: bool,
+        target_suberbs: bool,
+        target_other: str,
         memo: str,
     ):
         """
@@ -31,8 +38,11 @@ class ReservationStatus:
             address (str): 住所
             phone_number (str): 電話番号
             status (str): 予約受付状況または受付開始時期
-            target (str): 対象者
             inoculation_time (str): 接種期間・時期
+            target_age (str): 対象年齢
+            target_family (bool): かかりつけの方が対象か
+            target_not_family (bool): かかりつけ以外の方が対象か
+            target_suberbs (bool): 市外の方が対象か
             memo (str): 備考
 
         """
@@ -40,8 +50,12 @@ class ReservationStatus:
         self.__address = address
         self.__phone_number = phone_number
         self.__status = status
-        self.__target = target
         self.__inoculation_time = inoculation_time
+        self.__target_age = target_age
+        self.__target_family = target_family
+        self.__target_not_family = target_not_family
+        self.__target_suberbs = target_suberbs
+        self.__target_other = target_other
         self.__memo = memo
 
     @property
@@ -61,12 +75,28 @@ class ReservationStatus:
         return self.__status
 
     @property
-    def target(self):
-        return self.__target
-
-    @property
     def inoculation_time(self):
         return self.__inoculation_time
+
+    @property
+    def target_age(self):
+        return self.__target_age
+
+    @property
+    def target_family(self):
+        return self.__target_family
+
+    @property
+    def target_not_family(self):
+        return self.__target_not_family
+
+    @property
+    def target_suberbs(self):
+        return self.__target_suberbs
+
+    @property
+    def target_other(self):
+        return self.__target_other
 
     @property
     def memo(self):
