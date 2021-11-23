@@ -43,6 +43,7 @@ class ReservationStatus:
             target_family (bool): かかりつけの方が対象か
             target_not_family (bool): かかりつけ以外の方が対象か
             target_suberbs (bool): 市外の方が対象か
+            target_other (str): その他
             memo (str): 備考
 
         """
