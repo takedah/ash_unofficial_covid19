@@ -9,10 +9,24 @@ from ..services.service import Service
 
 
 class ReservationStatusService(Service):
-    """旭川市新型コロナ接種医療機関の予約受付状況データを扱うサービス"""
+    """旭川市新型コロナ接種医療機関の予約受付状況データを扱うサービス
 
-    def __init__(self):
-        Service.__init__(self, "reservation_statuses")
+    3回目接種医療機関の予約受付状況は暫定的にテーブルを分けることにする。
+
+    """
+
+    def __init__(self, is_third_time: bool = False):
+        """
+        Args:
+            is_third_time (bool): 3回目接種の医療機関の情報を取得する場合真を指定
+
+        """
+        if is_third_time:
+            table_name = "reservation3_statuses"
+        else:
+            table_name = "reservation_statuses"
+
+        Service.__init__(self, table_name)
 
     def create(self, reservation_statuses: ReservationStatusFactory) -> None:
         """データベースへ新型コロナワクチン接種医療機関の予約受付状況データを保存

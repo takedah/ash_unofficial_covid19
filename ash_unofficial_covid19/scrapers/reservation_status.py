@@ -19,17 +19,18 @@ class ScrapeReservationStatus(Scraper):
 
     """
 
-    def __init__(self, pdf_url: str):
+    def __init__(self, pdf_url: str, is_third_time: bool = False):
         """
         Args:
             pdf_url (str): PDFファイルのURL
                 旭川市の予約受付状況PDFファイルのURL
+            is_third_time (bool): 3回目接種の医療機関の情報を取得する場合真を指定
 
         """
         Scraper.__init__(self)
         downloaded_pdf = DownloadedPDF(pdf_url)
         pdf_df = self._get_dataframe(downloaded_pdf)
-        self.__lists = self._get_status_data(pdf_df)
+        self.__lists = self._get_status_data(pdf_df=pdf_df, is_third_time=is_third_time)
 
     @property
     def lists(self) -> list:
@@ -54,10 +55,11 @@ class ScrapeReservationStatus(Scraper):
             pandas_options={"header": None},
         )
 
-    def _get_status_data(self, pdf_df: list) -> list:
+    def _get_status_data(self, pdf_df: list, is_third_time: bool = False) -> list:
         """
         Args:
             pdf_df (list of :obj:`pd.DataFrame`): PDFファイルから抽出した表データ
+            is_third_time (bool): 3回目接種の医療機関の情報を取得する場合真を指定
 
         Returns:
             status_data (list of dict): 医療機関予約受付状況データ
@@ -80,17 +82,18 @@ class ScrapeReservationStatus(Scraper):
                 continue
 
             for row in pdf_table:
-                extracted_data = self._extract_status_data(row)
+                extracted_data = self._extract_status_data(row=row, is_third_time=is_third_time)
                 if extracted_data:
                     status_data.append(extracted_data)
 
         return status_data
 
-    def _extract_status_data(self, row: list) -> Optional[dict]:
+    def _extract_status_data(self, row: list, is_third_time: bool = False) -> Optional[dict]:
         """PDFから抽出した表データ二次元配列から新型コロナワクチン接種医療機関の予約受付状況情報のみ抽出
 
         Args:
             row (list): PDFから抽出した表データの1行を表すリスト
+            is_third_time (bool): 3回目接種の医療機関の情報を取得する場合真を指定
 
         Returns:
             status_data (dict): 予約受付状況データの辞書
@@ -127,8 +130,15 @@ class ScrapeReservationStatus(Scraper):
             target_family = family["available"]
             not_family = self._get_available(row[5])
             target_not_family = not_family["available"]
-            target_other = row[6].replace("―", "")
             memo = family["text"] + not_family["text"] + row[8]
+
+            if is_third_time:
+                suberbs = self._get_available(row[6])
+                target_suberbs = suberbs["available"]
+                target_other = row[7].replace("―", "")
+            else:
+                target_suberbs = False
+                target_other = row[6].replace("―", "")
 
             medical_institution_name = medical_institution_name.replace(" ", "").replace("　", "")
             if (
@@ -147,7 +157,7 @@ class ScrapeReservationStatus(Scraper):
                 "target_age": target_age,
                 "target_family": target_family,
                 "target_not_family": target_not_family,
-                "target_suberbs": False,
+                "target_suberbs": target_suberbs,
                 "target_other": target_other,
                 "memo": memo,
             }

@@ -95,3 +95,19 @@ CREATE TABLE reservation_statuses(
     memo TEXT,
     updated_at TIMESTAMPTZ NOT NULL
 );
+DROP TABLE IF EXISTS reservation3_statuses;
+CREATE TABLE reservation3_statuses(
+    id SERIAL NOT NULL,
+    medical_institution_name VARCHAR(128) NOT NULL PRIMARY KEY,
+    address TEXT,
+    phone_number TEXT,
+    status TEXT,
+    inoculation_time TEXT,
+    target_age TEXT,
+    target_family BOOLEAN,
+    target_not_family BOOLEAN,
+    target_suberbs BOOLEAN,
+    target_other TEXT,
+    memo TEXT,
+    updated_at TIMESTAMPTZ NOT NULL
+);

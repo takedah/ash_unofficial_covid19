@@ -30,6 +30,7 @@ class Config:
     PDF_URL = BASE_URL + "kurashi/135/146/149/d072466_d/fil/iryoukikan.pdf"
     MEDICAL_INSTITUTIONS_URL = BASE_URL + "kurashi/135/146/149/d073389.html"
     RESERVATION_STATUSES_URL = BASE_URL + "kurashi/135/146/149/d072466_d/fil/" + "yoyakuzyoukyou.pdf"
+    RESERVATION3_STATUSES_URL = BASE_URL + "kurashi/135/146/149/d072466_d/fil/" + "yoyakuzyoukyou3.pdf"
 
     # 北海道オープンデータポータルの設定
     HOKKAIDO_URL = (
