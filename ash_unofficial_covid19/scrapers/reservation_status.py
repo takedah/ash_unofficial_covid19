@@ -87,14 +87,14 @@ class ScrapeReservationStatus(Scraper):
         return status_data
 
     def _extract_status_data(self, row: list) -> Optional[dict]:
-        """PDFから抽出した表データ二次元配列から新型コロナウイルス陽性患者情報のみ抽出
+        """PDFから抽出した表データ二次元配列から新型コロナワクチン接種医療機関の予約受付状況情報のみ抽出
 
         Args:
             row (list): PDFから抽出した表データの1行を表すリスト
 
         Returns:
-            status_data (dict): 患者データの辞書
-                引数のリストが新型コロナウイルス陽性患者情報なら辞書にして返す
+            status_data (dict): 予約受付状況データの辞書
+                引数のリストが予約受付状況情報なら辞書にして返す
 
         """
         status_data = dict()
