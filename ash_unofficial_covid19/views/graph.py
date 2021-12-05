@@ -577,7 +577,7 @@ class PerHundredThousandPopulationView(GraphView):
             ha="left",
             backgroundcolor="white",
             font_properties=font,
-        )
+        ).set_bbox(dict(facecolor="white", edgecolor="white", alpha=0.4))
         ax.axhline(y=15, color="orange", linewidth=1, linestyle="--")
         ax.text(
             per_hundred_thousand_population_x[0],
@@ -587,7 +587,7 @@ class PerHundredThousandPopulationView(GraphView):
             ha="left",
             backgroundcolor="white",
             font_properties=font,
-        )
+        ).set_bbox(dict(facecolor="white", edgecolor="white", alpha=0.4))
         ax.axhline(y=25, color="salmon", linewidth=1, linestyle="--")
         ax.legend(prop=legend_font, loc=0)
 
