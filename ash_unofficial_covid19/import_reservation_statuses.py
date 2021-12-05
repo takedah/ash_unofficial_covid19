@@ -34,16 +34,18 @@ def import_reservation_statuses(pdf_url: str, is_third_time: bool = False) -> No
 
     service = ReservationStatusService(is_third_time=is_third_time)
     try:
-        service.create(factory)
         current_name_list = service.get_name_list()
-        non_exist_names = list(set(current_name_list) - set(new_name_list))
+        added_names = list(set(new_name_list) - set(current_name_list))
+        service.create(factory)
+        updated_name_list = service.get_name_list()
+        non_exist_names = list(set(updated_name_list) - set(new_name_list))
         for non_exist_name in non_exist_names:
             service.delete(non_exist_name)
+
+        import_locations(added_names)
     except (DatabaseConnectionError, ServiceError) as e:
         print(e.message)
 
-    added_names = list(set(new_name_list) - set(current_name_list))
-    import_locations(added_names)
     return
 
 

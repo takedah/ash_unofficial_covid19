@@ -43,18 +43,20 @@ def import_medical_institutions(url: str) -> None:
 
     service = MedicalInstitutionService()
     try:
-        service.create(medical_institution_factory)
         current_name_list = service.get_name_lists()
         new_name_list = scraped_data.get_name_lists()
         new_name_list.extend(scraped_pediatric_data.get_name_lists())
-        non_exist_names = list(set(current_name_list) - set(new_name_list))
+        added_names = list(set(new_name_list) - set(current_name_list))
+        service.create(medical_institution_factory)
+        updated_name_list = service.get_name_lists()
+        non_exist_names = list(set(updated_name_list) - set(new_name_list))
         for non_exist_name in non_exist_names:
             service.delete(non_exist_name)
+
+        import_locations(added_names)
     except (DatabaseConnectionError, ServiceError) as e:
         print(e.message)
 
-    added_names = list(set(new_name_list) - set(current_name_list))
-    import_locations(added_names)
     return
 
 
