@@ -2,7 +2,7 @@
 {% block content %}
 <article>
   <h1 class="h4 pt-2 pb-1">旭川市内新型コロナウイルス感染状況の最新動向</h1>
-  <p class="text-secondary">患者数は旭川市公式ホームページの新型コロナウイルス感染症患者の状況から取得したデータに基づいて算出しています。（ {{ asahikawa_patients.last_updated }} 現在）</p>
+  <p class="text-secondary">感染者数は旭川市公式ホームページから取得した {{ daily_total.today }} 発表分までのデータに基づいて算出しています。（ {{ asahikawa_patients.last_updated }} 更新）</p>
   <div class="card-group mb-2">
     <div class="card">
       <div class="card-header">

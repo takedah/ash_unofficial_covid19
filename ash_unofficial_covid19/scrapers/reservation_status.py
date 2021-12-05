@@ -108,6 +108,10 @@ class ScrapeReservationStatus(Scraper):
             if not isinstance(row[0], str):
                 return None
 
+            title_row_match = re.search("^(.*)新型コロナワクチン接種医療機関(.*)$", row[0])
+            if title_row_match:
+                return None
+
             # 一つの列に医療機関名、住所、電話番号が改行で区切られてまとめられてしまっているため分解する
             tmp = row[0].split("\r")
             tmp_length = len(tmp)

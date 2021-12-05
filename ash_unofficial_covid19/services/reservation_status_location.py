@@ -31,8 +31,6 @@ class ReservationStatusLocationService(Service):
 
         Args:
             medical_institution_name (str): 医療機関の名称
-            target_age (bool): 対象年齢フラグ
-                真の場合は対象年齢が12歳から15歳まで、偽の場合16歳以上を表す
 
         Returns:
             results (:obj:`ReservationStatusLocation`): 医療機関データ
@@ -64,3 +62,37 @@ class ReservationStatusLocationService(Service):
             raise ServiceError("指定した名称の医療機関はありませんでした。")
 
         return factory.create(**dict(res))
+
+    def find_all(self) -> ReservationStatusLocationFactory:
+        """新型コロナワクチン接種医療機関予約受付状況全件を返す
+
+        Args:
+            medical_institution_name (str): 医療機関の名称
+
+        Returns:
+            results (:obj:`ReservationStatusLocationFactory`): 医療機関データ
+                新型コロナワクチン接種医療機関予約受付状況の情報に緯度経度を含めた
+                データのリストを要素に持つオブジェクト
+
+        """
+        state = (
+            "SELECT "
+            + "reserve.medical_institution_name,"
+            + "address,phone_number,status,inoculation_time,"
+            + "target_age,target_family,target_not_family,target_suberbs,target_other,"
+            + "latitude,longitude,memo "
+            + "FROM "
+            + self.table_name
+            + " "
+            + "AS reserve "
+            + "LEFT JOIN locations AS loc ON reserve.medical_institution_name="
+            + "loc.medical_institution_name "
+            + "ORDER BY address;"
+        )
+        factory = ReservationStatusLocationFactory()
+        with self.get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(state)
+                for row in cur.fetchall():
+                    factory.create(**row)
+        return factory

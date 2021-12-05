@@ -17,6 +17,11 @@ def service():
             "longitude": 142.365976388889,
             "latitude": 43.778422777778,
         },
+        {
+            "medical_institution_name": "独立行政法人国立病院機構旭川医療センター",
+            "longitude": 142.3815237271935,
+            "latitude": 43.798826491523464,
+        },
     ]
     location_factory = LocationFactory()
     for row in test_locations_data:
@@ -38,6 +43,19 @@ def service():
             "target_suberbs": False,
             "target_other": "",
             "memo": "詳細は病院のホームページで確認してください。",
+        },
+        {
+            "medical_institution_name": "独立行政法人国立病院機構旭川医療センター",
+            "address": "旭川市花咲町7",
+            "phone_number": "0166-51-3910 予約専用",
+            "status": "受付中",
+            "inoculation_time": "１０月１日〜火・木曜日午後",
+            "target_age": "指定なし",
+            "target_family": True,
+            "target_not_family": False,
+            "target_suberbs": False,
+            "target_other": "",
+            "memo": "",
         },
     ]
     reservation_status_factory = ReservationStatusFactory()
@@ -70,3 +88,21 @@ def test_find(service):
 def test_not_exist_medical_institution(service):
     with pytest.raises(ServiceError):
         service.find(medical_institution_name="hoge")
+
+
+def test_find_all(service):
+    results = service.find_all()
+    result = results.items[0]
+    assert result.medical_institution_name == "独立行政法人国立病院機構旭川医療センター"
+    assert result.address == "旭川市花咲町7"
+    assert result.phone_number == "0166-51-3910 予約専用"
+    assert result.status == "受付中"
+    assert result.inoculation_time == "１０月１日〜火・木曜日午後"
+    assert result.target_age == "指定なし"
+    assert result.target_family == True
+    assert result.target_not_family == False
+    assert result.target_suberbs == False
+    assert result.target_other == ""
+    assert result.latitude == 43.798826491523464
+    assert result.longitude == 142.3815237271935
+    assert result.memo == ""

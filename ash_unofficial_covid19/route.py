@@ -13,6 +13,7 @@ from .views.graph import (
 )
 from .views.medical_institution import MedicalInstitutionView
 from .views.patient import AsahikawaPatientView
+from .views.reservation_status import ReservationStatusView
 
 app = Flask(__name__)
 
@@ -42,6 +43,11 @@ def add_security_headers(response):
 def get_asahikawa_patients():
     g.asahikawa_patients = AsahikawaPatientView()
     return g.asahikawa_patients
+
+
+def get_reservation3_statuses():
+    g.reservation3_statuses = ReservationStatusView()
+    return g.reservation3_statuses
 
 
 def get_medical_institutions():
@@ -166,6 +172,52 @@ def medical_institutions():
         below_15_medical_institutions_number=len(below_15_medical_institutions),
         above_16_area_list=medical_institutions.get_area_list(),
         below_15_area_list=medical_institutions.get_area_list(is_pediatric=True),
+        leaflet=True,
+    )
+
+
+@app.route("/reservation3_statuses")
+def reservation3_statuses():
+    reservation3_statuses = get_reservation3_statuses()
+    try:
+        search_results = reservation3_statuses.find_all()
+    except ServiceError:
+        abort(404)
+
+    search_lengths = len(search_results)
+    if search_lengths == 0:
+        abort(404)
+
+    return render_template(
+        "reservation3_statuses.html",
+        title="新型コロナワクチン3回目接種の予約受付状況",
+        gtag_id=Config.GTAG_ID,
+        last_updated=reservation3_statuses.last_updated,
+        search_results=search_results,
+        search_lengths=search_lengths,
+        leaflet=True,
+    )
+
+
+@app.route("/reservation3_statuses/<medical_institution_name>")
+def reservation3_status(medical_institution_name):
+    reservation3_statuses = get_reservation3_statuses()
+    try:
+        medical_institution_name = escape(medical_institution_name)
+    except ValueError:
+        abort(404)
+
+    try:
+        reservation3_status = reservation3_statuses.find(medical_institution_name)
+    except ServiceError:
+        abort(404)
+
+    return render_template(
+        "reservation3_status.html",
+        title="【旭川市のワクチン3回目接種医療機関】" + medical_institution_name,
+        gtag_id=Config.GTAG_ID,
+        last_updated=reservation3_statuses.last_updated,
+        reservation3_status=reservation3_status,
         leaflet=True,
     )
 

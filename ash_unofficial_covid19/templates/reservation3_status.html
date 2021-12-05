@@ -1,0 +1,86 @@
+{% extends 'layout.html' %}
+{% block content %}
+<article>
+  <h1 class="h5">旭川市の新型コロナワクチン3回目接種の予約受付状況の詳細</h1>
+  <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+    <p class="mb-0">{{ last_updated }}にダウンロードしたデータを元に表示しています。正確な情報は必ず<a class="alert-link" href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/146/149/d072466.html" title="旭川市公式ホームページ" target="_blank">旭川市公式ホームページ</a>を確認してください。</p>
+    <button type="button" class="close" data-dismiss="alert" aria-label="close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="card mt-3">
+    <div class="card-body">
+      <section>
+        <h2 class="h5 card-title">{{ reservation3_status.medical_institution_name }}の情報</h2>
+        <div class="table-responsive mt-3">
+          <table class="table table-bordered">
+            <tbody id="results" data-latitude="{{ reservation3_status.latitude|tojson }}" data-longitude="{{ reservation3_status.longitude|tojson }}" data-name="{{ reservation3_status.medical_institution_name|safe }}">
+              <tr>
+                <th>医療機関名</th>
+                <td>{{ reservation3_status.medical_institution_name }}</td>
+              </tr>
+              <tr>
+                <th>住所</th>
+                <td>{{ reservation3_status.address }}</td>
+              </tr>
+              <tr>
+                <th>電話番号</th>
+                <td>{{ reservation3_status.phone_number }}</td>
+              </tr>
+              <tr>
+                <th>予約受付状況</th>
+                <td>{{ reservation3_status.status }}</td>
+              </tr>
+              <tr>
+                <th>接種可能時期</th>
+                <td>{{ reservation3_status.inoculation_time }}</td>
+              </tr>
+              <tr>
+                <th>対象年齢</th>
+                <td>{{ reservation3_status.target_age }}</td>
+              </tr>
+              <tr>
+                <th>かかりつけの方</th>
+                <td>{{ "OK" if reservation3_status.target_family else "" }}</td>
+              </tr>
+              <tr>
+                <th>かかりつけ以外の方</th>
+                <td>{{ "OK" if reservation3_status.target_not_family else "" }}</td>
+              </tr>
+              <tr>
+                <th>市外の方</th>
+                <td>{{ "OK" if reservation3_status.target_suberbs else "" }}</td>
+              </tr>
+              <tr>
+                <th>その他</th>
+                <td>{{ reservation3_status.target_other }}</td>
+              </tr>
+              <tr>
+                <th>備考</th>
+                <td>{{ reservation3_status.memo }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+  <div class="card mt-3">
+    <div class="card-body">
+      <section>
+        <h2 class="h5 card-title">医療機関の地図</h2>
+        <p class="card-text">地図の表示はあくまで目安ですので、正確な場所の情報は各医療機関のホームページ等でご確認ください。</p>
+        <div id="mapid" class="mb-3"></div>
+        <p class="card-text small">
+          医療機関の位置情報は、<a href="https://developer.yahoo.co.jp/webapi/map/" title="Yahoo! Open Local Platform" target="_blank">Yahoo! Open Local Platform (YOLP) </a>のYahoo!ローカルサーチAPIを使用して取得しています。
+          <!-- Begin Yahoo! JAPAN Web Services Attribution Snippet -->
+          <a href="https://developer.yahoo.co.jp/sitemap/">
+            <img src="https://s.yimg.jp/images/yjdn/yjdn_attbtn1_125_17.gif" title="Webサービス by Yahoo! JAPAN" alt="Web Services by Yahoo! JAPAN" width="125" height="17" border="0"></a>
+          <!-- End Yahoo! JAPAN Web Services Attribution Snippet -->
+        </p>
+      </section>
+    </div>
+  </div>
+</article>
+<script charset="utf-8" src="{{ url_for('static', filename='js/show_map_individual.js') }}"></script>
+{% endblock %}

@@ -33,39 +33,39 @@ def import_medical_institutions(url: str) -> None:
 
     # 12歳から15歳まで
     try:
-        scraped_data = ScrapeMedicalInstitutions(html_url=url, is_pediatric=True)
+        scraped_pediatric_data = ScrapeMedicalInstitutions(html_url=url, is_pediatric=True)
     except (HTTPDownloadError, ScrapeError) as e:
         print(e.message)
         return
 
-    for row in scraped_data.lists:
+    for row in scraped_pediatric_data.lists:
         medical_institution_factory.create(**row)
 
     service = MedicalInstitutionService()
     try:
         service.create(medical_institution_factory)
+        current_name_list = service.get_name_lists()
+        new_name_list = scraped_data.get_name_lists()
+        new_name_list.extend(scraped_pediatric_data.get_name_lists())
+        non_exist_names = list(set(current_name_list) - set(new_name_list))
+        for non_exist_name in non_exist_names:
+            service.delete(non_exist_name)
     except (DatabaseConnectionError, ServiceError) as e:
         print(e.message)
-        return
+
+    added_names = list(set(new_name_list) - set(current_name_list))
+    import_locations(added_names)
+    return
 
 
-def import_locations() -> None:
+def import_locations(medical_institution_name_list: list) -> None:
     """
     医療機関の名称一覧から緯度経度を取得し、データベースへ格納する。
 
+    Args:
+        name_list (list): 医療機関名のリスト
+
     """
-    medical_institution_service = MedicalInstitutionService()
-    try:
-        medical_institutions = medical_institution_service.get_name_lists()
-    except ServiceError as e:
-        print(e.message)
-        return
-
-    medical_institution_name_list = list()
-    for medical_institution in medical_institutions:
-        medical_institution_name_list.append(medical_institution[0])
-    medical_institution_name_list = sorted(set(medical_institution_name_list), key=medical_institution_name_list.index)
-
     locations_factory = LocationFactory()
     for medical_institution_name in medical_institution_name_list:
         try:
@@ -81,8 +81,8 @@ def import_locations() -> None:
     service = LocationService()
     try:
         service.create(locations_factory)
-    except (DatabaseConnectionError, ServiceError):
-        pass
+    except (DatabaseConnectionError, ServiceError) as e:
+        print(e.message)
 
     # YOLPで緯度経度を取得できなかった医療機関に手動で情報を追加
     fix_data = [
@@ -145,28 +145,9 @@ def import_locations() -> None:
         service.create(locations_factory)
     except (DatabaseConnectionError, ServiceError) as e:
         print(e.message)
-        return
 
-
-def delete_non_exist_data(html_url: str) -> None:
-    """スクレイピングしたデータに存在しない登録済み医療機関データを削除する
-
-    Args:
-        html_url (str): ワクチン接種医療機関一覧HTMLページのURL
-
-    """
-    scraped_data = ScrapeMedicalInstitutions(html_url)
-    scraped_pediatric_data = ScrapeMedicalInstitutions(html_url=html_url, is_pediatric=True)
-    new_name_list = scraped_data.get_name_lists()
-    new_name_list.extend(scraped_pediatric_data.get_name_lists())
-    service = MedicalInstitutionService()
-    current_name_list = service.get_name_lists()
-    non_exist_names = list(set(current_name_list) - set(new_name_list))
-    for non_exist_name in non_exist_names:
-        service.delete(non_exist_name)
+    return
 
 
 if __name__ == "__main__":
     import_medical_institutions(Config.MEDICAL_INSTITUTIONS_URL)
-    import_locations()
-    delete_non_exist_data(Config.MEDICAL_INSTITUTIONS_URL)
