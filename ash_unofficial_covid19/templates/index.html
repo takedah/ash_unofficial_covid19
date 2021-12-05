@@ -40,28 +40,28 @@
       </div>
       <div class="card-body">
         <p class="card-text">現在 <strong class="h6">{{ per_hundred_thousand_population.alert_level }}</strong> です。実効再生産数（1人の感染者が次に平均で何人に感染させるかの指標）の簡易推定値は <strong class="h6">{{ daily_total.reproduction_number }}</strong> で、{{ daily_total.reproduction_status }}と見られます。</p>
-        <table class="table table-bordered table-hover">
-          <thead>
+        <table class="table table-bordered table-hover small">
+          <thead class="thead-dark">
             <tr>
-              <th class="text-nowrap">ステージ</th>
-              <th>状況</th>
+              <th class="text-nowrap text-center">ステージ</th>
+              <th class="text-nowrap text-center">状況</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>1</td>
+              <td class="text-center">1</td>
               <td>感染者が散発的に発生しており、医療提供体制に大きな支障がない段階</td>
             </tr>
             <tr>
-              <td>2</td>
+              <td class="text-center">2</td>
               <td>感染者の漸増及び医療提供体制への負荷が蓄積する段階</td>
             </tr>
             <tr class="table-warning">
-              <td>3</td>
+              <td class="text-center">3</td>
               <td>感染者の急増及び医療提供体制における大きな支障の発生を避けるための対応が必要な段階</td>
             </tr>
             <tr class="table-danger">
-              <td>4</td>
+              <td class="text-center">4</td>
               <td>爆発的な感染拡大及び深刻な医療提供体制の機能不全を避けるための対応が必要な段階</td>
             </tr>
           </tbody>
