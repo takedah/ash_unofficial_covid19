@@ -96,35 +96,7 @@
       </section>
     </div>
   </div>
-  <div class="card mt-3">
-    <div class="card-body">
-      <section>
-        <h2 class="h5 card-title">新型コロナワクチン接種医療機関一覧CSVをダウンロード</h2>
-        <p class="card-text">旭川市公式ホームページに掲載の新型コロナワクチン接種医療機関一覧をCSVファイルでダウンロードできるようにしました。 </p>
-        <p class="card-text"><a href="/012041_asahikawa_covid19_medical_institutions.csv" title="旭川市新型コロナワクチン接種医療機関一覧CSVファイルをダウンロード" class="btn btn-primary">新型コロナワクチン接種医療機関一覧CSVをダウンロード</a></p>
-      </section>
-    </div>
-  </div>
-  <div class="card mt-3">
-    <div class="card-body">
-      <section>
-        <h3 class="h5 card-title">新型コロナワクチン接種医療機関一覧CSVファイルのURL</h3>
-        <div class="input-group">
-          <input id="csv-url" type="text" class="form-control" value="https://ash-unofficial-covid19.herokuapp.com/012041_asahikawa_covid19_medical_institutions.csv">
-        </div>
-      </section>
-    </div>
-  </div>
-  <div class="card mt-3">
-    <div class="card-body">
-      <section>
-        <h2 class="h5 card-title">データのライセンス</h2>
-        <p class="card-text"><a rel="license" href="http://creativecommons.org/licenses/by/4.0/" target="_blank"><img alt="クリエイティブ・コモンズ・ライセンス" border=0 src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />この サイトのデータ は <a rel="license" href="http://creativecommons.org/licenses/by/4.0/" target="_blank">クリエイティブ・コモンズ 表示 4.0 国際 ライセンス</a>の下に提供されています。</p>
-      </section>
-    </div>
-  </div>
 </article>
 <script charset="utf-8" src="{{ url_for('static', filename='js/show_map_all.js') }}"></script>
 <script charset="utf-8" src="{{ url_for('static', filename='js/show_map_pediatrics_all.js') }}"></script>
-<script charset="utf-8" src="{{ url_for('static', filename='js/select_input.js') }}"></script>
 {% endblock %}

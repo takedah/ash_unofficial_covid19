@@ -569,28 +569,6 @@ class PerHundredThousandPopulationView(GraphView):
         ax.set_ylabel("1週間の新規感染者数（人/人口10万人あたり）", font_properties=font)
         ax.tick_params(labelsize=8)
         ax.tick_params(axis="x", rotation=45)
-        ax.text(
-            per_hundred_thousand_population_x[0],
-            15,
-            "警戒ステージ3",
-            va="center",
-            ha="left",
-            backgroundcolor="white",
-            font_properties=font,
-        ).set_bbox(dict(facecolor="white", edgecolor="white", alpha=0.4))
-        ax.axhline(y=15, color="orange", linewidth=1, linestyle="--")
-        ax.text(
-            per_hundred_thousand_population_x[0],
-            25,
-            "警戒ステージ4",
-            va="center",
-            ha="left",
-            backgroundcolor="white",
-            font_properties=font,
-        ).set_bbox(dict(facecolor="white", edgecolor="white", alpha=0.4))
-        ax.axhline(y=25, color="salmon", linewidth=1, linestyle="--")
-        ax.legend(prop=legend_font, loc=0)
-
         fig.tight_layout()
         canvas = FigureCanvasAgg(fig)
         im = BytesIO()
@@ -611,14 +589,10 @@ class PerHundredThousandPopulationView(GraphView):
             alert_level (str): 北海道の警戒ステージレベル
 
         """
-        if per_hundred_thousand_population >= 25:
-            return "警戒ステージ4相当（緊急事態宣言の目安）"
-        elif per_hundred_thousand_population >= 15:
-            return "警戒ステージ3相当（まん延防止等重点措置の目安）"
-        elif per_hundred_thousand_population >= 2.0:
-            return "警戒ステージ2相当"
+        if per_hundred_thousand_population >= 15:
+            return "警戒を強化すべきレベル"
         else:
-            return "警戒ステージ1相当"
+            return ""
 
 
 class WeeklyPerAgeView(GraphView):

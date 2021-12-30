@@ -1,0 +1,68 @@
+{% extends 'layout.html' %}
+{% block content %}
+<article>
+  <h1 class="h4">感染者の状況</h1>
+  <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+    <p class="mb-0">{{ last_updated }}にダウンロードしたデータを元に表示しています。正確な情報は必ず<a class="alert-link" href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" target="_blank">旭川市公式ホームページ</a>を確認してください。</p>
+    <button type="button" class="close" data-dismiss="alert" aria-label="close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="card mt-3">
+    <div class="card-body">
+      <section>
+        <h3 class="h5 card-title">全 {{ max_page }} ページ中 {{ page }} ページ目</h3>
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered table-hover table-sm">
+            <thead>
+              <tr>
+                <th class="text-nowrap small">市内番号</th>
+                <th class="text-nowrap small">公表日</th>
+                <th class="text-nowrap small">居住地</th>
+                <th class="text-nowrap small">年代</th>
+                <th class="text-nowrap small">性別</th>
+                <th class="text-nowrap small">濃厚接触者の状況</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for patient in patients.items %}
+              <tr>
+                <td class="text-nowrap small">{{ patient.patient_number }}</td>
+                <td class="text-nowrap small">{{ patient.publication_date }}</td>
+                <td class="text-nowrap small">{{ "非公表" if patient.residence == "" else patient.residence}}</td>
+                <td class="text-nowrap small">{{ "非公表" if patient.age == "" else patient.age}}</td>
+                <td class="text-nowrap small">{{ "非公表" if patient.sex == "" else patient.sex}}</td>
+                <td class="text-nowrap small">{{ patient.close_contact }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section>
+        <ul class="list-group list-group-horizontal small">
+          {% if 1 < page %}
+            {% for i in range(1, page) %}
+            {% if loop.index == 1 %}
+            <li class="list-group-item"><a href="/patients/{{ page - 1 }}">&lt;&lt;</a></li>
+            {% endif %}
+            {% if page - 3 < i %}
+            <li class="list-group-item"><a href="/patients/{{ i }}">{{ i }}</a></li>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+            <li class="list-group-item">{{ page }}</li>
+            {% if page < max_page %}
+            {% for i in range(page + 1, max_page + 1) %}
+            {% if i < page + 3 %}
+            <li class="list-group-item"><a href="/patients/{{ i }}">{{ i }}</a></li>
+            {% endif %}
+            {% endfor %}
+            <li class="list-group-item"><a href="/patients/{{ page + 1 }}">&gt;&gt;</a></li>
+            {% endif %}
+        </ul>
+      </section>
+    </div>
+  </div>
+</article>
+{% endblock %}

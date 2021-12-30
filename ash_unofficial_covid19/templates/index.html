@@ -36,44 +36,6 @@
   <div class="card-group mb-2">
     <div class="card">
       <div class="card-header">
-        新規感染者数に基づく市内の警戒ステージ及び実効再生産数
-      </div>
-      <div class="card-body">
-        <p class="card-text">現在 <strong class="h6">{{ per_hundred_thousand_population.alert_level }}</strong> です。実効再生産数（1人の感染者が次に平均で何人に感染させるかの指標）の簡易推定値は <strong class="h6">{{ daily_total.reproduction_number }}</strong> で、{{ daily_total.reproduction_status }}と見られます。</p>
-        <table class="table table-bordered table-hover small">
-          <thead class="thead-dark">
-            <tr>
-              <th class="text-nowrap text-center">ステージ</th>
-              <th class="text-nowrap text-center">状況</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="text-center">1</td>
-              <td>感染者が散発的に発生しており、医療提供体制に大きな支障がない段階</td>
-            </tr>
-            <tr>
-              <td class="text-center">2</td>
-              <td>感染者の漸増及び医療提供体制への負荷が蓄積する段階</td>
-            </tr>
-            <tr class="table-warning">
-              <td class="text-center">3</td>
-              <td>感染者の急増及び医療提供体制における大きな支障の発生を避けるための対応が必要な段階</td>
-            </tr>
-            <tr class="table-danger">
-              <td class="text-center">4</td>
-              <td>爆発的な感染拡大及び深刻な医療提供体制の機能不全を避けるための対応が必要な段階</td>
-            </tr>
-          </tbody>
-        </table>
-        <p class="card-text small">実効再生産数の簡易推定値は国立感染症研究所の<a href="https://www.niid.go.jp/niid/ja/diseases/ka/corona-virus/2019-ncov/2502-idsc/iasr-in/10465-496d04.html" title="国立感染症研究所">COVID-19感染報告者数に基づく簡易実効再生産数推定方法</a>に基づき、「直近7日間の新規感染者数 / 5日間前7日間の新規感染者数」で計算しています。</p>
-      </div>
-      <div class="card-footer text-muted bg-white">
-        <p class="card-text small">出典: <a href="https://www.pref.hokkaido.lg.jp/ss/ssa/singatakoronahaien.html" title="北海道公式ホームページ" class="text-muted" target="_blank">北海道公式ホームページ </a> <a href="https://www.niid.go.jp/niid/ja/diseases/ka/corona-virus/2019-ncov/2502-idsc/iasr-in/10465-496d04.html" title="国立感染症研究所" class="text-muted" target="_blank">国立感染症研究所 </a></p>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header">
         1週間ごとの年代別新規感染者数の内訳
       </div>
       <div class="card-body">
@@ -84,8 +46,6 @@
         <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted" target="_blank">旭川市公式ホームページ </a> 最終更新: {{ asahikawa_patients.last_updated }}</p>
       </div>
     </div>
-  </div>
-  <div class="card-group mb-2">
     <div class="card">
       <div class="card-header">
         これまでの年代別感染者数の割合
@@ -98,6 +58,8 @@
         <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted" target="_blank">旭川市公式ホームページ </a> 最終更新: {{ asahikawa_patients.last_updated }}</p>
       </div>
     </div>
+  </div>
+  <div class="card-group mb-2">
     <div class="card">
       <div class="card-header">
         累計感染者数（月別）
@@ -111,6 +73,8 @@
       <div class="card-footer text-muted bg-white">
         <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted" target="_blank">旭川市公式ホームページ </a> 最終更新: {{ asahikawa_patients.last_updated }}</p>
       </div>
+    </div>
+    <div class="card">
     </div>
   </div>
 </article>

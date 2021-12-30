@@ -119,10 +119,22 @@ def about():
 @app.route("/opendata")
 def opendata():
     asahikawa_patients = get_asahikawa_patients()
-    results = asahikawa_patients.find()
     return render_template(
         "opendata.html",
-        title="感染者の状況（非公式オープンデータ）",
+        title="非公式オープンデータ",
+        gtag_id=Config.GTAG_ID,
+        last_updated=asahikawa_patients.last_updated,
+        leaflet=False,
+    )
+
+
+@app.route("/patients")
+def patients():
+    asahikawa_patients = get_asahikawa_patients()
+    results = asahikawa_patients.find()
+    return render_template(
+        "patients.html",
+        title="感染者の状況",
         gtag_id=Config.GTAG_ID,
         last_updated=asahikawa_patients.last_updated,
         patients=results[0],
@@ -132,8 +144,8 @@ def opendata():
     )
 
 
-@app.route("/opendata/<page>")
-def opendata_pages(page):
+@app.route("/patients/<page>")
+def patients_pages(page):
     try:
         page = int(escape(page))
     except ValueError:
@@ -145,7 +157,7 @@ def opendata_pages(page):
         abort(404)
     title = "感染者の状況（非公式オープンデータ）全" + str(results[1]) + "ページ中" + str(page) + "ページ目"
     return render_template(
-        "opendata.html",
+        "patients.html",
         title=title,
         gtag_id=Config.GTAG_ID,
         last_updated=asahikawa_patients.last_updated,

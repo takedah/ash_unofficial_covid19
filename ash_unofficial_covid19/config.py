@@ -9,8 +9,8 @@ class Config:
     POPULATION = 328160
 
     # 札幌市の人口（2021年11月1日現在）
-    # https://www.city.sapporo.jp/toukei/jinko/jinko.html
-    SAPPORO_POPULATION = 1972959
+    # https://www.city.sapporo.jp/toukei/jinko/juuki/juuki.html
+    SAPPORO_POPULATION = 1960873
 
     # 旭川市公式ホームページと北海道オープンデータポータルの設定
     DATABASE_URL = os.environ.get("DATABASE_URL")
