@@ -36,6 +36,7 @@ def _get_download_lists() -> list:
         (Config.SEP2021_DATA_URL, 2021),
         (Config.OCT2021_DATA_URL, 2021),
         (Config.NOV2021_DATA_URL, 2021),
+        (Config.DEC2021_DATA_URL, 2021),
     ]
 
 
@@ -241,10 +242,10 @@ def _import_sapporo_patients_number(url: str) -> None:
 def import_latest():
     """今月の旭川市の新規陽性患者データを取得"""
     # 先にHTMLページから新規陽性患者データをデータベースへ登録
-    _import_asahikawa_patients(url=Config.LATEST_DATA_URL, target_year=2021)
+    _import_asahikawa_patients(url=Config.LATEST_DATA_URL, target_year=2022)
 
     # 最新の報道発表資料PDFファイルのURLと報道発表日をデータベースへ登録
-    _import_press_release_link(Config.OVERVIEW_URL, 2021)
+    _import_press_release_link(Config.OVERVIEW_URL, 2022)
 
     # 最新の報道発表資料PDFファイルから新規陽性患者データをデータベースへ更新登録
     press_release_links = _get_press_release_links()
@@ -259,12 +260,12 @@ def import_latest():
     _import_sapporo_patients_number(Config.SAPPORO_URL)
 
     # 報道発表資料PDFファイルから新規陽性患者データをデータベースへ更新登録
-    _import_press_release_link(url=Config.LATEST_DATA_URL, target_year=2021)
+    _import_press_release_link(url=Config.LATEST_DATA_URL, target_year=2022)
     press_release_links = _get_press_release_links()
     if press_release_links:
         for press_release_link in press_release_links.items:
             publication_date = press_release_link.publication_date
-            if publication_date.year == 2021 and publication_date.month == 12:
+            if publication_date.year == 2022 and publication_date.month == 1:
                 _import_asahikawa_data_from_press_release(
                     pdf_url=press_release_link.url,
                     publication_date=press_release_link.publication_date,
