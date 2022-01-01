@@ -264,7 +264,7 @@ def import_latest():
     if press_release_links:
         for press_release_link in press_release_links.items:
             publication_date = press_release_link.publication_date
-            if publication_date.year == 2021 and publication_date.month == 11:
+            if publication_date.year == 2021 and publication_date.month == 12:
                 _import_asahikawa_data_from_press_release(
                     pdf_url=press_release_link.url,
                     publication_date=press_release_link.publication_date,
