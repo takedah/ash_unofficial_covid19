@@ -8,7 +8,7 @@ class Config:
     # https://www.city.asahikawa.hokkaido.jp/700/701/705/d055301.html
     POPULATION = 328160
 
-    # 札幌市の人口（2021年11月1日現在）
+    # 札幌市の人口（2021年12月1日現在）
     # https://www.city.sapporo.jp/toukei/jinko/juuki/juuki.html
     SAPPORO_POPULATION = 1960873
 
