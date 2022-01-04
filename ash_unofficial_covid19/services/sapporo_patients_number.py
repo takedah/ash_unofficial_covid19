@@ -130,11 +130,16 @@ class SapporoPatientsNumberService(Service):
         """
         aggregate_by_weeks = self.get_aggregate_by_weeks(from_date=from_date, to_date=to_date)
         per_hundred_thousand_population_per_week = list()
-        for patients_number in aggregate_by_weeks:
+        for aggregate in aggregate_by_weeks:
+            if aggregate[1] is None:
+                patients_number = 0
+            else:
+                patients_number = aggregate[1]
+            target_week = aggregate[0]
             per_hundred_thousand_population = float(
-                Decimal(str(patients_number[1] / Config.SAPPORO_POPULATION * 100000)).quantize(
+                Decimal(str(patients_number / Config.SAPPORO_POPULATION * 100000)).quantize(
                     Decimal("0.01"), rounding=ROUND_HALF_UP
                 )
             )
-            per_hundred_thousand_population_per_week.append((patients_number[0], per_hundred_thousand_population))
+            per_hundred_thousand_population_per_week.append((target_week, per_hundred_thousand_population))
         return per_hundred_thousand_population_per_week
