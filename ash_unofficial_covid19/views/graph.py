@@ -569,6 +569,7 @@ class PerHundredThousandPopulationView(GraphView):
         ax.set_ylabel("1週間の新規感染者数（人/人口10万人あたり）", font_properties=font)
         ax.tick_params(labelsize=8)
         ax.tick_params(axis="x", rotation=45)
+        ax.legend(prop=legend_font, loc=0)
         fig.tight_layout()
         canvas = FigureCanvasAgg(fig)
         im = BytesIO()
