@@ -92,16 +92,21 @@ def get_atom():
 
 @app.route("/")
 def index():
+    asahikawa_patients = get_asahikawa_patients()
+    results = asahikawa_patients.find()
     return render_template(
         "index.html",
         title="旭川市内感染状況の最新動向",
         gtag_id=Config.GTAG_ID,
-        asahikawa_patients=get_asahikawa_patients(),
+        last_updated=asahikawa_patients.last_updated,
         daily_total=get_daily_total(),
         weekly_per_age=get_weekly_per_age(),
         per_hundred_thousand_population=get_per_hundred_thousand_population(),
         month_total=get_month_total(),
         by_age=get_by_age(),
+        patients=results[0],
+        max_page=results[1],
+        page=1,
         leaflet=False,
     )
 

@@ -2,7 +2,7 @@
 {% block content %}
 <article>
   <h1 class="h4 pt-2 pb-1">旭川市内新型コロナウイルス感染状況の最新動向</h1>
-  <p class="text-secondary">感染者数は旭川市公式ホームページから取得した {{ daily_total.today }} 発表分までのデータに基づいて算出しています。（ {{ asahikawa_patients.last_updated }} 更新）</p>
+  <p class="text-secondary">感染者数は旭川市公式ホームページから取得した {{ daily_total.today }} 発表分までのデータに基づいて算出しています。（ {{ last_updated }} 更新）</p>
   <div class="card-group mb-2">
     <div class="card">
       <div class="card-header">
@@ -15,7 +15,7 @@
         <p class="card-text text-right">（先週の同じ曜日と比べて {{ daily_total.increase_from_seven_days_before }}人）</p>
       </div>
       <div class="card-footer text-muted bg-white">
-        <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted" target="_blank">旭川市公式ホームページ </a> 最終更新: {{ asahikawa_patients.last_updated }}</p>
+        <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted" target="_blank">旭川市公式ホームページ </a> 最終更新: {{ last_updated }}</p>
       </div>
     </div>
     <div class="card">
@@ -29,7 +29,7 @@
         <p class="card-text text-right">（先週 {{ per_hundred_thousand_population.increase_from_last_week }}人）</p>
       </div>
       <div class="card-footer text-muted bg-white">
-        <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted" target="_blank">旭川市公式ホームページ </a> <a href="https://ckan.pf-sapporo.jp/dataset/covid_19_patients" title="DATA-SMART CITY SAPPORO" class="text-muted" target="_blank">DATA-SMART CITY SAPPORO </a> 最終更新: {{ asahikawa_patients.last_updated }}</p>
+        <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted" target="_blank">旭川市公式ホームページ </a> <a href="https://ckan.pf-sapporo.jp/dataset/covid_19_patients" title="DATA-SMART CITY SAPPORO" class="text-muted" target="_blank">DATA-SMART CITY SAPPORO </a> 最終更新: {{ last_updated }}</p>
       </div>
     </div>
   </div>
@@ -43,7 +43,7 @@
         <p class="card-text text-right">集計対象期間: {{ weekly_per_age.from_date }}〜{{ weekly_per_age.today }}</p>
       </div>
       <div class="card-footer text-muted bg-white">
-        <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted" target="_blank">旭川市公式ホームページ </a> 最終更新: {{ asahikawa_patients.last_updated }}</p>
+        <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted" target="_blank">旭川市公式ホームページ </a> 最終更新: {{ last_updated }}</p>
       </div>
     </div>
     <div class="card">
@@ -55,7 +55,7 @@
         <p class="card-text text-right">{{ by_age.today }}まで集計、年代非公表の人数を除く</p>
       </div>
       <div class="card-footer text-muted bg-white">
-        <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted" target="_blank">旭川市公式ホームページ </a> 最終更新: {{ asahikawa_patients.last_updated }}</p>
+        <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted" target="_blank">旭川市公式ホームページ </a> 最終更新: {{ last_updated }}</p>
       </div>
     </div>
   </div>
@@ -71,10 +71,43 @@
         <p class="card-text text-right">（先月 {{ month_total.increase_from_last_month }}人）</p>
       </div>
       <div class="card-footer text-muted bg-white">
-        <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted" target="_blank">旭川市公式ホームページ </a> 最終更新: {{ asahikawa_patients.last_updated }}</p>
+        <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted" target="_blank">旭川市公式ホームページ </a> 最終更新: {{ last_updated }}</p>
       </div>
     </div>
     <div class="card">
+      <div class="card-header">
+        感染者の状況（直近100件）
+      </div>
+      <div class="card-body">
+        <div class="table-responsive patients-table">
+          <table class="table table-striped table-bordered table-sm">
+            <thead>
+              <tr class="sticky-top bg-white">
+                <th class="text-nowrap text-center small">市内番号</th>
+                <th class="text-nowrap text-center small">公表日</th>
+                <th class="text-nowrap text-center small">居住地</th>
+                <th class="text-nowrap text-center small">年代</th>
+                <th class="text-nowrap text-center small">濃厚接触者の状況</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for patient in patients.items %}
+              <tr>
+                <td class="text-nowrap small">{{ patient.patient_number }}</td>
+                <td class="text-nowrap small">{{ patient.publication_date }}</td>
+                <td class="text-nowrap small">{{ "非公表" if patient.residence == "" else patient.residence}}</td>
+                <td class="text-nowrap small">{{ "非公表" if patient.age == "" else patient.age}}</td>
+                <td class="text-nowrap small">{{ patient.close_contact }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <p class="card-text mt-3 text-right small"><a href="/patients/2" title="過去の感染者の状況へ">過去の感染者の状況へ</a></p>
+      </div>
+      <div class="card-footer text-muted bg-white">
+        <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted" target="_blank">旭川市公式ホームページ </a> 最終更新: {{ last_updated }}</p>
+      </div>
     </div>
   </div>
 </article>

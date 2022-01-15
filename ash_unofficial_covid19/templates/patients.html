@@ -11,16 +11,15 @@
   <div class="card mt-3">
     <div class="card-body">
       <section>
-        <h3 class="h5 card-title">全 {{ max_page }} ページ中 {{ page }} ページ目</h3>
-        <div class="table-responsive">
+        <h3 class="h6 card-title">全 {{ max_page }} ページ中 {{ page }} ページ目を表示</h3>
+        <div class="table-responsive patients-table">
           <table class="table table-striped table-bordered table-hover table-sm">
             <thead>
-              <tr>
+              <tr class="sticky-top bg-white">
                 <th class="text-nowrap small">市内番号</th>
                 <th class="text-nowrap small">公表日</th>
                 <th class="text-nowrap small">居住地</th>
                 <th class="text-nowrap small">年代</th>
-                <th class="text-nowrap small">性別</th>
                 <th class="text-nowrap small">濃厚接触者の状況</th>
               </tr>
             </thead>
@@ -31,7 +30,6 @@
                 <td class="text-nowrap small">{{ patient.publication_date }}</td>
                 <td class="text-nowrap small">{{ "非公表" if patient.residence == "" else patient.residence}}</td>
                 <td class="text-nowrap small">{{ "非公表" if patient.age == "" else patient.age}}</td>
-                <td class="text-nowrap small">{{ "非公表" if patient.sex == "" else patient.sex}}</td>
                 <td class="text-nowrap small">{{ patient.close_contact }}</td>
               </tr>
               {% endfor %}
@@ -40,7 +38,7 @@
         </div>
       </section>
       <section>
-        <ul class="list-group list-group-horizontal small">
+        <ul class="list-group list-group-horizontal small mt-3">
           {% if 1 < page %}
             {% for i in range(1, page) %}
             {% if loop.index == 1 %}
