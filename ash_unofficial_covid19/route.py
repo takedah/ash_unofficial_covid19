@@ -22,14 +22,14 @@ app = Flask(__name__)
 def add_security_headers(response):
     csp = (
         "default-src 'self'; "
-        + "style-src 'self' 'unsafe-inline' "
-        + "stackpath.bootstrapcdn.com unpkg.com kit.fontawesome.com; "
+        + "style-src 'self' "
+        + "stackpath.bootstrapcdn.com unpkg.com; "
         + "script-src 'self' "
         + "code.jquery.com cdnjs.cloudflare.com stackpath.bootstrapcdn.com "
-        + "unpkg.com kit.fontawesome.com www.googletagmanager.com minmoji.ucda.jp "
+        + "unpkg.com www.googletagmanager.com minmoji.ucda.jp "
         + "'nonce-Pbq-X7F-632oxHhPe6mzMC-LHYE'; "
-        + "connect-src ka-f.fontawesome.com www.google-analytics.com; "
-        + "font-src ka-f.fontawesome.com minmoji.ucda.jp; "
+        + "connect-src www.google-analytics.com; "
+        + "font-src minmoji.ucda.jp; "
         + "img-src 'self' i.creativecommons.org licensebuttons.net "
         + "data: https:"
     )

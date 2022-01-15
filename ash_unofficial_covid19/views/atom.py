@@ -129,6 +129,7 @@ class AtomView:
             + Config.MY_DOMAIN
             + ",2021-02-28:/</id>\n"
             + "  <title>旭川市新型コロナウイルスまとめサイト</title>\n"
+            + "  <author>takedah</author>\n"
             + "  <updated>"
             + self.today.strftime("%Y-%m-%dT16:00:00+09:00")
             + "</updated>\n"
