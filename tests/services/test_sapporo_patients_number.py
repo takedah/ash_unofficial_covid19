@@ -73,7 +73,7 @@ def test_get_per_hundred_thousand_population_per_week(service):
     to_date = date(2021, 8, 29)
     result = service.get_per_hundred_thousand_population_per_week(from_date=from_date, to_date=to_date)
     expect = [
-        (date(2021, 8, 22), 86.92),
+        (date(2021, 8, 22), 86.95),
         (date(2021, 8, 29), 6.83),
     ]
     assert result == expect

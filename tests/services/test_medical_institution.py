@@ -62,15 +62,15 @@ def test_delete(service):
 
 
 @pytest.mark.parametrize(
-    "name,address,phone_number,book_at_medical_institution," + "book_at_call_center,area,memo,target_age",
+    "name,address,phone_number,book_at_medical_institution,book_at_call_center,area,memo,target_age",
     [
         (
-            "独立行政法人国立病院機構旭川医療センター",
-            "旭川市花咲町7",
-            "0166-51-3910 予約専用",
+            "市立旭川病院",
+            "旭川市金星町1",
+            "0166-29-0202",
             True,
             False,
-            "花咲町・末広・末広東・永山",
+            "東・金星町・各条17〜26丁目",
             "",
             "12歳から15歳まで",
         ),
@@ -104,19 +104,19 @@ def test_get_name_lists(service):
     expect = [
         ("市立旭川病院", "12歳から15歳まで"),
         ("市立旭川病院", "16歳以上"),
-        ("道北勤医協一条通病院", "16歳以上"),
         ("独立行政法人国立病院機構旭川医療センター", "12歳から15歳まで"),
+        ("道北勤医協一条通病院", "16歳以上"),
     ]
     assert results == expect
 
 
 def test_get_area_list(service):
     results = service.get_area_list()
-    expect = ["新富・東・金星町", "大成"]
+    expect = ["大成", "新富・東・金星町"]
     assert results == expect
 
 
 def test_get_pediatric_area_list(service):
     results = service.get_area_list(is_pediatric=True)
-    expect = ["花咲町・末広・末広東・永山", "東・金星町・各条17〜26丁目"]
+    expect = ["東・金星町・各条17〜26丁目", "花咲町・末広・末広東・永山"]
     assert results == expect

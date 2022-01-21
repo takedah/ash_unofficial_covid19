@@ -293,7 +293,7 @@ class MonthTotalView(GraphView):
 
 
 class ByAgeView(GraphView):
-    """年代別患者数グラフ"""
+    """年代別患者数割合グラフ"""
 
     def __init__(self):
         service = AsahikawaPatientService()
