@@ -338,16 +338,16 @@ class ByAgeView(GraphView):
         by_age_label = [row[0] for row in self.__by_age_data]
         by_age_x = [row[1] for row in self.__by_age_data]
         pie_colors = [
-            "orange",
-            "oldlace",
-            "wheat",
-            "moccasin",
-            "papayawhip",
-            "blanchedalmond",
-            "navajowhite",
-            "tan",
-            "antiquewhite",
-            "burlywood",
+            "mistyrose",
+            "lightsalmon",
+            "darksalmon",
+            "salmon",
+            "coral",
+            "lemonchiffon",
+            "palegoldenrod",
+            "darkkhaki",
+            "gold",
+            "goldenrod",
         ]
         ax.pie(
             by_age_x,
@@ -657,17 +657,17 @@ class WeeklyPerAgeView(GraphView):
             fig = plt.figure()
         ax = fig.add_subplot()
         colors = [
-            "lightblue",
+            "mistyrose",
+            "lightsalmon",
+            "darksalmon",
+            "salmon",
+            "coral",
+            "lemonchiffon",
+            "palegoldenrod",
+            "darkkhaki",
             "gold",
-            "yellowgreen",
-            "tomato",
-            "plum",
-            "peru",
-            "lightpink",
-            "cornflowerblue",
-            "tan",
-            "paleturquoise",
-            "whitesmoke",
+            "goldenrod",
+            "floralwhite",
         ]
         cols = list(map(lambda x: x.strftime("%m-%d") + "~", df.columns.tolist()))
         for i in range(len(df)):
