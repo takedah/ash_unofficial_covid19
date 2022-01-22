@@ -339,14 +339,14 @@ class ByAgeView(GraphView):
         by_age_x = [row[1] for row in self.__by_age_data]
         pie_colors = [
             "mistyrose",
+            "peachpuff",
             "lightsalmon",
-            "darksalmon",
             "salmon",
             "coral",
             "lemonchiffon",
             "palegoldenrod",
+            "khaki",
             "darkkhaki",
-            "gold",
             "goldenrod",
         ]
         ax.pie(
@@ -658,14 +658,14 @@ class WeeklyPerAgeView(GraphView):
         ax = fig.add_subplot()
         colors = [
             "mistyrose",
+            "peachpuff",
             "lightsalmon",
-            "darksalmon",
             "salmon",
             "coral",
             "lemonchiffon",
             "palegoldenrod",
+            "khaki",
             "darkkhaki",
-            "gold",
             "goldenrod",
             "floralwhite",
         ]
