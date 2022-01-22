@@ -331,12 +331,20 @@ class TestAsahikawaPatientService:
         assert result == expect
 
     def test_get_patients_number_by_age(self, service):
-        result = service.get_patients_number_by_age()
+        from_date = date(2021, 1, 1)
+        to_date = date(2021, 2, 28)
+        result = service.get_patients_number_by_age(from_date=from_date, to_date=to_date)
         expect = [
             ("10歳未満", 1),
+            ("10代", 0),
+            ("20代", 0),
             ("30代", 1),
+            ("40代", 0),
             ("50代", 1),
-            ("90歳以上", 2),
+            ("60代", 0),
+            ("70代", 0),
+            ("80代", 0),
+            ("90歳以上", 1),
         ]
         assert result == expect
 

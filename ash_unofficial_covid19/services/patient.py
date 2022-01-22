@@ -533,24 +533,59 @@ class AsahikawaPatientService(Service):
                     total_by_months.append((row[0], row[1]))
         return total_by_months
 
-    def get_patients_number_by_age(self) -> list:
+    def get_patients_number_by_age(self, from_date: date, to_date: date) -> list:
         """年代別の陽性患者数を返す
+
+        Args:
+            from_date (obj:`date`): 累計の始期
+            to_date (obj:`date`): 累計の終期
 
         Returns:
             patients_number_by_age (list of tuple): 集計結果
                 年代別の陽性患者数を要素とするタプルのリスト
 
         """
-        state = "SELECT age,COUNT(age) FROM asahikawa_patients GROUP BY age ORDER BY age;"
-        patients_number_by_age = list()
+        if not isinstance(from_date, date) or not isinstance(to_date, date):
+            raise ServiceError("期間の範囲指定が日付になっていません。")
+
+        state = "SELECT age,COUNT(age) FROM asahikawa_patients WHERE DATE(publication_date) BETWEEN %s AND %s GROUP BY age ORDER BY age;"
+        patients_number_by_age = [
+            ("10歳未満", 0),
+            ("10代", 0),
+            ("20代", 0),
+            ("30代", 0),
+            ("40代", 0),
+            ("50代", 0),
+            ("60代", 0),
+            ("70代", 0),
+            ("80代", 0),
+            ("90歳以上", 0),
+        ]
         with self.get_connection() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state)
+                cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
                 for row in cur.fetchall():
-                    # 年代非公表のデータは除外する
-                    if row[0] == "":
-                        continue
-                    patients_number_by_age.append((row[0], row[1]))
+                    if row[0] == "10歳未満":
+                        patients_number_by_age[0] = (row[0], row[1])
+                    elif row[0] == "10代":
+                        patients_number_by_age[1] = (row[0], row[1])
+                    elif row[0] == "20代":
+                        patients_number_by_age[2] = (row[0], row[1])
+                    elif row[0] == "30代":
+                        patients_number_by_age[3] = (row[0], row[1])
+                    elif row[0] == "40代":
+                        patients_number_by_age[4] = (row[0], row[1])
+                    elif row[0] == "50代":
+                        patients_number_by_age[5] = (row[0], row[1])
+                    elif row[0] == "60代":
+                        patients_number_by_age[6] = (row[0], row[1])
+                    elif row[0] == "70代":
+                        patients_number_by_age[7] = (row[0], row[1])
+                    elif row[0] == "80代":
+                        patients_number_by_age[8] = (row[0], row[1])
+                    elif row[0] == "90歳以上":
+                        patients_number_by_age[9] = (row[0], row[1])
+
         return patients_number_by_age
 
     def get_patients_number(self, target_date: date) -> int:

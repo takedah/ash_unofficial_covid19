@@ -298,7 +298,9 @@ class ByAgeView(GraphView):
     def __init__(self):
         service = AsahikawaPatientService()
         today = self.get_today()
-        self.__by_age_data = service.get_patients_number_by_age()
+        self.__by_age_data = service.get_patients_number_by_age(
+            from_date=today - relativedelta(months=1, days=-1), to_date=today
+        )
         self.__today = self.format_date_style(today)
 
     @property
@@ -350,12 +352,13 @@ class ByAgeView(GraphView):
         ax.pie(
             by_age_x,
             labels=by_age_label,
-            autopct="%1.1f %%",
+            autopct=lambda p: "{:.1f}%".format(p) if p >= 3 else "",
             startangle=90,
             radius=1.3,
             labeldistance=1.1,
             pctdistance=0.7,
             colors=pie_colors,
+            counterclock=False,
             textprops={"font_properties": font},
         )
         fig.tight_layout()
