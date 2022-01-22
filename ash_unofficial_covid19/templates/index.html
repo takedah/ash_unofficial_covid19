@@ -52,7 +52,7 @@
       </div>
       <div class="card-body">
         <p><img src="./by_age.png" alt="{{ by_age.get_graph_alt() }}" title="年代別感染者数の割合" class="img-fluid" decoding="async"></p>
-        <p class="card-text text-right small">{{ by_age.today }}まで集計、年代非公表の人数を除く</p>
+        <p class="card-text text-right small">※年代非公表の人数を除く</p>
       </div>
       <div class="card-footer text-muted bg-white">
         <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted" target="_blank">旭川市公式ホームページ </a> 最終更新: {{ last_updated }}</p>
@@ -76,7 +76,7 @@
     </div>
     <div class="card">
       <div class="card-header">
-        感染者の状況（直近100件）
+        感染者の状況の概要
       </div>
       <div class="card-body">
         <div class="table-responsive patients-table">
