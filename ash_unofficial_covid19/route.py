@@ -366,6 +366,17 @@ def patients_csv():
     return res
 
 
+@app.route("/012041_asahikawa_covid19_daily_total.csv")
+def daily_total_csv():
+    asahikawa_patient = get_asahikawa_patients()
+    csv_data = asahikawa_patient.get_daily_total_csv()
+    res = make_response()
+    res.data = csv_data
+    res.headers["Content-Type"] = "text/csv"
+    res.headers["Content-Disposition"] = "attachment: filename=" + "012041_asahikawa_covid19_daily_total.csv"
+    return res
+
+
 @app.route("/012041_asahikawa_covid19_medical_institutions.csv")
 def medical_institutions_csv():
     medical_institution = get_medical_institutions()
