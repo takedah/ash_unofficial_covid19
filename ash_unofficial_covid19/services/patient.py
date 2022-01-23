@@ -548,7 +548,10 @@ class AsahikawaPatientService(Service):
         if not isinstance(from_date, date) or not isinstance(to_date, date):
             raise ServiceError("期間の範囲指定が日付になっていません。")
 
-        state = "SELECT age,COUNT(age) FROM asahikawa_patients WHERE DATE(publication_date) BETWEEN %s AND %s GROUP BY age ORDER BY age;"
+        state = (
+            "SELECT age,COUNT(age) FROM asahikawa_patients WHERE DATE(publication_date) "
+            + "BETWEEN %s AND %s GROUP BY age ORDER BY age;"
+        )
         patients_number_by_age = [
             ("10歳未満", 0),
             ("10代", 0),

@@ -76,9 +76,9 @@ def test_find(service):
     assert result.status == "―"
     assert result.inoculation_time == "―"
     assert result.target_age == ""
-    assert result.target_family == False
-    assert result.target_not_family == False
-    assert result.target_suberbs == False
+    assert result.target_family is False
+    assert result.target_not_family is False
+    assert result.target_suberbs is False
     assert result.target_other == ""
     assert result.latitude == 43.778422777778
     assert result.longitude == 142.365976388889
@@ -99,9 +99,9 @@ def test_find_all(service):
     assert result.status == "受付中"
     assert result.inoculation_time == "１０月１日〜火・木曜日午後"
     assert result.target_age == "指定なし"
-    assert result.target_family == True
-    assert result.target_not_family == False
-    assert result.target_suberbs == False
+    assert result.target_family is True
+    assert result.target_not_family is False
+    assert result.target_suberbs is False
     assert result.target_other == ""
     assert result.latitude == 43.798826491523464
     assert result.longitude == 142.3815237271935
