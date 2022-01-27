@@ -96,7 +96,7 @@ class AsahikawaPatientView(View):
         csv_data.insert(
             0,
             [
-                "日付",
+                "公表日",
                 "陽性患者数",
             ],
         )
