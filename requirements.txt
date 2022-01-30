@@ -8,6 +8,7 @@ pandas
 tabula-py
 camelot-py
 opencv-python
+opencv-python--headless
 ghostscript
 types-requests
 types-python-dateutil
