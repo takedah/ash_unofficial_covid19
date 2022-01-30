@@ -1,0 +1,119 @@
+from datetime import date
+
+from .config import Config
+from .errors import DatabaseConnectionError, DataModelError, HTTPDownloadError, ScrapeError, ServiceError
+from .models.patients_number import PatientsNumberFactory
+from .models.press_release_link import PressReleaseLinkFactory
+from .scrapers.patients_number import ScrapePatientsNumber
+from .scrapers.press_release_link import ScrapePressReleaseLink
+from .services.patients_number import PatientsNumberService
+from .services.press_release_link import PressReleaseLinkService
+
+
+def _import_press_release_link(url: str, target_year: int) -> None:
+    """
+    旭川市公式ホームページから新型コロナウイルス感染症の感染者情報を報道発表資料の
+    PDFから抽出しデータベースへ格納するため、報道発表資料PDFファイル自体のURL等の
+    情報を抽出する。
+
+    Args:
+        url (str): 旭川市公式ホームページのURL
+        target_year (int): 対象年
+
+    """
+    try:
+        scraped_data = ScrapePressReleaseLink(html_url=url, target_year=target_year)
+    except (HTTPDownloadError, ScrapeError, DatabaseConnectionError, ServiceError) as e:
+        print(e.message)
+        return
+
+    try:
+        factory = PressReleaseLinkFactory()
+        for row in scraped_data.lists:
+            factory.create(**row)
+    except DataModelError as e:
+        print(e.message)
+        return
+
+    service = PressReleaseLinkService()
+    try:
+        service.create(factory)
+    except (DatabaseConnectionError, ServiceError) as e:
+        print(e.message)
+        return
+
+
+def _get_press_release_links() -> PressReleaseLinkFactory:
+    """報道発表資料PDFファイルのURLと報道発表日を要素に持つオブジェクトのリストを返す
+
+    Returns:
+        press_release_links (:obj:`PressReleaseLinkFactory`): 報道発表資料リスト
+            報道発表資料PDFファイルのURLと報道発表日を要素に持つオブジェクトのリストを
+            要素に持つオブジェクト
+
+    """
+    press_release_link_service = PressReleaseLinkService()
+    return press_release_link_service.find_all()
+
+
+def _import_asahikawa_data_from_press_release(pdf_url: str, publication_date: date) -> None:
+    """
+    旭川市公式ホームページから新型コロナウイルス感染症の新規陽性患者数を
+    報道発表資料のPDFから抽出し、データベースへ格納する。
+
+    Args:
+        url (str): 旭川市公式ホームページの報道発表資料PDFファイルのURL
+        publication_date (int): 報道発表日
+
+    """
+    try:
+        scraped_data = ScrapePatientsNumber(pdf_url=pdf_url, publication_date=publication_date)
+    except (HTTPDownloadError, ScrapeError) as e:
+        print(e.message)
+        return
+
+    factory = PatientsNumberFactory()
+    try:
+        for row in scraped_data.lists:
+            factory.create(**row)
+    except DataModelError as e:
+        print(e.message)
+        return
+
+    try:
+        service = PatientsNumberService()
+        service.create(factory)
+    except (DatabaseConnectionError, ServiceError) as e:
+        print(e.message)
+        return
+
+
+def import_latest():
+    # 最新の報道発表資料PDFファイルのURLと報道発表日をデータベースへ登録
+    _import_press_release_link(Config.OVERVIEW_URL, 2022)
+
+    # 最新の報道発表資料PDFファイルから新規陽性患者データをデータベースへ更新登録
+    press_release_links = _get_press_release_links()
+    latest_press_release_link = press_release_links.items[0]
+    _import_asahikawa_data_from_press_release(
+        pdf_url=latest_press_release_link.url,
+        publication_date=latest_press_release_link.publication_date,
+    )
+
+
+def import_past():
+    # 過去の報道発表資料PDFファイルから新規陽性患者データをデータベースへ更新登録
+    _import_press_release_link(url=Config.LATEST_DATA_URL, target_year=2022)
+    press_release_links = _get_press_release_links()
+    for press_release_link in press_release_links.items:
+        publication_date = press_release_link.publication_date
+        if date(2022, 1, 27) < publication_date:
+            _import_asahikawa_data_from_press_release(
+                pdf_url=press_release_link.url,
+                publication_date=press_release_link.publication_date,
+            )
+
+
+if __name__ == "__main__":
+    import_latest()
+    import_past()

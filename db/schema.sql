@@ -111,3 +111,19 @@ CREATE TABLE reservation3_statuses(
     memo TEXT,
     updated_at TIMESTAMPTZ NOT NULL
 );
+DROP TABLE IF EXISTS patients_numbers;
+CREATE TABLE patients_numbers(
+    publication_date DATE NOT NULL PRIMARY KEY,
+    age_under_10 INTEGER NOT NULL,
+    age_10s INTEGER NOT NULL,
+    age_20s INTEGER NOT NULL,
+    age_30s INTEGER NOT NULL,
+    age_40s INTEGER NOT NULL,
+    age_50s INTEGER NOT NULL,
+    age_60s INTEGER NOT NULL,
+    age_70s INTEGER NOT NULL,
+    age_80s INTEGER NOT NULL,
+    age_over_90 INTEGER NOT NULL,
+    investigating INTEGER NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL
+);
