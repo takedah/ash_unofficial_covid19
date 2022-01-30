@@ -3,16 +3,10 @@ from flask import Flask, abort, escape, g, make_response, render_template
 from .config import Config
 from .errors import ServiceError
 from .views.atom import AtomView
-from .views.graph import (
-    ByAgeView,
-    DailyTotalView,
-    MonthTotalView,
-    MovingAverageView,
-    PerHundredThousandPopulationView,
-    WeeklyPerAgeView,
-)
+from .views.graph import ByAgeView, DailyTotalView, MonthTotalView, PerHundredThousandPopulationView, WeeklyPerAgeView
 from .views.medical_institution import MedicalInstitutionView
 from .views.patient import AsahikawaPatientView
+from .views.patients_number import PatientsNumberView
 from .views.reservation_status import ReservationStatusView
 
 app = Flask(__name__)
@@ -45,6 +39,11 @@ def get_asahikawa_patients():
     return g.asahikawa_patients
 
 
+def get_patients_numbers():
+    g.patients_numbers = PatientsNumberView()
+    return g.patients_numbers
+
+
 def get_reservation3_statuses():
     g.reservation3_statuses = ReservationStatusView()
     return g.reservation3_statuses
@@ -70,11 +69,6 @@ def get_by_age():
     return g.by_age
 
 
-def get_moving_average():
-    g.moving_average = MovingAverageView()
-    return g.moving_average
-
-
 def get_per_hundred_thousand_population():
     g.per_hundred_thousand_population = PerHundredThousandPopulationView()
     return g.per_hundred_thousand_population
@@ -92,21 +86,17 @@ def get_atom():
 
 @app.route("/")
 def index():
-    asahikawa_patients = get_asahikawa_patients()
-    results = asahikawa_patients.find()
+    patients_numbers = get_patients_numbers()
     return render_template(
         "index.html",
         title="旭川市内感染状況の最新動向",
         gtag_id=Config.GTAG_ID,
-        last_updated=asahikawa_patients.last_updated,
+        last_updated=patients_numbers.last_updated,
         daily_total=get_daily_total(),
         weekly_per_age=get_weekly_per_age(),
         per_hundred_thousand_population=get_per_hundred_thousand_population(),
         month_total=get_month_total(),
         by_age=get_by_age(),
-        patients=results[0],
-        max_page=results[1],
-        page=1,
         leaflet=False,
     )
 
@@ -123,12 +113,12 @@ def about():
 
 @app.route("/opendata")
 def opendata():
-    asahikawa_patients = get_asahikawa_patients()
+    patients_numbers = get_patients_numbers()
     return render_template(
         "opendata.html",
         title="非公式オープンデータ",
         gtag_id=Config.GTAG_ID,
-        last_updated=asahikawa_patients.last_updated,
+        last_updated=patients_numbers.last_updated,
         leaflet=False,
     )
 
@@ -368,8 +358,8 @@ def patients_csv():
 
 @app.route("/012041_asahikawa_covid19_daily_total.csv")
 def daily_total_csv():
-    asahikawa_patient = get_asahikawa_patients()
-    csv_data = asahikawa_patient.get_daily_total_csv()
+    patients_numbers = get_patients_numbers()
+    csv_data = patients_numbers.get_daily_total_csv()
     res = make_response()
     res.data = csv_data
     res.headers["Content-Type"] = "text/csv"
@@ -429,17 +419,6 @@ def get_by_age_graph():
     res.data = graph_image.getvalue()
     res.headers["Content-Type"] = "img/png"
     res.headers["Content-Disposition"] = "attachment: filename=" + "by_age.png"
-    return res
-
-
-@app.route("/moving_average.png")
-def get_moving_average_graph():
-    moving_average = get_moving_average()
-    graph_image = moving_average.get_graph_image()
-    res = make_response()
-    res.data = graph_image.getvalue()
-    res.headers["Content-Type"] = "img/png"
-    res.headers["Content-Disposition"] = "attachment: filename=" + "moving_average.png"
     return res
 
 

@@ -79,29 +79,6 @@ class AsahikawaPatientView(View):
         )
         return self.list_to_csv(csv_data)
 
-    def get_daily_total_csv(self) -> str:
-        """陽性患者日計CSVファイルの文字列データを返す
-
-        Args:
-            from_date (obj:`date`): 集計の始期
-            to_date (obj:`date`): 集計の終期
-
-        Returns:
-            csv_data (str): 陽性患者属性CSVファイルの文字列データ
-
-        """
-        from_date = date(2020, 2, 23)
-        to_date = self.get_today()
-        csv_data = self.__service.get_aggregate_by_days(from_date=from_date, to_date=to_date)
-        csv_data.insert(
-            0,
-            [
-                "公表日",
-                "陽性患者数",
-            ],
-        )
-        return self.list_to_csv(csv_data)
-
     def find(self, page: int = 1, desc: bool = True) -> tuple[AsahikawaPatientFactory, int]:
         """グラフのデータをオブジェクトデータのリストで返す
 

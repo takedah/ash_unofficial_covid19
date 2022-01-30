@@ -13,7 +13,7 @@ from matplotlib.font_manager import FontProperties
 from matplotlib.ticker import MultipleLocator
 
 from ..errors import DatabaseConnectionError
-from ..services.patient import AsahikawaPatientService
+from ..services.patients_number import PatientsNumberService
 from ..services.press_release_link import PressReleaseLinkService
 from ..services.sapporo_patients_number import SapporoPatientsNumberService
 
@@ -110,7 +110,7 @@ class DailyTotalView(GraphView):
     """
 
     def __init__(self):
-        service = AsahikawaPatientService()
+        service = PatientsNumberService()
         today = self.get_today()
         self.__daily_total_data = service.get_aggregate_by_days(
             from_date=today - relativedelta(years=1), to_date=today
@@ -122,12 +122,6 @@ class DailyTotalView(GraphView):
         self.__most_recent = "{:,}".format(most_recent)
         self.__seven_days_before_most_recent = "{:,}".format(seven_days_before_most_recent)
         self.__increase_from_seven_days_before = "{:+,}".format(increase_from_seven_days_before)
-        reproduction_number = service.get_reproduction_number(today)
-        if reproduction_number < 1:
-            self.__reproduction_status = "1を下回っており感染減少傾向にある"
-        else:
-            self.__reproduction_status = "1以上であり感染拡大傾向にある"
-        self.__reproduction_number = str(reproduction_number)
 
     @property
     def today(self):
@@ -144,14 +138,6 @@ class DailyTotalView(GraphView):
     @property
     def increase_from_seven_days_before(self):
         return self.__increase_from_seven_days_before
-
-    @property
-    def reproduction_number(self):
-        return self.__reproduction_number
-
-    @property
-    def reproduction_status(self):
-        return self.__reproduction_status
 
     def get_graph_alt(self) -> str:
         """グラフの代替テキストを生成
@@ -216,7 +202,7 @@ class MonthTotalView(GraphView):
     """
 
     def __init__(self):
-        service = AsahikawaPatientService()
+        service = PatientsNumberService()
         today = self.get_today()
         self.__month_total_data = service.get_total_by_months(from_date=date(2020, 1, 1), to_date=today)
         self.__today = self.format_date_style(today)
@@ -296,7 +282,7 @@ class ByAgeView(GraphView):
     """年代別患者数割合グラフ"""
 
     def __init__(self):
-        service = AsahikawaPatientService()
+        service = PatientsNumberService()
         today = self.get_today()
         self.__by_age_data = service.get_patients_number_by_age(
             from_date=today - relativedelta(months=1, days=-1), to_date=today
@@ -372,93 +358,6 @@ class ByAgeView(GraphView):
         return im
 
 
-class MovingAverageView(GraphView):
-    """1日あたり患者数の7日間移動平均グラフ
-
-    Attributes:
-        today (str): 直近の日付
-        this_week (str): 今週の平均患者数
-        last_week (str): 先週の平均患者数
-        increase_from_last_week (str): 先週からの増加数
-
-    """
-
-    def __init__(self):
-        service = AsahikawaPatientService()
-        today = self.get_today()
-        self.__moving_average_data = service.get_seven_days_moving_average(
-            from_date=today - relativedelta(days=90), to_date=today
-        )
-        this_week = self.__moving_average_data[-1][1]
-        last_week = self.__moving_average_data[-2][1]
-        increase_from_last_week = float(
-            Decimal(str(this_week - last_week)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-        )
-        self.__this_week = "{:,}".format(this_week)
-        self.__last_week = "{:,}".format(last_week)
-        self.__increase_from_last_week = "{:+,}".format(increase_from_last_week)
-
-    @property
-    def this_week(self):
-        return self.__this_week
-
-    @property
-    def last_week(self):
-        return self.__last_week
-
-    @property
-    def increase_from_last_week(self):
-        return self.__increase_from_last_week
-
-    def get_graph_alt(self) -> str:
-        """グラフの代替テキストを生成
-
-        Returns:
-            graph_alt (str): グラフの代替テキスト
-
-        """
-        return ", ".join(
-            ["{0} {1}人".format(row[0].strftime("%Y年%m月%d日"), row[1]) for row in self.__moving_average_data]
-        )
-
-    def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
-        """グラフの画像を生成
-
-        Args:
-            figsize (tuple): グラフ画像データの縦横サイズを要素に持つタプル
-
-        Returns:
-            graph_image (BytesIO): グラフの画像データ
-
-        """
-        font = FontProperties(
-            fname="./ash_unofficial_covid19/static/fonts/NotoSansCJKjp-Light.otf",
-            size=12,
-        )
-        if figsize:
-            fig = plt.figure(figsize=figsize)
-        else:
-            fig = plt.figure()
-        ax = fig.add_subplot()
-        moving_average_x = [row[0].strftime("%m-%d") + "~" for row in self.__moving_average_data]
-        moving_average_y = [row[1] for row in self.__moving_average_data]
-        ax.plot(moving_average_x, moving_average_y, color="salmon")
-        ax.yaxis.set_major_locator(MultipleLocator(5))
-        ax.grid(axis="y", color="lightgray")
-        ax.set_title("旭川市新規感染者数の7日間移動平均の推移", font_properties=font)
-        ax.set_ylabel("7日間移動平均（人/1日あたり）", font_properties=font)
-        ax.tick_params(labelsize=8)
-        ax.tick_params(axis="x", rotation=45)
-        fig.tight_layout()
-        canvas = FigureCanvasAgg(fig)
-        im = BytesIO()
-        canvas.print_png(im)
-        plt.cla()
-        plt.clf()
-        plt.close()
-        return im
-
-
 class PerHundredThousandPopulationView(GraphView):
     """1週間の人口10万人あたり患者数グラフ
 
@@ -473,7 +372,7 @@ class PerHundredThousandPopulationView(GraphView):
     """
 
     def __init__(self):
-        service = AsahikawaPatientService()
+        service = PatientsNumberService()
         sapporo_service = SapporoPatientsNumberService()
         today = self.get_today()
         self.__per_hundred_thousand_population_data = service.get_per_hundred_thousand_population_per_week(
@@ -604,7 +503,7 @@ class WeeklyPerAgeView(GraphView):
     """1週間ごとの年代別新規陽性患者数グラフ"""
 
     def __init__(self):
-        service = AsahikawaPatientService()
+        service = PatientsNumberService()
         today = self.get_today()
         from_date = today - relativedelta(weeks=4, days=-1)
         df = service.get_aggregate_by_weeks_per_age(from_date=from_date, to_date=today)

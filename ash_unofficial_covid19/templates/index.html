@@ -75,39 +75,6 @@
       </div>
     </div>
     <div class="card">
-      <div class="card-header">
-        感染者の状況の概要
-      </div>
-      <div class="card-body">
-        <div class="table-responsive patients-table">
-          <table class="table table-striped table-bordered table-sm">
-            <thead>
-              <tr class="sticky-top bg-white">
-                <th class="text-nowrap text-center small">市内番号</th>
-                <th class="text-nowrap text-center small">公表日</th>
-                <th class="text-nowrap text-center small">居住地</th>
-                <th class="text-nowrap text-center small">年代</th>
-                <th class="text-nowrap text-center small">濃厚接触者の状況</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for patient in patients.items %}
-              <tr>
-                <td class="text-nowrap small">{{ patient.patient_number }}</td>
-                <td class="text-nowrap small">{{ patient.publication_date }}</td>
-                <td class="text-nowrap small">{{ "非公表" if patient.residence == "" else patient.residence}}</td>
-                <td class="text-nowrap small">{{ "非公表" if patient.age == "" else patient.age}}</td>
-                <td class="text-nowrap small">{{ patient.close_contact }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        <p class="card-text mt-3 text-right small"><a href="/patients/2" title="過去の感染者の状況へ">過去の感染者の状況へ</a></p>
-      </div>
-      <div class="card-footer text-muted bg-white">
-        <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" class="text-muted" target="_blank">旭川市公式ホームページ </a> 最終更新: {{ last_updated }}</p>
-      </div>
     </div>
   </div>
 </article>

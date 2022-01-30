@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 
 from ..config import Config
 from ..errors import DatabaseConnectionError
-from ..services.patient import AsahikawaPatientService
+from ..services.patients_number import PatientsNumberService
 from ..services.press_release_link import PressReleaseLinkService
 
 
@@ -74,7 +74,7 @@ class AtomView:
         return today
 
     def _get_aggregate_by_days(self, from_date: date, to_date: date) -> list:
-        """PatientService.get_aggregate_by_days()のラッパー
+        """PatientsNumberService.get_aggregate_by_days()のラッパー
 
         Args:
             from_date (obj:`date`): 集計の始期
@@ -85,11 +85,11 @@ class AtomView:
                 1日ごとの日付とその週の新規陽性患者数を要素とするタプルのリスト
 
         """
-        service = AsahikawaPatientService()
+        service = PatientsNumberService()
         return service.get_aggregate_by_days(from_date=from_date, to_date=to_date)
 
     def _get_per_hundred_thousand_population_per_week(self, from_date: date, to_date: date) -> list:
-        """PatientService.get_per_hundred_thousand_population_per_weekのラッパー
+        """PatientsNumberService.get_per_hundred_thousand_population_per_weekのラッパー
 
         Args:
             from_date (obj:`date`): 集計の始期
@@ -99,7 +99,7 @@ class AtomView:
             per_hundred_thousand (list of tuple): 集計結果
                 1週間ごとの日付とその週の人口10万人あたり新規陽性患者数を要素とするタプルのリスト
         """
-        service = AsahikawaPatientService()
+        service = PatientsNumberService()
         return service.get_per_hundred_thousand_population_per_week(from_date=from_date, to_date=to_date)
 
     def get_feed(self) -> str:
