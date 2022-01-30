@@ -122,6 +122,10 @@ class ScrapePatientsNumber(Scraper):
 
             patients_number_data.append(patients_number)
 
+        # PDFに年代別内訳表がない場合、その報道発表日の患者数は全年代0とする
+        if len(patients_number_data) == 0:
+            patients_number_data.append({"publication_date": publication_date})
+
         return patients_number_data
 
     @staticmethod

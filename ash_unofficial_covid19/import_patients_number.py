@@ -1,11 +1,12 @@
 from datetime import date
 
 from .config import Config
-from .errors import DatabaseConnectionError, DataModelError, HTTPDownloadError, ScrapeError, ServiceError
+from .errors import DatabaseConnectionError, HTTPDownloadError, ScrapeError, ServiceError
 from .models.patients_number import PatientsNumberFactory
 from .models.press_release_link import PressReleaseLinkFactory
 from .scrapers.patients_number import ScrapePatientsNumber
 from .scrapers.press_release_link import ScrapePressReleaseLink
+from .services.patient import AsahikawaPatientService
 from .services.patients_number import PatientsNumberService
 from .services.press_release_link import PressReleaseLinkService
 
@@ -31,8 +32,8 @@ def _import_press_release_link(url: str, target_year: int) -> None:
         factory = PressReleaseLinkFactory()
         for row in scraped_data.lists:
             factory.create(**row)
-    except DataModelError as e:
-        print(e.message)
+    except TypeError as e:
+        print(e.args[0])
         return
 
     service = PressReleaseLinkService()
@@ -76,8 +77,8 @@ def _import_asahikawa_data_from_press_release(pdf_url: str, publication_date: da
     try:
         for row in scraped_data.lists:
             factory.create(**row)
-    except DataModelError as e:
-        print(e.message)
+    except TypeError as e:
+        print(e.args[0])
         return
 
     try:
@@ -92,7 +93,7 @@ def import_latest():
     # 最新の報道発表資料PDFファイルのURLと報道発表日をデータベースへ登録
     _import_press_release_link(Config.OVERVIEW_URL, 2022)
 
-    # 最新の報道発表資料PDFファイルから新規陽性患者データをデータベースへ更新登録
+    # 最新の報道発表資料PDFファイルから年代別新規陽性患者数データをデータベースへ登録
     press_release_links = _get_press_release_links()
     latest_press_release_link = press_release_links.items[0]
     _import_asahikawa_data_from_press_release(
@@ -102,7 +103,7 @@ def import_latest():
 
 
 def import_past():
-    # 過去の報道発表資料PDFファイルから新規陽性患者データをデータベースへ更新登録
+    # 過去の報道発表資料PDFファイルから日別年代別陽性患者数データをデータベースへ登録
     _import_press_release_link(url=Config.LATEST_DATA_URL, target_year=2022)
     press_release_links = _get_press_release_links()
     for press_release_link in press_release_links.items:
@@ -114,6 +115,26 @@ def import_past():
             )
 
 
+def import_past_from_patients():
+    # 過去の陽性患者属性データベースから日別年代別陽性患者数データをデータベースへ登録
+    service = AsahikawaPatientService()
+    factory = PatientsNumberFactory()
+    try:
+        for row in service.get_aggregate_by_days_per_age(date(2020, 2, 23), date(2022, 1, 27)):
+            factory.create(**row)
+    except TypeError as e:
+        print(e.args[0])
+        return
+
+    try:
+        service = PatientsNumberService()
+        service.create(factory)
+    except (DatabaseConnectionError, ServiceError) as e:
+        print(e.message)
+        return
+
+
 if __name__ == "__main__":
     import_latest()
     import_past()
+    import_past_from_patients()

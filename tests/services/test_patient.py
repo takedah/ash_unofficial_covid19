@@ -225,6 +225,98 @@ class TestAsahikawaPatientService:
         with pytest.raises(ServiceError):
             service.find(page=2)
 
+    def test_get_aggregate_by_days_per_age(self, service):
+        from_date = date(2021, 2, 22)
+        to_date = date(2021, 2, 27)
+        result = service.get_aggregate_by_days_per_age(from_date=from_date, to_date=to_date)
+        expect = [
+            {
+                "publication_date": date(2021, 2, 22),
+                "age_under_10": 1,
+                "age_10s": 0,
+                "age_20s": 0,
+                "age_30s": 0,
+                "age_40s": 0,
+                "age_50s": 0,
+                "age_60s": 0,
+                "age_70s": 0,
+                "age_80s": 0,
+                "age_over_90": 0,
+                "investigating": 0,
+            },
+            {
+                "publication_date": date(2021, 2, 23),
+                "age_under_10": 0,
+                "age_10s": 0,
+                "age_20s": 0,
+                "age_30s": 0,
+                "age_40s": 0,
+                "age_50s": 0,
+                "age_60s": 0,
+                "age_70s": 0,
+                "age_80s": 0,
+                "age_over_90": 0,
+                "investigating": 0,
+            },
+            {
+                "publication_date": date(2021, 2, 24),
+                "age_under_10": 0,
+                "age_10s": 0,
+                "age_20s": 0,
+                "age_30s": 0,
+                "age_40s": 0,
+                "age_50s": 0,
+                "age_60s": 0,
+                "age_70s": 0,
+                "age_80s": 0,
+                "age_over_90": 0,
+                "investigating": 0,
+            },
+            {
+                "publication_date": date(2021, 2, 25),
+                "age_under_10": 0,
+                "age_10s": 0,
+                "age_20s": 0,
+                "age_30s": 0,
+                "age_40s": 0,
+                "age_50s": 0,
+                "age_60s": 0,
+                "age_70s": 0,
+                "age_80s": 0,
+                "age_over_90": 0,
+                "investigating": 1,
+            },
+            {
+                "publication_date": date(2021, 2, 26),
+                "age_under_10": 0,
+                "age_10s": 0,
+                "age_20s": 0,
+                "age_30s": 0,
+                "age_40s": 0,
+                "age_50s": 1,
+                "age_60s": 0,
+                "age_70s": 0,
+                "age_80s": 0,
+                "age_over_90": 0,
+                "investigating": 0,
+            },
+            {
+                "publication_date": date(2021, 2, 27),
+                "age_under_10": 0,
+                "age_10s": 0,
+                "age_20s": 0,
+                "age_30s": 1,
+                "age_40s": 0,
+                "age_50s": 0,
+                "age_60s": 0,
+                "age_70s": 0,
+                "age_80s": 0,
+                "age_over_90": 0,
+                "investigating": 0,
+            },
+        ]
+        assert result == expect
+
     def test_get_aggregate_by_days(self, service):
         from_date = date(2021, 2, 22)
         to_date = date(2021, 2, 28)

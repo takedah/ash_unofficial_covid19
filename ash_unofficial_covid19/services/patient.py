@@ -293,6 +293,52 @@ class AsahikawaPatientService(Service):
             )
         return rows
 
+    def get_aggregate_by_days_per_age(self, from_date: date, to_date: date) -> list:
+        """指定した期間の1日ごとの年代別陽性患者数の集計結果を返す
+
+        Args:
+            from_date (obj:`date`): 集計の始期
+            to_date (obj:`date`): 集計の終期
+
+        Returns:
+            aggregate_by_days_per_age (list of dict): 集計結果
+                1日ごとの日付とその日の年代別新規陽性患者数を要素とする辞書のリスト
+
+        """
+        if not isinstance(from_date, date) or not isinstance(to_date, date):
+            raise ServiceError("期間の範囲指定が日付になっていません。")
+
+        state = (
+            "SELECT date(from_day) AS publication_date, "
+            + "COUNT(CASE WHEN age = '10歳未満' THEN TRUE ELSE NULL END) AS age_under_10, "
+            + "COUNT(CASE WHEN age = '10代' THEN TRUE ELSE NULL END) AS age_10s, "
+            + "COUNT(CASE WHEN age = '20代' THEN TRUE ELSE NULL END) AS age_20s, "
+            + "COUNT(CASE WHEN age = '30代' THEN TRUE ELSE NULL END) AS age_30s, "
+            + "COUNT(CASE WHEN age = '40代' THEN TRUE ELSE NULL END) AS age_40s, "
+            + "COUNT(CASE WHEN age = '50代' THEN TRUE ELSE NULL END) AS age_50s, "
+            + "COUNT(CASE WHEN age = '60代' THEN TRUE ELSE NULL END) AS age_60s, "
+            + "COUNT(CASE WHEN age = '70代' THEN TRUE ELSE NULL END) AS age_70s, "
+            + "COUNT(CASE WHEN age = '80代' THEN TRUE ELSE NULL END) AS age_80s, "
+            + "COUNT(CASE WHEN age = '90歳以上' THEN TRUE ELSE NULL END) AS age_over_90, "
+            + "COUNT(CASE WHEN age = '' THEN TRUE ELSE NULL END) AS investigating "
+            + "FROM "
+            + "(SELECT generate_series AS from_day, "
+            + "generate_series + '1 day'::interval AS to_day FROM "
+            + "generate_series(%s::DATE, %s::DATE, '1 day')) "
+            + "AS day_ranges LEFT JOIN asahikawa_patients ON "
+            + "from_day <= asahikawa_patients.publication_date AND "
+            + "asahikawa_patients.publication_date < to_day GROUP BY from_day "
+            + "ORDER BY from_day;"
+        )
+        aggregate_by_days_per_age = list()
+        with self.get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
+                for row in cur.fetchall():
+                    aggregate_by_days_per_age.append(dict(row))
+
+        return aggregate_by_days_per_age
+
     def get_aggregate_by_days(self, from_date: date, to_date: date) -> list:
         """指定した期間の1日ごとの陽性患者数の集計結果を返す
 
