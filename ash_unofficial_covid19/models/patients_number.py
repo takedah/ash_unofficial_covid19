@@ -20,21 +20,22 @@ class PatientsNumber:
         age_70s (int): 70代の患者数
         age_80s (int): 80代の患者数
         age_over_90 (int): 90歳以上の患者数
+        investigating (int): 調査中等の患者数
 
     """
 
     publication_date: date
-    age_under_10: int
-    age_10s: int
-    age_20s: int
-    age_30s: int
-    age_40s: int
-    age_50s: int
-    age_60s: int
-    age_70s: int
-    age_80s: int
-    age_over_90: int
-    investigating: int
+    age_under_10: int = 0
+    age_10s: int = 0
+    age_20s: int = 0
+    age_30s: int = 0
+    age_40s: int = 0
+    age_50s: int = 0
+    age_60s: int = 0
+    age_70s: int = 0
+    age_80s: int = 0
+    age_over_90: int = 0
+    investigating: int = 0
 
 
 class PatientsNumberFactory(Factory):
