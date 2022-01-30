@@ -166,5 +166,3 @@ def import_past_from_patients():
 
 if __name__ == "__main__":
     import_latest()
-    import_past()
-    import_past_from_patients()
