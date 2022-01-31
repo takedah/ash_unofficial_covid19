@@ -157,4 +157,3 @@ def import_locations(medical_institution_name_list: list) -> None:
 
 if __name__ == "__main__":
     import_reservation_statuses(pdf_url=Config.RESERVATION_STATUSES_URL, is_third_time=False)
-    import_reservation_statuses(pdf_url=Config.RESERVATION3_STATUSES_URL, is_third_time=True)
