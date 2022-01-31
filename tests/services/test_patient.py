@@ -402,7 +402,7 @@ class TestAsahikawaPatientService:
             (date(2021, 2, 1), 0),
             (date(2021, 2, 8), 0),
             (date(2021, 2, 15), 0),
-            (date(2021, 2, 22), 1.22),
+            (date(2021, 2, 22), 1.21),
         ]
         assert result == expect
 
