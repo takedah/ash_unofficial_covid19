@@ -106,6 +106,17 @@ class ScrapeReservationStatus(Scraper):
         status_data = dict()
         row = list(map(lambda x: self.format_string(x), row))
         try:
+            area = row[0].replace(" ", "")
+            # 地区の文字列が正しくない箇所があるので正しい文字列に置換する。
+            if (
+                area == "各条１７～２７丁目・宮前・南地区"
+                or area == "各条１７～２８丁目・宮前・南地区"
+                or area == "各条１７～２９丁目・宮前・南地区"
+                or area == "各条１７～３０丁目・宮前・南地区"
+                or area == "各条１７～３１丁目・宮前・南地区"
+            ):
+                area = "各条１７～２６丁目・宮前・南地区"
+
             family = self._get_available(row[8])
             not_family = self._get_available(row[9])
             is_target_family = family["available"]
@@ -113,7 +124,7 @@ class ScrapeReservationStatus(Scraper):
             memo = family["text"] + " " + not_family["text"] + " " + row[11]
             memo = memo.strip()
             status_data = {
-                "area": row[0].replace(" ", ""),
+                "area": area,
                 "medical_institution_name": row[1].replace(" ", ""),
                 "address": row[2],
                 "phone_number": row[3],

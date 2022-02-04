@@ -14,16 +14,14 @@
       <section>
         <h1 class="h5 card-title">{{ title }}</h1>
         <div class="table-responsive">
-          <table class="table table-bordered">
+          <table class="table table-bordered table-striped">
             <thead>
               <tr>
                 <th class="text-nowrap">
-                  <ul class="list-group list-group-flush">
-                    <li class="list-group-item">医療機関名</li>
-                    <li class="list-group-item">接種するワクチン</li>
-                    <li class="list-group-item">住所</li>
-                    <li class="list-group-item">電話番号</li>
-                  </ul>
+                    医療機関名<br>
+                    接種するワクチン<br>
+                    住所<br>
+                    電話番号<br>
                 </th>
                 <th class="text-nowrap">予約受付開始時期</th>
                 <th class="text-nowrap">接種可能時期</th>
@@ -40,12 +38,10 @@
                 data-longitude="{{ search_result.longitude|tojson }}" data-name="{{ search_result.medical_institution_name|safe }}"
                 data-url="{{ search_result.medical_institution_name_url|safe }}">
                 <td class="text-nowrap">
-                  <ul class="list-group list-group-flush">
-                    <li class="list-group-item">{{  search_result.medical_institution_name }}</li>
-                    <li class="list-group-item">{{ search_result.vaccine }}</li>
-                    <li class="list-group-item">{{ search_result.address }}</li>
-                    <li class="list-group-item">{{ search_result.phone_number }}</li>
-                  </ul>
+                    <strong>{{ search_result.medical_institution_name }}</strong><br>
+                    {{ search_result.vaccine }}<br>
+                    {{ search_result.address }}<br>
+                    {{ search_result.phone_number }}<br>
                 </td>
                 <td class="text-nowrap">{{ search_result.status }}</td>
                 <td class="text-nowrap">{{ search_result.inoculation_time }}</td>
