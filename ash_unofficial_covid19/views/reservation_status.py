@@ -36,9 +36,9 @@ class ReservationStatusView(View):
             area (str): 地区
 
         Returns:
-            results (list of :obj:`ReservationStatusLocation`): 予約受付状況詳細データ
+            results (:obj:`ReservationStatusLocationFactory`): 予約受付状況詳細データ
                 新型コロナワクチン接種医療機関予約受付状況の情報に緯度経度を含めた
-                データオブジェクトのリスト。
+                データオブジェクトのリストを要素に持つオブジェクト。
 
         """
         return self.__service.find(medical_institution_name, area)
