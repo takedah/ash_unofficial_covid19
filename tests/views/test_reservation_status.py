@@ -4,10 +4,11 @@ from ash_unofficial_covid19.models.location import LocationFactory
 from ash_unofficial_covid19.models.reservation_status import ReservationStatusFactory
 from ash_unofficial_covid19.services.location import LocationService
 from ash_unofficial_covid19.services.reservation_status import ReservationStatusService
+from ash_unofficial_covid19.views.reservation_status import ReservationStatusView
 
 
 @pytest.fixture()
-def service():
+def view():
     # 位置情報データのセットアップ
     test_locations_data = [
         {
@@ -66,49 +67,37 @@ def service():
     factory = ReservationStatusFactory()
     for row in test_data:
         factory.create(**row)
+
     service = ReservationStatusService()
     service.create(factory)
-    yield service
+    view = ReservationStatusView()
+    yield view
 
 
-def test_delete(service):
-    results = service.delete(("旭川赤十字病院", "モデルナ"))
-    assert results
-
-
-def test_get_medical_institution_list(service):
-    results = service.get_medical_institution_list()
-    expect = [
-        ("旭川赤十字病院", "モデルナ", "曙1条1丁目"),
-        ("独立行政法人国立病院機構旭川医療センター", "ファイザー モデルナ", "花咲町7丁目"),
-    ]
-    assert results == expect
-
-
-def test_find_by_medical_institution(service):
-    results = service.find(medical_institution_name="独立行政法人国立病院機構旭川医療センター")
+def test_find_by_medical_institution(view):
+    results = view.find(medical_institution_name="独立行政法人国立病院機構旭川医療センター")
     result = results.items[0]
     assert result.medical_institution_name == "独立行政法人国立病院機構旭川医療センター"
     assert result.longitude == 142.3815237271935
     assert result.latitude == 43.798826491523464
 
 
-def test_find_by_area(service):
-    results = service.find(area="花咲町・末広・末広東・東鷹栖地区")
+def test_find_by_area(view):
+    results = view.find(area="花咲町・末広・末広東・東鷹栖地区")
     result = results.items[0]
     assert result.medical_institution_name == "独立行政法人国立病院機構旭川医療センター"
     assert result.longitude == 142.3815237271935
     assert result.latitude == 43.798826491523464
 
 
-def test_find_all(service):
-    results = service.find()
+def test_find_all(view):
+    results = view.find()
     result = results.items[1]
     assert result.medical_institution_name == "旭川赤十字病院"
     assert result.longitude == 142.348303888889
     assert result.latitude == 43.769628888889
 
 
-def test_get_areas(service):
-    results = service.get_areas()
+def test_get_areas(view):
+    results = view.get_areas()
     assert results == ["花咲町・末広・末広東・東鷹栖地区", "西地区"]

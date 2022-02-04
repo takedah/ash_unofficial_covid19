@@ -140,13 +140,16 @@ class ReservationStatusService(Service):
                     medical_institution_list.append((row["medical_institution_name"], row["vaccine"], row["address"]))
         return medical_institution_list
 
-    def find(self, medical_institution_name: Optional[str] = None) -> ReservationStatusLocationFactory:
+    def find(
+        self, medical_institution_name: Optional[str] = None, area: Optional[str] = None
+    ) -> ReservationStatusLocationFactory:
         """新型コロナワクチン接種医療機関予約状況と位置情報の検索
 
         指定した新型コロナワクチン接種医療機関の予約受付状況と位置情報を返す
 
         Args:
             medical_institution_name (str): 医療機関の名称
+            area (str): 地区
 
         Returns:
             results (list of :obj:`ReservationStatusLocation`): 予約受付状況詳細データ
@@ -154,15 +157,24 @@ class ReservationStatusService(Service):
                 データオブジェクトのリスト。
 
         """
-        if medical_institution_name is None:
-            target_name_list = None
-        else:
+        search_args = list()
+        where_sentence = ""
+        if medical_institution_name is not None:
             if isinstance(medical_institution_name, str):
-                target_name_list = [
-                    medical_institution_name,
-                ]
+                search_args.append(medical_institution_name)
+                where_sentence += " " + "WHERE reserve.medical_institution_name=%s"
             else:
                 raise TypeError("医療機関名の指定に誤りがあります。")
+
+        if area is not None:
+            if isinstance(area, str):
+                search_args.append(area)
+                if len(search_args) == 0:
+                    where_sentence += " " + "WHERE area=%s"
+                else:
+                    where_sentence += " " + "AND area=%s"
+            else:
+                raise TypeError("地区の指定に誤りがあります。")
 
         state = (
             "SELECT "
@@ -178,16 +190,32 @@ class ReservationStatusService(Service):
             + "LEFT JOIN locations AS loc ON reserve.medical_institution_name="
             + "loc.medical_institution_name"
         )
-        where_sentence = " " + "WHERE reserve.medical_institution_name=%s"
         order_sentence = " " + "ORDER BY area,address,vaccine;"
         factory = ReservationStatusLocationFactory()
         with self.get_connection() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
-                if medical_institution_name is None:
+                if len(search_args) == 0:
                     cur.execute(state + order_sentence)
                 else:
-                    cur.execute(state + where_sentence + order_sentence, target_name_list)
+                    cur.execute(state + where_sentence + order_sentence, search_args)
                 for row in cur.fetchall():
                     factory.create(**row)
 
         return factory
+
+    def get_areas(self) -> list:
+        """新型コロナワクチン接種医療機関の地区一覧を取得
+
+        Returns:
+            areas (list): 医療機関の地区一覧リスト
+
+        """
+        state = "SELECT DISTINCT(area)" + " " + "FROM" + " " + self.table_name + " " + "ORDER BY area;"
+        areas = list()
+        with self.get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(state)
+                for row in cur.fetchall():
+                    areas.append(row["area"])
+
+        return areas

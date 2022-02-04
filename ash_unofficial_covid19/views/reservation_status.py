@@ -1,3 +1,6 @@
+from typing import Optional
+
+from ..models.reservation_status import ReservationStatusLocationFactory
 from ..services.reservation_status import ReservationStatusService
 from ..views.view import View
 
@@ -21,13 +24,30 @@ class ReservationStatusView(View):
     def last_updated(self):
         return self.__last_updated
 
-    def find(self) -> list:
-        """
-        新型コロナワクチン接種医療機関の予約受付状況全件のリストを返す
+    def find(
+        self, medical_institution_name: Optional[str] = None, area: Optional[str] = None
+    ) -> ReservationStatusLocationFactory:
+        """新型コロナワクチン接種医療機関予約状況と位置情報の検索
+
+        指定した新型コロナワクチン接種医療機関の予約受付状況と位置情報を返す
+
+        Args:
+            medical_institution_name (str): 医療機関の名称
+            area (str): 地区
 
         Returns:
-            res (list of tuple): 医療機関の予約受付状況一覧リスト
-                医療機関予約受付状況データオブジェクトと医療機関名称をURLエンコードした文字列を対にしたタプルのリスト
+            results (list of :obj:`ReservationStatusLocation`): 予約受付状況詳細データ
+                新型コロナワクチン接種医療機関予約受付状況の情報に緯度経度を含めた
+                データオブジェクトのリスト。
 
         """
-        return self.__service.find()
+        return self.__service.find(medical_institution_name, area)
+
+    def get_areas(self) -> list:
+        """新型コロナワクチン接種医療機関の地区一覧を取得
+
+        Returns:
+            areas (list): 医療機関の地区一覧リスト
+
+        """
+        return self.__service.get_areas()
