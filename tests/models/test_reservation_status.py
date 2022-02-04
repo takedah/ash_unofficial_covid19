@@ -53,3 +53,9 @@ class TestReservationStatusLocation:
             reservation_status_location,
             ReservationStatusLocation,
         )
+        # 地区と医療機関名をURLパースした要素が生成されているか確認する。
+        assert reservation_status_location.area_url == "%E8%A5%BF%E5%9C%B0%E5%8C%BA"
+        assert (
+            reservation_status_location.medical_institution_name_url
+            == "%E6%97%AD%E5%B7%9D%E8%B5%A4%E5%8D%81%E5%AD%97%E7%97%85%E9%99%A2"
+        )

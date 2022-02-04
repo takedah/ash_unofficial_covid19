@@ -1,9 +1,10 @@
-import dataclasses
+import urllib.parse
+from dataclasses import dataclass, field
 
 from ..models.factory import Factory
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclass()
 class ReservationStatus:
     """新型コロナワクチン接種医療機関予約受付状況を表すモデルオブジェクト
 
@@ -78,7 +79,7 @@ class ReservationStatusFactory(Factory):
         self.__items.append(item)
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclass()
 class ReservationStatusLocation(ReservationStatus):
     """新型コロナワクチン接種医療機関予約受付状況詳細データモデル
 
@@ -99,11 +100,19 @@ class ReservationStatusLocation(ReservationStatus):
         is_target_not_family (bool): かかりつけ以外の方が対象か
         target_other (str): その他
         memo (str): 備考
+        medical_institution_name_url (str): 医療機関の名称をURLパースした文字列
+        area_url (str): 地区をURLパースした文字列
 
     """
 
     latitude: float = 0
     longitude: float = 0
+    medical_institution_name_url: str = field(init=False)
+    area_url: str = field(init=False)
+
+    def __post_init__(self):
+        self.medical_institution_name_url = urllib.parse.quote(self.medical_institution_name)
+        self.area_url = urllib.parse.quote(self.area)
 
 
 class ReservationStatusLocationFactory(Factory):
