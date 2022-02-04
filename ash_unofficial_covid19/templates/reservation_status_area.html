@@ -23,13 +23,13 @@
                     住所<br>
                     電話番号<br>
                 </th>
-                <th class="text-nowrap">予約受付開始時期</th>
-                <th class="text-nowrap">接種可能時期</th>
-                <th class="text-nowrap">年齢</th>
+                <th>予約受付開始時期</th>
+                <th>接種可能時期</th>
+                <th>年齢</th>
                 <th>かかりつけ</th>
                 <th>かかりつけ以外</th>
-                <th class="text-nowrap">その他</th>
-                <th class="text-nowrap">備考</th>
+                <th>その他</th>
+                <th>備考</th>
               </tr>
             </thead>
             <tbody id="results" data-length="{{ search_lengths|tojson }}">
@@ -37,15 +37,15 @@
               <tr id="order{{ loop.index }}" data-latitude="{{ search_result.latitude|tojson }}"
                 data-longitude="{{ search_result.longitude|tojson }}" data-name="{{ search_result.medical_institution_name|safe }}"
                 data-url="{{ search_result.medical_institution_name_url|safe }}">
-                <td class="text-nowrap">
+                <td>
                     <strong>{{ search_result.medical_institution_name }}</strong><br>
                     {{ search_result.vaccine }}<br>
                     {{ search_result.address }}<br>
                     {{ search_result.phone_number }}<br>
                 </td>
-                <td class="text-nowrap">{{ search_result.status }}</td>
-                <td class="text-nowrap">{{ search_result.inoculation_time }}</td>
-                <td class="text-nowrap">{{ search_result.age }}</td>
+                <td>{{ search_result.status }}</td>
+                <td>{{ search_result.inoculation_time }}</td>
+                <td>{{ search_result.age }}</td>
                 {% if search_result.is_target_family is none %}
                   <td></td>
                 {% elif search_result.is_target_family %}
@@ -60,8 +60,8 @@
                 {% else %}
                   <td>NG</td>
                 {% endif %}
-                <td class="text-nowrap">{{ search_result.other }}</td>
-                <td class="text-nowrap">{{ search_result.memo }}</td>
+                <td>{{ search_result.other }}</td>
+                <td>{{ search_result.memo }}</td>
               </tr>
               {% endfor %}
             </tbody>
