@@ -82,18 +82,20 @@ CREATE TABLE sapporo_patients_numbers(
 DROP TABLE IF EXISTS reservation_statuses;
 CREATE TABLE reservation_statuses(
     id SERIAL NOT NULL,
-    medical_institution_name VARCHAR(128) NOT NULL PRIMARY KEY,
+    area TEXT,
+    medical_institution_name VARCHAR(256) NOT NULL,
     address TEXT,
     phone_number TEXT,
+    vaccine VARCHAR(256) NOT NULL,
     status TEXT,
     inoculation_time TEXT,
     target_age TEXT,
-    target_family BOOLEAN,
-    target_not_family BOOLEAN,
-    target_suberbs BOOLEAN,
+    is_target_family BOOLEAN,
+    is_target_not_family BOOLEAN,
     target_other TEXT,
     memo TEXT,
-    updated_at TIMESTAMPTZ NOT NULL
+    updated_at TIMESTAMPTZ NOT NULL,
+    PRIMARY KEY(medical_institution_name, vaccine)
 );
 DROP TABLE IF EXISTS reservation3_statuses;
 CREATE TABLE reservation3_statuses(

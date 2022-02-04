@@ -8,6 +8,11 @@ from ash_unofficial_covid19.services.location import LocationService
 def service():
     test_data = [
         {
+            "medical_institution_name": "旭川赤十字病院",
+            "longitude": 142.348303888889,
+            "latitude": 43.769628888889,
+        },
+        {
             "medical_institution_name": "市立旭川病院",
             "longitude": 142.365976388889,
             "latitude": 43.778422777778,
@@ -28,7 +33,7 @@ def service():
 
 def test_find_all(service):
     results = service.find_all()
-    result = results.items[0]
+    result = results.items[1]
     assert result.medical_institution_name == "市立旭川病院"
     assert result.longitude == 142.365976388889
     assert result.latitude == 43.778422777778

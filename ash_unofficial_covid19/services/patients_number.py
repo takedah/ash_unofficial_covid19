@@ -127,7 +127,7 @@ class PatientsNumberService(Service):
                     publication_date.strftime("%Y-%m-%d"),
                 ]
             else:
-                raise ServiceError("報道発表日の指定に誤りがあります。")
+                raise TypeError("報道発表日の指定に誤りがあります。")
 
         state = (
             "SELECT"

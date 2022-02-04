@@ -4,7 +4,6 @@ from .config import Config
 from .errors import ServiceError
 from .views.atom import AtomView
 from .views.graph import ByAgeView, DailyTotalView, MonthTotalView, PerHundredThousandPopulationView, WeeklyPerAgeView
-from .views.medical_institution import MedicalInstitutionView
 from .views.patient import AsahikawaPatientView
 from .views.patients_number import PatientsNumberView
 from .views.reservation_status import ReservationStatusView
@@ -44,14 +43,9 @@ def get_patients_numbers():
     return g.patients_numbers
 
 
-def get_reservation3_statuses():
-    g.reservation3_statuses = ReservationStatusView()
-    return g.reservation3_statuses
-
-
-def get_medical_institutions():
-    g.medical_institutions = MedicalInstitutionView()
-    return g.medical_institutions
+def get_reservation_statuses():
+    g.reservation_statuses = ReservationStatusView()
+    return g.reservation_statuses
 
 
 def get_daily_total():
@@ -163,184 +157,22 @@ def patients_pages(page):
     )
 
 
-@app.route("/medical_institutions")
-def medical_institutions():
-    medical_institutions = get_medical_institutions()
-    above_16_medical_institutions = medical_institutions.find_area()
-    below_15_medical_institutions = medical_institutions.find_area(is_pediatric=True)
-    return render_template(
-        "medical_institutions.html",
-        title="新型コロナワクチン接種医療機関一覧",
-        gtag_id=Config.GTAG_ID,
-        last_updated=medical_institutions.last_updated,
-        above_16_medical_institutions=above_16_medical_institutions,
-        above_16_medical_institutions_number=len(above_16_medical_institutions),
-        below_15_medical_institutions=below_15_medical_institutions,
-        below_15_medical_institutions_number=len(below_15_medical_institutions),
-        above_16_area_list=medical_institutions.get_area_list(),
-        below_15_area_list=medical_institutions.get_area_list(is_pediatric=True),
-        leaflet=True,
-    )
+@app.route("/reservation_statuses")
+def reservation_statuses():
+    reservation_statuses = get_reservation_statuses()
+    search_results = reservation_statuses.find()
 
-
-@app.route("/reservation3_statuses")
-def reservation3_statuses():
-    reservation3_statuses = get_reservation3_statuses()
-    try:
-        search_results = reservation3_statuses.find_all()
-    except ServiceError:
-        abort(404)
-
-    search_lengths = len(search_results)
+    search_lengths = len(search_results.items)
     if search_lengths == 0:
         abort(404)
 
     return render_template(
-        "reservation3_statuses.html",
+        "reservation_statuses.html",
         title="新型コロナワクチン3回目接種の予約受付状況",
         gtag_id=Config.GTAG_ID,
-        last_updated=reservation3_statuses.last_updated,
-        search_results=search_results,
+        last_updated=reservation_statuses.last_updated,
+        search_results=search_results.items,
         search_lengths=search_lengths,
-        leaflet=True,
-    )
-
-
-@app.route("/reservation3_statuses/<medical_institution_name>")
-def reservation3_status(medical_institution_name):
-    reservation3_statuses = get_reservation3_statuses()
-    try:
-        medical_institution_name = escape(medical_institution_name)
-    except ValueError:
-        abort(404)
-
-    try:
-        reservation3_status = reservation3_statuses.find(medical_institution_name)
-    except ServiceError:
-        abort(404)
-
-    return render_template(
-        "reservation3_status.html",
-        title="【旭川市のワクチン3回目接種医療機関】" + medical_institution_name,
-        gtag_id=Config.GTAG_ID,
-        last_updated=reservation3_statuses.last_updated,
-        reservation3_status=reservation3_status,
-        leaflet=True,
-    )
-
-
-@app.route("/medical_institutions/areas/<area>")
-def medical_institutions_areas(area):
-    medical_institutions = get_medical_institutions()
-    try:
-        area = escape(area)
-    except ValueError:
-        abort(404)
-
-    try:
-        search_results = medical_institutions.find_area(area=area)
-    except ServiceError:
-        abort(404)
-
-    search_lengths = len(search_results)
-    if search_lengths == 0:
-        abort(404)
-
-    return render_template(
-        "area.html",
-        title="【旭川市】" + area + "の新型コロナワクチン接種医療機関一覧（16歳以上）",
-        gtag_id=Config.GTAG_ID,
-        reservation_status_updated=medical_institutions.reservation_status_updated,
-        area=area,
-        search_results=search_results,
-        search_lengths=search_lengths,
-        above_16_area_list=medical_institutions.get_area_list(),
-        below_15_area_list=medical_institutions.get_area_list(is_pediatric=True),
-        is_pediatric=False,
-        leaflet=True,
-    )
-
-
-@app.route("/medical_institutions/areas/pediatrics/<area>")
-def pediatric_medical_institutions_areas(area):
-    medical_institutions = get_medical_institutions()
-    try:
-        area = escape(area)
-    except ValueError:
-        abort(404)
-
-    try:
-        search_results = medical_institutions.find_area(area=area, is_pediatric=True)
-    except ServiceError:
-        abort(404)
-
-    search_lengths = len(search_results)
-    if search_lengths == 0:
-        abort(404)
-
-    return render_template(
-        "area.html",
-        title="【旭川市】" + area + "の新型コロナワクチン接種医療機関一覧（12歳から15歳まで）",
-        gtag_id=Config.GTAG_ID,
-        reservation_status_updated=medical_institutions.reservation_status_updated,
-        area=area,
-        search_results=search_results,
-        search_lengths=search_lengths,
-        above_16_area_list=medical_institutions.get_area_list(),
-        below_15_area_list=medical_institutions.get_area_list(is_pediatric=True),
-        is_pediatric=True,
-        leaflet=True,
-    )
-
-
-@app.route("/medical_institution/<name>")
-def medical_institution(name):
-    medical_institutions = get_medical_institutions()
-    try:
-        name = escape(name)
-    except ValueError:
-        abort(404)
-
-    try:
-        medical_institution = medical_institutions.find(name=name)
-    except ServiceError:
-        abort(404)
-
-    return render_template(
-        "medical_institution.html",
-        title="【旭川市のワクチン接種医療機関】" + name + "（16歳以上）",
-        gtag_id=Config.GTAG_ID,
-        reservation_status_updated=medical_institutions.reservation_status_updated,
-        medical_institution=medical_institution,
-        above_16_area_list=medical_institutions.get_area_list(),
-        below_15_area_list=medical_institutions.get_area_list(is_pediatric=True),
-        is_pediatric=False,
-        leaflet=True,
-    )
-
-
-@app.route("/medical_institution/pediatrics/<name>")
-def pediatric_medical_institution(name):
-    medical_institutions = get_medical_institutions()
-    try:
-        name = escape(name)
-    except ValueError:
-        abort(404)
-
-    try:
-        medical_institution = medical_institutions.find(name=name, is_pediatric=True)
-    except ServiceError:
-        abort(404)
-
-    return render_template(
-        "medical_institution.html",
-        title="【旭川市のワクチン接種医療機関】" + name + "（12歳から15歳まで）",
-        gtag_id=Config.GTAG_ID,
-        reservation_status_updated=medical_institutions.reservation_status_updated,
-        medical_institution=medical_institution,
-        above_16_area_list=medical_institutions.get_area_list(),
-        below_15_area_list=medical_institutions.get_area_list(is_pediatric=True),
-        is_pediatric=True,
         leaflet=True,
     )
 
@@ -364,17 +196,6 @@ def daily_total_csv():
     res.data = csv_data
     res.headers["Content-Type"] = "text/csv"
     res.headers["Content-Disposition"] = "attachment: filename=" + "012041_asahikawa_covid19_daily_total.csv"
-    return res
-
-
-@app.route("/012041_asahikawa_covid19_medical_institutions.csv")
-def medical_institutions_csv():
-    medical_institution = get_medical_institutions()
-    csv_data = medical_institution.get_csv()
-    res = make_response()
-    res.data = csv_data
-    res.headers["Content-Type"] = "text/csv"
-    res.headers["Content-Disposition"] = "attachment: filename=" + "012041_asahikawa_covid19_medical_institutions.csv"
     return res
 
 

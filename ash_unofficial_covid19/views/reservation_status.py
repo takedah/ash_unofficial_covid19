@@ -1,7 +1,4 @@
-import urllib.parse
-
-from ..models.reservation_status_location import ReservationStatusLocation
-from ..services.reservation_status_location import ReservationStatusLocationService
+from ..services.reservation_status import ReservationStatusService
 from ..views.view import View
 
 
@@ -16,7 +13,7 @@ class ReservationStatusView(View):
     """
 
     def __init__(self):
-        self.__service = ReservationStatusLocationService(is_third_time=True)
+        self.__service = ReservationStatusService()
         last_updated = self.__service.get_last_updated()
         self.__last_updated = last_updated.strftime("%Y/%m/%d %H:%M")
 
@@ -24,24 +21,7 @@ class ReservationStatusView(View):
     def last_updated(self):
         return self.__last_updated
 
-    def find(self, medical_institution_name: str) -> ReservationStatusLocation:
-        """位置情報、予約受付情報付き新型コロナワクチン接種医療機関情報
-
-        指定した対象年齢の新型コロナワクチン接種医療機関の一覧に医療機関の位置情報と
-        予約受付情報を付けて返す
-
-        Args:
-            medical_institution_name (str): 医療機関の名称
-
-        Returns:
-            results (:obj:`ReservationStatusLocation`): 医療機関データ
-                新型コロナワクチン接種医療機関予約受付情報の情報に緯度経度を含めた
-                データオブジェクト
-
-        """
-        return self.__service.find(medical_institution_name=medical_institution_name)
-
-    def find_all(self) -> list:
+    def find(self) -> list:
         """
         新型コロナワクチン接種医療機関の予約受付状況全件のリストを返す
 
@@ -50,13 +30,4 @@ class ReservationStatusView(View):
                 医療機関予約受付状況データオブジェクトと医療機関名称をURLエンコードした文字列を対にしたタプルのリスト
 
         """
-        res = list()
-        reservation_statuses = self.__service.find_all()
-        for reservation_status in reservation_statuses.items:
-            res.append(
-                (
-                    reservation_status,
-                    urllib.parse.quote(reservation_status.medical_institution_name),
-                )
-            )
-        return res
+        return self.__service.find()

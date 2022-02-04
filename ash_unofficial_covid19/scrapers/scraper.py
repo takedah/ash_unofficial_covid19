@@ -79,7 +79,7 @@ class Scraper(metaclass=ABCMeta):
 
         """
         if isinstance(value, str):
-            return re.sub("( +)", " ", value.replace("\r", " ").replace("\n", " ").strip())
+            return re.sub("( +)", " ", value.replace("　", " ").replace("\r", " ").replace("\n", " ").strip())
         else:
             return ""
 

@@ -1,112 +1,44 @@
+import dataclasses
+
 from ..models.factory import Factory
 
 
+@dataclasses.dataclass(frozen=True)
 class ReservationStatus:
-    """旭川市新型コロナワクチン接種医療機関予約受付状況を表すモデルオブジェクト
+    """新型コロナワクチン接種医療機関予約受付状況を表すモデルオブジェクト
 
     Attributes:
         medical_institution_name (str): 医療機関の名称
+        vaccine (str): ワクチンの種類
+        area (str): 地区
         address (str): 住所
         phone_number (str): 電話番号
         status (str): 予約受付状況または受付開始時期
         inoculation_time (str): 接種期間・時期
         target_age (str): 対象年齢
-        target_family (bool): かかりつけの方が対象か
-        target_not_family (bool): かかりつけ以外の方が対象か
-        target_suberbs (bool): 市外の方が対象か
+        is_target_family (bool): かかりつけの方が対象か
+        is_target_not_family (bool): かかりつけ以外の方が対象か
         target_other (str): その他
         memo (str): 備考
 
     """
 
-    def __init__(
-        self,
-        medical_institution_name: str,
-        address: str,
-        phone_number: str,
-        status: str,
-        inoculation_time: str,
-        target_age: str,
-        target_family: bool,
-        target_not_family: bool,
-        target_suberbs: bool,
-        target_other: str,
-        memo: str,
-    ):
-        """
-        Args:
-            medical_institution_name (str): 医療機関の名称
-            address (str): 住所
-            phone_number (str): 電話番号
-            status (str): 予約受付状況または受付開始時期
-            inoculation_time (str): 接種期間・時期
-            target_age (str): 対象年齢
-            target_family (bool): かかりつけの方が対象か
-            target_not_family (bool): かかりつけ以外の方が対象か
-            target_suberbs (bool): 市外の方が対象か
-            target_other (str): その他
-            memo (str): 備考
-
-        """
-        self.__medical_institution_name = medical_institution_name
-        self.__address = address
-        self.__phone_number = phone_number
-        self.__status = status
-        self.__inoculation_time = inoculation_time
-        self.__target_age = target_age
-        self.__target_family = target_family
-        self.__target_not_family = target_not_family
-        self.__target_suberbs = target_suberbs
-        self.__target_other = target_other
-        self.__memo = memo
-
-    @property
-    def medical_institution_name(self):
-        return self.__medical_institution_name
-
-    @property
-    def address(self):
-        return self.__address
-
-    @property
-    def phone_number(self):
-        return self.__phone_number
-
-    @property
-    def status(self):
-        return self.__status
-
-    @property
-    def inoculation_time(self):
-        return self.__inoculation_time
-
-    @property
-    def target_age(self):
-        return self.__target_age
-
-    @property
-    def target_family(self):
-        return self.__target_family
-
-    @property
-    def target_not_family(self):
-        return self.__target_not_family
-
-    @property
-    def target_suberbs(self):
-        return self.__target_suberbs
-
-    @property
-    def target_other(self):
-        return self.__target_other
-
-    @property
-    def memo(self):
-        return self.__memo
+    medical_institution_name: str
+    vaccine: str
+    area: str = ""
+    address: str = ""
+    phone_number: str = ""
+    status: str = ""
+    inoculation_time: str = ""
+    target_age: str = ""
+    is_target_family: bool = False
+    is_target_not_family: bool = False
+    target_other: str = ""
+    memo: str = ""
 
 
 class ReservationStatusFactory(Factory):
-    """旭川市新型コロナワクチン接種医療機関の予約受付状況を表すモデルオブジェクトを生成
+    """新型コロナワクチン接種医療機関の予約受付状況を表すモデルオブジェクトを生成
 
     Attributes:
         items (list of :obj:`ReservationStatus`): 医療機関予約受付状況一覧リスト
@@ -130,7 +62,7 @@ class ReservationStatusFactory(Factory):
                 作成するための引数
 
         Returns:
-            medical_institution (:obj:`ReservationStatus`): 医療機関予約受付状況データ
+            reservation_status (:obj:`ReservationStatus`): 医療機関予約受付状況データ
                 ReservationStatusクラスのオブジェクト
 
         """
@@ -141,6 +73,76 @@ class ReservationStatusFactory(Factory):
 
         Args:
             item (:obj:`ReservationStatus`): ReservationStatusクラスのオブジェクト
+
+        """
+        self.__items.append(item)
+
+
+@dataclasses.dataclass(frozen=True)
+class ReservationStatusLocation(ReservationStatus):
+    """新型コロナワクチン接種医療機関予約受付状況詳細データモデル
+
+    新型コロナワクチン接種医療機関予約受付状況に位置情報を加えたデータモデル。
+
+    Attributes:
+        medical_institution_name (str): 医療機関の名称
+        vaccine (str): ワクチンの種類
+        latitude (float): 医療機関のある緯度
+        longitude (float): 医療機関のある経度
+        area (str): 地区
+        address (str): 住所
+        phone_number (str): 電話番号
+        status (str): 予約受付状況または受付開始時期
+        inoculation_time (str): 接種期間・時期
+        target_age (str): 対象年齢
+        is_target_family (bool): かかりつけの方が対象か
+        is_target_not_family (bool): かかりつけ以外の方が対象か
+        target_other (str): その他
+        memo (str): 備考
+
+    """
+
+    latitude: float = 0
+    longitude: float = 0
+
+
+class ReservationStatusLocationFactory(Factory):
+    """新型コロナワクチン接種医療機関予約受付状況詳細オブジェクトを生成
+
+    Attributes:
+        items (list of :obj:`ReservationStatusLocation`): 医療機関予約受付状況詳細リスト
+            ReservationStatusLocationクラスのオブジェクトのリスト
+
+    """
+
+    def __init__(self):
+        self.__items = list()
+
+    @property
+    def items(self):
+        return self.__items
+
+    def _create_item(self, **row) -> ReservationStatusLocation:
+        """ReservationStatusLocationオブジェクトの生成
+
+        Args:
+            row (dict): 医療機関予約受付状況詳細データの辞書
+                新型コロナワクチン接種医療機関予約受付状況詳細データオブジェクトを
+                作成するための引数
+
+        Returns:
+            item (:obj:`ReservationStatusLocation`): 医療機関予約受付状況詳細データ
+                ReservationStatusLocationクラスのオブジェクト
+
+        """
+        return ReservationStatusLocation(**row)
+
+    def _register_item(self, item: ReservationStatusLocation):
+        """ReservationStatusLocationオブジェクトをリストへ追加
+
+        Args:
+            item (:obj:`ReservationStatusLocation`): データオブジェクト
+                ReservationStatusLocationクラスのオブジェクト
 
         """
         self.__items.append(item)

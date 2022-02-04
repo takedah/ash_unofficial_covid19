@@ -1,99 +1,102 @@
 import re
 from typing import Optional
 
-import tabula
+from bs4 import BeautifulSoup
 
-from ..scrapers.downloader import DownloadedPDF
+from ..scrapers.downloader import DownloadedHTML
 from ..scrapers.scraper import Scraper
 
 
 class ScrapeReservationStatus(Scraper):
     """旭川市新型コロナワクチン接種医療機関予約受付状況の取得
 
-    旭川市公式ホームページからダウンロードしたPDFファイルのデータから、
-    旭川市の新型コロナワクチン接種医療機関予約受付状況データを抽出し、リストに変換する。
+    旭川市新型コロナワクチン接種特設サイトからダウンロードしたHTMLファイルのデータから、
+    新型コロナワクチン接種医療機関予約受付状況データを抽出し、リストに変換する。
 
     Attributes:
-        reservation_status_data (list of dict): 医療機関予約受付状況データ
-            旭川市の新型コロナワクチン接種医療機関予約受付状況データを表す辞書のリスト
+        lists (list of dict): 医療機関予約受付状況データ
+            新型コロナワクチン接種医療機関予約受付状況データを表す辞書のリスト
 
     """
 
-    def __init__(self, pdf_url: str, is_third_time: bool = False):
+    def __init__(self, html_url: str):
         """
         Args:
-            pdf_url (str): PDFファイルのURL
-                旭川市の予約受付状況PDFファイルのURL
-            is_third_time (bool): 3回目接種の医療機関の情報を取得する場合真を指定
+            html_url (str): HTMLファイルのURL
+                新型コロナワクチン接種医療機関予約受付状況HTMLファイルのURL
 
         """
         Scraper.__init__(self)
-        downloaded_pdf = DownloadedPDF(pdf_url)
-        pdf_df = self._get_dataframe(downloaded_pdf)
-        self.__lists = self._get_status_data(pdf_df=pdf_df, is_third_time=is_third_time)
+        downloaded_html = self.get_html(html_url)
+        self.__lists = self._get_status_data(downloaded_html)
 
     @property
     def lists(self) -> list:
         return self.__lists
 
-    def _get_dataframe(self, downloaded_pdf: DownloadedPDF) -> list:
-        """
+    def _get_status_data(self, downloaded_html: DownloadedHTML) -> list:
+        """HTMLからtableの内容を抽出してリストに格納
+
         Args:
-            downloaded_pdf (BytesIO): PDFファイルデータ
-                ダウンロードしたPDFファイルのBytesIOデータを要素に持つオブジェクト
-
-        Returns:
-            table_data (list of obj:`pd.DataFrame`): 医療機関予約受付状況PDFデータ
-                旭川市の新型コロナワクチン接種医療機関予約受付状況PDFデータから抽出した
-                表データを、pandas DataFrameのリストで返す
-
-        """
-        return tabula.read_pdf(
-            downloaded_pdf.content,
-            lattice=True,
-            pages="all",
-            pandas_options={"header": None},
-        )
-
-    def _get_status_data(self, pdf_df: list, is_third_time: bool = False) -> list:
-        """
-        Args:
-            pdf_df (list of :obj:`pd.DataFrame`): PDFファイルから抽出した表データ
-            is_third_time (bool): 3回目接種の医療機関の情報を取得する場合真を指定
+            downloaded_html (:obj:`DownloadedHTML`): ダウンロードしたHTMLデータ
+                ダウンロードしたHTMLファイルのbytesデータを要素に持つオブジェクト
 
         Returns:
             status_data (list of dict): 医療機関予約受付状況データ
-                旭川市の新型コロナワクチン接種医療機関予約受付状況PDFデータから抽出した
-                表データを、医療機関予約受付状況データ辞書のリストで返す
+                HTMLデータから抽出した表データを、医療機関予約受付状況データ辞書の
+                リストで返す。
 
         """
+        soup = BeautifulSoup(downloaded_html.content, "html.parser")
+        table = soup.find("table", id="tablepress-1-no-2")
+        for tbody in table.find_all("tbody"):
+            target_tbody = tbody
+
         status_data = list()
-        for df in pdf_df:
-            # データフレームが空の場合スキップ
-            if df.empty:
-                continue
+        for tr in target_tbody.find_all("tr"):
+            row = list()
+            for td in tr.find_all("td"):
+                # 一つの列に医療機関名、住所、電話番号が改行で区切られて
+                # まとめられてしまっているため分解する。
+                if td.has_attr("class"):
+                    if "column-2" in td.get("class"):
+                        key_col = td.get_text(",", strip=True).split(",")
+                        # 分割した要素数が少ない場合、空文字列で埋める。
+                        if len(key_col) < 3:
+                            i = 0
+                            while i < 3 - len(key_col):
+                                key_col.append("")
+                                i += 1
+                        # 分割した要素数が多い場合、先頭の要素を結合して切り詰める。
+                        elif 3 < len(key_col):
+                            tmp_phone_number = key_col[-1]
+                            tmp_address = key_col[-2]
+                            i = 0
+                            tmp_medical_institution_name = ""
+                            while i < len(key_col) - 2:
+                                if tmp_medical_institution_name == "":
+                                    tmp_medical_institution_name = key_col[i]
+                                else:
+                                    tmp_medical_institution_name += " " + key_col[i]
+                                i += 1
+                            key_col = [tmp_medical_institution_name, tmp_address, tmp_phone_number]
+                        row.extend(key_col)
+                    else:
+                        row.append(td.get_text(" ", strip=True))
+                else:
+                    row.append(td.get_text(" ", strip=True))
 
-            df.dropna(how="all", inplace=True)
-            df.drop_duplicates(inplace=True)
-            df.fillna("", inplace=True)
-            pdf_table = df.values.tolist()
-            # リスト化した結果空リストだった場合スキップ
-            if pdf_table == []:
-                continue
-
-            for row in pdf_table:
-                extracted_data = self._extract_status_data(row=row, is_third_time=is_third_time)
-                if extracted_data:
-                    status_data.append(extracted_data)
+            extracted_data = self._extract_status_data(row)
+            if extracted_data:
+                status_data.append(extracted_data)
 
         return status_data
 
-    def _extract_status_data(self, row: list, is_third_time: bool = False) -> Optional[dict]:
-        """PDFから抽出した表データ二次元配列から新型コロナワクチン接種医療機関の予約受付状況情報のみ抽出
+    def _extract_status_data(self, row: list) -> Optional[dict]:
+        """HTMLから抽出した行データ配列から予約受付状況情報を抽出
 
         Args:
             row (list): PDFから抽出した表データの1行を表すリスト
-            is_third_time (bool): 3回目接種の医療機関の情報を取得する場合真を指定
 
         Returns:
             status_data (dict): 予約受付状況データの辞書
@@ -101,83 +104,46 @@ class ScrapeReservationStatus(Scraper):
 
         """
         status_data = dict()
+        row = list(map(lambda x: self.format_string(x), row))
         try:
-            if len(row) < 9:
-                return None
-
-            if not isinstance(row[0], str):
-                return None
-
-            title_row_match = re.search("^(.*)新型コロナワクチン接種医療機関(.*)$", row[0])
-            if title_row_match:
-                return None
-
-            # 一つの列に医療機関名、住所、電話番号が改行で区切られてまとめられてしまっているため分解する
-            tmp = row[0].split("\r")
-            tmp_length = len(tmp)
-            if tmp_length < 3:
-                return None
-
-            phone_number = tmp[-1]
-            address = tmp[-2]
-            i = 0
-            medical_institution_name = ""
-            while i < tmp_length - 2:
-                medical_institution_name += tmp[i]
-                i += 1
-
-            row = list(map(lambda x: self.format_string(x), row))
-            status = row[1].replace("―", "")
-            inoculation_time = row[2].replace("―", "")
-            target_age = row[3].replace("―", "")
-            family = self._get_available(row[4])
-            target_family = family["available"]
-            not_family = self._get_available(row[5])
-            target_not_family = not_family["available"]
-            memo = family["text"] + not_family["text"] + row[8]
-
-            if is_third_time:
-                suberbs = self._get_available(row[6])
-                target_suberbs = suberbs["available"]
-                target_other = row[7].replace("―", "")
-            else:
-                target_suberbs = False
-                target_other = row[6].replace("―", "")
-
-            medical_institution_name = medical_institution_name.replace(" ", "").replace("　", "")
-            if (
-                medical_institution_name == ""
-                or medical_institution_name == "医療機関名"
-                or medical_institution_name == "電話番号"
-            ):
-                return None
-
+            family = self._get_available(row[8])
+            not_family = self._get_available(row[9])
+            is_target_family = family["available"]
+            is_target_not_family = not_family["available"]
+            memo = family["text"] + " " + not_family["text"] + " " + row[11]
+            memo = memo.strip()
             status_data = {
-                "medical_institution_name": self._translate_name(medical_institution_name),
-                "address": address,
-                "phone_number": phone_number,
-                "status": status,
-                "inoculation_time": inoculation_time,
-                "target_age": target_age,
-                "target_family": target_family,
-                "target_not_family": target_not_family,
-                "target_suberbs": target_suberbs,
-                "target_other": target_other,
+                "area": row[0].replace(" ", ""),
+                "medical_institution_name": row[1].replace(" ", ""),
+                "address": row[2],
+                "phone_number": row[3],
+                "vaccine": row[4],
+                "status": row[5].replace("―", ""),
+                "inoculation_time": row[6].replace("―", ""),
+                "target_age": row[7].replace("―", ""),
+                "is_target_family": is_target_family,
+                "is_target_not_family": is_target_not_family,
+                "target_other": row[10].replace("―", ""),
                 "memo": memo,
             }
-            return {k: v.replace("　", "") if isinstance(v, str) else v for k, v in status_data.items()}
-        except IndexError:
+            return status_data
+        except (IndexError, ValueError):
             return None
 
     @staticmethod
     def _get_available(target_string: str) -> dict:
-        """かかりつけ、かかりつけ以外の文字列から対象なのかどうかを判定し、付記があればその文字列を取得
+        """文字列が対象、対象外のどちらを表しているか判定
+
+        かかりつけ、かかりつけ以外の文字列から対象なのかどうかを判定し、
+        付記があればその文字列を取得する。
 
         Args:
             target_string (str): ○を含む可能性のある文字列
 
         Returns:
-            result (dict): ○が含まれてたらavailableキーに真をセット、textキーに付記文字列があればセット
+            result (dict): 判定結果辞書
+                ○が含まれてたらavailableキーに真をセット、
+                textキーに付記文字列があればセット。
 
         """
         if not isinstance(target_string, str):
@@ -191,35 +157,21 @@ class ScrapeReservationStatus(Scraper):
         else:
             return {"available": False, "text": ""}
 
-    @staticmethod
-    def _translate_name(medical_institution_name: str) -> str:
-        """
-        医療機関名の表記揺れをHTMLページの方の名称に揃える
-
-        Args:
-            medical_institution_name (str): 医療機関名
-
-        Returns:
-            translated_name (str): 変換後の医療機関名
-                変換対象ではない医療機関名を指定した場合はそのまま変換せず返す
-
-        """
-        if not isinstance(medical_institution_name, str):
-            return ""
-
-        translate_table = {
-            "くさのこどもクリニック": "小児科くさのこどもクリニック",
-        }
-        return translate_table.get(medical_institution_name, medical_institution_name)
-
-    def get_name_list(self) -> list:
+    def get_medical_institution_list(self) -> list:
         """スクレイピング結果から主キーとなる医療機関名のリストを取得
 
         Returns:
-            name_list (list): スクレイピングした医療機関名のリスト
+            medical_institutione_list (list of tuple): 医療機関名のリスト
+                スクレイピングした医療機関名とワクチン種類、住所のタプルをリストで返す。
 
         """
-        name_list = list()
+        medical_institution_list = list()
         for reservation_status in self.lists:
-            name_list.append(reservation_status["medical_institution_name"])
-        return name_list
+            medical_institution_list.append(
+                (
+                    reservation_status["medical_institution_name"],
+                    reservation_status["vaccine"],
+                    reservation_status["address"],
+                )
+            )
+        return medical_institution_list
