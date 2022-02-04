@@ -132,17 +132,17 @@ def import_latest():
     # 札幌市の日別新規陽性患者数データをデータベースへ登録
     _import_sapporo_patients_number(Config.SAPPORO_URL)
 
-
-def import_past():
-    # 過去の報道発表資料PDFファイルから日別年代別陽性患者数データをデータベースへ登録
+    # 今月の報道発表資料PDFファイルから日別年代別陽性患者数データをデータベースへ登録
     _import_press_release_link(url=Config.LATEST_DATA_URL, target_year=2022)
     press_release_links = _get_press_release_links()
     for press_release_link in press_release_links.items:
-        if date(2022, 1, 27) < press_release_link.publication_date:
-            _import_asahikawa_data_from_press_release(
-                pdf_url=press_release_link.url,
-                publication_date=press_release_link.publication_date,
-            )
+        publication_date = press_release_link.publication_date
+        if date(2022, 1, 27) < publication_date:
+            if publication_date.year == 2022 and publication_date.month == 2:
+                _import_asahikawa_data_from_press_release(
+                    pdf_url=press_release_link.url,
+                    publication_date=press_release_link.publication_date,
+                )
 
 
 def import_past_from_patients():

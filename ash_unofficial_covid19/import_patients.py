@@ -37,6 +37,7 @@ def _get_download_lists() -> list:
         (Config.OCT2021_DATA_URL, 2021),
         (Config.NOV2021_DATA_URL, 2021),
         (Config.DEC2021_DATA_URL, 2021),
+        (Config.JAN2022_DATA_URL, 2021),
     ]
 
 
