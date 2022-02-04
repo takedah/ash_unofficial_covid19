@@ -16,13 +16,15 @@ def add_security_headers(response):
     csp = (
         "default-src 'self'; "
         + "style-src 'self' "
-        + "stackpath.bootstrapcdn.com unpkg.com; "
+        + "stackpath.bootstrapcdn.com unpkg.com "
+        + "'unsafe-inline'; "
         + "script-src 'self' "
         + "code.jquery.com cdnjs.cloudflare.com stackpath.bootstrapcdn.com "
         + "unpkg.com www.googletagmanager.com minmoji.ucda.jp "
+        + "kit.fontawesome.com "
         + "'nonce-Pbq-X7F-632oxHhPe6mzMC-LHYE'; "
-        + "connect-src www.google-analytics.com; "
-        + "font-src minmoji.ucda.jp; "
+        + "connect-src www.google-analytics.com ka-f.fontawesome.com; "
+        + "font-src minmoji.ucda.jp ka-f.fontawesome.com; "
         + "img-src 'self' i.creativecommons.org licensebuttons.net "
         + "data: https:"
     )
@@ -283,6 +285,17 @@ def get_month_total_graph():
     res.data = graph_image.getvalue()
     res.headers["Content-Type"] = "img/png"
     res.headers["Content-Disposition"] = "attachment: filename=" + "month_total.png"
+    return res
+
+
+@app.route("/month_total_for_card.png")
+def get_month_total_graph_for_card():
+    month_total = get_month_total()
+    graph_image = month_total.get_graph_image(figsize=(6.0, 3.15))
+    res = make_response()
+    res.data = graph_image.getvalue()
+    res.headers["Content-Type"] = "img/png"
+    res.headers["Content-Disposition"] = "attachment: filename=" + "month_total_for_card.png"
     return res
 
 

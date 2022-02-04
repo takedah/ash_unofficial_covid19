@@ -172,12 +172,10 @@ class DailyTotalView(GraphView):
         day_x = [row[0] for row in self.__daily_total_data]
         day_y = [row[1] for row in self.__daily_total_data]
         ax.bar(day_x, day_y, color="salmon")
-        ax.yaxis.set_major_locator(MultipleLocator(5))
+        ax.yaxis.set_major_locator(MultipleLocator(25))
         ax.xaxis.set_major_locator(mdates.MonthLocator())
         ax.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d"))
         ax.grid(axis="y", color="lightgray")
-        ax.set_title("旭川市新規感染者数の推移（日次）", font_properties=font)
-        ax.set_ylabel("新規感染者数（人）", font_properties=font)
         ax.tick_params(labelsize=8)
         ax.tick_params(axis="x", rotation=45)
         fig.tight_layout()
@@ -262,10 +260,7 @@ class MonthTotalView(GraphView):
         month_total_x = [row[0].strftime("%Y-%m") for row in month_total_data]
         month_total_y = [row[1] for row in month_total_data]
         ax.bar(month_total_x, month_total_y, facecolor="salmon")
-        ax.yaxis.set_major_locator(MultipleLocator(100))
-        ax.grid(axis="y", color="lightgray")
-        ax.set_title("旭川市累計感染者数の推移（月次）", font_properties=font)
-        ax.set_ylabel("累計感染者数（人）", font_properties=font)
+        ax.yaxis.set_major_locator(MultipleLocator(500))
         ax.tick_params(labelsize=8)
         ax.tick_params(axis="x", rotation=45)
         fig.tight_layout()
@@ -466,10 +461,8 @@ class PerHundredThousandPopulationView(GraphView):
             color="lightgray",
             label="札幌市",
         )
-        ax.yaxis.set_major_locator(MultipleLocator(5))
+        ax.yaxis.set_major_locator(MultipleLocator(25))
         ax.grid(axis="y", color="lightgray")
-        ax.set_title("旭川市1週間の人口10万人あたり新規感染者数の推移", font_properties=font)
-        ax.set_ylabel("1週間の新規感染者数（人/人口10万人あたり）", font_properties=font)
         ax.tick_params(labelsize=8)
         ax.tick_params(axis="x", rotation=45)
         ax.legend(prop=legend_font, loc=0)
@@ -578,7 +571,6 @@ class WeeklyPerAgeView(GraphView):
                 color=colors[i],
             )
         ax.tick_params(labelsize=8)
-        ax.set_title("旭川市年代別新規感染者数の推移（週別）", font_properties=font)
         ax.legend(df.index.tolist(), prop=legend_font, loc=4)
         fig.tight_layout()
         canvas = FigureCanvasAgg(fig)
