@@ -1,0 +1,97 @@
+{% extends 'layout.html' %}
+{% block content %}
+<article>
+  <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+    <p class="mb-0">{{ last_updated }}にダウンロードしたデータを元に表示しています。正確な情報は必ず<a class="alert-link"
+        href="https://asahikawa-vaccine.jp/" title="旭川市 新型コロナワクチン接種特設サイト"
+        target="_blank">旭川市 新型コロナワクチン接種特設サイト</a>を確認してください。</p>
+    <button type="button" class="close" data-dismiss="alert" aria-label="close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <section>
+        <h1 class="h5 card-title">{{ title }}</h1>
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th class="text-nowrap">
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item">医療機関名</li>
+                    <li class="list-group-item">接種するワクチン</li>
+                    <li class="list-group-item">住所</li>
+                    <li class="list-group-item">電話番号</li>
+                  </ul>
+                </th>
+                <th class="text-nowrap">予約受付開始時期</th>
+                <th class="text-nowrap">接種可能時期</th>
+                <th class="text-nowrap">年齢</th>
+                <th>かかりつけ</th>
+                <th>かかりつけ以外</th>
+                <th class="text-nowrap">その他</th>
+                <th class="text-nowrap">備考</th>
+              </tr>
+            </thead>
+            <tbody id="results" data-length="{{ search_lengths|tojson }}">
+              {% for search_result in search_results %}
+              <tr id="order{{ loop.index }}" data-latitude="{{ search_result.latitude|tojson }}"
+                data-longitude="{{ search_result.longitude|tojson }}" data-name="{{ search_result.medical_institution_name|safe }}"
+                data-url="{{ search_result.medical_institution_name_url|safe }}">
+                <td class="text-nowrap">
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item">{{  search_result.medical_institution_name }}</li>
+                    <li class="list-group-item">{{ search_result.vaccine }}</li>
+                    <li class="list-group-item">{{ search_result.address }}</li>
+                    <li class="list-group-item">{{ search_result.phone_number }}</li>
+                  </ul>
+                </td>
+                <td class="text-nowrap">{{ search_result.status }}</td>
+                <td class="text-nowrap">{{ search_result.inoculation_time }}</td>
+                <td class="text-nowrap">{{ search_result.age }}</td>
+                {% if search_result.is_target_family is none %}
+                  <td></td>
+                {% elif search_result.is_target_family %}
+                  <td>OK</td>
+                {% else %}
+                  <td>NG</td>
+                {% endif %}
+                {% if search_result.is_target_not_family is none %}
+                  <td></td>
+                {% elif search_result.is_target_not_family %}
+                  <td>OK</td>
+                {% else %}
+                  <td>NG</td>
+                {% endif %}
+                <td class="text-nowrap">{{ search_result.other }}</td>
+                <td class="text-nowrap">{{ search_result.memo }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+  <div class="card mt-3">
+    <div class="card-body">
+      <section>
+        <h2 class="h5 card-title">{{ area }}の医療機関マップ</h2>
+        <p class="card-text">地図の表示はあくまで目安ですので、正確な場所の情報は各医療機関のホームページ等でご確認ください。</p>
+        <div id="mapid" class="mb-3"></div>
+        <p class="card-text small">医療機関の位置情報は、<a href="https://developer.yahoo.co.jp/webapi/map/"
+            title="Yahoo! Open Local Platform" target="_blank">Yahoo! Open Local Platform (YOLP)
+          </a>のYahoo!ローカルサーチAPIを使用して取得しています。
+          <!-- Begin Yahoo! JAPAN Web Services Attribution Snippet -->
+          <a href="https://developer.yahoo.co.jp/sitemap/">
+            <img src="https://s.yimg.jp/images/yjdn/yjdn_attbtn1_125_17.gif" title="Webサービス by Yahoo! JAPAN"
+              alt="Web Services by Yahoo! JAPAN" width="125" height="17" border="0"></a>
+          <!-- End Yahoo! JAPAN Web Services Attribution Snippet -->
+        </p>
+      </section>
+    </div>
+  </div>
+</article>
+<script charset="utf-8" src="{{ url_for('static', filename='js/show_map_reservation.js') }}"></script>
+{% endblock %}

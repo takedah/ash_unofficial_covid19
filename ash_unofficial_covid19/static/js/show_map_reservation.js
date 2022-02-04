@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function() {
       document.getElementById("order" + currentOrder).dataset.url));
     locationData["latitude" + currentOrder] = latitude
     locationData["longitude" + currentOrder] = longitude
-    locationData["locationName" + currentOrder] = "<a href='/reservation3_statuses/" + url + "'>" + locationName + "</a>"
+    locationData["locationName" + currentOrder] = "<a href='/reservation_status/medical_institution/" + url + "'>" + locationName + "</a>"
     latitudeSum += latitude
     longitudeSum += longitude
   }
@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function() {
     locationData["centerLongitude"] = longitudeSum / resultsLength
   }
 
-  map.setView([locationData["centerLatitude"], locationData["centerLongitude"]], 12);
+  map.setView([locationData["centerLatitude"], locationData["centerLongitude"]], 14);
 
   for (var i = 0; i < resultsLength; i++) {
     var currentReversedOrder = String(resultsLength - i)

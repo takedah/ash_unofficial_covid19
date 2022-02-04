@@ -161,18 +161,19 @@ class ReservationStatusService(Service):
         where_sentence = ""
         if medical_institution_name is not None:
             if isinstance(medical_institution_name, str):
-                search_args.append(medical_institution_name)
                 where_sentence += " " + "WHERE reserve.medical_institution_name=%s"
+                search_args.append(medical_institution_name)
             else:
                 raise TypeError("医療機関名の指定に誤りがあります。")
 
         if area is not None:
             if isinstance(area, str):
-                search_args.append(area)
                 if len(search_args) == 0:
-                    where_sentence += " " + "WHERE area=%s"
+                    where_sentence += " " + "WHERE"
                 else:
-                    where_sentence += " " + "AND area=%s"
+                    where_sentence += " " + "AND"
+                where_sentence += " " + "area=%s"
+                search_args.append(area)
             else:
                 raise TypeError("地区の指定に誤りがあります。")
 

@@ -1,5 +1,6 @@
 import urllib.parse
 from dataclasses import dataclass, field
+from typing import Optional
 
 from ..models.factory import Factory
 
@@ -32,8 +33,8 @@ class ReservationStatus:
     status: str = ""
     inoculation_time: str = ""
     target_age: str = ""
-    is_target_family: bool = False
-    is_target_not_family: bool = False
+    is_target_family: Optional[bool] = None
+    is_target_not_family: Optional[bool] = None
     target_other: str = ""
     memo: str = ""
 

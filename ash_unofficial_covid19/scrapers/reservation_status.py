@@ -149,13 +149,17 @@ class ScrapeReservationStatus(Scraper):
         if not isinstance(target_string, str):
             return {"available": False, "text": ""}
 
-        family_match = re.search("^(.*)○(.*)$", target_string)
+        ok_match = re.search("^(.*)○(.*)$", target_string)
+        ng_match = re.search("^(.*)×(.*)$", target_string)
         family_text = ""
-        if family_match:
-            family_text = family_match.group(1) + family_match.group(2)
+        if ok_match:
+            family_text = ok_match.group(1) + ok_match.group(2)
             return {"available": True, "text": family_text}
+        elif ng_match:
+            family_text = ng_match.group(1) + ng_match.group(2)
+            return {"available": False, "text": family_text}
         else:
-            return {"available": False, "text": ""}
+            return {"available": None, "text": ""}
 
     def get_medical_institution_list(self) -> list:
         """スクレイピング結果から主キーとなる医療機関名のリストを取得

@@ -161,6 +161,7 @@ def patients_pages(page):
 def reservation_statuses():
     reservation_statuses = get_reservation_statuses()
     search_results = reservation_statuses.find()
+    areas = reservation_statuses.get_areas()
 
     search_lengths = len(search_results.items)
     if search_lengths == 0:
@@ -168,9 +169,62 @@ def reservation_statuses():
 
     return render_template(
         "reservation_statuses.html",
-        title="新型コロナワクチン3回目接種の予約受付状況",
+        title="新型コロナワクチン3回目接種医療機関マップ",
         gtag_id=Config.GTAG_ID,
         last_updated=reservation_statuses.last_updated,
+        search_results=search_results.items,
+        search_lengths=search_lengths,
+        areas=areas.items,
+        leaflet=True,
+    )
+
+
+@app.route("/reservation_status/area/<area>")
+def reservation_status_area(area):
+    try:
+        area = escape(area)
+    except ValueError:
+        abort(404)
+
+    reservation_statuses = get_reservation_statuses()
+    search_results = reservation_statuses.find(area=area)
+
+    search_lengths = len(search_results.items)
+    if search_lengths == 0:
+        abort(404)
+
+    return render_template(
+        "reservation_status_area.html",
+        title=area + "の新型コロナワクチン3回目接種医療機関予約受付状況",
+        gtag_id=Config.GTAG_ID,
+        last_updated=reservation_statuses.last_updated,
+        area=area,
+        search_results=search_results.items,
+        search_lengths=search_lengths,
+        leaflet=True,
+    )
+
+
+@app.route("/reservation_status/medical_institution/<medical_institution>")
+def reservation_status_medical_institution(medical_institution):
+    try:
+        medical_institution = escape(medical_institution)
+    except ValueError:
+        abort(404)
+
+    reservation_statuses = get_reservation_statuses()
+    search_results = reservation_statuses.find(medical_institution_name=medical_institution)
+
+    search_lengths = len(search_results.items)
+    if search_lengths == 0:
+        abort(404)
+
+    return render_template(
+        "reservation_status_medical_institution.html",
+        title=medical_institution + "の新型コロナワクチン3回目接種予約受付状況",
+        gtag_id=Config.GTAG_ID,
+        last_updated=reservation_statuses.last_updated,
+        medical_institution=medical_institution,
         search_results=search_results.items,
         search_lengths=search_lengths,
         leaflet=True,
