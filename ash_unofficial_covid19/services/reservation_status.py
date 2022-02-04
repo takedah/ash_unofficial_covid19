@@ -5,7 +5,7 @@ import psycopg2
 from psycopg2.extras import DictCursor
 
 from ..errors import ServiceError
-from ..models.reservation_status import ReservationStatusFactory, ReservationStatusLocationFactory
+from ..models.reservation_status import AreaFactory, ReservationStatusFactory, ReservationStatusLocationFactory
 from ..services.service import Service
 
 
@@ -203,7 +203,7 @@ class ReservationStatusService(Service):
 
         return factory
 
-    def get_areas(self) -> list:
+    def get_areas(self) -> AreaFactory:
         """新型コロナワクチン接種医療機関の地区一覧を取得
 
         Returns:
@@ -211,11 +211,11 @@ class ReservationStatusService(Service):
 
         """
         state = "SELECT DISTINCT(area)" + " " + "FROM" + " " + self.table_name + " " + "ORDER BY area;"
-        areas = list()
+        factory = AreaFactory()
         with self.get_connection() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
                 cur.execute(state)
                 for row in cur.fetchall():
-                    areas.append(row["area"])
+                    factory.create(**{"name": row["area"]})
 
-        return areas
+        return factory

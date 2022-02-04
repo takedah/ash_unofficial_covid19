@@ -1,6 +1,6 @@
 from typing import Optional
 
-from ..models.reservation_status import ReservationStatusLocationFactory
+from ..models.reservation_status import AreaFactory, ReservationStatusLocationFactory
 from ..services.reservation_status import ReservationStatusService
 from ..views.view import View
 
@@ -43,11 +43,16 @@ class ReservationStatusView(View):
         """
         return self.__service.find(medical_institution_name, area)
 
-    def get_areas(self) -> list:
-        """新型コロナワクチン接種医療機関の地区一覧を取得
+    def get_areas(self) -> AreaFactory:
+        """新型コロナワクチン接種医療機関の地区名称とこれをURLパースした文字列一覧を取得
+
+        新型コロナワクチン接種医療機関の地区名称とこれをURLパースした文字列を要素に持つ
+        オブジェクトを返す。
 
         Returns:
-            areas (list): 医療機関の地区一覧リスト
+            areas (:obj:`AreaFactory`): 医療機関の地区・URLパース文字列一覧データ
+                新型コロナワクチン接種医療機関の地区名称とこれをURLパースした文字列
+                データオブジェクトのリストを要素に持つオブジェクトを返す。
 
         """
         return self.__service.get_areas()

@@ -100,4 +100,5 @@ def test_find_all(view):
 
 def test_get_areas(view):
     results = view.get_areas()
-    assert results == ["花咲町・末広・末広東・東鷹栖地区", "西地区"]
+    assert results.items[0].name == "花咲町・末広・末広東・東鷹栖地区"
+    assert results.items[1].name == "西地区"
