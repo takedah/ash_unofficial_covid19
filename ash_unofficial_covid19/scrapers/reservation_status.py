@@ -27,28 +27,33 @@ class ScrapeReservationStatus(Scraper):
 
         """
         Scraper.__init__(self)
+        self.__lists = list()
         downloaded_html = self.get_html(html_url)
-        self.__lists = self._get_status_data(downloaded_html)
+        table_data = self.get_table_data(downloaded_html, "tablepress-1-no-2")
+        for row in table_data:
+            extracted_data = self._extract_status_data(row)
+            if extracted_data:
+                self.__lists.append(extracted_data)
 
     @property
     def lists(self) -> list:
         return self.__lists
 
-    def _get_status_data(self, downloaded_html: DownloadedHTML) -> list:
-        """HTMLからtableの内容を抽出してリストに格納
+    def get_table_data(self, downloaded_html: DownloadedHTML, table_id: str) -> list:
+        """HTMLから医療機関予約受付状況のtableの内容を抽出してリストに格納
 
         Args:
             downloaded_html (:obj:`DownloadedHTML`): ダウンロードしたHTMLデータ
                 ダウンロードしたHTMLファイルのbytesデータを要素に持つオブジェクト
+            table_id (str): 抽出対象のtable要素のid属性
 
         Returns:
-            status_data (list of dict): 医療機関予約受付状況データ
-                HTMLデータから抽出した表データを、医療機関予約受付状況データ辞書の
-                リストで返す。
+            status_data (list of list): table要素の行列データ
+                HTMLデータから抽出した表データを二次元配列リストで返す。
 
         """
         soup = BeautifulSoup(downloaded_html.content, "html.parser")
-        table = soup.find("table", id="tablepress-1-no-2")
+        table = soup.find("table", id=table_id)
         for tbody in table.find_all("tbody"):
             target_tbody = tbody
 
@@ -86,9 +91,7 @@ class ScrapeReservationStatus(Scraper):
                 else:
                     row.append(td.get_text(" ", strip=True))
 
-            extracted_data = self._extract_status_data(row)
-            if extracted_data:
-                status_data.append(extracted_data)
+            status_data.append(row)
 
         return status_data
 
