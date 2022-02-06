@@ -72,7 +72,7 @@ class ScrapeFirstReservationStatus(ScrapeReservationStatus):
                 "medical_institution_name": row[1].replace(" ", ""),
                 "address": row[2],
                 "phone_number": row[3],
-                "vaccine": None,
+                "vaccine": "",
                 "status": row[4].replace("―", ""),
                 "inoculation_time": row[5].replace("―", ""),
                 "target_age": row[6].replace("―", ""),

@@ -26,7 +26,7 @@ class FirstReservationStatus(ReservationStatus):
 
     """
 
-    vaccine: Optional[str] = None
+    vaccine: str = ""
     is_target_suberb: Optional[bool] = None
 
 
@@ -98,7 +98,7 @@ class FirstReservationStatusLocation(ReservationStatusLocation):
 
     """
 
-    vaccine: Optional[str] = None
+    vaccine: str = ""
     is_target_suberb: Optional[bool] = None
 
 
