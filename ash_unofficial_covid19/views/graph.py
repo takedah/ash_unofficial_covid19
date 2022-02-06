@@ -160,10 +160,6 @@ class DailyTotalView(GraphView):
             graph_image (BytesIO): グラフの画像データ
 
         """
-        font = FontProperties(
-            fname="./ash_unofficial_covid19/static/fonts/NotoSansCJKjp-Light.otf",
-            size=12,
-        )
         if figsize:
             fig = plt.figure(figsize=figsize)
         else:
@@ -248,10 +244,6 @@ class MonthTotalView(GraphView):
         """
         # グラフの描画は直近12か月分のみとする
         month_total_data = self.__month_total_data[-12:]
-        font = FontProperties(
-            fname="./ash_unofficial_covid19/static/fonts/NotoSansCJKjp-Light.otf",
-            size=12,
-        )
         if figsize:
             fig = plt.figure(figsize=figsize)
         else:
@@ -432,7 +424,6 @@ class PerHundredThousandPopulationView(GraphView):
 
         """
         font_file = "./ash_unofficial_covid19/static/fonts/NotoSansCJKjp-Light.otf"
-        font = FontProperties(fname=font_file, size=12)
         legend_font = FontProperties(fname=font_file, size=10)
         if figsize:
             fig = plt.figure(figsize=figsize)
@@ -542,7 +533,6 @@ class WeeklyPerAgeView(GraphView):
         """
         df = self.__aggregate_by_weeks_per_age.transpose()
         font_file = "./ash_unofficial_covid19/static/fonts/NotoSansCJKjp-Light.otf"
-        font = FontProperties(fname=font_file, size=12)
         legend_font = FontProperties(fname=font_file, size=10)
         if figsize:
             fig = plt.figure(figsize=figsize)
