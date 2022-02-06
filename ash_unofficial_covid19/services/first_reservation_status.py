@@ -5,22 +5,27 @@ import psycopg2
 from psycopg2.extras import DictCursor
 
 from ..errors import ServiceError
-from ..models.reservation_status import AreaFactory, ReservationStatusFactory, ReservationStatusLocationFactory
+from ..models.first_reservation_status import FirstReservationStatusFactory, FirstReservationStatusLocationFactory
+from ..models.reservation_status import AreaFactory
 from ..services.service import Service
 
 
-class ReservationStatusService(Service):
-    """旭川市新型コロナ接種医療機関の予約受付状況データを扱うサービス"""
+class FirstReservationStatusService(Service):
+    """旭川市新型コロナ1・2回目接種医療機関の予約受付状況データを扱うサービス
+
+    1・2回目接種医療機関の予約受付状況は暫定的にテーブルを分けることにする。
+
+    """
 
     def __init__(self):
-        table_name = "reservation_statuses"
+        table_name = "first_reservation_statuses"
         Service.__init__(self, table_name)
 
-    def create(self, reservation_statuses: ReservationStatusFactory) -> None:
-        """データベースへ新型コロナワクチン接種医療機関の予約受付状況データを保存
+    def create(self, first_reservation_statuses: FirstReservationStatusFactory) -> None:
+        """データベースへ新型コロナワクチン1・2回目接種医療機関の予約受付状況データを保存
 
         Args:
-            reservation_statuses (:obj:`ReservationStatusFactory`): 予約受付状況データ
+            first_reservation_statuses (:obj:`FirstReservationStatusFactory`): 予約受付状況データ
                 医療機関の予約受付状況データのオブジェクトのリストを要素に持つオブジェクト
 
         """
@@ -35,13 +40,14 @@ class ReservationStatusService(Service):
             "target_age",
             "is_target_family",
             "is_target_not_family",
+            "is_target_suberb",
             "target_other",
             "memo",
             "updated_at",
         )
 
         data_lists = list()
-        for reservation_status in reservation_statuses.items:
+        for reservation_status in first_reservation_statuses.items:
             data_lists.append(
                 [
                     reservation_status.area,
@@ -54,6 +60,7 @@ class ReservationStatusService(Service):
                     reservation_status.target_age,
                     reservation_status.is_target_family,
                     reservation_status.is_target_not_family,
+                    reservation_status.is_target_suberb,
                     reservation_status.target_other,
                     reservation_status.memo,
                     datetime.now(timezone(timedelta(hours=+9))),
@@ -63,11 +70,11 @@ class ReservationStatusService(Service):
         # データベースへ登録処理
         self.upsert(
             items=items,
-            primary_key="medical_institution_name,vaccine",
+            primary_key="medical_institution_name",
             data_lists=data_lists,
         )
 
-    def delete(self, target_values: tuple) -> bool:
+    def delete(self, target_value: str) -> bool:
         """指定した主キーの値を持つデータを削除する
 
         Args:
@@ -77,22 +84,15 @@ class ReservationStatusService(Service):
             result (bool): 削除に成功したら真を返す
 
         """
-        if not isinstance(target_values, tuple):
-            raise TypeError("キーの指定がタプルになっていません。")
-        else:
-            if len(target_values) == 2:
-                for target_value in target_values:
-                    if not isinstance(target_value, str):
-                        raise TypeError("キーの指定が文字列ではありません。")
-            else:
-                raise ServiceError("キーの指定の指定の配列の要素数が正しくありません。")
+        if not isinstance(target_value, str):
+            raise TypeError("キーの指定が文字列になっていません。")
 
-        state = "DELETE FROM " + self.table_name + " " + "WHERE medical_institution_name=%s" + " " + "AND vaccine=%s;"
-        log_message = self.table_name + "テーブルから " + str(target_values[0]) + ", " + str(target_values[1]) + " " + "を"
+        state = "DELETE FROM " + self.table_name + " " + "WHERE medical_institution_name=%s;"
+        log_message = self.table_name + "テーブルから" + " " + target_value + " " + "を"
         with self.get_connection() as conn:
             try:
                 with conn.cursor(cursor_factory=DictCursor) as cur:
-                    cur.execute(state, target_values)
+                    cur.execute(state, (target_value,))
                     result = cur.rowcount
                 if result:
                     self.info_log(log_message + "削除しました。")
@@ -109,47 +109,44 @@ class ReservationStatusService(Service):
                 raise ServiceError(e.args[0])
 
     def get_medical_institution_list(self) -> list:
-        """新型コロナワクチン接種医療機関一覧を取得
+        """新型コロナワクチン1・2回目接種医療機関一覧を取得
 
         Returns:
             medical_institution_list (list of tuple): 医療機関の一覧リスト
-                新型コロナワクチン接種医療機関の名称、ワクチン種類、住所のタプルを
-                リストで返す。
+                新型コロナワクチン1・2回目接種医療機関の名称をリストで返す。
 
         """
         state = (
-            "SELECT DISTINCT ON (medical_institution_name,vaccine)"
-            + " "
-            + "medical_institution_name,vaccine,address"
+            "SELECT DISTINCT(medical_institution_name)"
             + " "
             + "FROM"
             + " "
             + self.table_name
             + " "
-            + "ORDER BY medical_institution_name,vaccine;"
+            + "ORDER BY medical_institution_name;"
         )
         medical_institution_list = list()
         with self.get_connection() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
                 cur.execute(state)
                 for row in cur.fetchall():
-                    medical_institution_list.append((row["medical_institution_name"], row["vaccine"], row["address"]))
+                    medical_institution_list.append(row["medical_institution_name"])
         return medical_institution_list
 
     def find(
         self, medical_institution_name: Optional[str] = None, area: Optional[str] = None
-    ) -> ReservationStatusLocationFactory:
-        """新型コロナワクチン接種医療機関予約状況と位置情報の検索
+    ) -> FirstReservationStatusLocationFactory:
+        """新型コロナワクチン1・2回目接種医療機関予約状況と位置情報の検索
 
-        指定した新型コロナワクチン接種医療機関の予約受付状況と位置情報を返す
+        指定した新型コロナワクチン1・2回目接種医療機関の予約受付状況と位置情報を返す
 
         Args:
             medical_institution_name (str): 医療機関の名称
             area (str): 地区
 
         Returns:
-            results (list of :obj:`ReservationStatusLocation`): 予約受付状況詳細データ
-                新型コロナワクチン接種医療機関予約受付状況の情報に緯度経度を含めた
+            results (list of :obj:`FirstReservationStatusLocation`): 予約受付状況詳細データ
+                新型コロナワクチン1・2回目接種医療機関予約受付状況の情報に緯度経度を含めた
                 データオブジェクトのリスト。
 
         """
@@ -177,7 +174,7 @@ class ReservationStatusService(Service):
             "SELECT "
             + "area,reserve.medical_institution_name,"
             + "address,phone_number,vaccine,status,inoculation_time,target_age,"
-            + "is_target_family,is_target_not_family,target_other,"
+            + "is_target_family,is_target_not_family,is_target_suberb,target_other,"
             + "latitude,longitude,memo "
             + "FROM "
             + self.table_name
@@ -187,8 +184,8 @@ class ReservationStatusService(Service):
             + "LEFT JOIN locations AS loc ON reserve.medical_institution_name="
             + "loc.medical_institution_name"
         )
-        order_sentence = " " + "ORDER BY area,address,vaccine;"
-        factory = ReservationStatusLocationFactory()
+        order_sentence = " " + "ORDER BY area,address;"
+        factory = FirstReservationStatusLocationFactory()
         with self.get_connection() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
                 if len(search_args) == 0:
@@ -201,7 +198,7 @@ class ReservationStatusService(Service):
         return factory
 
     def get_areas(self) -> AreaFactory:
-        """新型コロナワクチン接種医療機関の地区一覧を取得
+        """新型コロナワクチン1・2回目接種医療機関の地区一覧を取得
 
         Returns:
             areas (list): 医療機関の地区一覧リスト

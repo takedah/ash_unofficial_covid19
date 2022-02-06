@@ -120,8 +120,8 @@ class ScrapeReservationStatus(Scraper):
             ):
                 area = "各条１７～２６丁目・宮前・南地区"
 
-            family = self._get_available(row[8])
-            not_family = self._get_available(row[9])
+            family = self.get_available(row[8])
+            not_family = self.get_available(row[9])
             is_target_family = family["available"]
             is_target_not_family = not_family["available"]
             memo = family["text"] + " " + not_family["text"] + " " + row[11]
@@ -145,7 +145,7 @@ class ScrapeReservationStatus(Scraper):
             return None
 
     @staticmethod
-    def _get_available(target_string: str) -> dict:
+    def get_available(target_string: str) -> dict:
         """文字列が対象、対象外のどちらを表しているか判定
 
         かかりつけ、かかりつけ以外の文字列から対象なのかどうかを判定し、
