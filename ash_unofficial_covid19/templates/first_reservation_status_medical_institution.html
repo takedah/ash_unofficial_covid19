@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 {% block content %}
-<article>
+<article id="firstReservationStatus">
   <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
     <p class="mb-0">{{ last_updated }}にダウンロードしたデータを元に表示しています。正確な情報は必ず<a class="alert-link"
         href="https://asahikawa-vaccine.jp/" title="旭川市 新型コロナワクチン接種特設サイト"
@@ -9,18 +9,22 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
+  <div class="alert alert-info alert-dismissible fade show mt-3" role="alert">
+    <p class="mb-0">3回目接種の情報は<a class="alert-link" href="/reservation_statuses" title="ワクチン3回目接種医療機関マップへ">ワクチン3回目接種医療機関マップ</a>をご利用ください。</p>
+    <button type="button" class="close" data-dismiss="alert" aria-label="close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
   <div class="card">
     <div class="card-body">
-      <section>
+      <section id="medicalInstitutionMap">
         <h1 class="h5 card-title">{{ title }}</h1>
         <p class="card-text d-block d-sm-none"><i class="far fa-hand-point-right"></i> 横にスクロールできます。</p>
         <div class="table-responsive">
-          <table class="table table-bordered">
+          <table class="table">
             <thead>
               <tr>
                 <th class="text-nowrap">
-                    医療機関名<br>
-                    接種するワクチン<br>
                     住所<br>
                     電話番号<br>
                 </th>
@@ -29,6 +33,7 @@
                 <th>年齢</th>
                 <th>かかりつけ</th>
                 <th>かかりつけ以外</th>
+                <th>市外</th>
                 <th>その他</th>
                 <th>備考</th>
               </tr>
@@ -39,8 +44,6 @@
                 data-longitude="{{ search_result.longitude|tojson }}" data-name="{{ search_result.medical_institution_name|safe }}"
                 data-url="{{ search_result.medical_institution_name_url|safe }}">
                 <td>
-                    <strong>{{ search_result.medical_institution_name }}</strong><br>
-                    {{ search_result.vaccine }}<br>
                     {{ search_result.address }}<br>
                     {{ search_result.phone_number }}<br>
                 </td>
@@ -61,6 +64,13 @@
                 {% else %}
                   <td>NG</td>
                 {% endif %}
+                {% if search_result.is_target_suberb is none %}
+                  <td></td>
+                {% elif search_result.is_target_suberb %}
+                  <td>OK</td>
+                {% else %}
+                  <td>NG</td>
+                {% endif %}
                 <td>{{ search_result.target_other }}</td>
                 <td>{{ search_result.memo }}</td>
               </tr>
@@ -68,13 +78,6 @@
             </tbody>
           </table>
         </div>
-      </section>
-    </div>
-  </div>
-  <div class="card mt-3">
-    <div class="card-body">
-      <section id="areaMap">
-        <h2 class="h5 card-title">{{ area }}の医療機関（3回目接種）マップ</h2>
         <p class="card-text">地図の表示はあくまで目安ですので、正確な場所の情報は各医療機関のホームページ等でご確認ください。</p>
         <div id="mapid" class="mb-3"></div>
         <p class="card-text small">医療機関の位置情報は、<a href="https://developer.yahoo.co.jp/webapi/map/"
@@ -92,8 +95,8 @@
   <div class="card mt-3">
     <div class="card-body">
       <section>
-        <h3 class="h5 card-title">他の地区から医療機関（3回目接種）を探す</h3>
-        <p class="card-text"><a href="/reservation_statuses" title="ワクチン3回目接種医療機関マップへ">ワクチン3回目接種医療機関マップへ</a></p>
+        <h2 class="h5 card-title">{{ medical_institution }}と同じ地区の医療機関（1・2回目接種）を探す</h2>
+        <p class="card-text"><a href="/first_reservation_status/area/{{ search_results[0].area_url }}" title="{{ search_results[0].area }}の新型コロナワクチン3回目接種医療機関一覧へ">{{ search_results[0].area }}の医療機関（1・2回目接種）一覧へ</a></p>
       </section>
     </div>
   </div>

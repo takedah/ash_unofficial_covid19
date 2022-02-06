@@ -22,7 +22,13 @@ document.addEventListener("DOMContentLoaded", function() {
       document.getElementById("order" + currentOrder).dataset.url));
     locationData["latitude" + currentOrder] = latitude
     locationData["longitude" + currentOrder] = longitude
-    locationData["locationName" + currentOrder] = "<a href='/reservation_status/medical_institution/" + url + "'>" + locationName + "</a>"
+    var parentPath = ""
+    if (document.getElementById("firstReservationStatus")) {
+      parentPath = "first_reservation_status"
+    } else {
+      parentPath = "reservation_status"
+    }
+    locationData["locationName" + currentOrder] = "<a href='/" + parentPath + "/medical_institution/" + url + "'>" + locationName + "</a>"
     latitudeSum += latitude
     longitudeSum += longitude
   }
@@ -34,16 +40,31 @@ document.addEventListener("DOMContentLoaded", function() {
     locationData["centerLongitude"] = longitudeSum / resultsLength
   }
 
-  map.setView([locationData["centerLatitude"], locationData["centerLongitude"]], 14);
+  var zoomLevel = 0
+  if (document.getElementById("areaMap")) {
+    zoomLevel = 15
+  } else if (document.getElementById("medicalInstitutionMap")) {
+    zoomLevel = 16
+  } else {
+    zoomLevel = 14
+  }
+  map.setView([locationData["centerLatitude"], locationData["centerLongitude"]], zoomLevel);
 
   for (var i = 0; i < resultsLength; i++) {
     var currentReversedOrder = String(resultsLength - i)
-    L.marker([
-      locationData["latitude" + currentReversedOrder],
-      locationData["longitude" + currentReversedOrder]
-    ]).addTo(map)
-      .bindPopup(locationData["locationName" + currentReversedOrder], {autoClose:
-        false});
+    var marker = L.marker([
+        locationData["latitude" + currentReversedOrder],
+        locationData["longitude" + currentReversedOrder]
+      ])
+    if (document.getElementById("allMap")) {
+      marker.addTo(map)
+        .bindPopup(locationData["locationName" + currentReversedOrder], {autoClose:
+          false});
+    } else {
+      marker.addTo(map)
+        .bindPopup(locationData["locationName" + currentReversedOrder], {autoClose:
+          false})
+        .openPopup();
+    }
   }
-
 }, false);

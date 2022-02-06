@@ -7,6 +7,7 @@ from .views.graph import ByAgeView, DailyTotalView, MonthTotalView, PerHundredTh
 from .views.patient import AsahikawaPatientView
 from .views.patients_number import PatientsNumberView
 from .views.reservation_status import ReservationStatusView
+from .views.first_reservation_status import FirstReservationStatusView
 
 app = Flask(__name__)
 
@@ -48,6 +49,11 @@ def get_patients_numbers():
 def get_reservation_statuses():
     g.reservation_statuses = ReservationStatusView()
     return g.reservation_statuses
+
+
+def get_first_reservation_statuses():
+    g.first_reservation_statuses = FirstReservationStatusView()
+    return g.first_reservation_statuses
 
 
 def get_daily_total():
@@ -226,6 +232,80 @@ def reservation_status_medical_institution(medical_institution):
         title=medical_institution + "の新型コロナワクチン3回目接種予約受付状況",
         gtag_id=Config.GTAG_ID,
         last_updated=reservation_statuses.last_updated,
+        medical_institution=medical_institution,
+        search_results=search_results.items,
+        search_lengths=search_lengths,
+        leaflet=True,
+    )
+
+
+@app.route("/first_reservation_statuses")
+def first_reservation_statuses():
+    first_reservation_statuses = get_first_reservation_statuses()
+    search_results = first_reservation_statuses.find()
+    areas = first_reservation_statuses.get_areas()
+
+    search_lengths = len(search_results.items)
+    if search_lengths == 0:
+        abort(404)
+
+    return render_template(
+        "first_reservation_statuses.html",
+        title="新型コロナワクチン1・2回目接種医療機関マップ",
+        gtag_id=Config.GTAG_ID,
+        last_updated=first_reservation_statuses.last_updated,
+        search_results=search_results.items,
+        search_lengths=search_lengths,
+        areas=areas.items,
+        leaflet=True,
+    )
+
+
+@app.route("/first_reservation_status/area/<area>")
+def first_reservation_status_area(area):
+    try:
+        area = escape(area)
+    except ValueError:
+        abort(404)
+
+    first_reservation_statuses = get_first_reservation_statuses()
+    search_results = first_reservation_statuses.find(area=area)
+
+    search_lengths = len(search_results.items)
+    if search_lengths == 0:
+        abort(404)
+
+    return render_template(
+        "first_reservation_status_area.html",
+        title=area + "の新型コロナワクチン1・2回目接種医療機関予約受付状況",
+        gtag_id=Config.GTAG_ID,
+        last_updated=first_reservation_statuses.last_updated,
+        area=area,
+        search_results=search_results.items,
+        search_lengths=search_lengths,
+        leaflet=True,
+    )
+
+
+@app.route("/first_reservation_status/medical_institution/<medical_institution>")
+def first_reservation_status_medical_institution(medical_institution):
+    try:
+        medical_institution = escape(medical_institution)
+    except ValueError:
+        abort(404)
+
+    first_reservation_statuses = get_first_reservation_statuses()
+    search_results = first_reservation_statuses.find(medical_institution_name=medical_institution)
+
+    search_lengths = len(search_results.items)
+    if search_lengths == 0:
+        abort(404)
+
+    return render_template(
+        "first_reservation_status_medical_institution.html",
+        title=medical_institution + "の新型コロナワクチン1・2回目接種予約受付状況",
+        gtag_id=Config.GTAG_ID,
+        last_updated=first_reservation_statuses.last_updated,
         medical_institution=medical_institution,
         search_results=search_results.items,
         search_lengths=search_lengths,
