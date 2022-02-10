@@ -131,6 +131,7 @@ class AtomView:
             + "  <title>旭川市新型コロナウイルスまとめサイト</title>\n"
             + "  <author>\n"
             + "    <name>takedah</name>\n"
+            + "    <uri>https://github.com/takedah/ash_unofficial_covid19</uri>\n"
             + "  </author>\n"
             + "  <updated>"
             + self.today.strftime("%Y-%m-%dT16:00:00+09:00")
