@@ -2,12 +2,12 @@ from flask import Flask, abort, escape, g, make_response, render_template
 
 from .config import Config
 from .errors import ServiceError
-from .views.atom import AtomView
+from .views.first_reservation_status import FirstReservationStatusView
 from .views.graph import ByAgeView, DailyTotalView, MonthTotalView, PerHundredThousandPopulationView, WeeklyPerAgeView
 from .views.patient import AsahikawaPatientView
 from .views.patients_number import PatientsNumberView
 from .views.reservation_status import ReservationStatusView
-from .views.first_reservation_status import FirstReservationStatusView
+from .views.xml import AtomView, RssView
 
 app = Flask(__name__)
 
@@ -84,6 +84,11 @@ def get_weekly_per_age():
 def get_atom():
     g.atom = AtomView()
     return g.atom
+
+
+def get_rss():
+    g.rss = RssView()
+    return g.rss
 
 
 @app.route("/")
@@ -434,6 +439,17 @@ def atom_xml():
     res.data = xml_data
     res.headers["Content-Type"] = "application/atom+xml"
     res.headers["Content-Disposition"] = "attachment: filename=" + "atom.xml"
+    return res
+
+
+@app.route("/rss.xml")
+def rss_xml():
+    rss = get_rss()
+    xml_data = rss.get_feed()
+    res = make_response()
+    res.data = xml_data
+    res.headers["Content-Type"] = "application/rss+xml"
+    res.headers["Content-Disposition"] = "attachment: filename=" + "rss.xml"
     return res
 
 

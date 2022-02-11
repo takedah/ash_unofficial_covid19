@@ -9,7 +9,7 @@ from ..services.patients_number import PatientsNumberService
 from ..services.press_release_link import PressReleaseLinkService
 
 
-class AtomView:
+class XmlView:
     def __init__(self):
         today = self._get_today()
         last_week = today - relativedelta(days=7)
@@ -102,8 +102,16 @@ class AtomView:
         service = PatientsNumberService()
         return service.get_per_hundred_thousand_population_per_week(from_date=from_date, to_date=to_date)
 
+    def get_feed(self):
+        pass
+
+
+class RssView(XmlView):
+    def __init__(self):
+        XmlView.__init__(self)
+
     def get_feed(self) -> str:
-        """Atom Feed文字列を返す
+        """RSS Feed文字列を返す
 
         Returns:
             feed (str): Atom Feed文字列
@@ -117,7 +125,68 @@ class AtomView:
             + self.increase_from_seven_days_before
             + "人でした。"
             + "直近1週間の人口10万人あたりの新規感染者数は"
-            + self.__this_week_per
+            + self.this_week_per
+            + "人で、先週から"
+            + self.increase_from_last_week_per
+            + "人となっています。"
+        )
+        return (
+            "<?xml version='1.0' encoding='UTF-8'?>\n"
+            + "<rss version='2.0' xmlns:atom='http://www.w3.org/2005/Atom'>\n"
+            + "  <channel>\n"
+            + "    <atom:link href='https://"
+            + Config.MY_DOMAIN
+            + "/rss.xml' rel='self' type='application/rss+xml' />\n"
+            + "    <title>旭川市新型コロナウイルスまとめサイト</title>\n"
+            + "    <link>https://"
+            + Config.MY_DOMAIN
+            + "/</link>\n"
+            + "    <description>\n"
+            + "旭川市の新型コロナウイルス感染症新規感染者数などの情報を集計して"
+            + "グラフとデータで公開しています。"
+            + "また、新型コロナワクチン接種医療機関を地図から探せるページも"
+            + "公開しています。\n"
+            + "    </description>\n"
+            + "    <item>\n"
+            + "      <guid isPermaLink='true'>https://"
+            + Config.MY_DOMAIN
+            + "/</guid>\n"
+            + "      <title>旭川市内感染状況の最新動向</title>\n"
+            + "      <link>https://"
+            + Config.MY_DOMAIN
+            + "/</link>\n"
+            + "      <pubDate>"
+            + self.today.strftime("%a, %d %b %Y 16:00:00 +0900")
+            + "</pubDate>\n"
+            + "      <description>"
+            + summary
+            + "</description>\n"
+            + "    </item>\n"
+            + "  </channel>\n"
+            + "</rss>\n"
+        )
+
+
+class AtomView(XmlView):
+    def __init__(self):
+        XmlView.__init__(self)
+
+    def get_feed(self) -> str:
+        """ATOM Feed文字列を返す
+
+        Returns:
+            feed (str): Atom Feed文字列
+
+        """
+        summary = (
+            self.today.strftime("%Y/%m/%d (%a)")
+            + " の旭川市の新型コロナ新規感染者数は"
+            + self.most_recent
+            + "人で、先週の同じ曜日から"
+            + self.increase_from_seven_days_before
+            + "人でした。"
+            + "直近1週間の人口10万人あたりの新規感染者数は"
+            + self.this_week_per
             + "人で、先週から"
             + self.increase_from_last_week_per
             + "人となっています。"

@@ -1,7 +1,7 @@
 from typing import Optional
 
-from ..models.reservation_status import AreaFactory
 from ..models.first_reservation_status import FirstReservationStatusLocationFactory
+from ..models.reservation_status import AreaFactory
 from ..services.first_reservation_status import FirstReservationStatusService
 from ..views.view import View
 
