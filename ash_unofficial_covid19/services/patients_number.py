@@ -154,38 +154,42 @@ class PatientsNumberService(Service):
 
         return factory
 
-    def get_rows(self) -> list:
-        """日別年代別陽性患者数データをリストを返す
+    def get_dicts(self, from_date: date, to_date: date) -> dict:
+        """指定した期間の日別年代別陽性患者数データを辞書で返す
+
+        Args:
+            from_date (obj:`date`): 集計の始期
+            to_date (obj:`date`): 集計の終期
 
         Returns:
-            rows (list of list): 日別年代別陽性患者数データの二次元配列
+            dicts (dict): 日別年代別陽性患者数データの辞書
 
         """
-        patients_numbers = self.find()
-        rows = list()
-        for patients_number in patients_numbers.items:
-            publication_date = patients_number.publication_date.strftime("%Y-%m-%d")
-            rows.append(
-                [
-                    str(v) if isinstance(v, int) else v
-                    for v in [
-                        publication_date,
-                        patients_number.age_under_10,
-                        patients_number.age_10s,
-                        patients_number.age_20s,
-                        patients_number.age_30s,
-                        patients_number.age_40s,
-                        patients_number.age_50s,
-                        patients_number.age_60s,
-                        patients_number.age_70s,
-                        patients_number.age_80s,
-                        patients_number.age_over_90,
-                        patients_number.investigating,
-                    ]
-                ]
-            )
+        if not isinstance(from_date, date) or not isinstance(to_date, date):
+            raise ServiceError("期間の範囲指定が日付になっていません。")
 
-        return rows
+        state = (
+            "SELECT"
+            + " "
+            + "publication_date,age_under_10,age_10s,age_20s,age_30s,age_40s,age_50s,"
+            + "age_60s,age_70s,age_80s,age_over_90,investigating"
+            + " "
+            + "FROM"
+            + " "
+            + self.table_name
+            + " "
+            + "WHERE publication_date BETWEEN %s AND %s ORDER BY publication_date;"
+        )
+        dicts = dict()
+        with self.get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
+                for row in cur.fetchall():
+                    patients_number_per_age = dict(row)
+                    del patients_number_per_age["publication_date"]
+                    dicts[row["publication_date"].strftime("%Y-%m-%d")] = patients_number_per_age
+
+        return dicts
 
     def get_aggregate_by_days(self, from_date: date, to_date: date) -> list:
         """指定した期間の1日ごとの陽性患者数の集計結果を返す

@@ -68,12 +68,36 @@ class TestPatientsNumberService:
         result = results.items[0]
         assert result.age_under_10 == 18
 
-    def test_get_rows(self, service):
-        results = service.get_rows()
-        expect = [
-            ["2022-01-28", "12", "19", "12", "14", "13", "15", "3", "2", "2", "0", "5"],
-            ["2022-01-29", "18", "19", "14", "14", "16", "8", "5", "2", "1", "0", "5"],
-        ]
+    def test_get_dicts(self, service):
+        results = service.get_dicts(from_date=date(2022, 1, 28), to_date=date(2022, 1, 29))
+        expect = {
+            "2022-01-28": {
+                "age_under_10": 12,
+                "age_10s": 19,
+                "age_20s": 12,
+                "age_30s": 14,
+                "age_40s": 13,
+                "age_50s": 15,
+                "age_60s": 3,
+                "age_70s": 2,
+                "age_80s": 2,
+                "age_over_90": 0,
+                "investigating": 5,
+            },
+            "2022-01-29": {
+                "age_under_10": 18,
+                "age_10s": 19,
+                "age_20s": 14,
+                "age_30s": 14,
+                "age_40s": 16,
+                "age_50s": 8,
+                "age_60s": 5,
+                "age_70s": 2,
+                "age_80s": 1,
+                "age_over_90": 0,
+                "investigating": 5,
+            },
+        }
         assert results == expect
 
     def test_get_aggregate_by_days(self, service):

@@ -56,7 +56,7 @@ class PatientsNumberView(View):
             to_date (obj:`date`): 集計の終期
 
         Returns:
-            csv_data (str): 陽性患者属性CSVファイルの文字列データ
+            csv_data (str): 陽性患者日計CSVファイルの文字列データ
 
         """
         from_date = date(2020, 2, 23)
@@ -70,3 +70,19 @@ class PatientsNumberView(View):
             ],
         )
         return self.list_to_csv(csv_data)
+
+    def get_daily_total_per_age_json(self) -> str:
+        """陽性患者年代別日計JSONファイルの文字列データを返す
+
+        Args:
+            from_date (obj:`date`): 集計の始期
+            to_date (obj:`date`): 集計の終期
+
+        Returns:
+            csv_data (str): 日別年代別陽性患者数JSONファイルの文字列データ
+
+        """
+        from_date = date(2020, 2, 23)
+        to_date = self.get_today()
+        json_data = self.__service.get_dicts(from_date=from_date, to_date=to_date)
+        return self.dict_to_json(json_data)
