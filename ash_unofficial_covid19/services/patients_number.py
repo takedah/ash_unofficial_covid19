@@ -30,8 +30,8 @@ class PatientsNumberService(Service):
         if not isinstance(from_date, date) or not isinstance(to_date, date):
             raise ServiceError("期間の範囲指定が日付になっていません。")
 
-        if from_date < date(2020, 2, 23):
-            raise ServiceError("集計の始期には2020年2月23日より前の日付を指定できません。")
+        if from_date < date(2020, 1, 1):
+            raise ServiceError("集計の始期には2020年1月1日より前の日付を指定できません。")
         elif datetime.now(timezone(timedelta(hours=+9), "JST")).date() < to_date:
             raise ServiceError("集計の終期には未来の日付を指定できません。")
         else:
@@ -173,6 +173,68 @@ class PatientsNumberService(Service):
 
         return factory
 
+    def get_lists(self, from_date: date, to_date: date) -> list:
+        """指定した期間の日別年代別陽性患者数データをリストで返す
+
+        Args:
+            from_date (obj:`date`): 集計の始期
+            to_date (obj:`date`): 集計の終期
+
+        Returns:
+            lists (list): 日別年代別陽性患者数データのリスト
+
+        """
+        self._date_range_validator(from_date, to_date)
+        state = (
+            "SELECT date(from_day) AS publication_date,"
+            + "age_under_10,age_10s,age_20s,age_30s,age_40s,age_50s,"
+            + "age_60s,age_70s,age_80s,age_over_90,investigating"
+            + " "
+            + "FROM"
+            + " "
+            + "(SELECT generate_series AS from_day, "
+            + "generate_series + '1 day'::interval AS to_day FROM "
+            + "generate_series(%s::DATE, %s::DATE, '1 day')) "
+            + "AS day_ranges LEFT JOIN"
+            + " "
+            + self.table_name
+            + " "
+            + "ON from_day <="
+            + " "
+            + self.table_name
+            + ".publication_date"
+            + " "
+            + "AND"
+            + " "
+            + self.table_name
+            + ".publication_date"
+            + " "
+            + "< to_day ORDER BY publication_date;"
+        )
+        lists = list()
+        with self.get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
+                for row in cur.fetchall():
+                    tmp = [
+                        row["publication_date"].strftime("%Y-%m-%d"),
+                        row["age_under_10"],
+                        row["age_10s"],
+                        row["age_20s"],
+                        row["age_30s"],
+                        row["age_40s"],
+                        row["age_50s"],
+                        row["age_60s"],
+                        row["age_70s"],
+                        row["age_80s"],
+                        row["age_over_90"],
+                        row["investigating"],
+                    ]
+                    values = list(map(lambda v: 0 if v is None else v, tmp))
+                    lists.append(values)
+
+        return lists
+
     def get_dicts(self, from_date: date, to_date: date) -> dict:
         """指定した期間の日別年代別陽性患者数データを辞書で返す
 
@@ -186,16 +248,30 @@ class PatientsNumberService(Service):
         """
         self._date_range_validator(from_date, to_date)
         state = (
-            "SELECT"
-            + " "
-            + "publication_date,age_under_10,age_10s,age_20s,age_30s,age_40s,age_50s,"
+            "SELECT date(from_day) AS publication_date,"
+            + "age_under_10,age_10s,age_20s,age_30s,age_40s,age_50s,"
             + "age_60s,age_70s,age_80s,age_over_90,investigating"
             + " "
             + "FROM"
             + " "
+            + "(SELECT generate_series AS from_day, "
+            + "generate_series + '1 day'::interval AS to_day FROM "
+            + "generate_series(%s::DATE, %s::DATE, '1 day')) "
+            + "AS day_ranges LEFT JOIN"
+            + " "
             + self.table_name
             + " "
-            + "WHERE publication_date BETWEEN %s AND %s ORDER BY publication_date;"
+            + "ON from_day <="
+            + " "
+            + self.table_name
+            + ".publication_date"
+            + " "
+            + "AND"
+            + " "
+            + self.table_name
+            + ".publication_date"
+            + " "
+            + "< to_day ORDER BY publication_date;"
         )
         dicts = dict()
         with self.get_connection() as conn:
@@ -203,7 +279,7 @@ class PatientsNumberService(Service):
                 cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
                 for row in cur.fetchall():
                     key = row["publication_date"].strftime("%Y-%m-%d")
-                    value = dict(row)
+                    value = {k: 0 if v is None else v for (k, v) in dict(row).items()}
                     del value["publication_date"]
                     dicts[key] = value
 

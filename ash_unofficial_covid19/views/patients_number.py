@@ -88,6 +88,26 @@ class PatientsNumberView(View):
         json_data = dict((d.strftime("%Y-%m-%d"), n) for d, n in aggregate_by_days)
         return self.dict_to_json(json_data)
 
+    def get_daily_total_per_age_csv(self) -> str:
+        """陽性患者年代別日計CSVファイルの文字列データを返す
+
+        Args:
+            from_date (obj:`date`): 集計の始期
+            to_date (obj:`date`): 集計の終期
+
+        Returns:
+            json_data (str): 日別年代別陽性患者数JSONファイルの文字列データ
+
+        """
+        from_date = date(2020, 2, 23)
+        to_date = self.get_today()
+        csv_data = self.__service.get_lists(from_date=from_date, to_date=to_date)
+        csv_data.insert(
+            0,
+            ["公表日", "10歳未満", "10代", "20代", "30代", "40代", "50代", "60代", "70代", "80代", "90歳以上", "調査中等"],
+        )
+        return self.list_to_csv(csv_data)
+
     def get_daily_total_per_age_json(self) -> str:
         """陽性患者年代別日計JSONファイルの文字列データを返す
 

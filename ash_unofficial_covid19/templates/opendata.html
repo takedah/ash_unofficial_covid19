@@ -8,26 +8,135 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-  <div class="card mt-3">
-    <div class="card-body">
-      <section>
-        <h2 class="h5 card-title">日別陽性患者数CSV</h2>
+  <div class="card-group mt-3">
+    <div class="card">
+      <div class="card-header">
+        日別陽性患者数CSV
+      </div>
+      <div class="card-body">
         <p class="card-text">日ごとの新規感染者数です。</p>
         <h3 class="h6 card-title">データレイアウト</h3>
-        <table class="table table-bordered table-hover">
+        <table class="table table-bordered table-striped table-sm">
+          <thead>
+            <tr>
+              <th>Header</th>
+              <th>Body</th>
+            </tr>
+          </thead>
           <tbody>
             <tr>
-              <th>公表日</th>
+              <td>公表日</td>
               <td>報道発表日</td>
             </tr>
             <tr>
-              <th>陽性患者数</th>
-              <td>発表された陽性患者数</td>
+              <td>陽性患者数</td>
+              <td>その日の陽性患者数の合計</td>
             </tr>
           </tbody>
         </table>
         <p class="card-text mt-3"><a href="/012041_asahikawa_covid19_daily_total.csv" title="旭川市新型コロナ日別陽性患者数CSVをダウンロード" class="btn btn-primary">日別陽性患者数CSVをダウンロード</a></p>
-      </section>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        日別陽性患者数JSON
+      </div>
+      <div class="card-body">
+        <p class="card-text">日ごとの新規感染者数のJSONです。</p>
+        <h2 class="h6 card-title">データレイアウト</h2>
+        <pre class="border text-light bg-dark pre-scrollable"><code>
+        {
+          "公表日 (YYYY-mm-dd)": 陽性患者数
+        }
+        </code></pre>
+        <p class="card-text mt-3"><a href="/api/daily_total.json" title="旭川市新型コロナ日別陽性患者数JSONをダウンロード" class="btn btn-primary">日別陽性患者数JSONをダウンロード</a></p>
+      </div>
+    </div>
+  </div>
+  <div class="card-group mt-3">
+    <div class="card">
+      <div class="card-header">
+        日別年代別陽性患者数CSV
+      </div>
+      <div class="card-body">
+        <p class="card-text">日ごとの年代別新規感染者数です。</p>
+        <h2 class="h6 card-title">データレイアウト</h2>
+        <table class="table table-bordered table-striped table-sm">
+          <thead>
+            <tr>
+              <th>Header</th>
+              <th>Body</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>公表日</td>
+              <td>報道発表日</td>
+            </tr>
+            <td>10歳未満</td>
+            <td>その日の10歳未満の陽性患者数</td>
+            </tr>
+            <td>10代</td>
+            <td>その日の10代の陽性患者数</td>
+            </tr>
+            <td>20代</td>
+            <td>その日の20代の陽性患者数</td>
+            </tr>
+            <td>30代</td>
+            <td>その日の30代の陽性患者数</td>
+            </tr>
+            <td>40代</td>
+            <td>その日の40代の陽性患者数</td>
+            </tr>
+            <td>50代</td>
+            <td>その日の50代の陽性患者数</td>
+            </tr>
+            <td>60代</td>
+            <td>その日の60代の陽性患者数</td>
+            </tr>
+            <td>70代</td>
+            <td>その日の70代の陽性患者数</td>
+            </tr>
+            <td>80代</td>
+            <td>その日の80代の陽性患者数</td>
+            </tr>
+            <td>90歳以上</td>
+            <td>その日の90歳以上の陽性患者数</td>
+            </tr>
+            <td>調査中等</td>
+            <td>その日の調査中等の陽性患者数</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="card-text mt-3"><a href="/012041_asahikawa_covid19_daily_total_per_age.csv" title="旭川市新型コロナ日別年代別陽性患者数CSVをダウンロード" class="btn btn-primary">日別年代別陽性患者数CSVをダウンロード</a></p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        日別年代別陽性患者数JSON
+      </div>
+      <div class="card-body">
+        <p class="card-text">日ごとの年代別新規感染者数のJSONです。</p>
+        <h2 class="h6 card-title">データレイアウト</h2>
+        <pre class="border text-light bg-dark pre-scrollable"><code>
+        {
+          "公表日 (YYYY-mm-dd)": {
+            "age_under_10": 10歳未満の陽性患者数,
+            "age_10s": 10代の陽性患者数,
+            "age_20s": 20代の陽性患者数,
+            "age_30s": 30代の陽性患者数,
+            "age_40s": 40代の陽性患者数,
+            "age_50s": 50代の陽性患者数,
+            "age_60s": 60代の陽性患者数,
+            "age_70s": 70代の陽性患者数,
+            "age_80s": 80代の陽性患者数,
+            "age_over_90": 90歳以上の陽性患者数,
+            "investigating": 調査中等の陽性患者数
+          }
+        }
+        </code></pre>
+        <p class="card-text mt-3"><a href="/api/daily_total_per_age.json" title="旭川市新型コロナ日別年代別陽性患者数JSONをダウンロード" class="btn btn-primary">日別年代別陽性患者数JSONをダウンロード</a></p>
+      </div>
     </div>
   </div>
   <div class="card mt-3">

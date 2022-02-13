@@ -70,9 +70,70 @@ class TestPatientsNumberService:
         result = results.items[0]
         assert result.age_under_10 == 18
 
+    def test_get_lists(self, service):
+        results = service.get_lists(from_date=date(2022, 1, 27), to_date=date(2022, 1, 29))
+        expect = [
+            [
+                "2022-01-27",
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+            ],
+            [
+                "2022-01-28",
+                12,
+                19,
+                12,
+                14,
+                13,
+                15,
+                3,
+                2,
+                2,
+                0,
+                5,
+            ],
+            [
+                "2022-01-29",
+                18,
+                19,
+                14,
+                14,
+                16,
+                8,
+                5,
+                2,
+                1,
+                0,
+                5,
+            ],
+        ]
+        assert results == expect
+
     def test_get_dicts(self, service):
-        results = service.get_dicts(from_date=date(2022, 1, 28), to_date=date(2022, 1, 29))
+        results = service.get_dicts(from_date=date(2022, 1, 27), to_date=date(2022, 1, 29))
         expect = {
+            "2022-01-27": {
+                "age_under_10": 0,
+                "age_10s": 0,
+                "age_20s": 0,
+                "age_30s": 0,
+                "age_40s": 0,
+                "age_50s": 0,
+                "age_60s": 0,
+                "age_70s": 0,
+                "age_80s": 0,
+                "age_over_90": 0,
+                "investigating": 0,
+            },
             "2022-01-28": {
                 "age_under_10": 12,
                 "age_10s": 19,
@@ -104,7 +165,7 @@ class TestPatientsNumberService:
 
     def test_get_dicts_with_invalid_date_range(self, service):
         with pytest.raises(ServiceError):
-            service.get_dicts(from_date=date(2020, 2, 22), to_date=date(2022, 1, 29))
+            service.get_dicts(from_date=date(2019, 12, 31), to_date=date(2022, 1, 29))
 
     def test_get_aggregate_by_days(self, service):
         from_date = date(2022, 1, 27)

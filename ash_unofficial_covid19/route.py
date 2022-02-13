@@ -350,6 +350,17 @@ def daily_total_json():
     return res
 
 
+@app.route("/012041_asahikawa_covid19_daily_total_per_age.csv")
+def daily_total_per_age_csv():
+    patients_numbers = get_patients_numbers()
+    csv_data = patients_numbers.get_daily_total_per_age_csv()
+    res = make_response()
+    res.data = csv_data
+    res.headers["Content-Type"] = "text/csv"
+    res.headers["Content-Disposition"] = "attachment: filename=" + "012041_asahikawa_covid19_daily_total_per_age.csv"
+    return res
+
+
 @app.route("/api/daily_total_per_age.json")
 def daily_total_per_age_json():
     patients_numbers = get_patients_numbers()
