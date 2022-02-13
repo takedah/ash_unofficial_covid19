@@ -136,6 +136,39 @@ class ReservationStatusService(Service):
                     medical_institution_list.append((row["medical_institution_name"], row["vaccine"], row["address"]))
         return medical_institution_list
 
+    def get_dicts(self) -> dict:
+        """新型コロナワクチン接種医療機関予約状況を辞書で返す
+
+        Returns:
+            dicts (dict): 新型コロナワクチン接種医療機関予約受付状況の辞書
+
+        """
+        state = (
+            "SELECT "
+            + "area,medical_institution_name,"
+            + "address,phone_number,vaccine,status,inoculation_time,target_age,"
+            + "is_target_family,is_target_not_family,target_other,memo "
+            + "FROM"
+            + " "
+            + self.table_name
+            + " "
+            + "ORDER BY area,address,vaccine;"
+        )
+        dicts = dict()
+        with self.get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(state)
+                i = 0
+                for row in cur.fetchall():
+                    # 医療機関名とワクチンの種類で複合キーとなっているが分かりにくいので
+                    # 仮の連番をキーに採用する。
+                    key = "row" + str(i)
+                    value = dict(row)
+                    dicts[key] = value
+                    i += 1
+
+        return dicts
+
     def find(
         self, medical_institution_name: Optional[str] = None, area: Optional[str] = None
     ) -> ReservationStatusLocationFactory:

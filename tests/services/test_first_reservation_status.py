@@ -89,6 +89,43 @@ def test_get_medical_institution_list(service):
     assert results == expect
 
 
+def test_get_dicts(service):
+    results = service.get_dicts()
+    expect = {
+        "row0": {
+            "area": "各条１７～２６丁目・宮前・南地区",
+            "medical_institution_name": "森山病院",
+            "address": "宮前2条1丁目",
+            "phone_number": "45-2026予約専用",
+            "vaccine": None,
+            "status": "受付中",
+            "inoculation_time": "2月28日～8月",
+            "target_age": "18歳以上",
+            "is_target_family": True,
+            "is_target_not_family": False,
+            "is_target_suberb": True,
+            "target_other": "",
+            "memo": "月・水 14:00～15:00",
+        },
+        "row1": {
+            "area": "新富・東・金星町地区",
+            "medical_institution_name": "市立旭川病院",
+            "address": "金星町1丁目",
+            "phone_number": "29-0202予約専用",
+            "vaccine": None,
+            "status": "",
+            "inoculation_time": "",
+            "target_age": "",
+            "is_target_family": None,
+            "is_target_not_family": None,
+            "is_target_suberb": None,
+            "target_other": "",
+            "memo": "",
+        },
+    }
+    assert results == expect
+
+
 def test_find_by_medical_institution(service):
     results = service.find(medical_institution_name="森山病院")
     result = results.items[0]

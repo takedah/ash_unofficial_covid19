@@ -56,3 +56,13 @@ class ReservationStatusView(View):
 
         """
         return self.__service.get_areas()
+
+    def get_reservation_status_json(self) -> str:
+        """新型コロナワクチン接種医療機関予約受付状況のJSON文字列データを返す
+
+        Returns:
+            json_data (str): 医療機関予約受付状況JSONファイルの文字列データ
+
+        """
+        json_data = self.__service.get_dicts()
+        return self.dict_to_json(json_data)

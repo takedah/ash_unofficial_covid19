@@ -371,6 +371,26 @@ def daily_total_per_age_json():
     return res
 
 
+@app.route("/api/reservation_status.json")
+def reservation_status_json():
+    reservation_statuses = get_reservation_statuses()
+    json_data = reservation_statuses.get_reservation_status_json()
+    res = make_response()
+    res.data = json_data
+    res.headers["Content-Type"] = "application/json"
+    return res
+
+
+@app.route("/api/first_reservation_status.json")
+def first_reservation_status_json():
+    first_reservation_statuses = get_first_reservation_statuses()
+    json_data = first_reservation_statuses.get_reservation_status_json()
+    res = make_response()
+    res.data = json_data
+    res.headers["Content-Type"] = "application/json"
+    return res
+
+
 @app.route("/daily_total.png")
 def get_daily_total_graph():
     daily_total = get_daily_total()

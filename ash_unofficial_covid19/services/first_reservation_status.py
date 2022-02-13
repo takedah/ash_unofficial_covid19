@@ -133,6 +133,38 @@ class FirstReservationStatusService(Service):
                     medical_institution_list.append(row["medical_institution_name"])
         return medical_institution_list
 
+    def get_dicts(self) -> dict:
+        """新型コロナワクチン1・2回目接種医療機関予約状況を辞書で返す
+
+        Returns:
+            dicts (dict): 新型コロナワクチン1・2回目接種医療機関予約受付状況詳細データ
+
+        """
+        state = (
+            "SELECT "
+            + "area,medical_institution_name,"
+            + "address,phone_number,vaccine,status,inoculation_time,target_age,"
+            + "is_target_family,is_target_not_family,is_target_suberb,target_other,"
+            + "memo "
+            + "FROM"
+            + " "
+            + self.table_name
+            + " "
+            + "ORDER BY area,address;"
+        )
+        dicts = dict()
+        with self.get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(state)
+                i = 0
+                for row in cur.fetchall():
+                    key = "row" + str(i)
+                    value = dict(row)
+                    dicts[key] = value
+                    i += 1
+
+        return dicts
+
     def find(
         self, medical_institution_name: Optional[str] = None, area: Optional[str] = None
     ) -> FirstReservationStatusLocationFactory:

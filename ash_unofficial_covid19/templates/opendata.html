@@ -3,7 +3,7 @@
 <article>
   <h1 class="h4">非公式オープンデータ</h1>
   <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
-    <p class="mb-0">{{ last_updated }}にダウンロードしたデータを元に表示しています。正確な情報は必ず<a class="alert-link" href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html" title="旭川市公式ホームページ" target="_blank">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a>を確認してください。</p>
+    <p class="mb-0">{{ last_updated }}にダウンロードしたデータを元に表示しています。正確な情報は必ず<a class="alert-link" href="https://www.city.asahikawa.hokkaido.jp/10013/10014/070236.html" title="旭川市公式ホームページ" target="_blank">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a>を確認してください。</p>
     <button type="button" class="close" data-dismiss="alert" aria-label="close">
       <span aria-hidden="true">&times;</span>
     </button>
@@ -11,7 +11,7 @@
   <div class="card-group mt-3">
     <div class="card">
       <div class="card-header">
-        日別陽性患者数CSV
+        <h2 class="h6 card-title mb-0">日別陽性患者数CSV</h2>
       </div>
       <div class="card-body">
         <p class="card-text">日ごとの新規感染者数です。</p>
@@ -39,11 +39,11 @@
     </div>
     <div class="card">
       <div class="card-header">
-        日別陽性患者数JSON
+        <h2 class="h6 card-title mb-0">日別陽性患者数JSON</h2>
       </div>
       <div class="card-body">
         <p class="card-text">日ごとの新規感染者数のJSONです。</p>
-        <h2 class="h6 card-title">データレイアウト</h2>
+        <h3 class="h6 card-title">データレイアウト</h3>
         <pre class="border text-light bg-dark pre-scrollable"><code>
         {
           "公表日 (YYYY-mm-dd)": 陽性患者数
@@ -56,11 +56,11 @@
   <div class="card-group mt-3">
     <div class="card">
       <div class="card-header">
-        日別年代別陽性患者数CSV
+        <h2 class="h6 card-title mb-0">日別年代別陽性患者数CSV</h2>
       </div>
       <div class="card-body">
         <p class="card-text">日ごとの年代別新規感染者数です。</p>
-        <h2 class="h6 card-title">データレイアウト</h2>
+        <h3 class="h6 card-title">データレイアウト</h3>
         <table class="table table-bordered table-striped table-sm">
           <thead>
             <tr>
@@ -113,11 +113,11 @@
     </div>
     <div class="card">
       <div class="card-header">
-        日別年代別陽性患者数JSON
+        <h2 class="h6 card-title mb-0">日別年代別陽性患者数JSON</h2>
       </div>
       <div class="card-body">
         <p class="card-text">日ごとの年代別新規感染者数のJSONです。</p>
-        <h2 class="h6 card-title">データレイアウト</h2>
+        <h3 class="h6 card-title">データレイアウト</h3>
         <pre class="border text-light bg-dark pre-scrollable"><code>
         {
           "公表日 (YYYY-mm-dd)": {
@@ -137,6 +137,58 @@
         </code></pre>
         <p class="card-text mt-3"><a href="/api/daily_total_per_age.json" title="旭川市新型コロナ日別年代別陽性患者数JSONをダウンロード" class="btn btn-primary">日別年代別陽性患者数JSONをダウンロード</a></p>
       </div>
+    </div>
+  </div>
+  <div class="card mt-3">
+    <div class="card-body">
+      <h2 class="h5 card-title">新型コロナワクチン3回目接種医療機関予約受付状況JSON</h2>
+      <p class="card-text">新型コロナワクチン3回目接種医療機関予約受付状況のJSONです。</p>
+      <h3 class="h6 card-title">データレイアウト</h3>
+      <pre class="border text-light bg-dark pre-scrollable"><code>
+        {
+          "row0": {
+              "area": "地区",
+              "medical_institution_name": "医療機関名",
+              "address": "住所",
+              "phone_number": "電話番号",
+              "vaccine": "接種するワクチン",
+              "status": "予約受付開始時期",
+              "inoculation_time": "接種可能時期",
+              "target_age": "年齢",
+              "is_target_family": かかりつけの方 (Boolean),
+              "is_target_not_family": かかりつけ以外の方 (Boolean),
+              "target_other": "その他",
+              "memo": "備考"
+          }
+        }
+      </code></pre>
+      <p class="card-text mt-3"><a href="/api/reservation_status.json" title="旭川市新型コロナワクチン3回目接種医療機関予約受付状況をダウンロード" class="btn btn-primary">ワクチン3回目接種予約受付状況JSONをダウンロード</a></p>
+    </div>
+  </div>
+  <div class="card mt-3">
+    <div class="card-body">
+      <h2 class="h5 card-title">新型コロナワクチン1・2回目接種医療機関予約受付状況JSON</h2>
+      <p class="card-text">新型コロナワクチン1・2回目接種医療機関予約受付状況のJSONです。</p>
+      <h3 class="h6 card-title">データレイアウト</h3>
+      <pre class="border text-light bg-dark pre-scrollable"><code>
+        {
+          "row0": {
+              "area": "地区",
+              "medical_institution_name": "医療機関名",
+              "address": "住所",
+              "phone_number": "電話番号",
+              "status": "予約受付開始時期",
+              "inoculation_time": "接種可能時期",
+              "target_age": "年齢",
+              "is_target_family": かかりつけの方 (Boolean),
+              "is_target_not_family": かかりつけ以外の方 (Boolean),
+              "is_target_suberb": 市外の方 (Boolean),
+              "target_other": "その他",
+              "memo": "備考"
+          }
+        }
+      </code></pre>
+      <p class="card-text mt-3"><a href="/api/first_reservation_status.json" title="旭川市新型コロナワクチン1・2回目接種医療機関予約受付状況をダウンロード" class="btn btn-primary">ワクチン1・2回目接種予約受付状況JSONをダウンロード</a></p>
     </div>
   </div>
   <div class="card mt-3">

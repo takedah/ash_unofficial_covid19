@@ -36,4 +36,5 @@ class View(metaclass=ABCMeta):
             json_data (str): JSON文字列データ
 
         """
-        return json.dumps(rows)
+        json_bytes = json.dumps(rows).encode()
+        return json_bytes.decode("unicode-escape")
