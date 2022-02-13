@@ -448,7 +448,6 @@ def atom_xml():
     res = make_response()
     res.data = xml_data
     res.headers["Content-Type"] = "application/atom+xml"
-    res.headers["Content-Disposition"] = "attachment: filename=" + "atom.xml"
     return res
 
 
@@ -459,7 +458,6 @@ def rss_xml():
     res = make_response()
     res.data = xml_data
     res.headers["Content-Type"] = "application/rss+xml"
-    res.headers["Content-Disposition"] = "attachment: filename=" + "rss.xml"
     return res
 
 

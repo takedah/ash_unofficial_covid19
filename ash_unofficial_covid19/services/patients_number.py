@@ -185,9 +185,10 @@ class PatientsNumberService(Service):
             with conn.cursor(cursor_factory=DictCursor) as cur:
                 cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
                 for row in cur.fetchall():
-                    patients_number_per_age = dict(row)
-                    del patients_number_per_age["publication_date"]
-                    dicts[row["publication_date"].strftime("%Y-%m-%d")] = patients_number_per_age
+                    key = row["publication_date"].strftime("%Y-%m-%d")
+                    value = dict(row)
+                    del value["publication_date"]
+                    dicts[key] = value
 
         return dicts
 
