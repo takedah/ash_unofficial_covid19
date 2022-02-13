@@ -52,6 +52,8 @@ class TestPatientsNumberService:
 
     def test_delete(self, service):
         assert service.delete(publication_date=date(2022, 1, 28))
+
+    def test_delete_with_invalid_args(self, service):
         with pytest.raises(ServiceError):
             service.delete("If arg is not date object.")
 
@@ -100,6 +102,10 @@ class TestPatientsNumberService:
         }
         assert results == expect
 
+    def test_get_dicts_with_invalid_date_range(self, service):
+        with pytest.raises(ServiceError):
+            service.get_dicts(from_date=date(2020, 2, 22), to_date=date(2022, 1, 29))
+
     def test_get_aggregate_by_days(self, service):
         from_date = date(2022, 1, 27)
         to_date = date(2022, 1, 29)
@@ -110,6 +116,10 @@ class TestPatientsNumberService:
             (date(2022, 1, 29), 102),
         ]
         assert result == expect
+
+    def test_get_aggregate_by_days_with_invalid_date_range(self, service):
+        with pytest.raises(ServiceError):
+            service.get_aggregate_by_days(from_date=date(2022, 1, 27), to_date=date(2100, 12, 31))
 
     def test_get_aggregate_by_weeks(self, service):
         from_date = date(2022, 1, 20)

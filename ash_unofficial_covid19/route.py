@@ -340,6 +340,16 @@ def daily_total_csv():
     return res
 
 
+@app.route("/api/daily_total.json")
+def daily_total_json():
+    patients_numbers = get_patients_numbers()
+    json_data = patients_numbers.get_daily_total_json()
+    res = make_response()
+    res.data = json_data
+    res.headers["Content-Type"] = "application/json"
+    return res
+
+
 @app.route("/api/daily_total_per_age.json")
 def daily_total_per_age_json():
     patients_numbers = get_patients_numbers()

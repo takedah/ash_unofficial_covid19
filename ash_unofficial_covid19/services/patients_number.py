@@ -18,6 +18,25 @@ class PatientsNumberService(Service):
     def __init__(self):
         Service.__init__(self, "patients_numbers")
 
+    @staticmethod
+    def _date_range_validator(from_date: date, to_date: date) -> None:
+        """期間の指定範囲が正しければNoneを返し、誤りがあればエラーを起こす
+
+        Args:
+            from_date (obj:`date`): 集計の始期
+            to_date (obj:`date`): 集計の終期
+
+        """
+        if not isinstance(from_date, date) or not isinstance(to_date, date):
+            raise ServiceError("期間の範囲指定が日付になっていません。")
+
+        if from_date < date(2020, 2, 23):
+            raise ServiceError("集計の始期には2020年2月23日より前の日付を指定できません。")
+        elif datetime.now(timezone(timedelta(hours=+9), "JST")).date() < to_date:
+            raise ServiceError("集計の終期には未来の日付を指定できません。")
+        else:
+            return
+
     def create(self, patients_numbers: PatientsNumberFactory) -> None:
         """データベースへ新型コロナウイルス感染症日別年代別陽性患者数データを一括登録
 
@@ -165,9 +184,7 @@ class PatientsNumberService(Service):
             dicts (dict): 日別年代別陽性患者数データの辞書
 
         """
-        if not isinstance(from_date, date) or not isinstance(to_date, date):
-            raise ServiceError("期間の範囲指定が日付になっていません。")
-
+        self._date_range_validator(from_date, to_date)
         state = (
             "SELECT"
             + " "
@@ -204,9 +221,7 @@ class PatientsNumberService(Service):
                 1日ごとの日付とその週の新規陽性患者数を要素とするタプル
 
         """
-        if not isinstance(from_date, date) or not isinstance(to_date, date):
-            raise ServiceError("期間の範囲指定が日付になっていません。")
-
+        self._date_range_validator(from_date, to_date)
         state = (
             "SELECT date(from_day) AS publication_date, "
             + "("
@@ -248,9 +263,7 @@ class PatientsNumberService(Service):
                 1週間ごとの日付とその週の新規陽性患者数を要素とするタプルのリスト
 
         """
-        if not isinstance(from_date, date) or not isinstance(to_date, date):
-            raise ServiceError("期間の範囲指定が日付になっていません。")
-
+        self._date_range_validator(from_date, to_date)
         state = (
             "SELECT date(from_week) AS weeks, "
             + "("
@@ -315,9 +328,7 @@ class PatientsNumberService(Service):
                 1週間ごとの日付とその週の年代別新規陽性患者数をpandasのDataFrameで返す
 
         """
-        if not isinstance(from_date, date) or not isinstance(to_date, date):
-            raise ServiceError("期間の範囲指定が日付になっていません。")
-
+        self._date_range_validator(from_date, to_date)
         state = (
             "SELECT date(from_week) AS weeks, "
             + "SUM(age_under_10) AS age_under_10, SUM(age_10s) AS age_10s, "
@@ -381,9 +392,7 @@ class PatientsNumberService(Service):
                 年代別の陽性患者数を要素とするタプルのリスト
 
         """
-        if not isinstance(from_date, date) or not isinstance(to_date, date):
-            raise ServiceError("期間の範囲指定が日付になっていません。")
-
+        self._date_range_validator(from_date, to_date)
         # 調査中等は集計しない。
         state = (
             "SELECT "
@@ -425,9 +434,7 @@ class PatientsNumberService(Service):
                 1か月ごとの年月とその週までの累計陽性患者数を要素とするタプルのリスト
 
         """
-        if not isinstance(from_date, date) or not isinstance(to_date, date):
-            raise ServiceError("期間の範囲指定が日付になっていません。")
-
+        self._date_range_validator(from_date, to_date)
         state = (
             "SELECT date(aggregate_patients.from_month) AS month, "
             + "SUM(aggregate_patients.patients_number) OVER("
