@@ -21,7 +21,7 @@ def add_security_headers(response):
         + "'unsafe-inline'; "
         + "script-src 'self' "
         + "code.jquery.com cdnjs.cloudflare.com stackpath.bootstrapcdn.com "
-        + "unpkg.com www.googletagmanager.com minmoji.ucda.jp "
+        + "unpkg.com www.googletagmanager.com typesquare.com "
         + "kit.fontawesome.com "
         + "'nonce-Pbq-X7F-632oxHhPe6mzMC-LHYE'; "
         + "connect-src www.google-analytics.com ka-f.fontawesome.com; "

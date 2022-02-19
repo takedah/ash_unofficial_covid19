@@ -1,12 +1,5 @@
-@font-face {
-  font-family: minmoji;
-  src: url('https://minmoji.ucda.jp/fontseot/https%3A__ash-unofficial-covid19.herokuapp.com_');
-  src: local('minmoji'),
-  url('https://minmoji.ucda.jp/fontswoff/https%3A__ash-unofficial-covid19.herokuapp.com_') format('woff'),
-  url('https://minmoji.ucda.jp/fonts/https%3A__ash-unofficial-covid19.herokuapp.com_') format('opentype');
-}
 body {
-  font-family: minmoji;
+  font-family: "UDDigiKyokasho R JIS2004";
   padding-top: 96px;
 }
 #mapid {
