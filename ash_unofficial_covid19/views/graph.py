@@ -560,6 +560,15 @@ class WeeklyPerAgeView(GraphView):
                 left=df.iloc[:i].sum(),
                 color=colors[i],
             )
+
+        min_x, max_x = ax.get_xlim()
+        for rect in ax.patches:
+            if 0.1 < rect.get_width() / max_x:
+                cx = rect.get_x() + rect.get_width() / 2
+                cy = rect.get_y() + rect.get_height() / 2
+                label_value = f"{rect.get_width():.0f}"
+                ax.text(cx, cy, label_value, ha="center", va="center")
+
         ax.tick_params(labelsize=8)
         ax.legend(df.index.tolist(), prop=legend_font, loc=4)
         fig.tight_layout()
