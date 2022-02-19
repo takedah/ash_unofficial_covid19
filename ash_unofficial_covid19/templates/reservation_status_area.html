@@ -35,9 +35,7 @@
             </thead>
             <tbody id="results" data-length="{{ search_lengths|tojson }}">
               {% for search_result in search_results %}
-              <tr id="order{{ loop.index }}" data-latitude="{{ search_result.latitude|tojson }}"
-                data-longitude="{{ search_result.longitude|tojson }}" data-name="{{ search_result.medical_institution_name|safe }}"
-                data-url="{{ search_result.medical_institution_name_url|safe }}">
+              <tr id="order{{ loop.index }}" data-latitude="{{ search_result.latitude|tojson }}" data-longitude="{{ search_result.longitude|tojson }}" data-name="{{ search_result.medical_institution_name|safe }}" data-url="{{ search_result.medical_institution_name_url|safe }}" data-vaccine="{{ search_result.vaccine|safe }}" data-status="{{ search_result.status|safe }}">
                 <td>
                     <strong>{{ search_result.medical_institution_name }}</strong><br>
                     {{ search_result.vaccine }}<br>
