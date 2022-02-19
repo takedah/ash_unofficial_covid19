@@ -346,7 +346,7 @@ def daily_total_json():
     json_data = patients_numbers.get_daily_total_json()
     res = make_response()
     res.data = json_data
-    res.headers["Content-Type"] = "application/json"
+    res.headers["Content-Type"] = "application/json; charset=UTF-8"
     return res
 
 
@@ -367,7 +367,7 @@ def daily_total_per_age_json():
     json_data = patients_numbers.get_daily_total_per_age_json()
     res = make_response()
     res.data = json_data
-    res.headers["Content-Type"] = "application/json"
+    res.headers["Content-Type"] = "application/json; charset=UTF-8"
     return res
 
 
@@ -377,7 +377,7 @@ def reservation_status_json():
     json_data = reservation_statuses.get_reservation_status_json()
     res = make_response()
     res.data = json_data
-    res.headers["Content-Type"] = "application/json"
+    res.headers["Content-Type"] = "application/json; charset=UTF-8"
     return res
 
 
@@ -387,7 +387,7 @@ def first_reservation_status_json():
     json_data = first_reservation_statuses.get_reservation_status_json()
     res = make_response()
     res.data = json_data
-    res.headers["Content-Type"] = "application/json"
+    res.headers["Content-Type"] = "application/json; charset=UTF-8"
     return res
 
 
@@ -486,9 +486,11 @@ def not_found(error):
 def atom_xml():
     atom = get_atom()
     xml_data = atom.get_feed()
+    last_modified = atom.get_last_modified()
     res = make_response()
     res.data = xml_data
-    res.headers["Content-Type"] = "application/atom+xml"
+    res.headers["Content-Type"] = "application/atom+xml; charset=UTF-8"
+    res.headers["Last-Modified"] = last_modified
     return res
 
 
@@ -496,9 +498,11 @@ def atom_xml():
 def rss_xml():
     rss = get_rss()
     xml_data = rss.get_feed()
+    last_modified = rss.get_last_modified()
     res = make_response()
     res.data = xml_data
-    res.headers["Content-Type"] = "application/rss+xml"
+    res.headers["Content-Type"] = "application/rss+xml; charset=UTF-8"
+    res.headers["Last-Modified"] = last_modified
     return res
 
 

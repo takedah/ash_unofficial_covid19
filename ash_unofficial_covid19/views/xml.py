@@ -1,4 +1,4 @@
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, time, timedelta, timezone
 from decimal import ROUND_HALF_UP, Decimal
 
 from dateutil.relativedelta import relativedelta
@@ -101,6 +101,24 @@ class XmlView:
         """
         service = PatientsNumberService()
         return service.get_per_hundred_thousand_population_per_week(from_date=from_date, to_date=to_date)
+
+    def get_last_modified(self) -> str:
+        """HTTP Last Modifiedヘッダー用文字列を出力
+
+        ATOM FeedとRSS Feed用に最終更新日をHTTP Headerに出力させるため、
+        最終更新日を文字列で出力する。時刻は旭川市公式ホームページの発表に合わせて
+        16時固定とする。
+
+        Returns:
+            last_modified (str): 最終更新日の文字列
+
+        """
+        last_modified_date = self._get_today()
+        # 時刻は16時固定とするが、UTCとしたいので7時とする
+        last_modified_time = time(7, 0, 0)
+        last_modified = datetime.combine(last_modified_date, last_modified_time)
+
+        return last_modified.astimezone(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S GMT")
 
     def get_feed(self):
         pass
