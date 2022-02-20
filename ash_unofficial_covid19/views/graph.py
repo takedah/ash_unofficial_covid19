@@ -567,7 +567,7 @@ class WeeklyPerAgeView(GraphView):
                 cx = rect.get_x() + rect.get_width() / 2
                 cy = rect.get_y() + rect.get_height() / 2
                 label_value = f"{rect.get_width():.0f}"
-                ax.text(cx, cy, label_value, ha="center", va="center")
+                ax.text(cx, cy, label_value, ha="center", va="center", fontproperties=legend_font)
 
         ax.tick_params(labelsize=8)
         ax.legend(df.index.tolist(), prop=legend_font, loc=4)
