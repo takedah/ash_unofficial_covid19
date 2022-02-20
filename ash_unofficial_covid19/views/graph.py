@@ -563,7 +563,7 @@ class WeeklyPerAgeView(GraphView):
 
         min_x, max_x = ax.get_xlim()
         for rect in ax.patches:
-            if 0.1 < rect.get_width() / max_x:
+            if 0.05 < rect.get_width() / max_x:
                 cx = rect.get_x() + rect.get_width() / 2
                 cy = rect.get_y() + rect.get_height() / 2
                 label_value = f"{rect.get_width():.0f}"
