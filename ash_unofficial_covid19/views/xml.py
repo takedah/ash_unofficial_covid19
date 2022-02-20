@@ -115,7 +115,7 @@ class XmlView:
         """
         last_modified_date = self._get_today()
         # 時刻は16時固定とするが、UTCとしたいので7時とする
-        last_modified_time = time(7, 0, 0)
+        last_modified_time = time(7, 0, 0, tzinfo=timezone.utc)
         last_modified = datetime.combine(last_modified_date, last_modified_time)
 
         return last_modified.astimezone(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S GMT")
