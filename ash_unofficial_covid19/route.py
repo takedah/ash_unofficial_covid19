@@ -24,8 +24,9 @@ def add_security_headers(response):
         + "unpkg.com www.googletagmanager.com typesquare.com "
         + "kit.fontawesome.com "
         + "'nonce-Pbq-X7F-632oxHhPe6mzMC-LHYE'; "
-        + "connect-src www.google-analytics.com ka-f.fontawesome.com; "
-        + "font-src minmoji.ucda.jp ka-f.fontawesome.com; "
+        + "connect-src www.google-analytics.com ka-f.fontawesome.com "
+        + "l.typesquare.com; "
+        + "font-src wf.typesquare.com ka-f.fontawesome.com; "
         + "img-src 'self' i.creativecommons.org licensebuttons.net "
         + "data: https:"
     )
