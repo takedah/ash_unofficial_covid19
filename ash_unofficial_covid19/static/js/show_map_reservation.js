@@ -57,13 +57,14 @@ document.addEventListener(
         locationName +
         "</a>";
       if (locationDataList[locationName] === undefined) {
-        status = vaccine + " " + status;
+        status = vaccine + "<br>" + "予約受付状況: " + status;
       } else {
         status =
           locationDataList[locationName]["status"] +
           "<br>" +
           vaccine +
-          " " +
+          "<br>" +
+          "予約受付状況: " +
           status;
       }
       locationDataList[locationName] = {
