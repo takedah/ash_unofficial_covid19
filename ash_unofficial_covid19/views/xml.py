@@ -135,6 +135,7 @@ class RssView(XmlView):
             feed (str): Atom Feed文字列
 
         """
+        title = self.today.strftime("%Y/%m/%d (%a)") + "の旭川市内感染状況の最新動向"
         summary = (
             self.today.strftime("%Y/%m/%d (%a)")
             + " の旭川市の新型コロナ新規感染者数は"
@@ -169,7 +170,9 @@ class RssView(XmlView):
             + "      <guid isPermaLink='true'>https://"
             + Config.MY_DOMAIN
             + "/</guid>\n"
-            + "      <title>旭川市内感染状況の最新動向</title>\n"
+            + "      <title>"
+            + title
+            + "</title>\n"
             + "      <link>https://"
             + Config.MY_DOMAIN
             + "/</link>\n"
@@ -196,6 +199,7 @@ class AtomView(XmlView):
             feed (str): Atom Feed文字列
 
         """
+        title = self.today.strftime("%Y/%m/%d (%a)") + "の旭川市内感染状況の最新動向"
         summary = (
             self.today.strftime("%Y/%m/%d (%a)")
             + " の旭川市の新型コロナ新規感染者数は"
@@ -233,7 +237,9 @@ class AtomView(XmlView):
             + "    <id>https://"
             + Config.MY_DOMAIN
             + "/</id>\n"
-            + "    <title>旭川市内感染状況の最新動向</title>\n"
+            + "    <title>"
+            + title
+            + "</title>\n"
             + "    <link rel='alternate' type='text/html' href='https://"
             + Config.MY_DOMAIN
             + "/' />\n"

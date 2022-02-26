@@ -490,7 +490,7 @@ def atom_xml():
     last_modified = atom.get_last_modified()
     res = make_response()
     res.data = xml_data
-    res.headers["Content-Type"] = "application/atom+xml; charset=UTF-8"
+    res.headers["Content-Type"] = "application/xml; charset=UTF-8"
     res.headers["Last-Modified"] = last_modified
     return res
 
@@ -502,7 +502,7 @@ def rss_xml():
     last_modified = rss.get_last_modified()
     res = make_response()
     res.data = xml_data
-    res.headers["Content-Type"] = "application/rss+xml; charset=UTF-8"
+    res.headers["Content-Type"] = "application/xml; charset=UTF-8"
     res.headers["Last-Modified"] = last_modified
     return res
 

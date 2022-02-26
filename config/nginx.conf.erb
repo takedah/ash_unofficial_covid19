@@ -36,7 +36,7 @@ http {
             proxy_redirect off;
             proxy_pass http://app_server;
         }
-        location ~* \.(jpg|png|gif|ico|svg|xml)$ {
+        location ~* \.(jpg|png|gif|ico|svg)$ {
             expires 10m;
             proxy_redirect off;
             proxy_pass http://app_server;
