@@ -21,14 +21,15 @@ def add_security_headers(response):
         + "'unsafe-inline'; "
         + "script-src 'self' "
         + "code.jquery.com cdnjs.cloudflare.com stackpath.bootstrapcdn.com "
-        + "unpkg.com www.googletagmanager.com typesquare.com "
+        + "unpkg.com www.googletagmanager.com www.line-website.com "
         + "kit.fontawesome.com "
         + "'nonce-Pbq-X7F-632oxHhPe6mzMC-LHYE'; "
         + "connect-src www.google-analytics.com ka-f.fontawesome.com "
         + "l.typesquare.com; "
         + "font-src wf.typesquare.com ka-f.fontawesome.com; "
         + "img-src 'self' i.creativecommons.org licensebuttons.net "
-        + "data: https:"
+        + "data: https:; "
+        + "frame-src social-plugins.line.me "
     )
     response.headers.add("Content-Security-Policy", csp)
     response.headers.add("X-Content-Type-Options", "nosniff")
