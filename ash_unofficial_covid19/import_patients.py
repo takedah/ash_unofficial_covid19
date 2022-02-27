@@ -299,7 +299,9 @@ def import_past():
     _import_additional_asahikawa_patients()
     # 重複事例5例を削除する
     # https://www.pref.hokkaido.lg.jp/fs/4/0/4/0/0/1/8/_/hokkaido_z0519.pdf
-    duplicate_patient_numbers = [7354, 9147, 9182, 11058, 30909]
+    # 北海道オープンデータポータルのオープンデータでは道内番号30909が重複削除となっているが、
+    # 道内番号30809の誤りと思われるのでこちらを削除する。
+    duplicate_patient_numbers = [7354, 9147, 9182, 11058, 30809]
     for patient_number in duplicate_patient_numbers:
         delete_patients(patient_number)
 
