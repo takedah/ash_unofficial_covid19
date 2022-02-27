@@ -197,6 +197,70 @@ class RssView(XmlView):
             + self.today.strftime("%Y%m%d")
             + "</guid>\n"
             + "    </item>\n"
+            + "    <item>\n"
+            + "      <title>このサイトについて</title>\n"
+            + "      <link>https://"
+            + Config.MY_DOMAIN
+            + "/about</link>\n"
+            + "      <description>旭川市新型コロナウイルスまとめサイトについてのページです。</description>\n"
+            + "      <pubDate>Sun, 27 Feb 2022 07:00:00 GMT</pubDate>\n"
+            + "      <guid>https://"
+            + Config.MY_DOMAIN
+            + "/about</guid>\n"
+            + "    </item>\n"
+            + "    <item>\n"
+            + "      <title>ワクチン3回目接種医療機関マップ</title>\n"
+            + "      <link>https://"
+            + Config.MY_DOMAIN
+            + "/reservation_statuses</link>\n"
+            + "      <description>地図などから新型コロナワクチン3回目接種医療機関の予約受付状況を確認できます。</description>\n"
+            + "      <pubDate>"
+            + last_modified
+            + "</pubDate>\n"
+            + "      <guid>https://"
+            + Config.MY_DOMAIN
+            + "/reservation_statuses</guid>\n"
+            + "    </item>\n"
+            + "    <item>\n"
+            + "      <title>ワクチン1・2回目接種医療機関マップ</title>\n"
+            + "      <link>https://"
+            + Config.MY_DOMAIN
+            + "/first_reservation_statuses</link>\n"
+            + "      <description>地図などから新型コロナワクチン1・2回目接種医療機関の予約受付状況を確認できます。</description>\n"
+            + "      <pubDate>"
+            + last_modified
+            + "</pubDate>\n"
+            + "      <guid>https://"
+            + Config.MY_DOMAIN
+            + "/first_reservation_statuses</guid>\n"
+            + "    </item>\n"
+            + "    <item>\n"
+            + "      <title>非公式オープンデータ</title>\n"
+            + "      <link>https://"
+            + Config.MY_DOMAIN
+            + "/opendata</link>\n"
+            + "      <description>旭川市公式ホームページからスクレイピングして新型コロナウイルス感染症の情報を取得し、"
+            + "非公式のオープンデータ（陽性患者属性CSV）としてダウンロードできるようにしたものです。</description>\n"
+            + "      <pubDate>"
+            + last_modified
+            + "</pubDate>\n"
+            + "      <guid>https://"
+            + Config.MY_DOMAIN
+            + "/opendata</guid>\n"
+            + "    </item>\n"
+            + "    <item>\n"
+            + "      <title>感染者の状況</title>\n"
+            + "      <link>https://"
+            + Config.MY_DOMAIN
+            + "/patients</link>\n"
+            + "      <description>旭川市の新型コロナウイルス感染症患者の状況です。"
+            + "2022年1月27日発表分をもって旭川市が感染者ごとの情報の公表をやめたため、同日時点までの情報を表示しています。"
+            + "</description>\n"
+            + "      <pubDate>Thu, 27 Jan 2022 07:00:00 GMT</pubDate>\n"
+            + "      <guid>https://"
+            + Config.MY_DOMAIN
+            + "/patients</guid>\n"
+            + "    </item>\n"
             + "  </channel>\n"
             + "</rss>\n"
         )
@@ -264,6 +328,70 @@ class AtomView(XmlView):
             + "</updated>\n"
             + "    <summary>"
             + summary
+            + "</summary>\n"
+            + "</entry>\n"
+            + "  <entry>\n"
+            + "    <title>このサイトについて</title>\n"
+            + "    <link>https://"
+            + Config.MY_DOMAIN
+            + "/about</link>\n"
+            + "    <id>https://"
+            + Config.MY_DOMAIN
+            + "/about</id>\n"
+            + "    <updated>Sun, 27 Feb 2022 07:00:00 GMT</updated>\n"
+            + "    <summary>旭川市新型コロナウイルスまとめサイトについてのページです。</summary>\n"
+            + "  </entry>\n"
+            + "  <entry>\n"
+            + "    <title>ワクチン3回目接種医療機関マップ</title>\n"
+            + "    <link>https://"
+            + Config.MY_DOMAIN
+            + "/reservation_statuses</link>\n"
+            + "    <id>https://"
+            + Config.MY_DOMAIN
+            + "/reservation_statuses</id>\n"
+            + "    <updated>"
+            + self.today.strftime("%Y-%m-%dT16:00:00+09:00")
+            + "</updated>\n"
+            + "    <summary>地図などから新型コロナワクチン3回目接種医療機関の予約受付状況を確認できます。</summary>\n"
+            + "  </entry>\n"
+            + "  <entry>\n"
+            + "    <title>ワクチン1・2回目接種医療機関マップ</title>\n"
+            + "    <link>https://"
+            + Config.MY_DOMAIN
+            + "/first_reservation_statuses</link>\n"
+            + "    <id>https://"
+            + Config.MY_DOMAIN
+            + "/first_reservation_statuses</id>\n"
+            + "    <updated>"
+            + self.today.strftime("%Y-%m-%dT16:00:00+09:00")
+            + "</updated>\n"
+            + "    <summary>地図などから新型コロナワクチン1・2回目接種医療機関の予約受付状況を確認できます。</summary>\n"
+            + "  </entry>\n"
+            + "  <entry>\n"
+            + "    <title>非公式オープンデータ</title>\n"
+            + "    <link>https://"
+            + Config.MY_DOMAIN
+            + "/opendata</link>\n"
+            + "    <id>https://"
+            + Config.MY_DOMAIN
+            + "/opendata</id>\n"
+            + "    <updated>"
+            + self.today.strftime("%Y-%m-%dT16:00:00+09:00")
+            + "</updated>\n"
+            + "    <summary>旭川市公式ホームページからスクレイピングして新型コロナウイルス感染症の情報を取得し、"
+            + "非公式のオープンデータ（陽性患者属性CSV）としてダウンロードできるようにしたものです。</summary>\n"
+            + "  </entry>\n"
+            + "  <entry>\n"
+            + "    <title>感染者の状況</title>\n"
+            + "    <link>https://"
+            + Config.MY_DOMAIN
+            + "/patients</link>\n"
+            + "    <id>https://"
+            + Config.MY_DOMAIN
+            + "/patients</id>\n"
+            + "    <updated>Thu, 27 Jan 2022 07:00:00 GMT</updated>\n"
+            + "    <summary>旭川市の新型コロナウイルス感染症患者の状況です。"
+            + "2022年1月27日発表分をもって旭川市が感染者ごとの情報の公表をやめたため、同日時点までの情報を表示しています。"
             + "</summary>\n"
             + "  </entry>\n"
             + "</feed>\n"
