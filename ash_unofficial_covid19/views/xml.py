@@ -332,9 +332,9 @@ class AtomView(XmlView):
             + "</entry>\n"
             + "  <entry>\n"
             + "    <title>このサイトについて</title>\n"
-            + "    <link>https://"
+            + "    <link href='https://"
             + Config.MY_DOMAIN
-            + "/about</link>\n"
+            + "/about' />\n"
             + "    <id>https://"
             + Config.MY_DOMAIN
             + "/about</id>\n"
@@ -343,9 +343,9 @@ class AtomView(XmlView):
             + "  </entry>\n"
             + "  <entry>\n"
             + "    <title>ワクチン3回目接種医療機関マップ</title>\n"
-            + "    <link>https://"
+            + "    <link href='https://"
             + Config.MY_DOMAIN
-            + "/reservation_statuses</link>\n"
+            + "/reservation_statuses' />\n"
             + "    <id>https://"
             + Config.MY_DOMAIN
             + "/reservation_statuses</id>\n"
@@ -356,9 +356,9 @@ class AtomView(XmlView):
             + "  </entry>\n"
             + "  <entry>\n"
             + "    <title>ワクチン1・2回目接種医療機関マップ</title>\n"
-            + "    <link>https://"
+            + "    <link href='https://"
             + Config.MY_DOMAIN
-            + "/first_reservation_statuses</link>\n"
+            + "/first_reservation_statuses' />\n"
             + "    <id>https://"
             + Config.MY_DOMAIN
             + "/first_reservation_statuses</id>\n"
@@ -369,9 +369,9 @@ class AtomView(XmlView):
             + "  </entry>\n"
             + "  <entry>\n"
             + "    <title>非公式オープンデータ</title>\n"
-            + "    <link>https://"
+            + "    <link href='https://"
             + Config.MY_DOMAIN
-            + "/opendata</link>\n"
+            + "/opendata' />\n"
             + "    <id>https://"
             + Config.MY_DOMAIN
             + "/opendata</id>\n"
@@ -383,9 +383,9 @@ class AtomView(XmlView):
             + "  </entry>\n"
             + "  <entry>\n"
             + "    <title>感染者の状況</title>\n"
-            + "    <link>https://"
+            + "    <link href='https://"
             + Config.MY_DOMAIN
-            + "/patients</link>\n"
+            + "/patients' />\n"
             + "    <id>https://"
             + Config.MY_DOMAIN
             + "/patients</id>\n"
