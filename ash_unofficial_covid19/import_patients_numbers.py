@@ -117,6 +117,40 @@ def _import_sapporo_patients_number(url: str) -> None:
         return
 
 
+def _fix_asahikawa_data() -> None:
+    """
+    報道発表資料に後日訂正があった分のデータを修正する。
+
+    """
+    factory = PatientsNumberFactory()
+
+    # 令和4年2月20日発表分の訂正
+    # 発表資料ではどの年代を1名取り下げたのか不明なため、調査中から1名減とした。
+    # https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d074697_d/fil/0220-2.pdf
+    fix_20220220 = {
+        "publication_date": date(2022, 2, 20),
+        "age_under_10": 24,
+        "age_10s": 13,
+        "age_20s": 12,
+        "age_30s": 10,
+        "age_40s": 8,
+        "age_50s": 7,
+        "age_60s": 7,
+        "age_70s": 8,
+        "age_80s": 3,
+        "age_over_90": 5,
+        "investigating": 0,
+    }
+    factory.create(**fix_20220220)
+
+    try:
+        service = PatientsNumberService()
+        service.create(factory)
+    except (DatabaseConnectionError, ServiceError) as e:
+        print(e.message)
+        return
+
+
 def import_latest():
     # 最新の報道発表資料PDFファイルのURLと報道発表日をデータベースへ登録
     _import_press_release_link(Config.OVERVIEW_URL, 2022)
@@ -143,6 +177,7 @@ def import_latest():
                     pdf_url=press_release_link.url,
                     publication_date=press_release_link.publication_date,
                 )
+                _fix_asahikawa_data()
 
 
 def import_past_from_patients():

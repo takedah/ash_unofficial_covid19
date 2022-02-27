@@ -56,6 +56,16 @@ class ScrapePressReleaseLink(Scraper):
         press_release_link = list()
         for a in soup.find_all("a"):
             anker_text = self.format_string(self.z2h_number(a.text.strip()))
+
+            # 令和4年2月21日発表分のリンクテキストが誤っている部分対策
+            if anker_text == "新型コロナウイルス感染症の発生状況（令和4年2月20日発表分）（PDF形式 58キロバイト）":
+                values = {
+                    "url": urllib.parse.urljoin(downloaded_html.url, a["href"]),
+                    "publication_date": self.format_date("2月21日", 2022),
+                }
+                press_release_link.append(values)
+                continue
+
             search_press_release = re.match("新型コロナウイルス感染症の発生状況.*令和[0-9]+年([0-9]+月[0-9]+日)発表分.*", anker_text)
             if search_press_release is not None:
                 public_date_string = search_press_release.group(1)
