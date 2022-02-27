@@ -67,13 +67,19 @@ class ScrapeFirstReservationStatus(ScrapeReservationStatus):
             is_target_suberb = suberb["available"]
             memo = family["text"] + " " + not_family["text"] + " " + suberb["text"] + " " + row[11]
             memo = memo.strip()
+            status = row[4].replace("―", "")
+            # 予約受付状況が空欄の場合、備考の値をセットする。
+            if status == "":
+                status = memo
+                memo = ""
+
             status_data = {
                 "area": area,
                 "medical_institution_name": row[1].replace(" ", ""),
                 "address": row[2],
                 "phone_number": row[3],
                 "vaccine": "",
-                "status": row[4].replace("―", ""),
+                "status": status,
                 "inoculation_time": row[5].replace("―", ""),
                 "target_age": row[6].replace("―", ""),
                 "is_target_family": is_target_family,

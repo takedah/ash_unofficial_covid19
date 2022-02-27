@@ -85,7 +85,7 @@ def html_content():
 <td class="column-7">―</td>
 <td class="column-8">―</td>
 <td class="column-9">―</td>
-<td class="column-10"></td>
+<td class="column-10">病院に直接お問い合わせください。</td>
 </tr>
 <tr class="row-31 odd">
 <td class="column-1">各条１７～２６丁目・宮前・南地区</td><td class="column-2">森山病院<br />
@@ -118,7 +118,7 @@ def test_lists(html_content, mocker):
             "address": "金星町1丁目",
             "phone_number": "29-0202予約専用",
             "vaccine": "",
-            "status": "",
+            "status": "病院に直接お問い合わせください。",
             "inoculation_time": "",
             "target_age": "",
             "is_target_family": None,

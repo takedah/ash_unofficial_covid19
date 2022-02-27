@@ -126,13 +126,19 @@ class ScrapeReservationStatus(Scraper):
             is_target_not_family = not_family["available"]
             memo = family["text"] + " " + not_family["text"] + " " + row[11]
             memo = memo.strip()
+            status = row[5].replace("―", "")
+            # 予約受付状況が空欄の場合、備考の値をセットする。
+            if status == "":
+                status = memo
+                memo = ""
+
             status_data = {
                 "area": area,
                 "medical_institution_name": row[1].replace(" ", ""),
                 "address": row[2],
                 "phone_number": row[3],
                 "vaccine": row[4],
-                "status": row[5].replace("―", ""),
+                "status": status,
                 "inoculation_time": row[6].replace("―", ""),
                 "target_age": row[7].replace("―", ""),
                 "is_target_family": is_target_family,
