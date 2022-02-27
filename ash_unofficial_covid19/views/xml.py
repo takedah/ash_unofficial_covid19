@@ -135,7 +135,7 @@ class RssView(XmlView):
             feed (str): Atom Feed文字列
 
         """
-        title = self.today.strftime("%Y/%m/%d (%a)") + "の旭川市内感染状況の最新動向"
+        title = self.today.strftime("%Y/%m/%d (%a)") + " の旭川市内感染状況の最新動向"
         summary = (
             self.today.strftime("%Y/%m/%d (%a)")
             + " の旭川市の新型コロナ新規感染者数は"
@@ -149,13 +149,11 @@ class RssView(XmlView):
             + self.increase_from_last_week_per
             + "人となっています。"
         )
+        last_modified = self.get_last_modified()
         return (
             "<?xml version='1.0' encoding='UTF-8'?>\n"
             + "<rss version='2.0' xmlns:atom='http://www.w3.org/2005/Atom'>\n"
             + "  <channel>\n"
-            + "    <atom:link href='https://"
-            + Config.MY_DOMAIN
-            + "/rss.xml' rel='self' type='application/rss+xml' />\n"
             + "    <title>旭川市新型コロナウイルスまとめサイト</title>\n"
             + "    <link>https://"
             + Config.MY_DOMAIN
@@ -166,22 +164,38 @@ class RssView(XmlView):
             + "また、新型コロナワクチン接種医療機関を地図から探せるページも"
             + "公開しています。\n"
             + "    </description>\n"
-            + "    <item>\n"
-            + "      <guid isPermaLink='true'>https://"
+            + "    <pubDate>"
+            + last_modified
+            + "</pubDate>\n"
+            + "    <lastBuildDate>"
+            + last_modified
+            + "</lastBuildDate>\n"
+            + "    <docs>"
+            + "https://"
             + Config.MY_DOMAIN
-            + "/</guid>\n"
+            + "/rss.xml"
+            + "</docs>\n"
+            + "  <atom:link rel='self' type='application/rss+xml' href='https://"
+            + Config.MY_DOMAIN
+            + "/rss.xml' />\n"
+            + "    <item>\n"
             + "      <title>"
             + title
             + "</title>\n"
             + "      <link>https://"
             + Config.MY_DOMAIN
             + "/</link>\n"
-            + "      <pubDate>"
-            + self.today.strftime("%a, %d %b %Y 16:00:00 +0900")
-            + "</pubDate>\n"
             + "      <description>"
             + summary
             + "</description>\n"
+            + "      <pubDate>"
+            + last_modified
+            + "</pubDate>\n"
+            + "      <guid>https://"
+            + Config.MY_DOMAIN
+            + "/#"
+            + self.today.strftime("%Y%m%d")
+            + "</guid>\n"
             + "    </item>\n"
             + "  </channel>\n"
             + "</rss>\n"
@@ -199,7 +213,7 @@ class AtomView(XmlView):
             feed (str): Atom Feed文字列
 
         """
-        title = self.today.strftime("%Y/%m/%d (%a)") + "の旭川市内感染状況の最新動向"
+        title = self.today.strftime("%Y/%m/%d (%a)") + " の旭川市内感染状況の最新動向"
         summary = (
             self.today.strftime("%Y/%m/%d (%a)")
             + " の旭川市の新型コロナ新規感染者数は"
@@ -227,22 +241,24 @@ class AtomView(XmlView):
             + "  <updated>"
             + self.today.strftime("%Y-%m-%dT16:00:00+09:00")
             + "</updated>\n"
-            + "  <link rel='alternate' type='text/html' href='https://"
+            + "  <link href='https://"
             + Config.MY_DOMAIN
             + "/' />\n"
             + "  <link rel='self' type='application/atom+xml' href='https://"
             + Config.MY_DOMAIN
             + "/atom.xml' />\n"
             + "  <entry>\n"
-            + "    <id>https://"
-            + Config.MY_DOMAIN
-            + "/</id>\n"
             + "    <title>"
             + title
             + "</title>\n"
-            + "    <link rel='alternate' type='text/html' href='https://"
+            + "    <link href='https://"
             + Config.MY_DOMAIN
             + "/' />\n"
+            + "    <id>https://"
+            + Config.MY_DOMAIN
+            + "/#"
+            + self.today.strftime("%Y%m%d")
+            + "</id>\n"
             + "    <updated>"
             + self.today.strftime("%Y-%m-%dT16:00:00+09:00")
             + "</updated>\n"
