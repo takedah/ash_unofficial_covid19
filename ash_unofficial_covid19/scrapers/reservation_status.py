@@ -29,7 +29,7 @@ class ScrapeReservationStatus(Scraper):
         Scraper.__init__(self)
         self.__lists = list()
         downloaded_html = self.get_html(html_url)
-        table_data = self.get_table_data(downloaded_html, "tablepress-1-no-2")
+        table_data = self.get_table_data(downloaded_html, "tablepress-9-no-2")
         for row in table_data:
             extracted_data = self._extract_status_data(row)
             if extracted_data:

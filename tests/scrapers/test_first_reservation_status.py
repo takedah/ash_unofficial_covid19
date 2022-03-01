@@ -7,7 +7,7 @@ from ash_unofficial_covid19.scrapers.first_reservation_status import ScrapeFirst
 @pytest.fixture()
 def html_content():
     return """
-<table id="tablepress-1-no-2" class="tablepress tablepress-id-1">
+<table id="tablepress-9-no-2" class="tablepress tablepress-id-1">
 <thead>
 <tr class="row-1 odd">
 <th class="column-1">地区</th><th class="column-2">医療機関名<br />
@@ -56,7 +56,7 @@ def html_content():
 </tr>
 </tbody>
 </table>
-<table id="tablepress-2-no-2" class="tablepress tablepress-id-2">
+<table id="tablepress-10-no-2" class="tablepress tablepress-id-2">
 <thead>
 <tr class="row-1 odd">
 <th class="column-1">地区</th><th class="column-2">医療機関名<br />
