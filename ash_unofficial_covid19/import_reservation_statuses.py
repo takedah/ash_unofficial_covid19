@@ -2,12 +2,15 @@ import time
 
 from .config import Config
 from .errors import DatabaseConnectionError, HTTPDownloadError, ScrapeError, ServiceError
+from .models.child_reservation_status import ChildReservationStatusFactory
 from .models.first_reservation_status import FirstReservationStatusFactory
 from .models.location import LocationFactory
 from .models.reservation_status import ReservationStatusFactory
+from .scrapers.child_reservation_status import ScrapeChildReservationStatus
 from .scrapers.first_reservation_status import ScrapeFirstReservationStatus
 from .scrapers.location import ScrapeYOLPLocation
 from .scrapers.reservation_status import ScrapeReservationStatus
+from .services.child_reservation_status import ChildReservationStatusService
 from .services.first_reservation_status import FirstReservationStatusService
 from .services.location import LocationService
 from .services.reservation_status import ReservationStatusService
@@ -94,6 +97,53 @@ def import_first_reservation_statuses(html_url: str) -> None:
     for current_name in current_name_list:
         if current_name not in new_name_list:
             deleted_names.append(current_name)
+
+    try:
+        service.create(factory)
+        import_locations(added_names)
+        for deleted_name in deleted_names:
+            service.delete(deleted_name)
+    except (DatabaseConnectionError, ServiceError) as e:
+        print(e.message)
+        return
+
+    return
+
+
+def import_child_reservation_statuses(html_url: str) -> None:
+    """
+    旭川市公式ホームページから新型コロナワクチン接種医療機関の予約受付状況一覧を取得し、
+    データベースへ格納する。
+
+    Args:
+        html_url (str): ワクチン接種医療機関予約受付状況HTMLファイルのURL
+
+    """
+    factory = ChildReservationStatusFactory()
+
+    try:
+        scraped_data = ScrapeChildReservationStatus(html_url)
+        new_name_list = scraped_data.get_medical_institution_list()
+    except HTTPDownloadError as e:
+        print(e.message)
+        return
+
+    for row in scraped_data.lists:
+        factory.create(**row)
+
+    service = ChildReservationStatusService()
+    current_name_list = service.get_medical_institution_list()
+    added_names = list()
+    for new_name in new_name_list:
+        if new_name not in current_name_list:
+            added_names.append(new_name[0])
+
+    added_names = list(set(added_names))
+
+    deleted_names = list()
+    for current_name in current_name_list:
+        if current_name not in new_name_list:
+            deleted_names.append((current_name[0], current_name[1]))
 
     try:
         service.create(factory)
@@ -211,3 +261,4 @@ def import_locations(medical_institution_name_list: list) -> None:
 if __name__ == "__main__":
     import_reservation_statuses(Config.RESERVATION_STATUSES_URL)
     import_first_reservation_statuses(Config.RESERVATION_STATUSES_URL)
+    import_child_reservation_statuses(Config.RESERVATION_STATUSES_URL)

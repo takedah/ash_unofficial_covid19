@@ -2,6 +2,7 @@ from flask import Flask, abort, escape, g, make_response, render_template
 
 from .config import Config
 from .errors import ServiceError
+from .views.child_reservation_status import ChildReservationStatusView
 from .views.first_reservation_status import FirstReservationStatusView
 from .views.graph import ByAgeView, DailyTotalView, MonthTotalView, PerHundredThousandPopulationView, WeeklyPerAgeView
 from .views.patient import AsahikawaPatientView
@@ -56,6 +57,11 @@ def get_reservation_statuses():
 def get_first_reservation_statuses():
     g.first_reservation_statuses = FirstReservationStatusView()
     return g.first_reservation_statuses
+
+
+def get_child_reservation_statuses():
+    g.child_reservation_statuses = ChildReservationStatusView()
+    return g.child_reservation_statuses
 
 
 def get_daily_total():
@@ -313,6 +319,80 @@ def first_reservation_status_medical_institution(medical_institution):
         title=medical_institution + "の新型コロナワクチン1・2回目接種予約受付状況",
         gtag_id=Config.GTAG_ID,
         last_updated=first_reservation_statuses.last_updated,
+        medical_institution=medical_institution,
+        search_results=search_results.items,
+        search_lengths=search_lengths,
+        leaflet=True,
+    )
+
+
+@app.route("/child_reservation_statuses")
+def child_reservation_statuses():
+    child_reservation_statuses = get_child_reservation_statuses()
+    search_results = child_reservation_statuses.find()
+    areas = child_reservation_statuses.get_areas()
+
+    search_lengths = len(search_results.items)
+    if search_lengths == 0:
+        abort(404)
+
+    return render_template(
+        "child_reservation_statuses.html",
+        title="新型コロナワクチン5～11歳接種医療機関マップ（ベータ版）",
+        gtag_id=Config.GTAG_ID,
+        last_updated=child_reservation_statuses.last_updated,
+        search_results=search_results.items,
+        search_lengths=search_lengths,
+        areas=areas.items,
+        leaflet=True,
+    )
+
+
+@app.route("/child_reservation_status/area/<area>")
+def child_reservation_status_area(area):
+    try:
+        area = escape(area)
+    except ValueError:
+        abort(404)
+
+    child_reservation_statuses = get_child_reservation_statuses()
+    search_results = child_reservation_statuses.find(area=area)
+
+    search_lengths = len(search_results.items)
+    if search_lengths == 0:
+        abort(404)
+
+    return render_template(
+        "child_reservation_status_area.html",
+        title=area + "の新型コロナワクチン5～11歳接種医療機関予約受付状況",
+        gtag_id=Config.GTAG_ID,
+        last_updated=child_reservation_statuses.last_updated,
+        area=area,
+        search_results=search_results.items,
+        search_lengths=search_lengths,
+        leaflet=True,
+    )
+
+
+@app.route("/child_reservation_status/medical_institution/<medical_institution>")
+def child_reservation_status_medical_institution(medical_institution):
+    try:
+        medical_institution = escape(medical_institution)
+    except ValueError:
+        abort(404)
+
+    child_reservation_statuses = get_child_reservation_statuses()
+    search_results = child_reservation_statuses.find(medical_institution_name=medical_institution)
+
+    search_lengths = len(search_results.items)
+    if search_lengths == 0:
+        abort(404)
+
+    return render_template(
+        "child_reservation_status_medical_institution.html",
+        title=medical_institution + "の新型コロナワクチン5～11歳接種予約受付状況",
+        gtag_id=Config.GTAG_ID,
+        last_updated=child_reservation_statuses.last_updated,
         medical_institution=medical_institution,
         search_results=search_results.items,
         search_lengths=search_lengths,

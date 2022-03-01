@@ -45,6 +45,8 @@ document.addEventListener(
       var parentPath = "";
       if (document.getElementById("firstReservationStatus")) {
         parentPath = "first_reservation_status";
+      } else if  (document.getElementById("childReservationStatus")) {
+        parentPath = "child_reservation_status";
       } else {
         parentPath = "reservation_status";
       }
