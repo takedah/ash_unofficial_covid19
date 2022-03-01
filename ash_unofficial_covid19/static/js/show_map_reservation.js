@@ -45,7 +45,7 @@ document.addEventListener(
       var parentPath = "";
       if (document.getElementById("firstReservationStatus")) {
         parentPath = "first_reservation_status";
-      } else if  (document.getElementById("childReservationStatus")) {
+      } else if (document.getElementById("childReservationStatus")) {
         parentPath = "child_reservation_status";
       } else {
         parentPath = "reservation_status";
@@ -59,15 +59,27 @@ document.addEventListener(
         locationName +
         "</a>";
       if (locationDataList[locationName] === undefined) {
-        status = vaccine + "<br>" + "予約受付状況: " + status;
+        if (vaccine === "") {
+          status = "予約受付状況: " + status;
+        } else {
+          status = vaccine + "<br>" + "予約受付状況: " + status;
+        }
       } else {
-        status =
-          locationDataList[locationName]["status"] +
-          "<br>" +
-          vaccine +
-          "<br>" +
-          "予約受付状況: " +
-          status;
+        if (vaccine === "") {
+          status =
+            locationDataList[locationName]["status"] +
+            "<br>" +
+            "予約受付状況: " +
+            status;
+        } else {
+          status =
+            locationDataList[locationName]["status"] +
+            "<br>" +
+            vaccine +
+            "<br>" +
+            "予約受付状況: " +
+            status;
+        }
       }
       locationDataList[locationName] = {
         locationName: locationName,
@@ -93,7 +105,11 @@ document.addEventListener(
     } else if (document.getElementById("medicalInstitutionMap")) {
       zoomLevel = 16;
     } else {
-      zoomLevel = 14;
+      if (document.getElementById("childReservationStatus")) {
+        zoomLevel = 12;
+      } else {
+        zoomLevel = 14;
+      }
     }
     map.setView([centerLatitude, centerLongitude], zoomLevel);
 
@@ -105,8 +121,7 @@ document.addEventListener(
       } else if (document.getElementById("medicalInstitutionMap")) {
         popupText = locationData["locationName"];
       } else {
-        popupText =
-          locationData["nameLink"] + "<br>" + locationData["status"];
+        popupText = locationData["nameLink"] + "<br>" + locationData["status"];
       }
       var marker = L.marker([
         locationData["latitude"],

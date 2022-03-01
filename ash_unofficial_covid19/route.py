@@ -338,7 +338,7 @@ def child_reservation_statuses():
 
     return render_template(
         "child_reservation_statuses.html",
-        title="新型コロナワクチン5～11歳接種医療機関マップ（ベータ版）",
+        title="新型コロナワクチン5～11歳接種医療機関マップ",
         gtag_id=Config.GTAG_ID,
         last_updated=child_reservation_statuses.last_updated,
         search_results=search_results.items,

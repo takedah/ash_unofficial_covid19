@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 {% block content %}
 <article id="childReservationStatus">
-  <h1 class="h4">旭川市の新型コロナワクチン5～11歳接種医療機関マップ（ベータ版）</h1>
+  <h1 class="h4">旭川市の新型コロナワクチン5～11歳接種医療機関マップ</h1>
   <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
     <p class="mb-0">{{ last_updated }}にダウンロードしたデータを元に表示しています。正確な情報は必ず<a class="alert-link"
         href="https://asahikawa-vaccine.jp/" title="旭川市 新型コロナワクチン接種特設サイト"
@@ -52,7 +52,6 @@
             <thead>
               <tr>
                 <th class="text-nowrap">医療機関名</th>
-                <th class="text-nowrap">ワクチン</th>
                 <th class="text-nowrap">予約受付状況</th>
                 <th class="text-nowrap">住所</th>
               </tr>
@@ -61,7 +60,6 @@
               {% for search_result in search_results %}
               <tr id="order{{ loop.index }}" data-latitude="{{ search_result.latitude|tojson }}" data-longitude="{{ search_result.longitude|tojson }}" data-name="{{ search_result.medical_institution_name|safe }}" data-url="{{ search_result.medical_institution_name_url|safe }}" data-vaccine="{{ search_result.vaccine|safe }}" data-status="{{ search_result.status|safe }}">
                 <td class="text-nowrap"><a href="/child_reservation_status/medical_institution/{{ search_result.medical_institution_name_url }}" title="{{ search_result.medical_institution_name }}の予約受付状況へ">{{ search_result.medical_institution_name }}</a></td>
-                <td class="text-nowrap">{{ search_result.vaccine }}</td>
                 <td class="text-nowrap">{{ search_result.status }}</td>
                 <td class="text-nowrap">{{ search_result.address }}</td>
               </tr>

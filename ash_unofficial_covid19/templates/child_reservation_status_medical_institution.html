@@ -19,13 +19,11 @@
             <thead>
               <tr>
                 <th class="text-nowrap">
-                    接種するワクチン<br>
                     住所<br>
                     電話番号<br>
                 </th>
                 <th>予約受付開始時期</th>
                 <th>接種可能時期</th>
-                <th>年齢</th>
                 <th>かかりつけ</th>
                 <th>かかりつけ以外</th>
                 <th>その他</th>
@@ -36,13 +34,11 @@
               {% for search_result in search_results %}
               <tr id="order{{ loop.index }}" data-latitude="{{ search_result.latitude|tojson }}" data-longitude="{{ search_result.longitude|tojson }}" data-name="{{ search_result.medical_institution_name|safe }}" data-url="{{ search_result.medical_institution_name_url|safe }}" data-vaccine="{{ search_result.vaccine|safe }}" data-status="{{ search_result.status|safe }}">
                 <td>
-                    {{ search_result.vaccine }}<br>
                     {{ search_result.address }}<br>
                     {{ search_result.phone_number }}<br>
                 </td>
                 <td>{{ search_result.status }}</td>
                 <td>{{ search_result.inoculation_time }}</td>
-                <td>{{ search_result.target_age }}</td>
                 {% if search_result.is_target_family is none %}
                   <td></td>
                 {% elif search_result.is_target_family %}
