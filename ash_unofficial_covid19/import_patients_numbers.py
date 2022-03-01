@@ -172,12 +172,11 @@ def import_latest():
     for press_release_link in press_release_links.items:
         publication_date = press_release_link.publication_date
         if date(2022, 1, 27) < publication_date:
-            if publication_date.year == 2022 and publication_date.month == 2:
+            if publication_date.year == 2022 and publication_date.month == 3:
                 _import_asahikawa_data_from_press_release(
                     pdf_url=press_release_link.url,
                     publication_date=press_release_link.publication_date,
                 )
-                _fix_asahikawa_data()
 
 
 def import_past_from_patients():
