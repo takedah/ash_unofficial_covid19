@@ -1,7 +1,11 @@
+from dataclasses import dataclass
+
 from ..models.factory import Factory
+from ..models.point import Point
 
 
-class Location:
+@dataclass
+class Location(Point):
     """医療機関の緯度経度を表すモデルオブジェクト
 
     Attributes:
@@ -11,34 +15,7 @@ class Location:
 
     """
 
-    def __init__(
-        self,
-        medical_institution_name: str,
-        longitude: float,
-        latitude: float,
-    ):
-        """
-        Args:
-            name (str): 医療機関の名称
-            longitude (float): 医療機関のある経度
-            latitude (float): 医療機関のある緯度
-
-        """
-        self.__medical_institution_name = medical_institution_name
-        self.__longitude = longitude
-        self.__latitude = latitude
-
-    @property
-    def medical_institution_name(self):
-        return self.__medical_institution_name
-
-    @property
-    def longitude(self):
-        return self.__longitude
-
-    @property
-    def latitude(self):
-        return self.__latitude
+    medical_institution_name: str = ""
 
 
 class LocationFactory(Factory):
