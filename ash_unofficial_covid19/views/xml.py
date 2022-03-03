@@ -5,8 +5,11 @@ from dateutil.relativedelta import relativedelta
 
 from ..config import Config
 from ..errors import DatabaseConnectionError
+from ..services.child_reservation_status import ChildReservationStatusService
+from ..services.first_reservation_status import FirstReservationStatusService
 from ..services.patients_number import PatientsNumberService
 from ..services.press_release_link import PressReleaseLinkService
+from ..services.reservation_status import ReservationStatusService
 
 
 class XmlView:
@@ -31,6 +34,9 @@ class XmlView:
         self.__today = today
         self.__most_recent = "{:,}".format(most_recent)
         self.__increase_from_seven_days_before = "{:+,}".format(increase_from_seven_days_before)
+        self.__reservation_status_updated = self._get_reservation_status_updated()
+        self.__first_reservation_status_updated = self._get_first_reservation_status_updated()
+        self.__child_reservation_status_updated = self._get_child_reservation_status_updated()
 
     @property
     def today(self):
@@ -51,6 +57,18 @@ class XmlView:
     @property
     def increase_from_last_week_per(self):
         return self.__increase_from_last_week_per
+
+    @property
+    def reservation_status_updated(self):
+        return self.__reservation_status_updated
+
+    @property
+    def first_reservation_status_updated(self):
+        return self.__first_reservation_status_updated
+
+    @property
+    def child_reservation_status_updated(self):
+        return self.__child_reservation_status_updated
 
     @staticmethod
     def _get_today() -> date:
@@ -120,6 +138,39 @@ class XmlView:
 
         return last_modified.astimezone(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S GMT")
 
+    @staticmethod
+    def _get_reservation_status_updated() -> datetime:
+        """新型コロナワクチン3回目接種予約受付状況テーブルの最終更新日を返す
+
+        Returns:
+            updated (datetime): 予約受付状況テーブルの最終更新日
+
+        """
+        service = ReservationStatusService()
+        return service.get_last_updated()
+
+    @staticmethod
+    def _get_first_reservation_status_updated() -> datetime:
+        """新型コロナワクチン1・2回目接種予約受付状況テーブルの最終更新日を返す
+
+        Returns:
+            updated (datetime): 予約受付状況テーブルの最終更新日
+
+        """
+        service = FirstReservationStatusService()
+        return service.get_last_updated()
+
+    @staticmethod
+    def _get_child_reservation_status_updated() -> datetime:
+        """新型コロナワクチン5～11歳接種予約受付状況テーブルの最終更新日を返す
+
+        Returns:
+            updated (datetime): 予約受付状況テーブルの最終更新日
+
+        """
+        service = ChildReservationStatusService()
+        return service.get_last_updated()
+
     def get_feed(self):
         pass
 
@@ -150,6 +201,9 @@ class RssView(XmlView):
             + "人となっています。"
         )
         last_modified = self.get_last_modified()
+        reservation_status_updated = self.reservation_status_updated.astimezone(timezone.utc)
+        first_reservation_status_updated = self.first_reservation_status_updated.astimezone(timezone.utc)
+        child_reservation_status_updated = self.child_reservation_status_updated.astimezone(timezone.utc)
         return (
             "<?xml version='1.0' encoding='UTF-8'?>\n"
             + "<rss version='2.0' xmlns:atom='http://www.w3.org/2005/Atom'>\n"
@@ -215,7 +269,7 @@ class RssView(XmlView):
             + "/reservation_statuses</link>\n"
             + "      <description>地図などから新型コロナワクチン3回目接種医療機関の予約受付状況を確認できます。</description>\n"
             + "      <pubDate>"
-            + last_modified
+            + reservation_status_updated.strftime("%a, %d %b %Y %H:%M:%S GMT")
             + "</pubDate>\n"
             + "      <guid>https://"
             + Config.MY_DOMAIN
@@ -228,11 +282,24 @@ class RssView(XmlView):
             + "/first_reservation_statuses</link>\n"
             + "      <description>地図などから新型コロナワクチン1・2回目接種医療機関の予約受付状況を確認できます。</description>\n"
             + "      <pubDate>"
-            + last_modified
+            + first_reservation_status_updated.strftime("%a, %d %b %Y %H:%M:%S GMT")
             + "</pubDate>\n"
             + "      <guid>https://"
             + Config.MY_DOMAIN
             + "/first_reservation_statuses</guid>\n"
+            + "    </item>\n"
+            + "    <item>\n"
+            + "      <title>ワクチン5～11歳接種医療機関マップ</title>\n"
+            + "      <link>https://"
+            + Config.MY_DOMAIN
+            + "/child_reservation_statuses</link>\n"
+            + "      <description>地図などから新型コロナワクチン5～11歳接種医療機関の予約受付状況を確認できます。</description>\n"
+            + "      <pubDate>"
+            + child_reservation_status_updated.strftime("%a, %d %b %Y %H:%M:%S GMT")
+            + "</pubDate>\n"
+            + "      <guid>https://"
+            + Config.MY_DOMAIN
+            + "/child_reservation_statuses</guid>\n"
             + "    </item>\n"
             + "    <item>\n"
             + "      <title>非公式オープンデータ</title>\n"
@@ -338,7 +405,7 @@ class AtomView(XmlView):
             + "    <id>https://"
             + Config.MY_DOMAIN
             + "/about</id>\n"
-            + "    <updated>Sun, 27 Feb 2022 07:00:00 GMT</updated>\n"
+            + "    <updated>2022-02-27T16:00:00+09:00</updated>\n"
             + "    <summary>旭川市新型コロナウイルスまとめサイトについてのページです。</summary>\n"
             + "  </entry>\n"
             + "  <entry>\n"
@@ -350,7 +417,7 @@ class AtomView(XmlView):
             + Config.MY_DOMAIN
             + "/reservation_statuses</id>\n"
             + "    <updated>"
-            + self.today.strftime("%Y-%m-%dT16:00:00+09:00")
+            + self.reservation_status_updated.strftime("%Y-%m-%dT%H:%M:%S+09:00")
             + "</updated>\n"
             + "    <summary>地図などから新型コロナワクチン3回目接種医療機関の予約受付状況を確認できます。</summary>\n"
             + "  </entry>\n"
@@ -363,9 +430,22 @@ class AtomView(XmlView):
             + Config.MY_DOMAIN
             + "/first_reservation_statuses</id>\n"
             + "    <updated>"
-            + self.today.strftime("%Y-%m-%dT16:00:00+09:00")
+            + self.first_reservation_status_updated.strftime("%Y-%m-%dT%H:%M:%S+09:00")
             + "</updated>\n"
             + "    <summary>地図などから新型コロナワクチン1・2回目接種医療機関の予約受付状況を確認できます。</summary>\n"
+            + "  </entry>\n"
+            + "  <entry>\n"
+            + "    <title>ワクチン5～11歳接種医療機関マップ</title>\n"
+            + "    <link href='https://"
+            + Config.MY_DOMAIN
+            + "/child_reservation_statuses' />\n"
+            + "    <id>https://"
+            + Config.MY_DOMAIN
+            + "/child_reservation_statuses</id>\n"
+            + "    <updated>"
+            + self.child_reservation_status_updated.strftime("%Y-%m-%dT%H:%M:%S+09:00")
+            + "</updated>\n"
+            + "    <summary>地図などから新型コロナワクチン5～11歳接種医療機関の予約受付状況を確認できます。</summary>\n"
             + "  </entry>\n"
             + "  <entry>\n"
             + "    <title>非公式オープンデータ</title>\n"
@@ -389,7 +469,7 @@ class AtomView(XmlView):
             + "    <id>https://"
             + Config.MY_DOMAIN
             + "/patients</id>\n"
-            + "    <updated>Thu, 27 Jan 2022 07:00:00 GMT</updated>\n"
+            + "    <updated>2022-01-27T16:00:00+09:00</updated>\n"
             + "    <summary>旭川市の新型コロナウイルス感染症患者の状況です。"
             + "2022年1月27日発表分をもって旭川市が感染者ごとの情報の公表をやめたため、同日時点までの情報を表示しています。"
             + "</summary>\n"
