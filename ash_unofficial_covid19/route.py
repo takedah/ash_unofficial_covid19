@@ -473,6 +473,16 @@ def first_reservation_status_json():
     return res
 
 
+@app.route("/api/child_reservation_status.json")
+def child_reservation_status_json():
+    child_reservation_statuses = get_child_reservation_statuses()
+    json_data = child_reservation_statuses.get_reservation_status_json()
+    res = make_response()
+    res.data = json_data
+    res.headers["Content-Type"] = "application/json; charset=UTF-8"
+    return res
+
+
 @app.route("/daily_total.png")
 def get_daily_total_graph():
     daily_total = get_daily_total()

@@ -44,11 +44,9 @@
       <div class="card-body">
         <p class="card-text">日ごとの新規感染者数のJSONです。</p>
         <h3 class="h6 card-title">データレイアウト</h3>
-        <pre class="border text-light bg-dark pre-scrollable"><code>
-        {
-          "公表日 (YYYY-mm-dd)": 陽性患者数
-        }
-        </code></pre>
+        <pre class="border text-light bg-dark pre-scrollable p-3"><code>{
+  "公表日 (YYYY-mm-dd)": 陽性患者数
+}</code></pre>
         <p class="card-text mt-3"><a href="/api/daily_total.json" title="旭川市新型コロナ日別陽性患者数JSONをダウンロード" class="btn btn-primary">日別陽性患者数JSONをダウンロード</a></p>
       </div>
     </div>
@@ -118,23 +116,21 @@
       <div class="card-body">
         <p class="card-text">日ごとの年代別新規感染者数のJSONです。</p>
         <h3 class="h6 card-title">データレイアウト</h3>
-        <pre class="border text-light bg-dark pre-scrollable"><code>
-        {
-          "公表日 (YYYY-mm-dd)": {
-            "age_under_10": 10歳未満の陽性患者数,
-            "age_10s": 10代の陽性患者数,
-            "age_20s": 20代の陽性患者数,
-            "age_30s": 30代の陽性患者数,
-            "age_40s": 40代の陽性患者数,
-            "age_50s": 50代の陽性患者数,
-            "age_60s": 60代の陽性患者数,
-            "age_70s": 70代の陽性患者数,
-            "age_80s": 80代の陽性患者数,
-            "age_over_90": 90歳以上の陽性患者数,
-            "investigating": 調査中等の陽性患者数
-          }
-        }
-        </code></pre>
+        <pre class="border text-light bg-dark pre-scrollable p-3"><code>{
+  "公表日 (YYYY-mm-dd)": {
+    "age_under_10": 10歳未満の陽性患者数,
+    "age_10s": 10代の陽性患者数,
+    "age_20s": 20代の陽性患者数,
+    "age_30s": 30代の陽性患者数,
+    "age_40s": 40代の陽性患者数,
+    "age_50s": 50代の陽性患者数,
+    "age_60s": 60代の陽性患者数,
+    "age_70s": 70代の陽性患者数,
+    "age_80s": 80代の陽性患者数,
+    "age_over_90": 90歳以上の陽性患者数,
+    "investigating": 調査中等の陽性患者数
+  }
+}</code></pre>
         <p class="card-text mt-3"><a href="/api/daily_total_per_age.json" title="旭川市新型コロナ日別年代別陽性患者数JSONをダウンロード" class="btn btn-primary">日別年代別陽性患者数JSONをダウンロード</a></p>
       </div>
     </div>
@@ -144,24 +140,22 @@
       <h2 class="h5 card-title">新型コロナワクチン3回目接種医療機関予約受付状況JSON</h2>
       <p class="card-text">新型コロナワクチン3回目接種医療機関予約受付状況のJSONです。</p>
       <h3 class="h6 card-title">データレイアウト</h3>
-      <pre class="border text-light bg-dark pre-scrollable"><code>
-        {
-          "row0": {
-              "area": "地区",
-              "medical_institution_name": "医療機関名",
-              "address": "住所",
-              "phone_number": "電話番号",
-              "vaccine": "接種するワクチン",
-              "status": "予約受付開始時期",
-              "inoculation_time": "接種可能時期",
-              "target_age": "年齢",
-              "is_target_family": かかりつけの方 (Boolean),
-              "is_target_not_family": かかりつけ以外の方 (Boolean),
-              "target_other": "その他",
-              "memo": "備考"
-          }
-        }
-      </code></pre>
+      <pre class="border text-light bg-dark pre-scrollable p-3"><code>{
+  "row0": {
+      "area": "地区",
+      "medical_institution_name": "医療機関名",
+      "address": "住所",
+      "phone_number": "電話番号",
+      "vaccine": "接種するワクチン",
+      "status": "予約受付開始時期",
+      "inoculation_time": "接種可能時期",
+      "target_age": "年齢",
+      "is_target_family": かかりつけの方 (Boolean),
+      "is_target_not_family": かかりつけ以外の方 (Boolean),
+      "target_other": "その他",
+      "memo": "備考"
+  }
+}</code></pre>
       <p class="card-text mt-3"><a href="/api/reservation_status.json" title="旭川市新型コロナワクチン3回目接種医療機関予約受付状況をダウンロード" class="btn btn-primary">ワクチン3回目接種予約受付状況JSONをダウンロード</a></p>
     </div>
   </div>
@@ -170,25 +164,47 @@
       <h2 class="h5 card-title">新型コロナワクチン1・2回目接種医療機関予約受付状況JSON</h2>
       <p class="card-text">新型コロナワクチン1・2回目接種医療機関予約受付状況のJSONです。</p>
       <h3 class="h6 card-title">データレイアウト</h3>
-      <pre class="border text-light bg-dark pre-scrollable"><code>
-        {
-          "row0": {
-              "area": "地区",
-              "medical_institution_name": "医療機関名",
-              "address": "住所",
-              "phone_number": "電話番号",
-              "status": "予約受付開始時期",
-              "inoculation_time": "接種可能時期",
-              "target_age": "年齢",
-              "is_target_family": かかりつけの方 (Boolean),
-              "is_target_not_family": かかりつけ以外の方 (Boolean),
-              "is_target_suberb": 市外の方 (Boolean),
-              "target_other": "その他",
-              "memo": "備考"
-          }
-        }
-      </code></pre>
+      <pre class="border text-light bg-dark pre-scrollable p-3"><code>{
+  "row0": {
+      "area": "地区",
+      "medical_institution_name": "医療機関名",
+      "address": "住所",
+      "phone_number": "電話番号",
+      "status": "予約受付開始時期",
+      "inoculation_time": "接種可能時期",
+      "target_age": "年齢",
+      "is_target_family": かかりつけの方 (Boolean),
+      "is_target_not_family": かかりつけ以外の方 (Boolean),
+      "is_target_suberb": 市外の方 (Boolean),
+      "target_other": "その他",
+      "memo": "備考"
+  }
+}</code></pre>
       <p class="card-text mt-3"><a href="/api/first_reservation_status.json" title="旭川市新型コロナワクチン1・2回目接種医療機関予約受付状況をダウンロード" class="btn btn-primary">ワクチン1・2回目接種予約受付状況JSONをダウンロード</a></p>
+    </div>
+  </div>
+  <div class="card mt-3">
+    <div class="card-body">
+      <h2 class="h5 card-title">新型コロナワクチン5～11歳接種医療機関予約受付状況JSON</h2>
+      <p class="card-text">新型コロナワクチン5～11歳接種医療機関予約受付状況のJSONです。</p>
+      <h3 class="h6 card-title">データレイアウト</h3>
+      <pre class="border text-light bg-dark pre-scrollable p-3"><code>{
+  "row0": {
+      "area": "地区",
+      "medical_institution_name": "医療機関名",
+      "address": "住所",
+      "phone_number": "電話番号",
+      "vaccine": "接種するワクチン",
+      "status": "予約受付開始時期",
+      "inoculation_time": "接種可能時期",
+      "target_age": "年齢",
+      "is_target_family": かかりつけの方 (Boolean),
+      "is_target_not_family": かかりつけ以外の方 (Boolean),
+      "target_other": "その他",
+      "memo": "備考"
+  }
+}</code></pre>
+      <p class="card-text mt-3"><a href="/api/child_reservation_status.json" title="旭川市新型コロナワクチン5～11歳接種医療機関予約受付状況をダウンロード" class="btn btn-primary">ワクチン5～11歳接種予約受付状況JSONをダウンロード</a></p>
     </div>
   </div>
   <div class="card mt-3">
