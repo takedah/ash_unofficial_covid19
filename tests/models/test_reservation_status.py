@@ -1,6 +1,4 @@
 from ash_unofficial_covid19.models.reservation_status import (
-    Area,
-    AreaFactory,
     ReservationStatus,
     ReservationStatusFactory,
     ReservationStatusLocation,
@@ -61,14 +59,3 @@ class TestReservationStatusLocation:
             reservation_status_location.medical_institution_name_url
             == "%E6%97%AD%E5%B7%9D%E8%B5%A4%E5%8D%81%E5%AD%97%E7%97%85%E9%99%A2"
         )
-
-
-class TestArea:
-    def test_create(self):
-        test_data = {"name": "西地区"}
-        factory = AreaFactory()
-        # Areaクラスのオブジェクトが生成できるか確認する。
-        area = factory.create(**test_data)
-        assert isinstance(area, Area)
-        # 地区をURLパースした要素が生成されているか確認する。
-        assert area.url == "%E8%A5%BF%E5%9C%B0%E5%8C%BA"

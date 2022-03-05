@@ -1,7 +1,7 @@
-from flask import Flask, abort, escape, g, make_response, render_template
+from flask import Flask, abort, escape, g, make_response, render_template, request
 
 from .config import Config
-from .errors import ServiceError
+from .errors import DataModelError, ServiceError
 from .views.child_reservation_status import ChildReservationStatusView
 from .views.first_reservation_status import FirstReservationStatusView
 from .views.graph import ByAgeView, DailyTotalView, MonthTotalView, PerHundredThousandPopulationView, WeeklyPerAgeView
@@ -196,6 +196,202 @@ def reservation_statuses():
         search_results=search_results.items,
         search_lengths=search_lengths,
         areas=areas.items,
+        leaflet=True,
+    )
+
+
+@app.route("/reservation_statuses/search_by_gps", methods=["GET", "POST"])
+def reservation_statuses_search_by_gps():
+    reservation_statuses = get_reservation_statuses()
+    if request.method == "GET":
+        search_results = reservation_statuses.find()
+        areas = reservation_statuses.get_areas()
+        search_lengths = len(search_results.items)
+        if search_lengths == 0:
+            abort(404)
+
+        return render_template(
+            "reservation_statuses.html",
+            title="新型コロナワクチン3回目接種医療機関マップ",
+            gtag_id=Config.GTAG_ID,
+            last_updated=reservation_statuses.last_updated,
+            search_results=search_results.items,
+            search_lengths=search_lengths,
+            areas=areas.items,
+            leaflet=True,
+        )
+
+    title = "現在地から近いワクチン3回目接種医療機関の検索結果"
+    current_latitude = escape(request.form["current_latitude"])
+    current_longitude = escape(request.form["current_longitude"])
+    try:
+        current_latitude = float(current_latitude)
+        current_longitude = float(current_longitude)
+    except ValueError:
+        title = "緯度経度が正しく指定されていません"
+        return render_template(
+            "error.html",
+            title=title,
+            gtag_id=Config.GTAG_ID,
+            leaflet=False,
+        )
+
+    try:
+        search_results = reservation_statuses.search_by_gps(longitude=current_longitude, latitude=current_latitude)
+    except DataModelError as e:
+        title = e.message
+        return render_template(
+            "error.html",
+            title=title,
+            gtag_id=Config.GTAG_ID,
+            leaflet=False,
+        )
+
+    search_lengths = len(search_results)
+    if search_lengths == 0:
+        abort(404)
+
+    return render_template(
+        "reservation_status_search_by_gps.html",
+        title="現在地から近い新型コロナワクチン3回目接種医療機関予約受付状況",
+        gtag_id=Config.GTAG_ID,
+        last_updated=reservation_statuses.last_updated,
+        search_results=search_results,
+        search_lengths=search_lengths,
+        current_longitude=current_longitude,
+        current_latitude=current_latitude,
+        leaflet=True,
+    )
+
+
+@app.route("/first_reservation_statuses/search_by_gps", methods=["GET", "POST"])
+def first_reservation_statuses_search_by_gps():
+    first_reservation_statuses = get_first_reservation_statuses()
+    if request.method == "GET":
+        search_results = first_reservation_statuses.find()
+        areas = first_reservation_statuses.get_areas()
+        search_lengths = len(search_results.items)
+        if search_lengths == 0:
+            abort(404)
+
+        return render_template(
+            "first_reservation_statuses.html",
+            title="新型コロナワクチン1・2回目接種医療機関マップ",
+            gtag_id=Config.GTAG_ID,
+            last_updated=first_reservation_statuses.last_updated,
+            search_results=search_results.items,
+            search_lengths=search_lengths,
+            areas=areas.items,
+            leaflet=True,
+        )
+
+    title = "現在地から近いワクチン1・2回目接種医療機関の検索結果"
+    current_latitude = escape(request.form["current_latitude"])
+    current_longitude = escape(request.form["current_longitude"])
+    try:
+        current_latitude = float(current_latitude)
+        current_longitude = float(current_longitude)
+    except ValueError:
+        title = "緯度経度が正しく指定されていません"
+        return render_template(
+            "error.html",
+            title=title,
+            gtag_id=Config.GTAG_ID,
+            leaflet=False,
+        )
+
+    try:
+        search_results = first_reservation_statuses.search_by_gps(
+            longitude=current_longitude, latitude=current_latitude
+        )
+    except DataModelError as e:
+        title = e.message
+        return render_template(
+            "error.html",
+            title=title,
+            gtag_id=Config.GTAG_ID,
+            leaflet=False,
+        )
+
+    search_lengths = len(search_results)
+    if search_lengths == 0:
+        abort(404)
+
+    return render_template(
+        "first_reservation_status_search_by_gps.html",
+        title="現在地から近い新型コロナワクチン1・2回目接種医療機関予約受付状況",
+        gtag_id=Config.GTAG_ID,
+        last_updated=first_reservation_statuses.last_updated,
+        search_results=search_results,
+        search_lengths=search_lengths,
+        current_longitude=current_longitude,
+        current_latitude=current_latitude,
+        leaflet=True,
+    )
+
+
+@app.route("/child_reservation_statuses/search_by_gps", methods=["GET", "POST"])
+def child_reservation_statuses_search_by_gps():
+    child_reservation_statuses = get_child_reservation_statuses()
+    if request.method == "GET":
+        search_results = child_reservation_statuses.find()
+        areas = child_reservation_statuses.get_areas()
+        search_lengths = len(search_results.items)
+        if search_lengths == 0:
+            abort(404)
+
+        return render_template(
+            "child_reservation_statuses.html",
+            title="新型コロナワクチン5～11歳接種医療機関マップ",
+            gtag_id=Config.GTAG_ID,
+            last_updated=child_reservation_statuses.last_updated,
+            search_results=search_results.items,
+            search_lengths=search_lengths,
+            areas=areas.items,
+            leaflet=True,
+        )
+
+    title = "現在地から近いワクチン5～11歳接種医療機関の検索結果"
+    current_latitude = escape(request.form["current_latitude"])
+    current_longitude = escape(request.form["current_longitude"])
+    try:
+        current_latitude = float(current_latitude)
+        current_longitude = float(current_longitude)
+    except ValueError:
+        title = "緯度経度が正しく指定されていません"
+        return render_template(
+            "error.html",
+            title=title,
+            gtag_id=Config.GTAG_ID,
+            leaflet=False,
+        )
+
+    try:
+        search_results = child_reservation_statuses.search_by_gps(
+            longitude=current_longitude, latitude=current_latitude
+        )
+    except DataModelError as e:
+        title = e.message
+        return render_template(
+            "error.html",
+            title=title,
+            gtag_id=Config.GTAG_ID,
+            leaflet=False,
+        )
+
+    search_lengths = len(search_results)
+    if search_lengths == 0:
+        abort(404)
+
+    return render_template(
+        "child_reservation_status_search_by_gps.html",
+        title="現在地から近い新型コロナワクチン5～11歳接種医療機関予約受付状況",
+        gtag_id=Config.GTAG_ID,
+        last_updated=child_reservation_statuses.last_updated,
+        search_results=search_results,
+        search_lengths=search_lengths,
+        current_longitude=current_longitude,
+        current_latitude=current_latitude,
         leaflet=True,
     )
 

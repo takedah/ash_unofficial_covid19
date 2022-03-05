@@ -5,7 +5,8 @@ import psycopg2
 from psycopg2.extras import DictCursor
 
 from ..errors import ServiceError
-from ..models.reservation_status import AreaFactory, ReservationStatusFactory, ReservationStatusLocationFactory
+from ..models.area import AreaFactory
+from ..models.reservation_status import ReservationStatusFactory, ReservationStatusLocationFactory
 from ..services.service import Service
 
 

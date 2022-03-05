@@ -102,6 +102,8 @@ document.addEventListener(
     var zoomLevel = 0;
     if (document.getElementById("areaMap")) {
       zoomLevel = 15;
+    } else if (document.getElementById("gpsMap")) {
+      zoomLevel = 14;
     } else if (document.getElementById("medicalInstitutionMap")) {
       zoomLevel = 16;
     } else {
@@ -111,12 +113,31 @@ document.addEventListener(
         zoomLevel = 14;
       }
     }
+
     map.setView([centerLatitude, centerLongitude], zoomLevel);
+    if (document.getElementById("gpsMap")) {
+      var currentLongitude = parseFloat(
+        JSON.parse(document.getElementById("results").dataset.currentlongitude)
+      );
+      var currentLatitude = parseFloat(
+        JSON.parse(document.getElementById("results").dataset.currentlatitude)
+      );
+      map.options.closePopupOnClick = false;
+      map.setView([currentLatitude, currentLongitude], zoomLevel);
+      var currentPointMarker = L.marker([currentLatitude, currentLongitude]);
+      currentPointMarker
+        .addTo(map)
+        .bindPopup("現在地", { autoClose: false })
+        .openPopup();
+    }
 
     for (var prop in locationDataList) {
       var locationData = locationDataList[prop];
       var popupText = "";
-      if (document.getElementById("areaMap")) {
+      if (
+        document.getElementById("areaMap") ||
+        document.getElementById("gpsMap")
+      ) {
         popupText = locationData["nameLink"];
       } else if (document.getElementById("medicalInstitutionMap")) {
         popupText = locationData["locationName"];

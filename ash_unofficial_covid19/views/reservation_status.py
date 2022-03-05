@@ -1,6 +1,9 @@
 from typing import Optional
 
-from ..models.reservation_status import AreaFactory, ReservationStatusLocationFactory
+from ..models.area import AreaFactory
+from ..models.point import PointFactory
+from ..models.reservation_status import ReservationStatusLocationFactory
+from ..services.location import LocationService
 from ..services.reservation_status import ReservationStatusService
 from ..views.view import View
 
@@ -66,3 +69,21 @@ class ReservationStatusView(View):
         """
         json_data = self.__service.get_dicts()
         return self.dict_to_json(json_data)
+
+    def search_by_gps(self, longitude: float, latitude: float) -> list:
+        """指定した緯度経度から直線距離が近い上位5件の医療機関予約受付状況データを返す
+
+        Args:
+            longitude (float): 経度
+            latitude (float): 緯度
+
+        Returns:
+            near_locations (list of dicts): 現在地から最も近い上位5件の
+                医療機関オブジェクトと順位、現在地までの距離（キロメートルに換算し
+                小数点第3位を切り上げ）を要素に持つ辞書のリスト
+
+        """
+        point_factory = PointFactory()
+        current_point = point_factory.create(longitude=longitude, latitude=latitude)
+        reservation_statuses = self.__service.find()
+        return LocationService.get_near_locations(locations=reservation_statuses, current_point=current_point)

@@ -37,6 +37,29 @@
   <div class="card mt-3">
     <div class="card-body">
       <section>
+        <h2 class="h5 card-title">現在地から近い医療機関を探す</h2>
+        <p class="card-text mb-2">位置情報を使用して、現在地から近い新型コロナワクチン1・2回目接種医療機関の一覧を検索することができます。</p>
+      </section>
+      <section>
+        <p id="gpsServiceStatus" class="none"></p>
+      </section>
+      <section id="nudge">
+        <p><button id="useGps" class="btn btn-primary">現在地の位置情報を取得</button></p>
+      </section>
+      <section id="searchByGps">
+        <form action="/first_reservation_statuses/search_by_gps" method="POST">
+          <p>
+          <input type="hidden" id="currentLatitude" name="current_latitude" value="">
+          <input type="hidden" id="currentLongitude" name="current_longitude" value="">
+          <button type="submit" id="sendCurrentLocation" class="btn btn-success">現在地から近い医療機関を検索</button>
+          </p>
+        </form>
+      </section>
+    </div>
+  </div>
+  <div class="card mt-3">
+    <div class="card-body">
+      <section>
         <h2 class="h5 card-title">地区から探す</h2>
         <p class="card-text">以下のリンクから地区ごとの新型コロナワクチン1・2回目接種医療機関の予約受付状況や地図を一覧で確認できます。</p>
         <div class="list-group-flush">
@@ -78,4 +101,5 @@
   </div>
 </article>
 <script charset="utf-8" src="{{ url_for('static', filename='js/show_map_reservation.js') }}"></script>
+<script charset="utf-8" src="{{ url_for('static', filename='js/get_gps.js') }}"></script>
 {% endblock %}
