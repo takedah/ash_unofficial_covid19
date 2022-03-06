@@ -33,14 +33,15 @@
     <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/apple-touch-icon.png') }}">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon-32x32.png') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon-16x16.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='js/site.webmanifest') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/add.css') }}">
   </head>
   <body>
     <header>
-      <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-white">
-        <a class="navbar-brand" href="/"><img src="{{ url_for('static', filename='images/title.png') }}" alt="COVID-19 ASAHIKAWA 新型コロナウイルスまとめサイト" title="COVID-19 ASAHIKAWA 新型コロナウイルスまとめサイト" width="256" height="56"></a>
+      <nav class="navbar navbar-expand-md fixed-top navbar-dark bg-dark">
+        <a class="navbar-brand" href="/"><img src="{{ url_for('static', filename='images/title_dark.png') }}" alt="STOP COVID-19 ASAHIKAWA 新型コロナウイルスまとめサイト" title="STOP COVID-19 ASAHIKAWA 新型コロナウイルスまとめサイト" width="180" height="40"></a>
         <div class="dropdown show ml-auto mr-0">
-          <a class="btn btn-secondary dropdown-toggle btn-sm" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <a class="btn btn-dark dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Menu
           </a>
           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
