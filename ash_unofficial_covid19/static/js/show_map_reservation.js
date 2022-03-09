@@ -114,7 +114,6 @@ document.addEventListener(
       }
     }
 
-    map.setView([centerLatitude, centerLongitude], zoomLevel);
     if (document.getElementById("gpsMap")) {
       var currentLongitude = parseFloat(
         JSON.parse(document.getElementById("results").dataset.currentlongitude)
@@ -129,6 +128,8 @@ document.addEventListener(
         .addTo(map)
         .bindPopup("現在地", { autoClose: false })
         .openPopup();
+    } else {
+      map.setView([centerLatitude, centerLongitude], zoomLevel);
     }
 
     for (var prop in locationDataList) {
