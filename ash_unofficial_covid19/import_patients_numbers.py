@@ -164,7 +164,8 @@ def import_latest():
     )
 
     # 札幌市の日別新規陽性患者数データをデータベースへ登録
-    _import_sapporo_patients_number(Config.SAPPORO_URL)
+    # 札幌市のオープンデータの文字コードがSJISになってしまっているので一旦中止
+    # _import_sapporo_patients_number(Config.SAPPORO_URL)
 
     # 今月の報道発表資料PDFファイルから日別年代別陽性患者数データをデータベースへ登録
     _import_press_release_link(url=Config.LATEST_DATA_URL, target_year=2022)
