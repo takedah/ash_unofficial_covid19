@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 {% block content %}
 <article id="firstReservationStatus">
-  <h1 class="h4 py-2">旭川市の新型コロナワクチン1・2回目接種医療機関マップ</h1>
+  <h1 class="h4 py-2">旭川市のコロナワクチンマップ（1・2回目接種）</h1>
   <div class="alert alert-danger alert-dismissible fade show" role="alert">
     <p class="mb-0">{{ last_updated }}にダウンロードしたデータを元に表示しています。正確な情報は必ず<a class="alert-link"
         href="https://asahikawa-vaccine.jp/" title="旭川市 新型コロナワクチン接種特設サイト"
@@ -25,15 +25,15 @@
                     住所<br>
                     電話番号<br>
                 </th>
-                <th>予約受付開始時期</th>
-                <th>接種可能時期</th>
-                <th>年齢</th>
+                <th class="text-nowrap">予約受付開始時期</th>
+                <th class="text-nowrap">接種可能時期</th>
+                <th class="text-nowrap">年齢</th>
                 <th>かかりつけ</th>
                 <th>かかりつけ以外</th>
                 <th>市外</th>
-                <th>その他</th>
-                <th>備考</th>
-                <th>距離</th>
+                <th class="text-nowrap">その他</th>
+                <th class="text-nowrap">備考</th>
+                <th class="text-nowrap">距離</th>
               </tr>
             </thead>
             <tbody id="results" data-length="{{ search_lengths|tojson }}" data-currentlatitude="{{ current_latitude|tojson }}" data-currentlongitude="{{ current_longitude|tojson }}">
@@ -102,7 +102,7 @@
     <div class="card-body">
       <section>
         <h3 class="h5 card-title">他の条件で医療機関（1・2回目接種）を探す</h3>
-        <p class="card-text"><a href="/first_reservation_statuses" title="ワクチン1・2回目接種医療機関マップへ">ワクチン1・2回目接種医療機関マップへ</a></p>
+        <p class="card-text"><a href="/first_reservation_statuses" title="コロナワクチンマップ（1・2回目接種）へ">コロナワクチンマップ（1・2回目接種）へ</a></p>
       </section>
     </div>
   </div>

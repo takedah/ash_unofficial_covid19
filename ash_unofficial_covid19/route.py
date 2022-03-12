@@ -30,7 +30,7 @@ def add_security_headers(response):
         + "font-src wf.typesquare.com ka-f.fontawesome.com; "
         + "img-src 'self' i.creativecommons.org licensebuttons.net "
         + "data: https:; "
-        + "frame-src social-plugins.line.me "
+        + "frame-src social-plugins.line.me docs.google.com;"
     )
     response.headers.add("Content-Security-Policy", csp)
     response.headers.add("X-Content-Type-Options", "nosniff")
@@ -190,7 +190,7 @@ def reservation_statuses():
 
     return render_template(
         "reservation_statuses.html",
-        title="新型コロナワクチン3回目接種医療機関マップ",
+        title="コロナワクチンマップ（3回目接種）",
         gtag_id=Config.GTAG_ID,
         last_updated=reservation_statuses.last_updated,
         search_results=search_results.items,
@@ -212,7 +212,7 @@ def reservation_statuses_search_by_gps():
 
         return render_template(
             "reservation_statuses.html",
-            title="新型コロナワクチン3回目接種医療機関マップ",
+            title="コロナワクチンマップ（3回目接種）",
             gtag_id=Config.GTAG_ID,
             last_updated=reservation_statuses.last_updated,
             search_results=search_results.items,
@@ -276,7 +276,7 @@ def first_reservation_statuses_search_by_gps():
 
         return render_template(
             "first_reservation_statuses.html",
-            title="新型コロナワクチン1・2回目接種医療機関マップ",
+            title="コロナワクチンマップ（1・2回目接種）",
             gtag_id=Config.GTAG_ID,
             last_updated=first_reservation_statuses.last_updated,
             search_results=search_results.items,
@@ -342,7 +342,7 @@ def child_reservation_statuses_search_by_gps():
 
         return render_template(
             "child_reservation_statuses.html",
-            title="新型コロナワクチン5～11歳接種医療機関マップ",
+            title="コロナワクチンマップ（5～11歳接種）",
             gtag_id=Config.GTAG_ID,
             last_updated=child_reservation_statuses.last_updated,
             search_results=search_results.items,
@@ -460,7 +460,7 @@ def first_reservation_statuses():
 
     return render_template(
         "first_reservation_statuses.html",
-        title="新型コロナワクチン1・2回目接種医療機関マップ",
+        title="コロナワクチンマップ（1・2回目接種）",
         gtag_id=Config.GTAG_ID,
         last_updated=first_reservation_statuses.last_updated,
         search_results=search_results.items,
@@ -534,7 +534,7 @@ def child_reservation_statuses():
 
     return render_template(
         "child_reservation_statuses.html",
-        title="新型コロナワクチン5～11歳接種医療機関マップ",
+        title="コロナワクチンマップ（5～11歳接種）",
         gtag_id=Config.GTAG_ID,
         last_updated=child_reservation_statuses.last_updated,
         search_results=search_results.items,
