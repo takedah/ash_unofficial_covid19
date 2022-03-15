@@ -15,6 +15,7 @@ from matplotlib.ticker import MultipleLocator
 from ..errors import DatabaseConnectionError
 from ..services.patients_number import PatientsNumberService
 from ..services.press_release_link import PressReleaseLinkService
+from ..services.sapporo_patients_number import SapporoPatientsNumberService
 
 
 class GraphView(metaclass=ABCMeta):
@@ -359,19 +360,18 @@ class PerHundredThousandPopulationView(GraphView):
 
     def __init__(self):
         service = PatientsNumberService()
-        # sapporo_service = SapporoPatientsNumberService()
+        sapporo_service = SapporoPatientsNumberService()
         today = self.get_today()
         self.__per_hundred_thousand_population_data = service.get_per_hundred_thousand_population_per_week(
             from_date=today - relativedelta(weeks=16, days=-1),
             to_date=today,
         )
-        # 札幌市のオープンデータの文字コードがSJISになってしまっているので一旦中止
-        # self.__sapporo_per_hundred_thousand_population_data = (
-        #     sapporo_service.get_per_hundred_thousand_population_per_week(
-        #         from_date=today - relativedelta(weeks=16, days=-1),
-        #         to_date=today,
-        #     )
-        # )
+        self.__sapporo_per_hundred_thousand_population_data = (
+            sapporo_service.get_per_hundred_thousand_population_per_week(
+                from_date=today - relativedelta(weeks=16, days=-1),
+                to_date=today,
+            )
+        )
         this_week = self.__per_hundred_thousand_population_data[-1][1]
         last_week = self.__per_hundred_thousand_population_data[-2][1]
         increase_from_last_week = float(
@@ -440,19 +440,18 @@ class PerHundredThousandPopulationView(GraphView):
             color="salmon",
             label="旭川市",
         )
-        # 札幌市のオープンデータの文字コードがSJISになってしまっているので一旦中止
-        # sapporo_per_hundred_thousand_population_x = [
-        #     row[0].strftime("%m-%d") + "~" for row in self.__sapporo_per_hundred_thousand_population_data
-        # ]
-        # sapporo_per_hundred_thousand_population_y = [
-        #     row[1] for row in self.__sapporo_per_hundred_thousand_population_data
-        # ]
-        # ax.plot(
-        #     sapporo_per_hundred_thousand_population_x,
-        #     sapporo_per_hundred_thousand_population_y,
-        #     color="lightgray",
-        #     label="札幌市",
-        # )
+        sapporo_per_hundred_thousand_population_x = [
+            row[0].strftime("%m-%d") + "~" for row in self.__sapporo_per_hundred_thousand_population_data
+        ]
+        sapporo_per_hundred_thousand_population_y = [
+            row[1] for row in self.__sapporo_per_hundred_thousand_population_data
+        ]
+        ax.plot(
+            sapporo_per_hundred_thousand_population_x,
+            sapporo_per_hundred_thousand_population_y,
+            color="lightgray",
+            label="札幌市",
+        )
         ax.yaxis.set_major_locator(MultipleLocator(25))
         ax.grid(axis="y", color="lightgray")
         ax.tick_params(labelsize=8)
