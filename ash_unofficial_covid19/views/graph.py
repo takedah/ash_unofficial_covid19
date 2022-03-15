@@ -167,7 +167,7 @@ class DailyTotalView(GraphView):
         ax = fig.add_subplot()
         day_x = [row[0] for row in self.__daily_total_data]
         day_y = [row[1] for row in self.__daily_total_data]
-        ax.bar(day_x, day_y, color="salmon")
+        ax.bar(day_x, day_y, color="#64B5F6")
         ax.yaxis.set_major_locator(MultipleLocator(25))
         ax.xaxis.set_major_locator(mdates.MonthLocator())
         ax.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d"))
@@ -251,7 +251,7 @@ class MonthTotalView(GraphView):
         ax = fig.add_subplot()
         month_total_x = [row[0].strftime("%Y-%m") for row in month_total_data]
         month_total_y = [row[1] for row in month_total_data]
-        ax.bar(month_total_x, month_total_y, facecolor="salmon")
+        ax.bar(month_total_x, month_total_y, facecolor="#64B5F6")
         ax.yaxis.set_major_locator(MultipleLocator(500))
         ax.tick_params(labelsize=8)
         ax.tick_params(axis="x", rotation=45)
@@ -311,16 +311,16 @@ class ByAgeView(GraphView):
         by_age_label = [row[0] for row in self.__by_age_data]
         by_age_x = [row[1] for row in self.__by_age_data]
         pie_colors = [
-            "mistyrose",
-            "peachpuff",
-            "lightsalmon",
-            "salmon",
-            "orangered",
-            "lemonchiffon",
-            "khaki",
-            "darkkhaki",
-            "goldenrod",
-            "orange",
+            "#64B5F6",
+            "#FFF176",
+            "#81C784",
+            "#E57373",
+            "#BA68C8",
+            "#A1887F",
+            "#F06292",
+            "#E0E0E0",
+            "#AED581",
+            "#4DD0E1",
         ]
         ax.pie(
             by_age_x,
@@ -437,7 +437,7 @@ class PerHundredThousandPopulationView(GraphView):
         ax.plot(
             per_hundred_thousand_population_x,
             per_hundred_thousand_population_y,
-            color="salmon",
+            color="#64B5F6",
             label="旭川市",
         )
         sapporo_per_hundred_thousand_population_x = [
@@ -540,17 +540,17 @@ class WeeklyPerAgeView(GraphView):
             fig = plt.figure()
         ax = fig.add_subplot()
         colors = [
-            "mistyrose",
-            "peachpuff",
-            "lightsalmon",
-            "salmon",
-            "orangered",
-            "lemonchiffon",
-            "khaki",
-            "darkkhaki",
-            "goldenrod",
-            "orange",
-            "floralwhite",
+            "#64B5F6",
+            "#FFF176",
+            "#81C784",
+            "#E57373",
+            "#BA68C8",
+            "#A1887F",
+            "#F06292",
+            "#E0E0E0",
+            "#AED581",
+            "#4DD0E1",
+            "#1976D2",
         ]
         cols = list(map(lambda x: x.strftime("%m-%d") + "~", df.columns.tolist()))
         for i in range(len(df)):
