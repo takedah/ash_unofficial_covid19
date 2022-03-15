@@ -1,11 +1,11 @@
 document.addEventListener(
   "DOMContentLoaded",
   function () {
-    var resultsLength = Number(
+    const resultsLength = Number(
       JSON.parse(document.getElementById("results").dataset.length)
     );
 
-    var map = L.map("mapid", { tap: false });
+    const map = L.map("mapid", { tap: false });
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -115,25 +115,55 @@ document.addEventListener(
     }
 
     if (document.getElementById("gpsMap")) {
-      var currentLongitude = parseFloat(
+      const currentLongitude = parseFloat(
         JSON.parse(document.getElementById("results").dataset.currentlongitude)
       );
-      var currentLatitude = parseFloat(
+      const currentLatitude = parseFloat(
         JSON.parse(document.getElementById("results").dataset.currentlatitude)
       );
       map.options.closePopupOnClick = false;
       map.setView([currentLatitude, currentLongitude], zoomLevel);
-      var currentPointMarker = L.marker([currentLatitude, currentLongitude]);
-      currentPointMarker
-        .addTo(map)
-        .bindPopup("現在地", { autoClose: false })
-        .openPopup();
+      const currentPointCircle = L.circle([currentLatitude, currentLongitude], {
+        radius: 250,
+        weight: 0.3,
+        color: "red",
+        fillColor: "red",
+        fillOpacity: 0.5,
+      });
+      currentPointCircle.addTo(map);
     } else {
       map.setView([centerLatitude, centerLongitude], zoomLevel);
     }
 
+    const mapPrimaryIcon = L.divIcon({
+      html: "<i class='fas fa-map-marker-alt'></i>",
+      className: "map_primary_icon",
+      iconAnchor: [14, 36],
+      popupAnchor: [0, -22],
+    });
+    const mapWarningIcon = L.divIcon({
+      html: "<i class='fas fa-map-marker-alt'></i>",
+      className: "map_warning_icon",
+      iconAnchor: [14, 36],
+      popupAnchor: [0, -22],
+    });
+
+    const mapDangerIcon = L.divIcon({
+      html: "<i class='fas fa-map-marker-alt'></i>",
+      className: "map_danger_icon",
+      iconAnchor: [14, 36],
+      popupAnchor: [0, -22],
+    });
+
     for (var prop in locationDataList) {
       var locationData = locationDataList[prop];
+      if (/.*受付中.*/.test(locationData["status"])) {
+        mapIcon = mapPrimaryIcon;
+      } else if (/.*受付停止中.*/.test(locationData["status"])) {
+        mapIcon = mapDangerIcon;
+      } else {
+        mapIcon = mapWarningIcon;
+      }
       var popupText = "";
       if (
         document.getElementById("areaMap") ||
@@ -145,10 +175,10 @@ document.addEventListener(
       } else {
         popupText = locationData["nameLink"] + "<br>" + locationData["status"];
       }
-      var marker = L.marker([
-        locationData["latitude"],
-        locationData["longitude"],
-      ]);
+      var marker = L.marker(
+        [locationData["latitude"], locationData["longitude"]],
+        { icon: mapIcon }
+      );
       if (document.getElementById("allMap")) {
         marker.addTo(map).bindPopup(popupText, {
           autoClose: false,

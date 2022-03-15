@@ -77,6 +77,15 @@
       <section id="gpsMap">
         <h2 class="h5 card-title">現在地から近い医療機関（5～11歳接種）マップ</h2>
         <p class="card-text">地図の表示はあくまで目安ですので、正確な場所の情報は各医療機関のホームページ等でご確認ください。</p>
+        <table class="table table-borderless table-sm">
+          <tbody>
+            <tr>
+              <td class="map_primary_icon text-center align-middle"><i class='fas fa-map-marker-alt'></i></td><td class="small align-middle">受付中</td>
+              <td class="map_danger_icon text-center align-middle"><i class='fas fa-map-marker-alt'></i></td><td class="small align-middle">受付停止中</td>
+              <td class="map_warning_icon text-center align-middle"><i class='fas fa-map-marker-alt'></i></td><td class="small align-middle">その他（病院に直接問い合わせる必要ありなど）</td>
+            </tr>
+          </tbody>
+        </table>
         <div id="mapid" class="mb-3"></div>
         <p class="card-text small">医療機関の位置情報は、<a href="https://developer.yahoo.co.jp/webapi/map/"
             title="Yahoo! Open Local Platform" target="_blank">Yahoo! Open Local Platform (YOLP)

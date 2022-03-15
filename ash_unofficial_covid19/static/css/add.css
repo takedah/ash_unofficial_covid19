@@ -10,3 +10,18 @@ body {
 .patients-table {
   max-height: 420px;
 }
+.map_primary_icon {
+  color: #1976D2;
+  background-color: transparent;
+  font-size: 32px;
+}
+.map_warning_icon {
+  color: #FBC02D;
+  background-color: transparent;
+  font-size: 32px;
+}
+.map_danger_icon {
+  color: #D32F2F;
+  background-color: transparent;
+  font-size: 32px;
+}
