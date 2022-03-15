@@ -794,5 +794,10 @@ def rss_xml():
     return res
 
 
+@app.route("/site.webmanifest")
+def site_webmanifest():
+    return render_template("site.webmanifest"), 200, {"Content-Type": "application/json; charset=UTF-8"}
+
+
 if __name__ == "__main__":
     app.run()
