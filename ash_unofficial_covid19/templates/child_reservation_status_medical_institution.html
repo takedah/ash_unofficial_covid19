@@ -25,10 +25,9 @@
                 </th>
                 <th class="text-nowrap">予約受付開始時期</th>
                 <th class="text-nowrap">接種可能時期</th>
-                <th>かかりつけ</th>
-                <th>かかりつけ以外</th>
-                <th class="text-nowrap">その他</th>
-                <th class="text-nowrap">備考</th>
+                <th class="text-nowrap">かかりつけ</th>
+                <th class="text-nowrap">かかりつけ以外</th>
+                <th class="text-nowrap">その他条件・備考など</th>
               </tr>
             </thead>
             <tbody id="results" data-length="{{ search_lengths|tojson }}">
@@ -54,8 +53,12 @@
                 {% else %}
                   <td>NG</td>
                 {% endif %}
-                <td>{{ search_result.target_other }}</td>
-                <td>{{ search_result.memo }}</td>
+                <td>
+                  {% if not search_result.target_other == "" %}
+                    <p>{{ search_result.target_other }}</p>
+                  {% endif %}
+                  <p>{{ search_result.memo }}</p>
+                </td>
               </tr>
               {% endfor %}
             </tbody>

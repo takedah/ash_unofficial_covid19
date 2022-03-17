@@ -124,7 +124,7 @@ document.addEventListener(
       map.options.closePopupOnClick = false;
       map.setView([currentLatitude, currentLongitude], zoomLevel);
       const currentPointCircle = L.circle([currentLatitude, currentLongitude], {
-        radius: 250,
+        radius: 150,
         weight: 0.3,
         color: "red",
         fillColor: "red",
