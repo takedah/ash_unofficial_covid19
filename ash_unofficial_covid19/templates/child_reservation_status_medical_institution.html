@@ -13,32 +13,35 @@
   <div class="card">
     <div class="card-body">
       <section id="medicalInstitutionMap">
-        <h2 class="h5 card-title">{{ title }}</h2>
-        <p class="card-text d-block d-sm-none"><i class="far fa-hand-point-right"></i> 横にスクロールできます。</p>
-        <div class="table-responsive">
+        {% for search_result in search_results %}
+          {% if loop.index == 1 %}
+            <h2 class="h5 card-title">{{ search_result.medical_institution_name }}の5～11歳接種予約受付状況</h2>
+            <h3 class="h6 card-title">医療機関の情報</h3>
+            <table class="table table-bordered" id="results" data-length="{{ search_lengths|tojson }}">
+              <tbody>
+                <tr>
+                  <th class="table-active text-nowrap">住所</th><td>{{ search_result.address }}</td>
+                </tr>
+                <tr>
+                  <th class="table-active text-nowrap">電話番号</th><td>{{ search_result.phone_number }}</td>
+                </tr>
+              </tbody>
+            </table>
+          {% endif %}
+          <h3 class="h6 card-title">{{ search_result.vaccine }}</h3>
           <table class="table">
-            <thead>
-              <tr>
-                <th class="text-nowrap">
-                    住所<br>
-                    電話番号<br>
-                </th>
-                <th class="text-nowrap">予約受付開始時期</th>
-                <th class="text-nowrap">接種可能時期</th>
-                <th class="text-nowrap">かかりつけ</th>
-                <th class="text-nowrap">かかりつけ以外</th>
-                <th class="text-nowrap">その他条件・備考など</th>
-              </tr>
-            </thead>
-            <tbody id="results" data-length="{{ search_lengths|tojson }}">
-              {% for search_result in search_results %}
+            <tbody>
               <tr id="order{{ loop.index }}" data-latitude="{{ search_result.latitude|tojson }}" data-longitude="{{ search_result.longitude|tojson }}" data-name="{{ search_result.medical_institution_name|safe }}" data-url="{{ search_result.medical_institution_name_url|safe }}" data-vaccine="{{ search_result.vaccine|safe }}" data-status="{{ search_result.status|safe }}">
-                <td>
-                    {{ search_result.address }}<br>
-                    {{ search_result.phone_number }}<br>
-                </td>
-                <td>{{ search_result.status }}</td>
-                <td>{{ search_result.inoculation_time }}</td>
+                <th class="text-nowrap">予約受付開始時期</th><td>{{ search_result.status }}</td>
+              </tr>
+              <tr>
+                <th class="text-nowrap">接種可能時期</th><td>{{ search_result.inoculation_time }}</td>
+              </tr>
+              <tr>
+                <th class="text-nowrap">年齢</th><td>{{ search_result.target_age }}</td>
+              </tr>
+              <tr>
+                <th class="text-nowrap">かかりつけ</th>
                 {% if search_result.is_target_family is none %}
                   <td></td>
                 {% elif search_result.is_target_family %}
@@ -46,6 +49,9 @@
                 {% else %}
                   <td>NG</td>
                 {% endif %}
+              </tr>
+              <tr>
+                <th class="text-nowrap">かかりつけ以外</th>
                 {% if search_result.is_target_not_family is none %}
                   <td></td>
                 {% elif search_result.is_target_not_family %}
@@ -53,27 +59,19 @@
                 {% else %}
                   <td>NG</td>
                 {% endif %}
-                <td>
-                  {% if not search_result.target_other == "" %}
-                    <p>{{ search_result.target_other }}</p>
-                  {% endif %}
-                  <p>{{ search_result.memo }}</p>
-                </td>
               </tr>
-              {% endfor %}
+              <tr>
+                <th class="text-nowrap">その他条件</th>
+                <td>{{ search_result.target_other }}</td>
+              </tr>
+              <tr>
+                <th class="text-nowrap">備考</th>
+                <td>{{ search_result.memo }}</td>
+              </tr>
             </tbody>
           </table>
-        </div>
+        {% endfor %}
         <p class="card-text">地図の表示はあくまで目安ですので、正確な場所の情報は各医療機関のホームページ等でご確認ください。</p>
-        <table class="table table-borderless table-sm">
-          <tbody>
-            <tr>
-              <td class="map_primary_icon text-center align-middle"><i class='fas fa-map-marker-alt'></i></td><td class="small align-middle">受付中</td>
-              <td class="map_danger_icon text-center align-middle"><i class='fas fa-map-marker-alt'></i></td><td class="small align-middle">受付停止中</td>
-              <td class="map_warning_icon text-center align-middle"><i class='fas fa-map-marker-alt'></i></td><td class="small align-middle">その他（病院に直接問い合わせる必要ありなど）</td>
-            </tr>
-          </tbody>
-        </table>
         <div id="mapid" class="mb-3"></div>
         <p class="card-text small">医療機関の位置情報は、<a href="https://developer.yahoo.co.jp/webapi/map/"
             title="Yahoo! Open Local Platform" target="_blank">Yahoo! Open Local Platform (YOLP)
