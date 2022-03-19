@@ -245,11 +245,11 @@ class RssView(XmlView):
             + "      <pubDate>"
             + last_modified
             + "</pubDate>\n"
-            + "      <guid>https://"
+            + "      <guid isPermaLink='false'>tag:"
             + Config.MY_DOMAIN
-            + "/#"
-            + self.today.strftime("%Y%m%d")
-            + "</guid>\n"
+            + ","
+            + self.today.strftime("%Y-%m-%d")
+            + ":/</guid>\n"
             + "    </item>\n"
             + "    <item>\n"
             + "      <title>このサイトについて</title>\n"
@@ -361,9 +361,9 @@ class AtomView(XmlView):
         return (
             "<?xml version='1.0' encoding='UTF-8'?>\n"
             + "<feed xmlns='http://www.w3.org/2005/Atom' xml:lang='ja'>\n"
-            + "  <id>tag:"
+            + "  <id>https://"
             + Config.MY_DOMAIN
-            + ",2021-02-28:/</id>\n"
+            + "/</id>\n"
             + "  <title>旭川市新型コロナウイルスまとめサイト</title>\n"
             + "  <author>\n"
             + "    <name>takedah</name>\n"
@@ -385,11 +385,11 @@ class AtomView(XmlView):
             + "    <link href='https://"
             + Config.MY_DOMAIN
             + "/' />\n"
-            + "    <id>https://"
+            + "    <id>tag:"
             + Config.MY_DOMAIN
-            + "/#"
-            + self.today.strftime("%Y%m%d")
-            + "</id>\n"
+            + ","
+            + self.today.strftime("%Y-%m-%d")
+            + ":/</id>\n"
             + "    <updated>"
             + self.today.strftime("%Y-%m-%dT16:00:00+09:00")
             + "</updated>\n"
