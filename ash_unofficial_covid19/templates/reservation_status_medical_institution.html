@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 {% block content %}
 <article>
-  <h1 class="h4 py-2">旭川市のコロナワクチンマップ（3回目接種）</h1>
+  <h1 class="h4 py-2">{{ title }}</h1>
   <div class="alert alert-danger alert-dismissible fade show" role="alert">
     <p class="mb-0">{{ last_updated }}にダウンロードしたデータを元に表示しています。最新の情報は<a class="alert-link"
         href="https://asahikawa-vaccine.jp/" title="旭川市 新型コロナワクチン接種特設サイト"
@@ -10,25 +10,30 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-  <div class="card">
-    <div class="card-body">
-      <section id="medicalInstitutionMap">
-        {% for search_result in search_results %}
-          {% if loop.index == 1 %}
-            <h2 class="h5 card-title">{{ search_result.medical_institution_name }}の3回目接種予約受付状況</h2>
-            <h3 class="h6 card-title">医療機関の情報</h3>
+  {% for search_result in search_results %}
+    {% if loop.index == 1 %}
+      <div class="card">
+        <div class="card-body">
+          <section>
+            <h2 class="h5 card-title">医療機関の情報</h2>
             <table class="table table-bordered" id="results" data-length="{{ search_lengths|tojson }}">
               <tbody>
                 <tr>
-                  <th class="table-active text-nowrap">住所</th><td>{{ search_result.address }}</td>
+                  <th class="table-active text-nowrap">所在地</th><td>{{ search_result.address }}</td>
                 </tr>
                 <tr>
                   <th class="table-active text-nowrap">電話番号</th><td>{{ search_result.phone_number }}</td>
                 </tr>
               </tbody>
             </table>
-          {% endif %}
-          <h3 class="h6 card-title">{{ search_result.vaccine }}</h3>
+          </section>
+        </div>
+      </div>
+    {% endif %}
+    <div class="card mt-3">
+      <div class="card-body">
+        <section>
+          <h2 class="h5 card-title">{{ search_result.vaccine }}の予約受付状況（3回目接種）</h2>
           <table class="table">
             <tbody>
               <tr id="order{{ loop.index }}" data-latitude="{{ search_result.latitude|tojson }}" data-longitude="{{ search_result.longitude|tojson }}" data-name="{{ search_result.medical_institution_name|safe }}" data-url="{{ search_result.medical_institution_name_url|safe }}" data-vaccine="{{ search_result.vaccine|safe }}" data-status="{{ search_result.status|safe }}">
@@ -70,8 +75,15 @@
               </tr>
             </tbody>
           </table>
-        {% endfor %}
-        <p class="card-text">地図の表示はあくまで目安ですので、正確な場所の情報は各医療機関のホームページ等でご確認ください。</p>
+        </section>
+      </div>
+    </div>
+  {% endfor %}
+  <div class="card mt-3">
+    <div class="card-body">
+      <section id="medicalInstitutionMap">
+        <h2 class="h5 card-title">{{ medical_institution }}の地図</h2>
+        <p class="card-text">地図の表示は目安となっています。正確な場所の情報は各医療機関のホームページ等でご確認ください。</p>
         <div id="mapid" class="mb-3"></div>
         <p class="card-text small">医療機関の位置情報は、<a href="https://developer.yahoo.co.jp/webapi/map/"
             title="Yahoo! Open Local Platform" target="_blank">Yahoo! Open Local Platform (YOLP)
@@ -96,7 +108,7 @@
   <div class="card mt-3">
     <div class="card-body">
       <section>
-        <h3 class="h5 card-title">他の地区から医療機関（3回目接種）を探す</h3>
+        <h3 class="h5 card-title">他の条件で医療機関（3回目接種）を探す</h3>
         <p class="card-text"><a href="/reservation_statuses" title="コロナワクチンマップ（3回目接種）へ">コロナワクチンマップ（3回目接種）へ</a></p>
       </section>
     </div>

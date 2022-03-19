@@ -438,7 +438,7 @@ def reservation_status_medical_institution(medical_institution):
 
     return render_template(
         "reservation_status_medical_institution.html",
-        title=medical_institution + "の新型コロナワクチン3回目接種予約受付状況",
+        title=medical_institution + "の新型コロナワクチン接種予約受付状況（3回目接種）",
         gtag_id=Config.GTAG_ID,
         last_updated=reservation_statuses.last_updated,
         medical_institution=medical_institution,
@@ -512,7 +512,7 @@ def first_reservation_status_medical_institution(medical_institution):
 
     return render_template(
         "first_reservation_status_medical_institution.html",
-        title=medical_institution + "の新型コロナワクチン1・2回目接種予約受付状況",
+        title=medical_institution + "の新型コロナワクチン接種予約受付状況（1・2回目接種）",
         gtag_id=Config.GTAG_ID,
         last_updated=first_reservation_statuses.last_updated,
         medical_institution=medical_institution,
@@ -586,7 +586,7 @@ def child_reservation_status_medical_institution(medical_institution):
 
     return render_template(
         "child_reservation_status_medical_institution.html",
-        title=medical_institution + "の新型コロナワクチン5～11歳接種予約受付状況",
+        title=medical_institution + "の新型コロナワクチン接種予約受付状況（5～11歳接種）",
         gtag_id=Config.GTAG_ID,
         last_updated=child_reservation_statuses.last_updated,
         medical_institution=medical_institution,
