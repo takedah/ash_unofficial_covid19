@@ -1,9 +1,9 @@
 {% extends 'layout.html' %}
 {% block content %}
 <article id="childReservationStatus">
-  <h1 class="h4 py-2">旭川市のコロナワクチンマップ（5～11歳接種）</h1>
+  <h1 class="h4 py-2">{{ title }}</h1>
   <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <p class="mb-0">{{ last_updated }}にダウンロードしたデータを元に表示しています。正確な情報は必ず<a class="alert-link"
+    <p class="mb-0">{{ last_updated }}にダウンロードしたデータを元に表示しています。最新の情報は<a class="alert-link"
         href="https://asahikawa-vaccine.jp/" title="旭川市 新型コロナワクチン接種特設サイト"
         target="_blank">旭川市 新型コロナワクチン接種特設サイト <i class="fas fa-external-link-alt"></i></a>を確認してください。</p>
     <button type="button" class="close" data-dismiss="alert" aria-label="close">
@@ -13,7 +13,7 @@
   <div class="card">
     <div class="card-body">
       <section>
-        <h2 class="h5 card-title">{{ title }}</h2>
+        <h2 class="h5 card-title">現在地から近い医療機関（5～11歳接種）の予約受付状況一覧</h2>
         <p class="card-text d-block d-sm-none"><i class="far fa-hand-point-right"></i> 横にスクロールできます。</p>
         <div class="table-responsive">
           <table class="table table-bordered">
@@ -72,6 +72,7 @@
             </tbody>
           </table>
         </div>
+        <p class="card-text mt-3">距離は現在地からの直線距離で算出しているため、実際の道路状況によっては結果が異なりますのでご注意ください。</p>
       </section>
     </div>
   </div>
@@ -79,7 +80,7 @@
     <div class="card-body">
       <section id="gpsMap">
         <h2 class="h5 card-title">現在地から近い医療機関（5～11歳接種）マップ</h2>
-        <p class="card-text">地図の表示はあくまで目安ですので、正確な場所の情報は各医療機関のホームページ等でご確認ください。</p>
+        <p class="card-text">地図は目安となっています。正確な場所の情報は各医療機関のホームページ等でご確認ください。</p>
         <table class="table table-borderless table-sm">
           <tbody>
             <tr>

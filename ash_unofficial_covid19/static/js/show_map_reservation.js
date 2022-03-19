@@ -121,7 +121,6 @@ document.addEventListener(
       const currentLatitude = parseFloat(
         JSON.parse(document.getElementById("results").dataset.currentlatitude)
       );
-      map.options.closePopupOnClick = false;
       map.setView([currentLatitude, currentLongitude], zoomLevel);
       const currentPointCircle = L.circle([currentLatitude, currentLongitude], {
         radius: 150,
@@ -165,12 +164,7 @@ document.addEventListener(
         mapIcon = mapWarningIcon;
       }
       var popupText = "";
-      if (
-        document.getElementById("areaMap") ||
-        document.getElementById("gpsMap")
-      ) {
-        popupText = locationData["nameLink"];
-      } else if (document.getElementById("medicalInstitutionMap")) {
+      if (document.getElementById("medicalInstitutionMap")) {
         popupText = locationData["locationName"];
       } else {
         popupText = locationData["nameLink"] + "<br>" + locationData["status"];
@@ -179,15 +173,15 @@ document.addEventListener(
         [locationData["latitude"], locationData["longitude"]],
         { icon: mapIcon }
       );
-      if (document.getElementById("allMap")) {
-        marker.addTo(map).bindPopup(popupText, {
-          autoClose: false,
-        });
-      } else {
+      if (document.getElementById("medicalInstitutionMap")) {
         marker
           .addTo(map)
-          .bindPopup(popupText, { autoClose: false })
+          .bindPopup(popupText, {
+            autoClose: false,
+          })
           .openPopup();
+      } else {
+        marker.addTo(map).bindPopup(popupText, { autoClose: false });
       }
     }
   },

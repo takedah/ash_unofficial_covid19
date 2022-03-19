@@ -113,7 +113,7 @@ class DailyTotalView(GraphView):
         service = PatientsNumberService()
         today = self.get_today()
         self.__daily_total_data = service.get_aggregate_by_days(
-            from_date=today - relativedelta(years=1), to_date=today
+            from_date=today - relativedelta(months=3), to_date=today
         )
         self.__today = self.format_date_style(today)
         most_recent = self.__daily_total_data[-1][1]
