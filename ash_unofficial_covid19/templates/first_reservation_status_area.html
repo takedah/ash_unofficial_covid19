@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 {% block content %}
 <article id="firstReservationStatus">
-  <h1 class="h4 py-2">旭川市のコロナワクチンマップ（1・2回目接種）</h1>
+  <h1 class="h4 py-2">{{ title }}</h1>
   <div class="alert alert-danger alert-dismissible fade show" role="alert">
     <p class="mb-0">{{ last_updated }}にダウンロードしたデータを元に表示しています。最新の情報は<a class="alert-link"
         href="https://asahikawa-vaccine.jp/" title="旭川市 新型コロナワクチン接種特設サイト"
@@ -11,7 +11,7 @@
     </button>
   </div>
   <div class="alert alert-info alert-dismissible fade show mt-3" role="alert">
-    <p class="mb-0">3回目接種の情報は<a class="alert-link" href="/reservation_statuses" title="コロナワクチンマップ（3回目）へ">コロナワクチンマップ（3回目）</a>をご利用ください。</p>
+    <p class="mb-0">3回目接種の情報は<a class="alert-link" href="/reservation_statuses" title="コロナワクチンマップ（3回目）へ">コロナワクチンマップ（3回目接種）</a>をご利用ください。</p>
     <button type="button" class="close" data-dismiss="alert" aria-label="close">
       <span aria-hidden="true">&times;</span>
     </button>
@@ -19,7 +19,7 @@
   <div class="card">
     <div class="card-body">
       <section>
-        <h2 class="h5 card-title">{{ title }}</h2>
+        <h2 class="h5 card-title">{{ area }}の医療機関（1・2回目接種）の予約受付状況一覧</h2>
         <p class="card-text d-block d-sm-none"><i class="far fa-hand-point-right"></i> 横にスクロールできます。</p>
         <div class="table-responsive">
           <table class="table table-bordered">
@@ -88,8 +88,8 @@
   <div class="card mt-3">
     <div class="card-body">
       <section id="areaMap">
-        <h2 class="h5 card-title">{{ area }}の医療機関（1・2回目接種）マップ</h2>
-        <p class="card-text">地図の表示はあくまで目安ですので、正確な場所の情報は各医療機関のホームページ等でご確認ください。</p>
+        <h2 class="h5 card-title">{{ area }}の医療機関（1・2回目接種）の地図</h2>
+        <p class="card-text">地図の表示は目安となっています。正確な場所の情報は各医療機関のホームページ等でご確認ください。</p>
         <table class="table table-borderless table-sm">
           <tbody>
             <tr>
@@ -115,7 +115,7 @@
   <div class="card mt-3">
     <div class="card-body">
       <section>
-        <h3 class="h5 card-title">他の地区から医療機関（1・2回目接種）を探す</h3>
+        <h3 class="h5 card-title">他の条件で医療機関（1・2回目接種）を探す</h3>
         <p class="card-text"><a href="/first_reservation_statuses" title="コロナワクチンマップ（1・2回目接種）へ">コロナワクチンマップ（1・2回目接種）へ</a></p>
       </section>
     </div>

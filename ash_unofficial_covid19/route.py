@@ -221,7 +221,7 @@ def reservation_statuses_search_by_gps():
             leaflet=True,
         )
 
-    title = "現在地から近いワクチン3回目接種医療機関の検索結果"
+    title = "現在地から近い新型コロナワクチン接種医療機関（3回目接種）の検索結果"
     current_latitude = escape(request.form["current_latitude"])
     current_longitude = escape(request.form["current_longitude"])
     try:
@@ -253,7 +253,7 @@ def reservation_statuses_search_by_gps():
 
     return render_template(
         "reservation_status_search_by_gps.html",
-        title="現在地から近い新型コロナワクチン3回目接種医療機関予約受付状況",
+        title=title,
         gtag_id=Config.GTAG_ID,
         last_updated=reservation_statuses.last_updated,
         search_results=search_results,
@@ -285,7 +285,7 @@ def first_reservation_statuses_search_by_gps():
             leaflet=True,
         )
 
-    title = "現在地から近いワクチン1・2回目接種医療機関の検索結果"
+    title = "現在地から近い新型コロナワクチン接種医療機関（1・2回目接種）の検索結果"
     current_latitude = escape(request.form["current_latitude"])
     current_longitude = escape(request.form["current_longitude"])
     try:
@@ -319,7 +319,7 @@ def first_reservation_statuses_search_by_gps():
 
     return render_template(
         "first_reservation_status_search_by_gps.html",
-        title="現在地から近い新型コロナワクチン1・2回目接種医療機関予約受付状況",
+        title=title,
         gtag_id=Config.GTAG_ID,
         last_updated=first_reservation_statuses.last_updated,
         search_results=search_results,
@@ -351,7 +351,7 @@ def child_reservation_statuses_search_by_gps():
             leaflet=True,
         )
 
-    title = "現在地から近いワクチン5～11歳接種医療機関の検索結果"
+    title = "現在地から近い新型コロナワクチン接種医療機関（5～11歳接種）の検索結果"
     current_latitude = escape(request.form["current_latitude"])
     current_longitude = escape(request.form["current_longitude"])
     try:
@@ -385,7 +385,7 @@ def child_reservation_statuses_search_by_gps():
 
     return render_template(
         "child_reservation_status_search_by_gps.html",
-        title="現在地から近い新型コロナワクチン5～11歳接種医療機関予約受付状況",
+        title=title,
         gtag_id=Config.GTAG_ID,
         last_updated=child_reservation_statuses.last_updated,
         search_results=search_results,
@@ -412,7 +412,7 @@ def reservation_status_area(area):
 
     return render_template(
         "reservation_status_area.html",
-        title=area + "の新型コロナワクチン3回目接種医療機関予約受付状況",
+        title=area + "の新型コロナワクチン接種医療機関（3回目接種）の検索結果",
         gtag_id=Config.GTAG_ID,
         last_updated=reservation_statuses.last_updated,
         area=area,
@@ -486,7 +486,7 @@ def first_reservation_status_area(area):
 
     return render_template(
         "first_reservation_status_area.html",
-        title=area + "の新型コロナワクチン1・2回目接種医療機関予約受付状況",
+        title=area + "の新型コロナワクチン接種医療機関（1・2回目接種）の検索結果",
         gtag_id=Config.GTAG_ID,
         last_updated=first_reservation_statuses.last_updated,
         area=area,
@@ -560,7 +560,7 @@ def child_reservation_status_area(area):
 
     return render_template(
         "child_reservation_status_area.html",
-        title=area + "の新型コロナワクチン5～11歳接種医療機関予約受付状況",
+        title=area + "の新型コロナワクチン接種医療機関（5～11歳接種）の検索結果",
         gtag_id=Config.GTAG_ID,
         last_updated=child_reservation_statuses.last_updated,
         area=area,
