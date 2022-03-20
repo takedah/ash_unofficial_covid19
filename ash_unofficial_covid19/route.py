@@ -773,25 +773,35 @@ def not_found(error):
 @app.route("/atom.xml")
 def atom_xml():
     atom = get_atom()
-    xml_data = atom.get_feed()
-    last_modified = atom.get_last_modified()
-    res = make_response()
-    res.data = xml_data
-    res.headers["Content-Type"] = "application/xml; charset=UTF-8"
-    res.headers["Last-Modified"] = last_modified
-    return res
+    last_modified = atom.get_last_modified_header()
+    return (
+        render_template(
+            "atom.xml",
+            atom=atom.get_feed(),
+        ),
+        200,
+        {
+            "Content-Type": "application/xml; charset=UTF-8",
+            "Last-Modified": last_modified,
+        },
+    )
 
 
 @app.route("/rss.xml")
 def rss_xml():
     rss = get_rss()
-    xml_data = rss.get_feed()
-    last_modified = rss.get_last_modified()
-    res = make_response()
-    res.data = xml_data
-    res.headers["Content-Type"] = "application/xml; charset=UTF-8"
-    res.headers["Last-Modified"] = last_modified
-    return res
+    last_modified = rss.get_last_modified_header()
+    return (
+        render_template(
+            "rss.xml",
+            rss=rss.get_feed(),
+        ),
+        200,
+        {
+            "Content-Type": "application/xml; charset=UTF-8",
+            "Last-Modified": last_modified,
+        },
+    )
 
 
 @app.route("/site.webmanifest")
