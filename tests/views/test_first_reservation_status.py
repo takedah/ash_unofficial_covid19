@@ -107,3 +107,9 @@ def test_get_area_list(view):
         results[1]["url"]
         == "%E6%96%B0%E5%AF%8C%E3%83%BB%E6%9D%B1%E3%83%BB%E9%87%91%E6%98%9F%E7%94%BA%E5%9C%B0%E5%8C%BA"
     )
+
+
+def test_get_medical_institution_list(view):
+    results = view.get_medical_institution_list()
+    assert results[0]["name"] == "市立旭川病院"
+    assert results[1]["url"] == "%E6%A3%AE%E5%B1%B1%E7%97%85%E9%99%A2"

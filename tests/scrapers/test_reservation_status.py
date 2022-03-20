@@ -137,6 +137,6 @@ def test_get_medical_institution_list(html_content, mocker):
     responce_mock.content = html_content
     mocker.patch.object(requests, "get", return_value=responce_mock)
     scraper = ScrapeReservationStatus("http://dummy.local")
-    expect = [("旭川赤十字病院", "モデルナ", "曙1条1丁目"), ("独立行政法人国立病院機構旭川医療センター", "ファイザー モデルナ", "花咲町7丁目")]
+    expect = [("旭川赤十字病院", "モデルナ"), ("独立行政法人国立病院機構旭川医療センター", "ファイザー モデルナ")]
     name_lists = scraper.get_medical_institution_list()
     assert name_lists == expect

@@ -53,7 +53,7 @@ class ReservationStatusView(View):
         辞書のリストを返す。
 
         Returns:
-            areas (list of dict): 医療機関の地区・URLパース文字列一覧データ
+            area_list (list of dict): 医療機関の地区・URLパース文字列一覧データ
 
         """
         area_list = list()
@@ -66,6 +66,35 @@ class ReservationStatusView(View):
                 }
             )
         return area_list
+
+    def get_medical_institution_list(self) -> list:
+        """新型コロナワクチン接種医療機関名とこれをURLパースした文字列一覧を取得
+
+        新型コロナワクチン接種医療機関名とこれをURLパースした文字列を要素に持つ
+        辞書のリストを返す。
+
+        Returns:
+            medical_institution_list (list of dict): 医療機関名・URLパース文字列一覧データ
+
+        """
+        # 元のリストが医療機関名とワクチン種類のタプルが要素となっているため、
+        # 医療機関名のみ抽出して重複を削除しておく。
+        medical_institution_name_vaccine_list = self.__service.get_medical_institution_list()
+        medical_institution_names = list()
+        for medical_institution_name in medical_institution_name_vaccine_list:
+            medical_institution_names.append(medical_institution_name[0])
+
+        medical_institution_names = sorted(set(medical_institution_names), key=medical_institution_names.index)
+
+        medical_institution_list = list()
+        for medical_institution_name in medical_institution_names:
+            medical_institution_list.append(
+                {
+                    "name": medical_institution_name,
+                    "url": urllib.parse.quote(medical_institution_name),
+                }
+            )
+        return medical_institution_list
 
     def get_reservation_status_json(self) -> str:
         """新型コロナワクチン接種医療機関予約受付状況のJSON文字列データを返す

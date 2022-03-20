@@ -102,3 +102,9 @@ def test_get_area_list(view):
     results = view.get_area_list()
     assert results[0]["name"] == "花咲町・末広・末広東・東鷹栖地区"
     assert results[1]["url"] == "%E8%A5%BF%E5%9C%B0%E5%8C%BA"
+
+
+def test_get_medical_institution_list(view):
+    results = view.get_medical_institution_list()
+    assert results[0]["url"] == "%E6%97%AD%E5%B7%9D%E8%B5%A4%E5%8D%81%E5%AD%97%E7%97%85%E9%99%A2"
+    assert results[1]["name"] == "独立行政法人国立病院機構旭川医療センター"

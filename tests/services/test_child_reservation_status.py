@@ -79,8 +79,8 @@ def test_delete(service):
 def test_get_medical_institution_list(service):
     results = service.get_medical_institution_list()
     expect = [
-        ("旭川赤十字病院", "", "曙1条1丁目"),
-        ("独立行政法人国立病院機構旭川医療センター", "", "花咲町7丁目"),
+        ("旭川赤十字病院", ""),
+        ("独立行政法人国立病院機構旭川医療センター", ""),
     ]
     assert results == expect
 

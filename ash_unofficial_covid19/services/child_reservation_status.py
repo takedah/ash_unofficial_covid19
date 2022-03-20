@@ -113,7 +113,7 @@ class ChildReservationStatusService(Service):
 
         Returns:
             medical_institution_list (list of tuple): 医療機関の一覧リスト
-                新型コロナワクチン接種医療機関の名称、ワクチン種類、住所のタプルを
+                新型コロナワクチン接種医療機関の名称、ワクチン種類のタプルを
                 リストで返す。
 
         """
@@ -133,7 +133,7 @@ class ChildReservationStatusService(Service):
             with conn.cursor(cursor_factory=DictCursor) as cur:
                 cur.execute(state)
                 for row in cur.fetchall():
-                    medical_institution_list.append((row["medical_institution_name"], row["vaccine"], row["address"]))
+                    medical_institution_list.append((row["medical_institution_name"], row["vaccine"]))
         return medical_institution_list
 
     def get_dicts(self) -> dict:
