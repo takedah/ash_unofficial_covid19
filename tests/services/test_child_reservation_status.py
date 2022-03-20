@@ -39,7 +39,7 @@ def service():
             "medical_institution_name": "旭川赤十字病院",
             "address": "曙1条1丁目",
             "phone_number": "76-9838(予約専用）",
-            "vaccine": "モデルナ",
+            "vaccine": "",
             "status": "受付中",
             "inoculation_time": "2/12～",
             "target_age": "",
@@ -53,7 +53,7 @@ def service():
             "medical_institution_name": "独立行政法人国立病院機構旭川医療センター",
             "address": "花咲町7丁目",
             "phone_number": "51-3910予約専用",
-            "vaccine": "ファイザー モデルナ",
+            "vaccine": "",
             "status": "受付中",
             "inoculation_time": "2/1～",
             "target_age": "18歳以上",
@@ -72,15 +72,15 @@ def service():
 
 
 def test_delete(service):
-    results = service.delete(("旭川赤十字病院", "モデルナ"))
+    results = service.delete(("旭川赤十字病院", ""))
     assert results
 
 
 def test_get_medical_institution_list(service):
     results = service.get_medical_institution_list()
     expect = [
-        ("旭川赤十字病院", "モデルナ", "曙1条1丁目"),
-        ("独立行政法人国立病院機構旭川医療センター", "ファイザー モデルナ", "花咲町7丁目"),
+        ("旭川赤十字病院", "", "曙1条1丁目"),
+        ("独立行政法人国立病院機構旭川医療センター", "", "花咲町7丁目"),
     ]
     assert results == expect
 
@@ -93,7 +93,7 @@ def test_get_dicts(service):
             "medical_institution_name": "独立行政法人国立病院機構旭川医療センター",
             "address": "花咲町7丁目",
             "phone_number": "51-3910予約専用",
-            "vaccine": "ファイザー モデルナ",
+            "vaccine": "",
             "status": "受付中",
             "inoculation_time": "2/1～",
             "target_age": "18歳以上",
@@ -107,7 +107,7 @@ def test_get_dicts(service):
             "medical_institution_name": "旭川赤十字病院",
             "address": "曙1条1丁目",
             "phone_number": "76-9838(予約専用）",
-            "vaccine": "モデルナ",
+            "vaccine": "",
             "status": "受付中",
             "inoculation_time": "2/12～",
             "target_age": "",
@@ -144,7 +144,7 @@ def test_find_all(service):
     assert result.latitude == 43.769628888889
 
 
-def test_get_areas(service):
-    results = service.get_areas()
-    assert results.items[0].name == "花咲町・末広・末広東・東鷹栖地区"
-    assert results.items[1].name == "西地区"
+def test_get_area_list(service):
+    results = service.get_area_list()
+    assert results[0] == "花咲町・末広・末広東・東鷹栖地区"
+    assert results[1] == "西地区"

@@ -98,7 +98,7 @@ def test_find_all(view):
     assert result.latitude == 43.769628888889
 
 
-def test_get_areas(view):
-    results = view.get_areas()
-    assert results.items[0].name == "花咲町・末広・末広東・東鷹栖地区"
-    assert results.items[1].name == "西地区"
+def test_get_area_list(view):
+    results = view.get_area_list()
+    assert results[0]["name"] == "花咲町・末広・末広東・東鷹栖地区"
+    assert results[1]["url"] == "%E8%A5%BF%E5%9C%B0%E5%8C%BA"

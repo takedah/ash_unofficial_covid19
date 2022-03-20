@@ -182,7 +182,7 @@ def patients_pages(page):
 def reservation_statuses():
     reservation_statuses = get_reservation_statuses()
     search_results = reservation_statuses.find()
-    areas = reservation_statuses.get_areas()
+    areas = reservation_statuses.get_area_list()
 
     search_lengths = len(search_results.items)
     if search_lengths == 0:
@@ -195,7 +195,7 @@ def reservation_statuses():
         last_updated=reservation_statuses.last_updated,
         search_results=search_results.items,
         search_lengths=search_lengths,
-        areas=areas.items,
+        areas=areas,
         leaflet=True,
     )
 
@@ -452,7 +452,7 @@ def reservation_status_medical_institution(medical_institution):
 def first_reservation_statuses():
     first_reservation_statuses = get_first_reservation_statuses()
     search_results = first_reservation_statuses.find()
-    areas = first_reservation_statuses.get_areas()
+    areas = first_reservation_statuses.get_area_list()
 
     search_lengths = len(search_results.items)
     if search_lengths == 0:
@@ -465,7 +465,7 @@ def first_reservation_statuses():
         last_updated=first_reservation_statuses.last_updated,
         search_results=search_results.items,
         search_lengths=search_lengths,
-        areas=areas.items,
+        areas=areas,
         leaflet=True,
     )
 
@@ -526,7 +526,7 @@ def first_reservation_status_medical_institution(medical_institution):
 def child_reservation_statuses():
     child_reservation_statuses = get_child_reservation_statuses()
     search_results = child_reservation_statuses.find()
-    areas = child_reservation_statuses.get_areas()
+    areas = child_reservation_statuses.get_area_list()
 
     search_lengths = len(search_results.items)
     if search_lengths == 0:
@@ -539,7 +539,7 @@ def child_reservation_statuses():
         last_updated=child_reservation_statuses.last_updated,
         search_results=search_results.items,
         search_lengths=search_lengths,
-        areas=areas.items,
+        areas=areas,
         leaflet=True,
     )
 

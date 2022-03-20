@@ -65,7 +65,7 @@
         <p class="card-text">以下のリンクから地区ごとの新型コロナワクチン3回目接種医療機関の予約受付状況や地図を一覧で確認できます。</p>
         <div class="list-group-flush">
           {% for area in areas %}
-          <a href="/reservation_status/area/{{ area.url }}" title="{{ area.name }}の新型コロナワクチン3回目接種医療機関一覧へ" class="list-group-item list-group-item-action text-primary">{{ area.name }}</a>
+          <a href="/reservation_status/area/{{ area["url"] }}" title="{{ area["name"] }}の新型コロナワクチン3回目接種医療機関一覧へ" class="list-group-item list-group-item-action text-primary">{{ area["name"] }}</a>
           {% endfor %}
         </div>
       </section>

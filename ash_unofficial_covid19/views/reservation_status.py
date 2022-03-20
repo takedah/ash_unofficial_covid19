@@ -1,6 +1,6 @@
+import urllib.parse
 from typing import Optional
 
-from ..models.area import AreaFactory
 from ..models.point import PointFactory
 from ..models.reservation_status import ReservationStatusLocationFactory
 from ..services.location import LocationService
@@ -46,19 +46,26 @@ class ReservationStatusView(View):
         """
         return self.__service.find(medical_institution_name, area)
 
-    def get_areas(self) -> AreaFactory:
+    def get_area_list(self) -> list:
         """新型コロナワクチン接種医療機関の地区名称とこれをURLパースした文字列一覧を取得
 
         新型コロナワクチン接種医療機関の地区名称とこれをURLパースした文字列を要素に持つ
-        オブジェクトを返す。
+        辞書のリストを返す。
 
         Returns:
-            areas (:obj:`AreaFactory`): 医療機関の地区・URLパース文字列一覧データ
-                新型コロナワクチン接種医療機関の地区名称とこれをURLパースした文字列
-                データオブジェクトのリストを要素に持つオブジェクトを返す。
+            areas (list of dict): 医療機関の地区・URLパース文字列一覧データ
 
         """
-        return self.__service.get_areas()
+        area_list = list()
+        area_names = self.__service.get_area_list()
+        for area_name in area_names:
+            area_list.append(
+                {
+                    "name": area_name,
+                    "url": urllib.parse.quote(area_name),
+                }
+            )
+        return area_list
 
     def get_reservation_status_json(self) -> str:
         """新型コロナワクチン接種医療機関予約受付状況のJSON文字列データを返す
