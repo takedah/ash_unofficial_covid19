@@ -30,7 +30,7 @@ def add_security_headers(response):
         + "font-src wf.typesquare.com ka-f.fontawesome.com; "
         + "img-src 'self' i.creativecommons.org licensebuttons.net "
         + "data: https:; "
-        + "frame-src social-plugins.line.me docs.google.com;"
+        + "frame-src docs.google.com;"
     )
     response.headers.add("Content-Security-Policy", csp)
     response.headers.add("X-Content-Type-Options", "nosniff")
