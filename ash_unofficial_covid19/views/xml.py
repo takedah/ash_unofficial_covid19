@@ -9,6 +9,9 @@ from ..services.first_reservation_status import FirstReservationStatusService
 from ..services.patients_number import PatientsNumberService
 from ..services.press_release_link import PressReleaseLinkService
 from ..services.reservation_status import ReservationStatusService
+from ..views.child_reservation_status import ChildReservationStatusView
+from ..views.first_reservation_status import FirstReservationStatusView
+from ..views.reservation_status import ReservationStatusView
 
 
 class XmlView:
@@ -301,6 +304,198 @@ class XmlView:
     def get_feed(self):
         pass
 
+    def get_reservation_status_area_feed_list(self) -> list:
+        """コロナワクチンマップ（3回目接種）の地区一覧Feed用データを返す
+
+        Returns:
+            feed_data_list (list): コロナワクチンマップ（3回目接種）の地区一覧Feed用データのリスト
+
+        """
+        service = ReservationStatusService()
+        view = ReservationStatusView()
+        area_list = view.get_area_list()
+        feed_data_list = list()
+        for area in area_list:
+            title = area["name"] + "の新型コロナワクチン接種医療機関（3回目接種）の検索結果"
+            link = "https://" + self.my_domain + "/reservation_status/area/" + area["url"]
+            description = title + "です。"
+            pub_date = service.get_last_updated()
+            pub_date = pub_date.astimezone(timezone.utc)
+            guid = link
+            feed_data_list.append(
+                {
+                    "title": title,
+                    "link": link,
+                    "description": description,
+                    "pub_date": pub_date,
+                    "guid": guid,
+                }
+            )
+
+        return feed_data_list
+
+    def get_reservation_status_medical_institution_feed_list(self) -> list:
+        """コロナワクチンマップ（3回目接種）の医療機関一覧Feed用データを返す
+
+        Returns:
+            feed_data_list (list): コロナワクチンマップ（3回目接種）の医療機関一覧Feed用データのリスト
+
+        """
+        service = ReservationStatusService()
+        view = ReservationStatusView()
+        medical_institution_list = view.get_medical_institution_list()
+        feed_data_list = list()
+        for medical_institution in medical_institution_list:
+            title = medical_institution["name"] + "の新型コロナワクチン接種予約受付状況（3回目接種）"
+            link = (
+                "https://" + self.my_domain + "/reservation_status/medical_institution/" + medical_institution["url"]
+            )
+            description = title + "です。"
+            pub_date = service.get_last_updated()
+            pub_date = pub_date.astimezone(timezone.utc)
+            guid = link
+            feed_data_list.append(
+                {
+                    "title": title,
+                    "link": link,
+                    "description": description,
+                    "pub_date": pub_date,
+                    "guid": guid,
+                }
+            )
+
+        return feed_data_list
+
+    def get_first_reservation_status_area_feed_list(self) -> list:
+        """コロナワクチンマップ（1・2回目接種）の地区一覧Feed用データを返す
+
+        Returns:
+            feed_data_list (list): コロナワクチンマップ（1・2回目接種）の地区一覧Feed用データのリスト
+
+        """
+        service = FirstReservationStatusService()
+        view = FirstReservationStatusView()
+        area_list = view.get_area_list()
+        feed_data_list = list()
+        for area in area_list:
+            title = area["name"] + "の新型コロナワクチン接種医療機関（1・2回目接種）の検索結果"
+            link = "https://" + self.my_domain + "/first_reservation_status/area/" + area["url"]
+            description = title + "です。"
+            pub_date = service.get_last_updated()
+            pub_date = pub_date.astimezone(timezone.utc)
+            guid = link
+            feed_data_list.append(
+                {
+                    "title": title,
+                    "link": link,
+                    "description": description,
+                    "pub_date": pub_date,
+                    "guid": guid,
+                }
+            )
+
+        return feed_data_list
+
+    def get_first_reservation_status_medical_institution_feed_list(self) -> list:
+        """コロナワクチンマップ（1・2回目接種）の医療機関一覧Feed用データを返す
+
+        Returns:
+            feed_data_list (list): コロナワクチンマップ（1・2回目接種）の医療機関一覧Feed用データのリスト
+
+        """
+        service = FirstReservationStatusService()
+        view = FirstReservationStatusView()
+        medical_institution_list = view.get_medical_institution_list()
+        feed_data_list = list()
+        for medical_institution in medical_institution_list:
+            title = medical_institution["name"] + "の新型コロナワクチン接種予約受付状況（1・2回目接種）"
+            link = (
+                "https://"
+                + self.my_domain
+                + "/first_reservation_status/medical_institution/"
+                + medical_institution["url"]
+            )
+            description = title + "です。"
+            pub_date = service.get_last_updated()
+            pub_date = pub_date.astimezone(timezone.utc)
+            guid = link
+            feed_data_list.append(
+                {
+                    "title": title,
+                    "link": link,
+                    "description": description,
+                    "pub_date": pub_date,
+                    "guid": guid,
+                }
+            )
+
+        return feed_data_list
+
+    def get_child_reservation_status_area_feed_list(self) -> list:
+        """コロナワクチンマップ（5～11歳接種）の地区一覧Feed用データを返す
+
+        Returns:
+            feed_data_list (list): コロナワクチンマップ（5～11歳接種）の地区一覧Feed用データのリスト
+
+        """
+        service = ChildReservationStatusService()
+        view = ChildReservationStatusView()
+        area_list = view.get_area_list()
+        feed_data_list = list()
+        for area in area_list:
+            title = area["name"] + "の新型コロナワクチン接種医療機関（5～11歳接種）の検索結果"
+            link = "https://" + self.my_domain + "/child_reservation_status/area/" + area["url"]
+            description = title + "です。"
+            pub_date = service.get_last_updated()
+            pub_date = pub_date.astimezone(timezone.utc)
+            guid = link
+            feed_data_list.append(
+                {
+                    "title": title,
+                    "link": link,
+                    "description": description,
+                    "pub_date": pub_date,
+                    "guid": guid,
+                }
+            )
+
+        return feed_data_list
+
+    def get_child_reservation_status_medical_institution_feed_list(self) -> list:
+        """コロナワクチンマップ（5～11歳接種）の医療機関一覧Feed用データを返す
+
+        Returns:
+            feed_data_list (list): コロナワクチンマップ（5～11歳接種）の医療機関一覧Feed用データのリスト
+
+        """
+        service = ChildReservationStatusService()
+        view = ChildReservationStatusView()
+        medical_institution_list = view.get_medical_institution_list()
+        feed_data_list = list()
+        for medical_institution in medical_institution_list:
+            title = medical_institution["name"] + "の新型コロナワクチン接種予約受付状況（5～11歳接種）"
+            link = (
+                "https://"
+                + self.my_domain
+                + "/child_reservation_status/medical_institution/"
+                + medical_institution["url"]
+            )
+            description = title + "です。"
+            pub_date = service.get_last_updated()
+            pub_date = pub_date.astimezone(timezone.utc)
+            guid = link
+            feed_data_list.append(
+                {
+                    "title": title,
+                    "link": link,
+                    "description": description,
+                    "pub_date": pub_date,
+                    "guid": guid,
+                }
+            )
+
+        return feed_data_list
+
 
 class RssView(XmlView):
     def __init__(self):
@@ -324,6 +519,33 @@ class RssView(XmlView):
             self._get_item(self.opendata_feed),
             self._get_item(self.patient_feed),
         ]
+
+        # 地区一覧を追加
+        area_feed_list = self.get_reservation_status_area_feed_list()
+        for area_feed in area_feed_list:
+            items.append(self._get_item(area_feed))
+
+        first_area_feed_list = self.get_first_reservation_status_area_feed_list()
+        for area_feed in first_area_feed_list:
+            items.append(self._get_item(area_feed))
+
+        child_area_feed_list = self.get_child_reservation_status_area_feed_list()
+        for area_feed in child_area_feed_list:
+            items.append(self._get_item(area_feed))
+
+        # 医療機関一覧を追加
+        medical_institution_feed_list = self.get_reservation_status_medical_institution_feed_list()
+        for medical_institution_feed in medical_institution_feed_list:
+            items.append(self._get_item(medical_institution_feed))
+
+        first_medical_institution_feed_list = self.get_first_reservation_status_medical_institution_feed_list()
+        for medical_institution_feed in first_medical_institution_feed_list:
+            items.append(self._get_item(medical_institution_feed))
+
+        child_medical_institution_feed_list = self.get_child_reservation_status_medical_institution_feed_list()
+        for medical_institution_feed in child_medical_institution_feed_list:
+            items.append(self._get_item(medical_institution_feed))
+
         return {
             "title": self.title,
             "link": self.link,
@@ -376,6 +598,33 @@ class AtomView(XmlView):
             self._get_item(self.opendata_feed),
             self._get_item(self.patient_feed),
         ]
+
+        # 地区一覧を追加
+        area_feed_list = self.get_reservation_status_area_feed_list()
+        for area_feed in area_feed_list:
+            entries.append(self._get_item(area_feed))
+
+        first_area_feed_list = self.get_first_reservation_status_area_feed_list()
+        for area_feed in first_area_feed_list:
+            entries.append(self._get_item(area_feed))
+
+        child_area_feed_list = self.get_child_reservation_status_area_feed_list()
+        for area_feed in child_area_feed_list:
+            entries.append(self._get_item(area_feed))
+
+        # 医療機関一覧を追加
+        medical_institution_feed_list = self.get_reservation_status_medical_institution_feed_list()
+        for medical_institution_feed in medical_institution_feed_list:
+            entries.append(self._get_item(medical_institution_feed))
+
+        first_medical_institution_feed_list = self.get_first_reservation_status_medical_institution_feed_list()
+        for medical_institution_feed in first_medical_institution_feed_list:
+            entries.append(self._get_item(medical_institution_feed))
+
+        child_medical_institution_feed_list = self.get_child_reservation_status_medical_institution_feed_list()
+        for medical_institution_feed in child_medical_institution_feed_list:
+            entries.append(self._get_item(medical_institution_feed))
+
         return {
             "id": self.link,
             "title": self.title,
