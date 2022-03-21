@@ -804,6 +804,23 @@ def rss_xml():
     )
 
 
+@app.route("/sitemap.xml")
+def sitemap_xml():
+    sitemap = get_atom()
+    last_modified = sitemap.get_last_modified_header()
+    return (
+        render_template(
+            "sitemap.xml",
+            atom=sitemap.get_feed(),
+        ),
+        200,
+        {
+            "Content-Type": "application/xml; charset=UTF-8",
+            "Last-Modified": last_modified,
+        },
+    )
+
+
 @app.route("/site.webmanifest")
 def site_webmanifest():
     return render_template("site.webmanifest"), 200, {"Content-Type": "application/json; charset=UTF-8"}
