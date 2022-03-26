@@ -83,15 +83,23 @@
               <tr>
                 <th class="text-nowrap">医療機関名</th>
                 <th class="text-nowrap">ワクチン</th>
+                <th class="text-nowrap">かかりつけ以外</th>
                 <th class="text-nowrap">予約受付状況</th>
                 <th class="text-nowrap">住所</th>
               </tr>
             </thead>
             <tbody id="results" data-length="{{ search_lengths|tojson }}">
               {% for search_result in search_results %}
-              <tr id="order{{ loop.index }}" data-latitude="{{ search_result.latitude|tojson }}" data-longitude="{{ search_result.longitude|tojson }}" data-name="{{ search_result.medical_institution_name|safe }}" data-url="{{ search_result.medical_institution_name_url|safe }}" data-vaccine="{{ search_result.vaccine|safe }}" data-status="{{ search_result.status|safe }}">
+              <tr id="order{{ loop.index }}" data-latitude="{{ search_result.latitude|tojson }}" data-longitude="{{ search_result.longitude|tojson }}" data-name="{{ search_result.medical_institution_name|safe }}" data-url="{{ search_result.medical_institution_name_url|safe }}" data-vaccine="{{ search_result.vaccine|safe }}" data-is_not_family="{{ search_result.is_target_not_family|safe }}" data-status="{{ search_result.status|safe }}">
                 <td class="text-nowrap"><a href="/reservation_status/medical_institution/{{ search_result.medical_institution_name_url }}" title="{{ search_result.medical_institution_name }}の予約受付状況へ">{{ search_result.medical_institution_name }}</a></td>
                 <td class="text-nowrap">{{ search_result.vaccine }}</td>
+                {% if search_result.is_target_not_family %}
+                  <td class="text-nowrap">OK</td>
+                {% elif search_result.is_target_not_family is none %}
+                  <td class="text-nowrap"></td>
+                {% else %}
+                  <td class="text-nowrap">NG</td>
+                {% endif %}
                 <td class="text-nowrap">{{ search_result.status }}</td>
                 <td class="text-nowrap">{{ search_result.address }}</td>
               </tr>
