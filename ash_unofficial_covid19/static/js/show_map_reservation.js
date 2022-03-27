@@ -37,6 +37,12 @@ document.addEventListener(
           document.getElementById("order" + currentOrder).dataset.vaccine
         )
       );
+      var isTargetNotFamily = JSON.parse(
+        JSON.stringify(
+          document.getElementById("order" + currentOrder).dataset
+            .istargetnotfamily
+        )
+      );
       var status = JSON.parse(
         JSON.stringify(
           document.getElementById("order" + currentOrder).dataset.status
@@ -58,27 +64,40 @@ document.addEventListener(
         "'>" +
         locationName +
         "</a>";
+      if (/True/.test(isTargetNotFamily)) {
+        isTargetNotFamily =
+          "<br><span class='text-white bg-success'>かかりつけ以外OK</span>";
+      } else if (/False/.test(isTargetNotFamily)) {
+        isTargetNotFamily =
+          "<br><span class='text-white bg-danger'>かかりつけ以外NG</span>";
+      } else {
+        isTargetNotFamily = "";
+      }
+      var statusMessage = "";
       if (locationDataList[locationName] === undefined) {
         if (vaccine === "") {
-          status = "予約受付状況: " + status;
+          statusMessage = "予約受付状況: " + status + isTargetNotFamily;
         } else {
-          status = vaccine + "<br>" + "予約受付状況: " + status;
+          statusMessage =
+            vaccine + "<br>" + "予約受付状況: " + status + isTargetNotFamily;
         }
       } else {
         if (vaccine === "") {
-          status =
-            locationDataList[locationName]["status"] +
+          statusMessage =
+            locationDataList[locationName]["statusMessage"] +
             "<br>" +
             "予約受付状況: " +
-            status;
+            status +
+            isTargetNotFamily;
         } else {
-          status =
-            locationDataList[locationName]["status"] +
+          statusMessage =
+            locationDataList[locationName]["statusMessage"] +
             "<br>" +
             vaccine +
             "<br>" +
             "予約受付状況: " +
-            status;
+            status +
+            isTargetNotFamily;
         }
       }
       locationDataList[locationName] = {
@@ -86,7 +105,8 @@ document.addEventListener(
         latitude: latitude,
         longitude: longitude,
         nameLink: nameLink,
-        status: status,
+        statusMessage: statusMessage,
+        isTargetNotFamily: isTargetNotFamily,
       };
       latitudeSum += latitude;
       longitudeSum += longitude;
@@ -156,9 +176,9 @@ document.addEventListener(
 
     for (var prop in locationDataList) {
       var locationData = locationDataList[prop];
-      if (/.*受付中.*/.test(locationData["status"])) {
+      if (/.*受付中.*/.test(locationData["statusMessage"])) {
         mapIcon = mapPrimaryIcon;
-      } else if (/.*受付停止中.*/.test(locationData["status"])) {
+      } else if (/.*受付停止中.*/.test(locationData["statusMessage"])) {
         mapIcon = mapDangerIcon;
       } else {
         mapIcon = mapWarningIcon;
@@ -167,7 +187,8 @@ document.addEventListener(
       if (document.getElementById("medicalInstitutionMap")) {
         popupText = locationData["locationName"];
       } else {
-        popupText = locationData["nameLink"] + "<br>" + locationData["status"];
+        popupText =
+          locationData["nameLink"] + "<br>" + locationData["statusMessage"];
       }
       var marker = L.marker(
         [locationData["latitude"], locationData["longitude"]],

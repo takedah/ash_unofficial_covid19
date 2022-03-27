@@ -33,7 +33,6 @@
                 <th class="text-nowrap">予約受付開始時期</th>
                 <th class="text-nowrap">接種可能時期</th>
                 <th class="text-nowrap">年齢</th>
-                <th class="text-nowrap">かかりつけ</th>
                 <th class="text-nowrap">かかりつけ以外</th>
                 <th class="text-nowrap">市外</th>
                 <th class="text-nowrap">その他条件・備考など</th>
@@ -41,7 +40,7 @@
             </thead>
             <tbody id="results" data-length="{{ search_lengths|tojson }}">
               {% for search_result in search_results %}
-              <tr id="order{{ loop.index }}" data-latitude="{{ search_result.latitude|tojson }}" data-longitude="{{ search_result.longitude|tojson }}" data-name="{{ search_result.medical_institution_name|safe }}" data-url="{{ search_result.medical_institution_name_url|safe }}" data-vaccine="{{ search_result.vaccine|safe }}" data-status="{{ search_result.status|safe }}">
+              <tr id="order{{ loop.index }}" data-latitude="{{ search_result.latitude|tojson }}" data-longitude="{{ search_result.longitude|tojson }}" data-name="{{ search_result.medical_institution_name|safe }}" data-url="{{ search_result.medical_institution_name_url|safe }}" data-vaccine="{{ search_result.vaccine|safe }}" data-istargetnotfamily="{{ search_result.is_target_not_family|safe }}" data-status="{{ search_result.status|safe }}">
                 <td>
                   <strong><a href="../medical_institution/{{ search_result.medical_institution_name_url }}" title="{{ search_result.medical_institution_name }}">{{ search_result.medical_institution_name }}</a></strong><br>
                     {{ search_result.address }}<br>
@@ -50,13 +49,6 @@
                 <td>{{ search_result.status }}</td>
                 <td>{{ search_result.inoculation_time }}</td>
                 <td>{{ search_result.target_age }}</td>
-                {% if search_result.is_target_family is none %}
-                  <td></td>
-                {% elif search_result.is_target_family %}
-                  <td>OK</td>
-                {% else %}
-                  <td>NG</td>
-                {% endif %}
                 {% if search_result.is_target_not_family is none %}
                   <td></td>
                 {% elif search_result.is_target_not_family %}

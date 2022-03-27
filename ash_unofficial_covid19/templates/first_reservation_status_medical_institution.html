@@ -42,7 +42,7 @@
           <h2 class="h5 card-title">予約受付状況（1・2回目接種）</h2>
           <table class="table">
             <tbody>
-              <tr id="order{{ loop.index }}" data-latitude="{{ search_result.latitude|tojson }}" data-longitude="{{ search_result.longitude|tojson }}" data-name="{{ search_result.medical_institution_name|safe }}" data-url="{{ search_result.medical_institution_name_url|safe }}" data-vaccine="{{ search_result.vaccine|safe }}" data-status="{{ search_result.status|safe }}">
+              <tr id="order{{ loop.index }}" data-latitude="{{ search_result.latitude|tojson }}" data-longitude="{{ search_result.longitude|tojson }}" data-name="{{ search_result.medical_institution_name|safe }}" data-url="{{ search_result.medical_institution_name_url|safe }}" data-vaccine="{{ search_result.vaccine|safe }}" data-istargetnotfamily="{{ search_result.is_target_not_family|safe }}" data-status="{{ search_result.status|safe }}">
                 <th class="text-nowrap">予約受付開始時期</th><td>{{ search_result.status }}</td>
               </tr>
               <tr>
@@ -50,16 +50,6 @@
               </tr>
               <tr>
                 <th class="text-nowrap">年齢</th><td>{{ search_result.target_age }}</td>
-              </tr>
-              <tr>
-                <th class="text-nowrap">かかりつけ</th>
-                {% if search_result.is_target_family is none %}
-                  <td></td>
-                {% elif search_result.is_target_family %}
-                  <td>OK</td>
-                {% else %}
-                  <td>NG</td>
-                {% endif %}
               </tr>
               <tr>
                 <th class="text-nowrap">かかりつけ以外</th>
