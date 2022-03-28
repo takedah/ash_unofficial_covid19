@@ -66,10 +66,10 @@ document.addEventListener(
         "</a>";
       if (/True/.test(isTargetNotFamily)) {
         isTargetNotFamily =
-          "<div class='h6 py-2'><span class='text-white bg-success p-2 rounded'>かかりつけ以外OK</span></div>";
+          "<div class='mb-1 py-2'><span class='text-white bg-success p-2 rounded'>かかりつけ以外OK</span></div>";
       } else if (/False/.test(isTargetNotFamily)) {
         isTargetNotFamily =
-          "<div class='h6 py-2'><span class='text-white bg-secondary p-2 rounded'>かかりつけ以外NG</span></div>";
+          "<div class='mb-1 py-2'><span class='text-white bg-secondary p-2 rounded'>かかりつけ以外NG</span></div>";
       } else {
         isTargetNotFamily = "";
       }
@@ -77,17 +77,17 @@ document.addEventListener(
       if (locationDataList[locationName] === undefined) {
         if (vaccine === "") {
           statusMessage =
-            "<div class='h6'>" +
+            "<div class='mb-1'>" +
             "予約受付状況: " +
             status +
             "</div>" +
             isTargetNotFamily;
         } else {
           statusMessage =
-            "<div class='h6'>" +
+            "<div class='mb-1'>" +
             vaccine +
             "</div>" +
-            "<div class='h6'>" +
+            "<div class='mb-1'>" +
             "予約受付状況: " +
             status +
             "</div>" +
@@ -97,7 +97,7 @@ document.addEventListener(
         if (vaccine === "") {
           statusMessage =
             locationDataList[locationName]["statusMessage"] +
-            "<div class='h6'>" +
+            "<div class='mb-1'>" +
             "予約受付状況: " +
             status +
             "</div>" +
@@ -105,10 +105,10 @@ document.addEventListener(
         } else {
           statusMessage =
             locationDataList[locationName]["statusMessage"] +
-            "<div class='h6'>" +
+            "<div class='mb-1'>" +
             vaccine +
             "</div>" +
-            "<div class='h6'>" +
+            "<div class='mb-1'>" +
             "予約受付状況: " +
             status +
             "</div>" +
@@ -201,10 +201,10 @@ document.addEventListener(
       var popupText = "";
       if (document.getElementById("medicalInstitutionMap")) {
         popupText =
-          "<div class='h5'>" + locationData["locationName"] + "</div>";
+          "<div class='h6'>" + locationData["locationName"] + "</div>";
       } else {
         popupText =
-          "<div class='h5'>" +
+          "<div class='h6'>" +
           locationData["nameLink"] +
           "</div>" +
           locationData["statusMessage"];
