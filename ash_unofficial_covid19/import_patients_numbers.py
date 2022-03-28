@@ -143,6 +143,24 @@ def _fix_asahikawa_data() -> None:
     }
     factory.create(**fix_20220220)
 
+    # 令和4年3月26日発表分の訂正
+    # 発表資料ではどの年代を1名取り下げたのか不明なため、人数が最も多い10歳未満から1名減とした。
+    # https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d074860_d/fil/0327-2.pdf
+    fix_20220326 = {
+        "publication_date": date(2022, 3, 26),
+        "age_under_10": 27,
+        "age_10s": 9,
+        "age_20s": 8,
+        "age_30s": 14,
+        "age_40s": 18,
+        "age_50s": 12,
+        "age_60s": 3,
+        "age_70s": 2,
+        "age_80s": 2,
+        "age_over_90": 0,
+        "investigating": 0,
+    }
+    factory.create(**fix_20220326)
     try:
         service = PatientsNumberService()
         service.create(factory)
@@ -174,6 +192,9 @@ def import_latest():
                     pdf_url=press_release_link.url,
                     publication_date=press_release_link.publication_date,
                 )
+
+    # データの訂正を反映
+    _fix_asahikawa_data()
 
     # 札幌市の日別新規陽性患者数データをデータベースへ登録
     _import_sapporo_patients_number(Config.SAPPORO_URL)
