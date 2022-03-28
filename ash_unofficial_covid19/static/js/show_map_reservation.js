@@ -66,37 +66,52 @@ document.addEventListener(
         "</a>";
       if (/True/.test(isTargetNotFamily)) {
         isTargetNotFamily =
-          "<br><span class='text-white bg-success'>かかりつけ以外OK</span>";
+          "<div class='h6 py-2'><span class='text-white bg-success p-2 rounded'>かかりつけ以外OK</span></div>";
       } else if (/False/.test(isTargetNotFamily)) {
         isTargetNotFamily =
-          "<br><span class='text-white bg-danger'>かかりつけ以外NG</span>";
+          "<div class='h6 py-2'><span class='text-white bg-secondary p-2 rounded'>かかりつけ以外NG</span></div>";
       } else {
         isTargetNotFamily = "";
       }
       var statusMessage = "";
       if (locationDataList[locationName] === undefined) {
         if (vaccine === "") {
-          statusMessage = "予約受付状況: " + status + isTargetNotFamily;
+          statusMessage =
+            "<div class='h6'>" +
+            "予約受付状況: " +
+            status +
+            "</div>" +
+            isTargetNotFamily;
         } else {
           statusMessage =
-            vaccine + "<br>" + "予約受付状況: " + status + isTargetNotFamily;
+            "<div class='h6'>" +
+            vaccine +
+            "</div>" +
+            "<div class='h6'>" +
+            "予約受付状況: " +
+            status +
+            "</div>" +
+            isTargetNotFamily;
         }
       } else {
         if (vaccine === "") {
           statusMessage =
             locationDataList[locationName]["statusMessage"] +
-            "<br>" +
+            "<div class='h6'>" +
             "予約受付状況: " +
             status +
+            "</div>" +
             isTargetNotFamily;
         } else {
           statusMessage =
             locationDataList[locationName]["statusMessage"] +
-            "<br>" +
+            "<div class='h6'>" +
             vaccine +
-            "<br>" +
+            "</div>" +
+            "<div class='h6'>" +
             "予約受付状況: " +
             status +
+            "</div>" +
             isTargetNotFamily;
         }
       }
@@ -185,10 +200,14 @@ document.addEventListener(
       }
       var popupText = "";
       if (document.getElementById("medicalInstitutionMap")) {
-        popupText = locationData["locationName"];
+        popupText =
+          "<div class='h5'>" + locationData["locationName"] + "</div>";
       } else {
         popupText =
-          locationData["nameLink"] + "<br>" + locationData["statusMessage"];
+          "<div class='h5'>" +
+          locationData["nameLink"] +
+          "</div>" +
+          locationData["statusMessage"];
       }
       var marker = L.marker(
         [locationData["latitude"], locationData["longitude"]],
