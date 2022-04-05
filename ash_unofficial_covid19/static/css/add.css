@@ -1,5 +1,7 @@
 body {
   padding-top: 88px;
+  font-family: 'BIZ UDGothic', sans-serif;
+  font-family: 'BIZ UDPGothic', sans-serif;
 }
 #mapid {
   height: 480px;
