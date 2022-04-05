@@ -440,6 +440,7 @@ class PerHundredThousandPopulationView(GraphView):
             color="#64B5F6",
             label="旭川市",
         )
+        """
         sapporo_per_hundred_thousand_population_x = [
             row[0].strftime("%m-%d") + "~" for row in self.__sapporo_per_hundred_thousand_population_data
         ]
@@ -452,6 +453,7 @@ class PerHundredThousandPopulationView(GraphView):
             color="lightgray",
             label="札幌市",
         )
+        """
         ax.yaxis.set_major_locator(MultipleLocator(25))
         ax.grid(axis="y", color="lightgray")
         ax.tick_params(labelsize=8)

@@ -187,14 +187,14 @@ def import_latest():
     for press_release_link in press_release_links.items:
         publication_date = press_release_link.publication_date
         if date(2022, 1, 27) < publication_date:
-            if publication_date.year == 2022 and publication_date.month == 3:
+            if publication_date.year == 2022 and publication_date.month == 4:
                 _import_asahikawa_data_from_press_release(
                     pdf_url=press_release_link.url,
                     publication_date=press_release_link.publication_date,
                 )
 
     # データの訂正を反映
-    _fix_asahikawa_data()
+    # _fix_asahikawa_data()
 
     # 札幌市の日別新規陽性患者数データをデータベースへ登録
     _import_sapporo_patients_number(Config.SAPPORO_URL)
