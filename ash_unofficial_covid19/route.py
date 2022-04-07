@@ -686,7 +686,7 @@ def get_daily_total_graph():
     graph_image = daily_total.get_graph_image()
     res = make_response()
     res.data = graph_image.getvalue()
-    res.headers["Content-Type"] = "img/png"
+    res.headers["Content-Type"] = "image/png"
     res.headers["Content-Disposition"] = "attachment: filename=" + "daily_total.png"
     return res
 
@@ -697,7 +697,7 @@ def get_daily_total_graph_for_card():
     graph_image = daily_total.get_graph_image(figsize=(6.0, 3.15))
     res = make_response()
     res.data = graph_image.getvalue()
-    res.headers["Content-Type"] = "img/png"
+    res.headers["Content-Type"] = "image/png"
     res.headers["Content-Disposition"] = "attachment: filename=" + "daily_total_for_card.png"
     return res
 
@@ -708,7 +708,7 @@ def get_month_total_graph():
     graph_image = month_total.get_graph_image()
     res = make_response()
     res.data = graph_image.getvalue()
-    res.headers["Content-Type"] = "img/png"
+    res.headers["Content-Type"] = "image/png"
     res.headers["Content-Disposition"] = "attachment: filename=" + "month_total.png"
     return res
 
@@ -719,7 +719,7 @@ def get_month_total_graph_for_card():
     graph_image = month_total.get_graph_image(figsize=(6.0, 3.15))
     res = make_response()
     res.data = graph_image.getvalue()
-    res.headers["Content-Type"] = "img/png"
+    res.headers["Content-Type"] = "image/png"
     res.headers["Content-Disposition"] = "attachment: filename=" + "month_total_for_card.png"
     return res
 
@@ -730,7 +730,7 @@ def get_by_age_graph():
     graph_image = by_age.get_graph_image()
     res = make_response()
     res.data = graph_image.getvalue()
-    res.headers["Content-Type"] = "img/png"
+    res.headers["Content-Type"] = "image/png"
     res.headers["Content-Disposition"] = "attachment: filename=" + "by_age.png"
     return res
 
@@ -741,7 +741,7 @@ def get_per_hundred_thousand_population_graph():
     graph_image = per_hundred_thousand_population.get_graph_image()
     res = make_response()
     res.data = graph_image.getvalue()
-    res.headers["Content-Type"] = "img/png"
+    res.headers["Content-Type"] = "image/png"
     res.headers["Content-Disposition"] = "attachment: filename=" + "per_hundred_thousand_population.png"
     return res
 
@@ -752,7 +752,7 @@ def get_weekly_per_age_graph():
     graph_image = weekly_per_age.get_graph_image()
     res = make_response()
     res.data = graph_image.getvalue()
-    res.headers["Content-Type"] = "img/png"
+    res.headers["Content-Type"] = "image/png"
     res.headers["Content-Disposition"] = "attachment: filename=" + "weekly_per_age.png"
     return res
 
