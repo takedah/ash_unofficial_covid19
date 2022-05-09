@@ -77,6 +77,7 @@ CREATE TABLE reservation_statuses(
     target_age TEXT,
     is_target_family BOOLEAN,
     is_target_not_family BOOLEAN,
+    is_target_suberb BOOLEAN,
     target_other TEXT,
     memo TEXT,
     updated_at TIMESTAMPTZ NOT NULL,

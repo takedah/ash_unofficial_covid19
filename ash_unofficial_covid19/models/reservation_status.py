@@ -20,6 +20,7 @@ class ReservationStatus:
         target_age (str): 対象年齢
         is_target_family (bool): かかりつけの方が対象か
         is_target_not_family (bool): かかりつけ以外の方が対象か
+        is_target_suberb (bool): 市外の方が対象か
         target_other (str): その他
         memo (str): 備考
 
@@ -35,6 +36,7 @@ class ReservationStatus:
     target_age: str = ""
     is_target_family: Optional[bool] = None
     is_target_not_family: Optional[bool] = None
+    is_target_suberb: Optional[bool] = None
     target_other: str = ""
     memo: str = ""
 
@@ -99,6 +101,7 @@ class ReservationStatusLocation(ReservationStatus):
         target_age (str): 対象年齢
         is_target_family (bool): かかりつけの方が対象か
         is_target_not_family (bool): かかりつけ以外の方が対象か
+        is_target_suberb (bool): 市外の方が対象か
         target_other (str): その他
         memo (str): 備考
         medical_institution_name_url (str): 医療機関の名称をURLパースした文字列

@@ -56,6 +56,16 @@
                 {% endif %}
               </tr>
               <tr>
+                <th class="text-nowrap">市外の方</th>
+                {% if search_result.is_target_suberb is none %}
+                  <td></td>
+                {% elif search_result.is_target_suberb %}
+                  <td>OK</td>
+                {% else %}
+                  <td>NG</td>
+                {% endif %}
+              </tr>
+              <tr>
                 <th class="text-nowrap">その他条件</th>
                 <td>{{ search_result.target_other }}</td>
               </tr>

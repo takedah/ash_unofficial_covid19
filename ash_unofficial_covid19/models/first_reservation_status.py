@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Optional
 
 from ..models.factory import Factory
 from ..models.reservation_status import ReservationStatus, ReservationStatusLocation
@@ -27,7 +26,6 @@ class FirstReservationStatus(ReservationStatus):
     """
 
     vaccine: str = ""
-    is_target_suberb: Optional[bool] = None
 
 
 class FirstReservationStatusFactory(Factory):
@@ -99,7 +97,6 @@ class FirstReservationStatusLocation(ReservationStatusLocation):
     """
 
     vaccine: str = ""
-    is_target_suberb: Optional[bool] = None
 
 
 class FirstReservationStatusLocationFactory(Factory):

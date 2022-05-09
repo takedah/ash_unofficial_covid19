@@ -122,8 +122,10 @@ class ScrapeReservationStatus(Scraper):
 
             family = self.get_available(row[8])
             not_family = self.get_available(row[9])
+            suberb = self.get_available(row[10])
             is_target_family = family["available"]
             is_target_not_family = not_family["available"]
+            is_target_suberb = suberb["available"]
             memo = family["text"] + " " + not_family["text"] + " " + row[12]
             memo = memo.strip()
             status = row[5].replace("―", "")
@@ -143,6 +145,7 @@ class ScrapeReservationStatus(Scraper):
                 "target_age": row[7].replace("―", ""),
                 "is_target_family": is_target_family,
                 "is_target_not_family": is_target_not_family,
+                "is_target_suberb": is_target_suberb,
                 "target_other": row[11].replace("―", ""),
                 "memo": memo,
             }

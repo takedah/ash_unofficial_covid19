@@ -19,6 +19,7 @@ class TestReservationStatus:
             "target_age": "",
             "is_target_family": False,
             "is_target_not_family": False,
+            "is_target_suberb": None,
             "target_other": "当院の患者IDをお持ちの方",
             "memo": "当院ホームページをご確認ください",
         }
@@ -41,6 +42,7 @@ class TestReservationStatusLocation:
             "target_age": "",
             "is_target_family": False,
             "is_target_not_family": False,
+            "is_target_suberb": None,
             "target_other": "当院の患者IDをお持ちの方",
             "longitude": 142.348303888889,
             "latitude": 43.769628888889,

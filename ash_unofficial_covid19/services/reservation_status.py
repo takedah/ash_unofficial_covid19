@@ -35,6 +35,7 @@ class ReservationStatusService(Service):
             "target_age",
             "is_target_family",
             "is_target_not_family",
+            "is_target_suberb",
             "target_other",
             "memo",
             "updated_at",
@@ -54,6 +55,7 @@ class ReservationStatusService(Service):
                     reservation_status.target_age,
                     reservation_status.is_target_family,
                     reservation_status.is_target_not_family,
+                    reservation_status.is_target_suberb,
                     reservation_status.target_other,
                     reservation_status.memo,
                     datetime.now(timezone(timedelta(hours=+9))),
@@ -147,7 +149,7 @@ class ReservationStatusService(Service):
             "SELECT "
             + "area,medical_institution_name,"
             + "address,phone_number,vaccine,status,inoculation_time,target_age,"
-            + "is_target_family,is_target_not_family,target_other,memo "
+            + "is_target_family,is_target_not_family,is_target_suberb,target_other,memo "
             + "FROM"
             + " "
             + self.table_name
@@ -210,7 +212,7 @@ class ReservationStatusService(Service):
             "SELECT "
             + "area,reserve.medical_institution_name,"
             + "address,phone_number,vaccine,status,inoculation_time,target_age,"
-            + "is_target_family,is_target_not_family,target_other,"
+            + "is_target_family,is_target_not_family,is_target_suberb,target_other,"
             + "latitude,longitude,memo "
             + "FROM "
             + self.table_name
