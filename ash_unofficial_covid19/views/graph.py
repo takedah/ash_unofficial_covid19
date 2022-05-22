@@ -362,16 +362,19 @@ class PerHundredThousandPopulationView(GraphView):
         service = PatientsNumberService()
         sapporo_service = SapporoPatientsNumberService()
         today = self.get_today()
+        sapporo_last_update_date = sapporo_service.get_last_update_date()
         self.__per_hundred_thousand_population_data = service.get_per_hundred_thousand_population_per_week(
             from_date=today - relativedelta(weeks=16, days=-1),
             to_date=today,
         )
-        self.__sapporo_per_hundred_thousand_population_data = (
-            sapporo_service.get_per_hundred_thousand_population_per_week(
-                from_date=today - relativedelta(weeks=16, days=-1),
-                to_date=today,
-            )
+        sapporo_per_hundred_thousand_population_data = sapporo_service.get_per_hundred_thousand_population_per_week(
+            from_date=today - relativedelta(weeks=16, days=-1),
+            to_date=sapporo_last_update_date,
         )
+        if sapporo_last_update_date < today:
+            del sapporo_per_hundred_thousand_population_data[-1:]
+
+        self.__sapporo_per_hundred_thousand_population_data = sapporo_per_hundred_thousand_population_data
         this_week = self.__per_hundred_thousand_population_data[-1][1]
         last_week = self.__per_hundred_thousand_population_data[-2][1]
         increase_from_last_week = float(
@@ -440,7 +443,6 @@ class PerHundredThousandPopulationView(GraphView):
             color="#64B5F6",
             label="旭川市",
         )
-        """
         sapporo_per_hundred_thousand_population_x = [
             row[0].strftime("%m-%d") + "~" for row in self.__sapporo_per_hundred_thousand_population_data
         ]
@@ -453,7 +455,6 @@ class PerHundredThousandPopulationView(GraphView):
             color="lightgray",
             label="札幌市",
         )
-        """
         ax.yaxis.set_major_locator(MultipleLocator(25))
         ax.grid(axis="y", color="lightgray")
         ax.tick_params(labelsize=8)

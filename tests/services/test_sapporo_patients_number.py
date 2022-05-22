@@ -77,3 +77,9 @@ def test_get_per_hundred_thousand_population_per_week(service):
         (date(2021, 8, 29), 6.83),
     ]
     assert result == expect
+
+
+def test_get_last_update_date(service):
+    result = service.get_last_update_date()
+    expect = date(2021, 8, 29)
+    assert result == expect

@@ -143,3 +143,18 @@ class SapporoPatientsNumberService(Service):
             )
             per_hundred_thousand_population_per_week.append((target_week, per_hundred_thousand_population))
         return per_hundred_thousand_population_per_week
+
+    def get_last_update_date(self) -> date:
+        """札幌市のオープンデータの最新の公表日を取得する
+
+        Returns:
+            last_update_date (date): 札幌市のオープンデータの最新の公表日を取得する
+
+        """
+        state = "SELECT MAX(publication_date) FROM " + self.table_name + ";"
+        with self.get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(state)
+                for row in cur.fetchall():
+                    last_update_date = row["max"]
+        return last_update_date
