@@ -1,11 +1,10 @@
 from flask import Flask, abort, escape, g, make_response, render_template, request
 
 from .config import Config
-from .errors import DataModelError, ServiceError
+from .errors import DataModelError
 from .views.child_reservation_status import ChildReservationStatusView
 from .views.first_reservation_status import FirstReservationStatusView
 from .views.graph import ByAgeView, DailyTotalView, MonthTotalView, PerHundredThousandPopulationView, WeeklyPerAgeView
-from .views.patient import AsahikawaPatientView
 from .views.patients_number import PatientsNumberView
 from .views.reservation_status import ReservationStatusView
 from .views.xml import AtomView, RssView
@@ -38,11 +37,6 @@ def add_security_headers(response):
     response.headers.add("X-Frame-Options", "DENY")
     response.headers.add("X-XSS-Protection", "1;mode=block")
     return response
-
-
-def get_asahikawa_patients():
-    g.asahikawa_patients = AsahikawaPatientView()
-    return g.asahikawa_patients
 
 
 def get_patients_numbers():
@@ -135,46 +129,6 @@ def opendata():
         title="非公式オープンデータ",
         gtag_id=Config.GTAG_ID,
         last_updated=patients_numbers.last_updated,
-        leaflet=False,
-    )
-
-
-@app.route("/patients")
-def patients():
-    asahikawa_patients = get_asahikawa_patients()
-    results = asahikawa_patients.find()
-    return render_template(
-        "patients.html",
-        title="感染者の状況",
-        gtag_id=Config.GTAG_ID,
-        last_updated=asahikawa_patients.last_updated,
-        patients=results[0],
-        max_page=results[1],
-        page=1,
-        leaflet=False,
-    )
-
-
-@app.route("/patients/<page>")
-def patients_pages(page):
-    try:
-        page = int(escape(page))
-    except ValueError:
-        abort(404)
-    try:
-        asahikawa_patients = get_asahikawa_patients()
-        results = asahikawa_patients.find(page=page)
-    except ServiceError:
-        abort(404)
-    title = "感染者の状況（非公式オープンデータ）全" + str(results[1]) + "ページ中" + str(page) + "ページ目"
-    return render_template(
-        "patients.html",
-        title=title,
-        gtag_id=Config.GTAG_ID,
-        last_updated=asahikawa_patients.last_updated,
-        patients=results[0],
-        max_page=results[1],
-        page=page,
         leaflet=False,
     )
 

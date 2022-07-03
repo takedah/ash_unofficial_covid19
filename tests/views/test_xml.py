@@ -225,13 +225,6 @@ class TestRssView:
                     "title": "旭川市新型コロナウイルス感染症非公式オープンデータ",
                 },
                 {
-                    "description": "2022年1月27日発表分をもって旭川市が感染者ごとの情報の公表をやめたため、同日時点までの情報を表示しています。",
-                    "guid": "tag:ash-unofficial-covid19.herokuapp.com,2022-01-27:/patients",
-                    "link": "https://ash-unofficial-covid19.herokuapp.com/patients",
-                    "pub_date": "Thu, 27 Jan 2022 00:00:00 GMT",
-                    "title": "旭川市の新型コロナウイルス感染症患者の状況",
-                },
-                {
                     "description": "花咲町・末広・末広東・東鷹栖地区の新型コロナワクチン接種医療機関（3回目接種）の検索結果です。",
                     "guid": "https://ash-unofficial-covid19.herokuapp.com/reservation_status/area/"
                     + "%E8%8A%B1%E5%92%B2%E7%94%BA%E3%83%BB%E6%9C%AB%E5%BA%83%E3%83%BB%"
@@ -458,13 +451,6 @@ class TestAtomView:
                     "link": "https://ash-unofficial-covid19.herokuapp.com/opendata",
                     "updated": "2022-01-29T07:00:00Z",
                     "title": "旭川市新型コロナウイルス感染症非公式オープンデータ",
-                },
-                {
-                    "summary": "2022年1月27日発表分をもって旭川市が感染者ごとの情報の公表をやめたため、同日時点までの情報を表示しています。",
-                    "id": "tag:ash-unofficial-covid19.herokuapp.com,2022-01-27:/patients",
-                    "link": "https://ash-unofficial-covid19.herokuapp.com/patients",
-                    "updated": "2022-01-27T00:00:00Z",
-                    "title": "旭川市の新型コロナウイルス感染症患者の状況",
                 },
                 {
                     "summary": "花咲町・末広・末広東・東鷹栖地区の新型コロナワクチン接種医療機関（3回目接種）の検索結果です。",

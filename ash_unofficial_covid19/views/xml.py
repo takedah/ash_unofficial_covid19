@@ -34,7 +34,6 @@ class XmlView:
         self.__first_reservation_status_feed = self._get_first_reservation_status_feed()
         self.__child_reservation_status_feed = self._get_child_reservation_status_feed()
         self.__opendata_feed = self._get_opendata_feed()
-        self.__patient_feed = self._get_patient_feed()
 
     @property
     def today(self):
@@ -83,10 +82,6 @@ class XmlView:
     @property
     def opendata_feed(self):
         return self.__opendata_feed
-
-    @property
-    def patient_feed(self):
-        return self.__patient_feed
 
     def get_last_modified_header(self) -> str:
         """HTTP Last Modifiedヘッダー用文字列を出力
@@ -273,26 +268,6 @@ class XmlView:
         description = "旭川市が公式ホームページで公表している新型コロナウイルスに関する情報を、CSVやJSONといった機械判読しやすい形に変換したものを公開しています。"
         pub_date = self.last_modified
         guid = "tag:" + self.my_domain + "," + pub_date.strftime("%Y-%m-%d") + ":/opendata"
-        return {
-            "title": title,
-            "link": link,
-            "description": description,
-            "pub_date": pub_date,
-            "guid": guid,
-        }
-
-    def _get_patient_feed(self) -> dict:
-        """感染者の状況のFeed用データを返す
-
-        Returns:
-            feed_data (dict): 感染者の状況のFeed用データ
-
-        """
-        title = "旭川市の新型コロナウイルス感染症患者の状況"
-        link = "https://" + self.my_domain + "/patients"
-        description = "2022年1月27日発表分をもって旭川市が感染者ごとの情報の公表をやめたため、同日時点までの情報を表示しています。"
-        pub_date = datetime(2022, 1, 27, 0, 0, tzinfo=timezone.utc)
-        guid = "tag:" + self.my_domain + "," + pub_date.strftime("%Y-%m-%d") + ":/patients"
         return {
             "title": title,
             "link": link,
@@ -517,7 +492,6 @@ class RssView(XmlView):
             self._get_item(self.first_reservation_status_feed),
             self._get_item(self.child_reservation_status_feed),
             self._get_item(self.opendata_feed),
-            self._get_item(self.patient_feed),
         ]
 
         # 地区一覧を追加
@@ -596,7 +570,6 @@ class AtomView(XmlView):
             self._get_item(self.first_reservation_status_feed),
             self._get_item(self.child_reservation_status_feed),
             self._get_item(self.opendata_feed),
-            self._get_item(self.patient_feed),
         ]
 
         # 地区一覧を追加
