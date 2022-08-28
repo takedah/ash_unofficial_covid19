@@ -4,13 +4,13 @@ import os
 class Config:
     """パッケージ全体で使用する定数をまとめる"""
 
-    # 旭川市の人口（2021年1月1日現在）
+    # 旭川市の人口（2022年1月1日現在）
     # https://www.city.asahikawa.hokkaido.jp/700/701/705/d055301.html
-    POPULATION = 331397
+    POPULATION = 327960
 
-    # 札幌市の人口（2021年1月1日現在）
+    # 札幌市の人口（2022年1月1日現在）
     # https://www.city.sapporo.jp/toukei/jinko/juuki/juuki.html
-    SAPPORO_POPULATION = 1961575
+    SAPPORO_POPULATION = 1960668
 
     # 旭川市公式ホームページと北海道オープンデータポータルの設定
     DATABASE_URL = os.environ.get("DATABASE_URL")
