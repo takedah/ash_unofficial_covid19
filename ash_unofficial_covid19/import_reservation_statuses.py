@@ -256,6 +256,11 @@ def import_locations(medical_institution_name_list: list) -> None:
             "longitude": 142.390319166667,
             "latitude": 43.805724166667,
         },
+        {
+            "medical_institution_name": "ながのクリニック",
+            "longitude": 142.396569444444,
+            "latitude": 43.744830833333,
+        },
     ]
     for add_data in add_data_list:
         add_locations_factory.create(**add_data)
