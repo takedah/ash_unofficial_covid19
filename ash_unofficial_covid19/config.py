@@ -15,7 +15,7 @@ class Config:
     # 旭川市公式ホームページと北海道オープンデータポータルの設定
     DATABASE_URL = os.environ.get("DATABASE_URL")
     BASE_URL = "https://www.city.asahikawa.hokkaido.jp/"
-    OVERVIEW_URL = BASE_URL + "kurashi/135/136/150/d068529.html"
+    OVERVIEW_URL = BASE_URL + "kurashi/135/136/150/d076150.html"
     LATEST_DATA_URL = BASE_URL + "kurashi/135/136/150/d076004.html"
     AUG2022_DATA_URL = BASE_URL + "kurashi/135/136/150/d075802.html"
     JUL2022_DATA_URL = BASE_URL + "kurashi/135/136/150/d075601.html"

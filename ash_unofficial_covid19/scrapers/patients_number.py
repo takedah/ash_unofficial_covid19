@@ -83,44 +83,75 @@ class ScrapePatientsNumber(Scraper):
             if pdf_table == []:
                 continue
 
-            # 年齢別陽性患者数内訳以外の表だった場合スキップ
-            label_column = self._nomalize(pdf_table[0][0])
-            if label_column != "10歳未満":
-                continue
-
             patients_number: dict[str, Union[date, int]] = dict()
-            for row in pdf_table:
-                patients_number["publication_date"] = publication_date
-                age = self._nomalize(str(row[0]))
-                try:
-                    number = int(self._nomalize(str(row[1])))
-                except ValueError:
-                    number = 0
+            patients_number["publication_date"] = publication_date
 
-                if age == "10歳未満":
-                    patients_number["age_under_10"] = number
-                elif age == "10歳代":
-                    patients_number["age_10s"] = number
-                elif age == "20歳代":
-                    patients_number["age_20s"] = number
-                elif age == "30歳代":
-                    patients_number["age_30s"] = number
-                elif age == "40歳代":
-                    patients_number["age_40s"] = number
-                elif age == "50歳代":
-                    patients_number["age_50s"] = number
-                elif age == "60歳代":
-                    patients_number["age_60s"] = number
-                elif age == "70歳代":
-                    patients_number["age_70s"] = number
-                elif age == "80歳代":
-                    patients_number["age_80s"] = number
-                elif age == "90歳以上":
-                    patients_number["age_over_90"] = number
-                else:
-                    patients_number["investigating"] = number
+            if publication_date > date(2022, 9, 26):
+                for row in pdf_table:
+                    if row is None:
+                        continue
 
-            patients_number_data.append(patients_number)
+                    if self._nomalize(row[0].split("\n")[0]) == "全体":
+                        age_under_10 = (
+                            int(self._nomalize(row[1].split("\n")[0]))
+                            + int(self._nomalize(row[2].split("\n")[0]))
+                            + int(self._nomalize(row[3].split("\n")[0]))
+                        )
+                        age_60s = int(self._nomalize(row[9].split("\n")[0])) + int(
+                            self._nomalize(row[10].split("\n")[0])
+                        )
+                        patients_number["age_under_10"] = age_under_10
+                        patients_number["age_10s"] = int(self._nomalize(row[4].split("\n")[0]))
+                        patients_number["age_20s"] = int(self._nomalize(row[5].split("\n")[0]))
+                        patients_number["age_30s"] = int(self._nomalize(row[6].split("\n")[0]))
+                        patients_number["age_40s"] = int(self._nomalize(row[7].split("\n")[0]))
+                        patients_number["age_50s"] = int(self._nomalize(row[8].split("\n")[0]))
+                        patients_number["age_60s"] = age_60s
+                        patients_number["age_70s"] = int(self._nomalize(row[10].split("\n")[1]))
+                        patients_number["age_80s"] = int(self._nomalize(row[10].split("\n")[2]))
+                        patients_number["age_over_90"] = int(self._nomalize(row[10].split("\n")[3]))
+                        patients_number["investigating"] = 0
+                        patients_number_data.append(patients_number)
+                        return patients_number_data
+
+            else:
+                # 年齢別陽性患者数内訳以外の表だった場合スキップ
+                label_column = self._nomalize(pdf_table[0][0])
+                if label_column != "10歳未満":
+                    continue
+
+                for row in pdf_table:
+                    age = self._nomalize(str(row[0]))
+                    try:
+                        number = int(self._nomalize(str(row[1])))
+                    except ValueError:
+                        number = 0
+
+                    if age == "10歳未満":
+                        patients_number["age_under_10"] = number
+                    elif age == "10歳代":
+                        patients_number["age_10s"] = number
+                    elif age == "20歳代":
+                        patients_number["age_20s"] = number
+                    elif age == "30歳代":
+                        patients_number["age_30s"] = number
+                    elif age == "40歳代":
+                        patients_number["age_40s"] = number
+                    elif age == "50歳代":
+                        patients_number["age_50s"] = number
+                    elif age == "60歳代":
+                        patients_number["age_60s"] = number
+                    elif age == "70歳代":
+                        patients_number["age_70s"] = number
+                    elif age == "80歳代":
+                        patients_number["age_80s"] = number
+                    elif age == "90歳以上":
+                        patients_number["age_over_90"] = number
+                    else:
+                        patients_number["investigating"] = number
+
+                patients_number_data.append(patients_number)
+                return patients_number_data
 
         # PDFに年代別内訳表がない場合、その報道発表日の患者数は全年代0とする
         if len(patients_number_data) == 0:
