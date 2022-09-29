@@ -7,7 +7,7 @@ from ash_unofficial_covid19.scrapers.reservation_status import ScrapeReservation
 @pytest.fixture()
 def html_content():
     return """
-<table id="tablepress-9-no-2" class="tablepress tablepress-id-1">
+<table id="tablepress-17-no-2" class="tablepress tablepress-id-1">
 <thead>
 <tr class="row-1 odd">
 <th class="column-1">地区</th><th class="column-2">医療機関名<br />
@@ -22,7 +22,7 @@ def html_content():
 </th><th class="column-8">かかりつけ<br />
 以外</th>
 <th class="column-9">市外可</th>
-<th class="column-10">その他</th><th class="column-11">備考</th>
+<th class="column-11">備考</th>
 </tr>
 </thead>
 <tbody class="row-hover">
@@ -37,8 +37,7 @@ def html_content():
 <td class="column-7">×</td>
 <td class="column-8">×</td>
 <td class="column-9">―</td>
-<td class="column-10">当院の患者IDをお持ちの方</td>
-<td class="column-11">当院ホームページをご確認ください</td>
+<td class="column-10">当院ホームページをご確認ください</td>
 </tr>
 <tr class="row-68 even">
 <td class="column-1">花咲町・末広・末広東・東鷹栖地区</td>
@@ -54,8 +53,7 @@ def html_content():
 <td class="column-7">○</td>
 <td class="column-8">×</td>
 <td class="column-9">―</td>
-<td class="column-10">―</td>
-<td class="column-11"></td>
+<td class="column-10"></td>
 </tr>
 </tbody>
 </table>
@@ -114,7 +112,7 @@ def test_lists(html_content, mocker):
             "is_target_family": False,
             "is_target_not_family": False,
             "is_target_suberb": None,
-            "target_other": "当院の患者IDをお持ちの方",
+            "target_other": "",
             "memo": "当院ホームページをご確認ください",
         },
         {

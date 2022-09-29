@@ -261,6 +261,16 @@ def import_locations(medical_institution_name_list: list) -> None:
             "longitude": 142.396569444444,
             "latitude": 43.744830833333,
         },
+        {
+            "medical_institution_name": "旭川消化器肛門クリニック",
+            "longitude": 142.387003055556,
+            "latitude": 43.803429722222,
+        },
+        {
+            "medical_institution_name": "のむらひふ科耳鼻咽喉科甲状腺クリニック",
+            "longitude": 142.381543888889,
+            "latitude": 43.727218333333,
+        },
     ]
     for add_data in add_data_list:
         add_locations_factory.create(**add_data)

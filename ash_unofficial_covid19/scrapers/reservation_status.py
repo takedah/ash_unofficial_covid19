@@ -29,7 +29,7 @@ class ScrapeReservationStatus(Scraper):
         Scraper.__init__(self)
         self.__lists = list()
         downloaded_html = self.get_html(html_url)
-        table_data = self.get_table_data(downloaded_html, "tablepress-9-no-2")
+        table_data = self.get_table_data(downloaded_html, "tablepress-17-no-2")
         for row in table_data:
             extracted_data = self._extract_status_data(row)
             if extracted_data:
@@ -126,7 +126,7 @@ class ScrapeReservationStatus(Scraper):
             is_target_family = family["available"]
             is_target_not_family = not_family["available"]
             is_target_suberb = suberb["available"]
-            memo = family["text"] + " " + not_family["text"] + " " + row[12]
+            memo = family["text"] + " " + not_family["text"] + " " + row[11]
             memo = memo.strip()
             status = row[5].replace("―", "")
             # 予約受付状況が空欄の場合、備考の値をセットする。
@@ -146,7 +146,7 @@ class ScrapeReservationStatus(Scraper):
                 "is_target_family": is_target_family,
                 "is_target_not_family": is_target_not_family,
                 "is_target_suberb": is_target_suberb,
-                "target_other": row[11].replace("―", ""),
+                "target_other": "",
                 "memo": memo,
             }
             return status_data
