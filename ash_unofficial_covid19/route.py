@@ -145,7 +145,7 @@ def reservation_statuses():
 
     return render_template(
         "reservation_statuses.html",
-        title="コロナワクチンマップ（3回目接種）",
+        title="旭川市のコロナワクチンマップ（追加接種（オミクロン対応ワクチン））",
         gtag_id=Config.GTAG_ID,
         last_updated=reservation_statuses.last_updated,
         search_results=search_results.items,
@@ -167,7 +167,7 @@ def reservation_statuses_search_by_gps():
 
         return render_template(
             "reservation_statuses.html",
-            title="コロナワクチンマップ（3回目接種）",
+            title="旭川市のコロナワクチンマップ（追加接種（オミクロン対応ワクチン））",
             gtag_id=Config.GTAG_ID,
             last_updated=reservation_statuses.last_updated,
             search_results=search_results.items,
@@ -176,7 +176,7 @@ def reservation_statuses_search_by_gps():
             leaflet=True,
         )
 
-    title = "現在地から近い新型コロナワクチン接種医療機関（3回目接種）の検索結果"
+    title = "現在地から近い新型コロナワクチン接種医療機関（追加接種（オミクロン対応ワクチン））の検索結果"
     current_latitude = escape(request.form["current_latitude"])
     current_longitude = escape(request.form["current_longitude"])
     try:
@@ -231,7 +231,7 @@ def first_reservation_statuses_search_by_gps():
 
         return render_template(
             "first_reservation_statuses.html",
-            title="コロナワクチンマップ（1・2回目接種）",
+            title="旭川市のコロナワクチンマップ（1・2回目接種）",
             gtag_id=Config.GTAG_ID,
             last_updated=first_reservation_statuses.last_updated,
             search_results=search_results.items,
@@ -297,7 +297,7 @@ def child_reservation_statuses_search_by_gps():
 
         return render_template(
             "child_reservation_statuses.html",
-            title="コロナワクチンマップ（5歳から11歳接種）",
+            title="旭川市のコロナワクチンマップ（5歳から11歳接種）",
             gtag_id=Config.GTAG_ID,
             last_updated=child_reservation_statuses.last_updated,
             search_results=search_results.items,
@@ -367,7 +367,7 @@ def reservation_status_area(area):
 
     return render_template(
         "reservation_status_area.html",
-        title=area + "の新型コロナワクチン接種医療機関（3回目接種）の検索結果",
+        title=area + "の新型コロナワクチン接種医療機関（追加接種（オミクロン対応ワクチン））の検索結果",
         gtag_id=Config.GTAG_ID,
         last_updated=reservation_statuses.last_updated,
         area=area,
@@ -393,7 +393,7 @@ def reservation_status_medical_institution(medical_institution):
 
     return render_template(
         "reservation_status_medical_institution.html",
-        title=medical_institution + "の新型コロナワクチン接種予約受付状況（3回目接種）",
+        title=medical_institution + "の新型コロナワクチン接種予約受付状況（追加接種（オミクロン対応ワクチン））",
         gtag_id=Config.GTAG_ID,
         last_updated=reservation_statuses.last_updated,
         medical_institution=medical_institution,
@@ -415,7 +415,7 @@ def first_reservation_statuses():
 
     return render_template(
         "first_reservation_statuses.html",
-        title="コロナワクチンマップ（1・2回目接種）",
+        title="旭川市のコロナワクチンマップ（1・2回目接種）",
         gtag_id=Config.GTAG_ID,
         last_updated=first_reservation_statuses.last_updated,
         search_results=search_results.items,
@@ -489,7 +489,7 @@ def child_reservation_statuses():
 
     return render_template(
         "child_reservation_statuses.html",
-        title="コロナワクチンマップ（5歳から11歳接種）",
+        title="旭川市のコロナワクチンマップ（5歳から11歳接種）",
         gtag_id=Config.GTAG_ID,
         last_updated=child_reservation_statuses.last_updated,
         search_results=search_results.items,

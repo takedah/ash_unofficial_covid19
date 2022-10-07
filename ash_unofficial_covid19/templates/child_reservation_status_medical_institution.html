@@ -19,6 +19,9 @@
             <table class="table table-bordered" id="results" data-length="{{ search_lengths|tojson }}">
               <tbody>
                 <tr>
+                  <th class="table-active text-nowrap">医療機関名</th><td>{{ medical_institution }}</td>
+                </tr>
+                <tr>
                   <th class="table-active text-nowrap">所在地</th><td>{{ search_result.address }}</td>
                 </tr>
                 <tr>

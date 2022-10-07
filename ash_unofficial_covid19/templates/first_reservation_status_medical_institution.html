@@ -11,7 +11,7 @@
     </button>
   </div>
   <div class="alert alert-info alert-dismissible fade show mt-3" role="alert">
-    <p class="mb-0">3回目接種の情報は<a class="alert-link" href="/reservation_statuses" title="コロナワクチンマップ（3回目）へ">コロナワクチンマップ（3回目接種）</a>をご利用ください。</p>
+    <p class="mb-0">追加接種（オミクロン対応ワクチン）の情報は<a class="alert-link" href="/reservation_statuses" title="コロナワクチンマップ（追加接種（オミクロン対応ワクチン））へ">コロナワクチンマップ（追加接種（オミクロン対応ワクチン））</a>をご利用ください。</p>
     <button type="button" class="close" data-dismiss="alert" aria-label="close">
       <span aria-hidden="true">&times;</span>
     </button>
@@ -24,6 +24,9 @@
             <h2 class="h5 card-title">医療機関の情報</h2>
             <table class="table table-bordered" id="results" data-length="{{ search_lengths|tojson }}">
               <tbody>
+                <tr>
+                  <th class="table-active text-nowrap">医療機関名</th><td>{{ medical_institution }}</td>
+                </tr>
                 <tr>
                   <th class="table-active text-nowrap">所在地</th><td>{{ search_result.address }}</td>
                 </tr>
@@ -105,7 +108,7 @@
     <div class="card-body">
       <section>
         <h2 class="h5 card-title">{{ medical_institution }}と同じ地区の医療機関（1・2回目接種）を探す</h2>
-        <p class="card-text"><a href="/first_reservation_status/area/{{ search_results[0].area_url }}" title="{{ search_results[0].area }}の新型コロナワクチン3回目接種医療機関一覧へ">{{ search_results[0].area }}の医療機関（1・2回目接種）一覧へ</a></p>
+        <p class="card-text"><a href="/first_reservation_status/area/{{ search_results[0].area_url }}" title="{{ search_results[0].area }}の新型コロナワクチン1・2回目接種医療機関一覧へ">{{ search_results[0].area }}の医療機関（1・2回目接種）一覧へ</a></p>
       </section>
     </div>
   </div>
