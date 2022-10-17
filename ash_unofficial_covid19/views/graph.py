@@ -168,7 +168,7 @@ class DailyTotalView(GraphView):
         day_x = [row[0] for row in self.__daily_total_data]
         day_y = [row[1] for row in self.__daily_total_data]
         ax.bar(day_x, day_y, color="#64B5F6")
-        ax.yaxis.set_major_locator(MultipleLocator(25))
+        ax.yaxis.set_major_locator(MultipleLocator(50))
         ax.xaxis.set_major_locator(mdates.MonthLocator())
         ax.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d"))
         ax.grid(axis="y", color="lightgray")
@@ -252,7 +252,7 @@ class MonthTotalView(GraphView):
         month_total_x = [row[0].strftime("%Y-%m") for row in month_total_data]
         month_total_y = [row[1] for row in month_total_data]
         ax.bar(month_total_x, month_total_y, facecolor="#64B5F6")
-        ax.yaxis.set_major_locator(MultipleLocator(1000))
+        ax.yaxis.set_major_locator(MultipleLocator(3000))
         ax.tick_params(labelsize=8)
         ax.tick_params(axis="x", rotation=45)
         fig.tight_layout()
@@ -455,7 +455,7 @@ class PerHundredThousandPopulationView(GraphView):
             color="lightgray",
             label="札幌市",
         )
-        ax.yaxis.set_major_locator(MultipleLocator(25))
+        ax.yaxis.set_major_locator(MultipleLocator(50))
         ax.grid(axis="y", color="lightgray")
         ax.tick_params(labelsize=8)
         ax.tick_params(axis="x", rotation=45)
