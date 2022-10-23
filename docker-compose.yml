@@ -9,6 +9,8 @@ services:
     volumes:
       - "./:/projects"
       - "./dockerfiles/tmp:/var/gunicorn"
+      - "/etc/passwd:/etc/passwd:ro"
+      - "/etc/group:/etc/group:ro"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
@@ -18,6 +20,7 @@ services:
       virtual_hub:
           aliases:
             - gunicorn
+    user: "${UID}:${GID}"
 
   web:
     container_name: web
