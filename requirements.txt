@@ -1,7 +1,7 @@
 BeautifulSoup4
 flask
 gunicorn
-psycopg2
+psycopg2-binary
 requests
 matplotlib
 pandas
@@ -14,3 +14,4 @@ types-requests
 types-python-dateutil
 pytest
 pytest-mock
+python-dotenv
