@@ -1,5 +1,9 @@
 FROM python:3.9.7
 
+RUN mkdir /var/gunicorn
+
+RUN chmod 777 /var/gunicorn
+
 ARG project_dir=/projects/
 
 ADD ./requirements.txt $project_dir
