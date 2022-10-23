@@ -15,7 +15,7 @@ from ash_unofficial_covid19.views.xml import AtomView, RssView
 
 @pytest.fixture()
 def setup():
-    # 3回目接種予約受付状況のセットアップ
+    # 追加接種（オミクロン対応ワクチン）予約受付状況のセットアップ
     test_data = [
         {
             "area": "西地区",
@@ -197,11 +197,11 @@ class TestRssView:
                     "title": "旭川市新型コロナウイルスまとめサイトについて",
                 },
                 {
-                    "description": "旭川市の新型コロナワクチン接種医療機関（3回目接種）の予約受付状況などの情報を、地図から探すことができます。",
+                    "description": "旭川市の新型コロナワクチン接種医療機関（追加接種（オミクロン対応ワクチン））の予約受付状況などの情報を、地図から探すことができます。",
                     "guid": "tag:ash-unofficial-covid19.herokuapp.com,2022-03-20:/reservation_statuses",
                     "link": "https://ash-unofficial-covid19.herokuapp.com/reservation_statuses",
                     "pub_date": "Sun, 20 Mar 2022 00:00:00 GMT",
-                    "title": "旭川市のコロナワクチンマップ（3回目接種）",
+                    "title": "旭川市のコロナワクチンマップ（追加接種（オミクロン対応ワクチン））",
                 },
                 {
                     "description": "旭川市の新型コロナワクチン接種医療機関（1・2回目接種）の予約受付状況などの情報を、地図から探すことができます。",
@@ -225,7 +225,7 @@ class TestRssView:
                     "title": "旭川市新型コロナウイルス感染症非公式オープンデータ",
                 },
                 {
-                    "description": "花咲町・末広・末広東・東鷹栖地区の新型コロナワクチン接種医療機関（3回目接種）の検索結果です。",
+                    "description": "花咲町・末広・末広東・東鷹栖地区の新型コロナワクチン接種医療機関（追加接種（オミクロン対応ワクチン））の検索結果です。",
                     "guid": "https://ash-unofficial-covid19.herokuapp.com/reservation_status/area/"
                     + "%E8%8A%B1%E5%92%B2%E7%94%BA%E3%83%BB%E6%9C%AB%E5%BA%83%E3%83%BB%"
                     + "E6%9C%AB%E5%BA%83%E6%9D%B1%E3%83%BB%E6%9D%B1%E9%B7%B9%E6%A0%96%E5%9C%B0%E5%8C%BA",
@@ -233,16 +233,16 @@ class TestRssView:
                     + "%E8%8A%B1%E5%92%B2%E7%94%BA%E3%83%BB%E6%9C%AB%E5%BA%83%E3%83%BB%"
                     + "E6%9C%AB%E5%BA%83%E6%9D%B1%E3%83%BB%E6%9D%B1%E9%B7%B9%E6%A0%96%E5%9C%B0%E5%8C%BA",
                     "pub_date": "Sun, 20 Mar 2022 00:00:00 GMT",
-                    "title": "花咲町・末広・末広東・東鷹栖地区の新型コロナワクチン接種医療機関（3回目接種）の検索結果",
+                    "title": "花咲町・末広・末広東・東鷹栖地区の新型コロナワクチン接種医療機関（追加接種（オミクロン対応ワクチン））の検索結果",
                 },
                 {
-                    "description": "西地区の新型コロナワクチン接種医療機関（3回目接種）の検索結果です。",
+                    "description": "西地区の新型コロナワクチン接種医療機関（追加接種（オミクロン対応ワクチン））の検索結果です。",
                     "guid": "https://ash-unofficial-covid19.herokuapp.com/reservation_status/area/"
                     + "%E8%A5%BF%E5%9C%B0%E5%8C%BA",
                     "link": "https://ash-unofficial-covid19.herokuapp.com/reservation_status/area/"
                     + "%E8%A5%BF%E5%9C%B0%E5%8C%BA",
                     "pub_date": "Sun, 20 Mar 2022 00:00:00 GMT",
-                    "title": "西地区の新型コロナワクチン接種医療機関（3回目接種）の検索結果",
+                    "title": "西地区の新型コロナワクチン接種医療機関（追加接種（オミクロン対応ワクチン））の検索結果",
                 },
                 {
                     "description": "各条１７～２６丁目・宮前・南地区の新型コロナワクチン接種医療機関（1・2回目接種）の検索結果です。",
@@ -285,16 +285,16 @@ class TestRssView:
                     "title": "西地区の新型コロナワクチン接種医療機関（5～11歳接種）の検索結果",
                 },
                 {
-                    "description": "旭川赤十字病院の新型コロナワクチン接種予約受付状況（3回目接種）です。",
+                    "description": "旭川赤十字病院の新型コロナワクチン接種予約受付状況（追加接種（オミクロン対応ワクチン））です。",
                     "guid": "https://ash-unofficial-covid19.herokuapp.com/reservation_status/medical_institution/"
                     + "%E6%97%AD%E5%B7%9D%E8%B5%A4%E5%8D%81%E5%AD%97%E7%97%85%E9%99%A2",
                     "link": "https://ash-unofficial-covid19.herokuapp.com/reservation_status/medical_institution/"
                     + "%E6%97%AD%E5%B7%9D%E8%B5%A4%E5%8D%81%E5%AD%97%E7%97%85%E9%99%A2",
                     "pub_date": "Sun, 20 Mar 2022 00:00:00 GMT",
-                    "title": "旭川赤十字病院の新型コロナワクチン接種予約受付状況（3回目接種）",
+                    "title": "旭川赤十字病院の新型コロナワクチン接種予約受付状況（追加接種（オミクロン対応ワクチン））",
                 },
                 {
-                    "description": "独立行政法人国立病院機構旭川医療センターの新型コロナワクチン接種予約受付状況（3回目接種）です。",
+                    "description": "独立行政法人国立病院機構旭川医療センターの新型コロナワクチン接種予約受付状況（追加接種（オミクロン対応ワクチン））です。",
                     "guid": "https://ash-unofficial-covid19.herokuapp.com/reservation_status/medical_institution/"
                     + "%E7%8B%AC%E7%AB%8B%E8%A1%8C%E6%94%BF%E6%B3%95%E4%BA%BA%E5%9B%BD%"
                     + "E7%AB%8B%E7%97%85%E9%99%A2%E6%A9%9F%E6%A7%8B%E6%97%AD%E5%B7%9D%E"
@@ -304,7 +304,7 @@ class TestRssView:
                     + "E7%AB%8B%E7%97%85%E9%99%A2%E6%A9%9F%E6%A7%8B%E6%97%AD%E5%B7%9D%E"
                     + "5%8C%BB%E7%99%82%E3%82%BB%E3%83%B3%E3%82%BF%E3%83%BC",
                     "pub_date": "Sun, 20 Mar 2022 00:00:00 GMT",
-                    "title": "独立行政法人国立病院機構旭川医療センターの新型コロナワクチン接種予約受付状況（3回目接種）",
+                    "title": "独立行政法人国立病院機構旭川医療センターの新型コロナワクチン接種予約受付状況（追加接種（オミクロン対応ワクチン））",
                 },
                 {
                     "description": "市立旭川病院の新型コロナワクチン接種予約受付状況（1・2回目接種）です。",
@@ -425,11 +425,11 @@ class TestAtomView:
                     "title": "旭川市新型コロナウイルスまとめサイトについて",
                 },
                 {
-                    "summary": "旭川市の新型コロナワクチン接種医療機関（3回目接種）の予約受付状況などの情報を、地図から探すことができます。",
+                    "summary": "旭川市の新型コロナワクチン接種医療機関（追加接種（オミクロン対応ワクチン））の予約受付状況などの情報を、地図から探すことができます。",
                     "id": "tag:ash-unofficial-covid19.herokuapp.com,2022-03-20:/reservation_statuses",
                     "link": "https://ash-unofficial-covid19.herokuapp.com/reservation_statuses",
                     "updated": "2022-03-20T00:00:00Z",
-                    "title": "旭川市のコロナワクチンマップ（3回目接種）",
+                    "title": "旭川市のコロナワクチンマップ（追加接種（オミクロン対応ワクチン））",
                 },
                 {
                     "summary": "旭川市の新型コロナワクチン接種医療機関（1・2回目接種）の予約受付状況などの情報を、地図から探すことができます。",
@@ -453,7 +453,7 @@ class TestAtomView:
                     "title": "旭川市新型コロナウイルス感染症非公式オープンデータ",
                 },
                 {
-                    "summary": "花咲町・末広・末広東・東鷹栖地区の新型コロナワクチン接種医療機関（3回目接種）の検索結果です。",
+                    "summary": "花咲町・末広・末広東・東鷹栖地区の新型コロナワクチン接種医療機関（追加接種（オミクロン対応ワクチン））の検索結果です。",
                     "id": "https://ash-unofficial-covid19.herokuapp.com/reservation_status/area/"
                     + "%E8%8A%B1%E5%92%B2%E7%94%BA%E3%83%BB%E6%9C%AB%E5%BA%83%E3%83%BB%"
                     + "E6%9C%AB%E5%BA%83%E6%9D%B1%E3%83%BB%E6%9D%B1%E9%B7%B9%E6%A0%96%E5%9C%B0%E5%8C%BA",
@@ -461,16 +461,16 @@ class TestAtomView:
                     + "%E8%8A%B1%E5%92%B2%E7%94%BA%E3%83%BB%E6%9C%AB%E5%BA%83%E3%83%BB%"
                     + "E6%9C%AB%E5%BA%83%E6%9D%B1%E3%83%BB%E6%9D%B1%E9%B7%B9%E6%A0%96%E5%9C%B0%E5%8C%BA",
                     "updated": "2022-03-20T00:00:00Z",
-                    "title": "花咲町・末広・末広東・東鷹栖地区の新型コロナワクチン接種医療機関（3回目接種）の検索結果",
+                    "title": "花咲町・末広・末広東・東鷹栖地区の新型コロナワクチン接種医療機関（追加接種（オミクロン対応ワクチン））の検索結果",
                 },
                 {
-                    "summary": "西地区の新型コロナワクチン接種医療機関（3回目接種）の検索結果です。",
+                    "summary": "西地区の新型コロナワクチン接種医療機関（追加接種（オミクロン対応ワクチン））の検索結果です。",
                     "id": "https://ash-unofficial-covid19.herokuapp.com/reservation_status/area/"
                     + "%E8%A5%BF%E5%9C%B0%E5%8C%BA",
                     "link": "https://ash-unofficial-covid19.herokuapp.com/reservation_status/area/"
                     + "%E8%A5%BF%E5%9C%B0%E5%8C%BA",
                     "updated": "2022-03-20T00:00:00Z",
-                    "title": "西地区の新型コロナワクチン接種医療機関（3回目接種）の検索結果",
+                    "title": "西地区の新型コロナワクチン接種医療機関（追加接種（オミクロン対応ワクチン））の検索結果",
                 },
                 {
                     "summary": "各条１７～２６丁目・宮前・南地区の新型コロナワクチン接種医療機関（1・2回目接種）の検索結果です。",
@@ -513,16 +513,16 @@ class TestAtomView:
                     "title": "西地区の新型コロナワクチン接種医療機関（5～11歳接種）の検索結果",
                 },
                 {
-                    "summary": "旭川赤十字病院の新型コロナワクチン接種予約受付状況（3回目接種）です。",
+                    "summary": "旭川赤十字病院の新型コロナワクチン接種予約受付状況（追加接種（オミクロン対応ワクチン））です。",
                     "id": "https://ash-unofficial-covid19.herokuapp.com/reservation_status/medical_institution/"
                     + "%E6%97%AD%E5%B7%9D%E8%B5%A4%E5%8D%81%E5%AD%97%E7%97%85%E9%99%A2",
                     "link": "https://ash-unofficial-covid19.herokuapp.com/reservation_status/medical_institution/"
                     + "%E6%97%AD%E5%B7%9D%E8%B5%A4%E5%8D%81%E5%AD%97%E7%97%85%E9%99%A2",
                     "updated": "2022-03-20T00:00:00Z",
-                    "title": "旭川赤十字病院の新型コロナワクチン接種予約受付状況（3回目接種）",
+                    "title": "旭川赤十字病院の新型コロナワクチン接種予約受付状況（追加接種（オミクロン対応ワクチン））",
                 },
                 {
-                    "summary": "独立行政法人国立病院機構旭川医療センターの新型コロナワクチン接種予約受付状況（3回目接種）です。",
+                    "summary": "独立行政法人国立病院機構旭川医療センターの新型コロナワクチン接種予約受付状況（追加接種（オミクロン対応ワクチン））です。",
                     "id": "https://ash-unofficial-covid19.herokuapp.com/reservation_status/medical_institution/"
                     + "%E7%8B%AC%E7%AB%8B%E8%A1%8C%E6%94%BF%E6%B3%95%E4%BA%BA%E5%9B%BD%"
                     + "E7%AB%8B%E7%97%85%E9%99%A2%E6%A9%9F%E6%A7%8B%E6%97%AD%E5%B7%9D%E"
@@ -532,7 +532,7 @@ class TestAtomView:
                     + "E7%AB%8B%E7%97%85%E9%99%A2%E6%A9%9F%E6%A7%8B%E6%97%AD%E5%B7%9D%E"
                     + "5%8C%BB%E7%99%82%E3%82%BB%E3%83%B3%E3%82%BF%E3%83%BC",
                     "updated": "2022-03-20T00:00:00Z",
-                    "title": "独立行政法人国立病院機構旭川医療センターの新型コロナワクチン接種予約受付状況（3回目接種）",
+                    "title": "独立行政法人国立病院機構旭川医療センターの新型コロナワクチン接種予約受付状況（追加接種（オミクロン対応ワクチン））",
                 },
                 {
                     "summary": "市立旭川病院の新型コロナワクチン接種予約受付状況（1・2回目接種）です。",
