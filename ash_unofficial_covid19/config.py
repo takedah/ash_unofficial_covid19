@@ -66,4 +66,4 @@ class Config:
     GTAG_ID = os.environ.get("GTAG_ID")
 
     # 公開ドメインの設定
-    MY_DOMAIN = "ash-unofficial-covid19.herokuapp.com"
+    MY_DOMAIN = "covid19.asahikawa-opendata.morori.jp"

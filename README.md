@@ -2,7 +2,7 @@
 
 ## Description
 
-[旭川市新型コロナウイルスまとめサイト](https://ash-unofficial-covid19.herokuapp.com/)
+[旭川市新型コロナウイルスまとめサイト](https://covid19.asahikawa-opendata.morori.jp/)
 
 北海道全体の新型コロナウイルス感染症の情報については、 [北海道新型コロナウイルスまとめサイト](https://stopcovid19.hokkaido.dev/) や [北海道オープンデータポータル](https://www.harp.lg.jp/opendata/) でCSV形式のテキストファイルやJSON形式のWeb APIといった再利用しやすい形式で取得できますが、旭川市単独のデータは [旭川市公式ホームページ](https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html) に掲載はあるものの、再利用しやすい形式とはなっていないのが現状です。
 
