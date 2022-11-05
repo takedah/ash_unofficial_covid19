@@ -34,3 +34,7 @@ body {
   background-color: transparent;
   font-size: 32px;
 }
+.bgx-primary {
+  color: #FFF;
+  background-color: #64B5F6;
+}
