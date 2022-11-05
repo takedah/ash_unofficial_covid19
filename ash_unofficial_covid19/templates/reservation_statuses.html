@@ -6,14 +6,12 @@
     <p class="mb-0">{{ last_updated }}にダウンロードしたデータを元に表示しています。最新の情報は<a class="alert-link"
         href="https://asahikawa-vaccine.jp/" title="旭川市 新型コロナワクチン接種特設サイト"
         target="_blank">旭川市 新型コロナワクチン接種特設サイト <i class="fas fa-external-link-alt"></i></a>を確認してください。</p>
-    <button type="button" class="close" data-dismiss="alert" aria-label="close">
-      <span aria-hidden="true">&times;</span>
-    </button>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
   </div>
   <div class="card mt-3">
     <div class="card-body">
       <section id="allMap">
-        <h2 class="h5 card-title">地図から探す</h2>
+        <h2 class="h5 card-title mb-3">地図から探す</h2>
         <p class="card-text">地図のポップアップのリンクから新型コロナワクチン追加接種（オミクロン対応ワクチン）医療機関の予約受付状況を確認できます。（地図の表示はあくまで目安ですので、正確な場所の情報は各医療機関のホームページ等でご確認ください。）</p>
         <table class="table table-borderless table-sm">
           <tbody>
@@ -40,7 +38,7 @@
   <div class="card mt-3">
     <div class="card-body">
       <section>
-        <h2 class="h5 card-title">現在地から近い医療機関を探す</h2>
+        <h2 class="h5 card-title mb-3">現在地から近い医療機関を探す</h2>
         <p class="card-text mb-2">位置情報を使用して、現在地から近い新型コロナワクチン追加接種（オミクロン対応ワクチン）医療機関の一覧を検索することができます。</p>
         <p id="gpsServiceStatus" class="none"></p>
         <div id="nudge">
@@ -61,9 +59,9 @@
   <div class="card mt-3">
     <div class="card-body">
       <section>
-        <h2 class="h5 card-title">地区から探す</h2>
+        <h2 class="h5 card-title mb-3">地区から探す</h2>
         <p class="card-text">以下のリンクから地区ごとの新型コロナワクチン追加接種（オミクロン対応ワクチン）医療機関の予約受付状況や地図を一覧で確認できます。</p>
-        <div class="list-group-flush">
+        <div class="list-group list-group-flush">
           {% for area in areas %}
           <a href="/reservation_status/area/{{ area["url"] }}" title="{{ area["name"] }}の新型コロナワクチン追加接種（オミクロン対応ワクチン）医療機関一覧へ" class="list-group-item list-group-item-action text-primary">{{ area["name"] }}</a>
           {% endfor %}
@@ -74,7 +72,7 @@
   <div class="card mt-3">
     <div class="card-body">
       <section>
-        <h2 class="h5 card-title">一覧から探す</h2>
+        <h2 class="h5 card-title mb-3">一覧から探す</h2>
         <p class="card-text">以下のリンクから新型コロナワクチン追加接種（オミクロン対応ワクチン）医療機関ごとの予約受付状況や地図を確認できます。</p>
         <p class="card-text d-block d-sm-none"><i class="far fa-hand-point-right"></i> 横にスクロールできます。</p>
         <div class="table-responsive">

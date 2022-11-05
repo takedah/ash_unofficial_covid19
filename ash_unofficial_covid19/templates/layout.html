@@ -14,7 +14,7 @@
     </script>
     {% endif %}
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="twitter:card" content="summary_large_image">
     <meta property="og:url" content="https://covid19.asahikawa-opendata.morori.jp/">
     <meta property="og:title" content="旭川市新型コロナウイルスまとめサイト">
@@ -23,7 +23,7 @@
     <title>{{ title }} | 旭川市新型コロナウイルスまとめサイト</title>
     <link rel="alternate" type="application/atom+xml" title="旭川市内感染状況の最新動向 | 旭川市新型コロナウイルスまとめサイト" href="/atom.xml">
     <link rel="alternate" type="application/rss+xml" title="旭川市内感染状況の最新動向 | 旭川市新型コロナウイルスまとめサイト" href="/rss.xml">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     {% if leaflet %}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="anonymous">
     <!-- Make sure you put this AFTER Leaflet's CSS -->
@@ -37,19 +37,21 @@
   </head>
   <body>
     <header>
-      <nav class="navbar navbar-expand-md fixed-top navbar-dark bg-dark">
-        <a class="navbar-brand" href="/"><img src="{{ url_for('static', filename='images/title_dark.png') }}" alt="STOP COVID-19 ASAHIKAWA 新型コロナウイルスまとめサイト" title="STOP COVID-19 ASAHIKAWA 新型コロナウイルスまとめサイト" width="180" height="40"></a>
-        <div class="dropdown show ml-auto mr-0">
-          <a class="btn btn-dark dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="fas fa-bars"></i>
-          </a>
-          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
-            <a href="/" title="旭川市新型コロナウイルス感染症状況の最新動向へ" class="dropdown-item">旭川市内感染状況の最新動向</a>
-            <a href="/about" title="旭川市新型コロナウイルスまとめサイトについてへ" class="dropdown-item">このサイトについて</a>
-            <a href="/reservation_statuses" title="旭川市コロナワクチンマップ（追加接種（オミクロン対応ワクチン））へ" class="dropdown-item">コロナワクチンマップ（追加接種（オミクロン対応ワクチン））</a>
-            <a href="/first_reservation_statuses" title="旭川市コロナワクチンマップ（1・2回目接種）へ" class="dropdown-item">コロナワクチンマップ（1・2回目接種）</a>
-            <a href="/child_reservation_statuses" title="旭川市コロナワクチンマップ（5歳から11歳接種）へ" class="dropdown-item">コロナワクチンマップ（5歳から11歳接種）</a>
-            <a href="/opendata" title="旭川市新型コロナウイルス感染症非公式オープンデータへ" class="dropdown-item">非公式オープンデータ</a>
+      <nav class="navbar fixed-top navbar-dark bgx-primary">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="/"><img src="{{ url_for('static', filename='images/title.png') }}" alt="STOP COVID-19 ASAHIKAWA 新型コロナウイルスまとめサイト" title="STOP COVID-19 ASAHIKAWA 新型コロナウイルスまとめサイト" width="180" height="40"></a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarToggler">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item"><a href="/" title="旭川市新型コロナウイルス感染症状況の最新動向へ" class="nav-link text-white">旭川市内感染状況の最新動向</a></li>
+              <li class="nav-item"><a href="/about" title="旭川市新型コロナウイルスまとめサイトについてへ" class="nav-link text-white">このサイトについて</a></li>
+              <li class="nav-item"><a href="/reservation_statuses" title="旭川市コロナワクチンマップ（追加接種（オミクロン対応ワクチン））へ" class="nav-link text-white">コロナワクチンマップ（追加接種（オミクロン対応ワクチン））</a></li>
+              <li class="nav-item"><a href="/first_reservation_statuses" title="旭川市コロナワクチンマップ（1・2回目接種）へ" class="nav-link text-white">コロナワクチンマップ（1・2回目接種）</a></li>
+              <li class="nav-item"><a href="/child_reservation_statuses" title="旭川市コロナワクチンマップ（5歳から11歳接種）へ" class="nav-link text-white">コロナワクチンマップ（5歳から11歳接種）</a></li>
+              <li class="nav-item"><a href="/opendata" title="旭川市新型コロナウイルス感染症非公式オープンデータへ" class="nav-link text-white">非公式オープンデータ</a></li>
+            </ul>
           </div>
         </div>
       </nav>
@@ -65,7 +67,7 @@
           <div class="col-md-3 order-md-1">
             <nav>
               <div class="list-group list-group-flush">
-                <a href="/" title="旭川市新型コロナウイルス感染症状況の最新動向へ" class="list-group-item list-group-item-action font-weight-bold text-primary"> 旭川市内感染状況の最新動向</a>
+                <a href="/" title="旭川市新型コロナウイルス感染症状況の最新動向へ" class="list-group-item list-group-item-action"> 旭川市内感染状況の最新動向</a>
                 <a href="/about" title="このサイトについてへ" class="list-group-item list-group-item-action">このサイトについて</a>
                 <a href="/reservation_statuses" title="旭川市コロナワクチンマップ（追加接種（オミクロン対応ワクチン））へ" class="list-group-item list-group-item-action">コロナワクチンマップ（追加接種（オミクロン対応ワクチン））</a>
                 <a href="/first_reservation_statuses" title="旭川市コロナワクチンマップ（1・2回目接種）へ" class="list-group-item list-group-item-action">コロナワクチンマップ（1・2回目接種）</a>
@@ -88,9 +90,7 @@
     </main>
     <footer class="footer">
     </footer>
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script async src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script async src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
     <script src="https://kit.fontawesome.com/af6896cda7.js" crossorigin="anonymous" async="async" defer="defer"></script>
     <script src="https://www.line-website.com/social-plugins/js/thirdparty/loader.min.js" async="async" defer="defer"></script>
   </body>

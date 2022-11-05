@@ -6,16 +6,14 @@
     <p class="mb-0">{{ last_updated }}にダウンロードしたデータを元に表示しています。最新の情報は<a class="alert-link"
         href="https://asahikawa-vaccine.jp/" title="旭川市 新型コロナワクチン接種特設サイト"
         target="_blank">旭川市 新型コロナワクチン接種特設サイト <i class="fas fa-external-link-alt"></i></a>を確認してください。</p>
-    <button type="button" class="close" data-dismiss="alert" aria-label="close">
-      <span aria-hidden="true">&times;</span>
-    </button>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
   </div>
   {% for search_result in search_results %}
     {% if loop.index == 1 %}
       <div class="card">
         <div class="card-body">
           <section>
-            <h2 class="h5 card-title">医療機関の情報</h2>
+            <h2 class="h5 card-title mb-3">医療機関の情報</h2>
             <table class="table table-bordered" id="results" data-length="{{ search_lengths|tojson }}">
               <tbody>
                 <tr>
@@ -36,7 +34,7 @@
     <div class="card mt-3">
       <div class="card-body">
         <section>
-          <h2 class="h5 card-title">予約受付状況（5歳から11歳接種）</h2>
+          <h2 class="h5 card-title mb-3">予約受付状況（5歳から11歳接種）</h2>
           <table class="table">
             <tbody>
               <tr id="order{{ loop.index }}" data-latitude="{{ search_result.latitude|tojson }}" data-longitude="{{ search_result.longitude|tojson }}" data-name="{{ search_result.medical_institution_name|safe }}" data-url="{{ search_result.medical_institution_name_url|safe }}" data-vaccine="{{ search_result.vaccine|safe }}" data-istargetnotfamily="{{ search_result.is_target_not_family|safe }}" data-status="{{ search_result.status|safe }}">
@@ -72,7 +70,7 @@
   <div class="card mt-3">
     <div class="card-body">
       <section id="medicalInstitutionMap">
-        <h2 class="h5 card-title">{{ medical_institution }}の地図</h2>
+        <h2 class="h5 card-title mb-3">{{ medical_institution }}の地図</h2>
         <p class="card-text">地図の表示は目安となっています。正確な場所の情報は各医療機関のホームページ等でご確認ください。</p>
         <div id="mapid" class="mb-3"></div>
         <p class="card-text small">医療機関の位置情報は、<a href="https://developer.yahoo.co.jp/webapi/map/"
@@ -90,7 +88,7 @@
   <div class="card mt-3">
     <div class="card-body">
       <section>
-        <h2 class="h5 card-title">{{ medical_institution }}と同じ地区の医療機関（5歳から11歳接種）を探す</h2>
+        <h2 class="h5 card-title mb-3">{{ medical_institution }}と同じ地区の医療機関（5歳から11歳接種）を探す</h2>
         <p class="card-text"><a href="/child_reservation_status/area/{{ search_results[0].area_url }}" title="{{ search_results[0].area }}の新型コロナワクチン5歳から11歳接種医療機関一覧へ">{{ search_results[0].area }}の医療機関（5歳から11歳接種）一覧へ</a></p>
       </section>
     </div>
@@ -98,7 +96,7 @@
   <div class="card mt-3">
     <div class="card-body">
       <section>
-        <h3 class="h5 card-title">他の地区から医療機関（5歳から11歳接種）を探す</h3>
+        <h3 class="h5 card-title mb-3">他の地区から医療機関（5歳から11歳接種）を探す</h3>
         <p class="card-text"><a href="/child_reservation_statuses" title="コロナワクチンマップ（5歳から11歳接種）へ">コロナワクチンマップ（5歳から11歳接種）へ</a></p>
       </section>
     </div>
