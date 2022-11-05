@@ -5,6 +5,7 @@
 @font-face {
   font-family: 'BIZ UDPGothic';
   src: url('/static/fonts/BIZUDPGothic-Regular.ttf') format('truetype');
+  font-display: swap;
 }
 body {
   padding-top: 88px;
