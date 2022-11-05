@@ -1,6 +1,13 @@
+/*
+ * "BIZ UDPGothic" is lisenced under the SIL Open Font License 1.1. (http://scripts.sil.org/OFL)
+ * https://fonts.google.com/specimen/BIZ+UDPGothic/about
+ */
+@font-face {
+  font-family: 'BIZ UDPGothic';
+  src: url('/static/fonts/BIZUDPGothic-Regular.ttf') format('truetype');
+}
 body {
   padding-top: 88px;
-  font-family: 'BIZ UDGothic', sans-serif;
   font-family: 'BIZ UDPGothic', sans-serif;
 }
 #mapid {

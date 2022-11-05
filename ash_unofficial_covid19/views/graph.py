@@ -300,7 +300,7 @@ class ByAgeView(GraphView):
 
         """
         font = FontProperties(
-            fname="./ash_unofficial_covid19/static/fonts/NotoSansCJKjp-Light.otf",
+            fname="./ash_unofficial_covid19/static/fonts/BIZUDPGothic-Regular.ttf",
             size=12,
         )
         if figsize:
@@ -426,7 +426,7 @@ class PerHundredThousandPopulationView(GraphView):
             graph_image (BytesIO): グラフの画像データ
 
         """
-        font_file = "./ash_unofficial_covid19/static/fonts/NotoSansCJKjp-Light.otf"
+        font_file = "./ash_unofficial_covid19/static/fonts/BIZUDPGothic-Regular.ttf"
         legend_font = FontProperties(fname=font_file, size=10)
         if figsize:
             fig = plt.figure(figsize=figsize)
@@ -535,7 +535,7 @@ class WeeklyPerAgeView(GraphView):
 
         """
         df = self.__aggregate_by_weeks_per_age.transpose()
-        font_file = "./ash_unofficial_covid19/static/fonts/NotoSansCJKjp-Light.otf"
+        font_file = "./ash_unofficial_covid19/static/fonts/BIZUDPGothic-Regular.ttf"
         legend_font = FontProperties(fname=font_file, size=10)
         if figsize:
             fig = plt.figure(figsize=figsize)
