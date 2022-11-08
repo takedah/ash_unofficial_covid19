@@ -28,6 +28,7 @@ def add_security_headers(response):
         + "img-src 'self' i.creativecommons.org licensebuttons.net "
         + "data: https:; "
         + "frame-src docs.google.com social-plugins.line.me;"
+        + "base-uri 'self';"
     )
     response.headers.add("Content-Security-Policy", csp)
     response.headers.add("X-Content-Type-Options", "nosniff")
