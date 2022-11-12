@@ -3,8 +3,8 @@
   <head>
     {% if gtag_id is not none %}
     <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id={{ gtag_id }}"></script>
-    <script nonce="Pbq-X7F-632oxHhPe6mzMC-LHYE">
+    <script defer src="https://www.googletagmanager.com/gtag/js?id={{ gtag_id }}"></script>
+    <script defer nonce="Pbq-X7F-632oxHhPe6mzMC-LHYE">
       window.dataLayer = window.dataLayer || [];
       function gtag() {
         dataLayer.push(arguments);
@@ -34,6 +34,8 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon-16x16.png') }}">
     <link rel="manifest" href="/site.webmanifest">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/add.css') }}">
+    <script defer src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    <script defer src="https://kit.fontawesome.com/af6896cda7.js" crossorigin="anonymous"></script>
   </head>
   <body>
     <header>
@@ -80,9 +82,6 @@
             <div class="d-flex flex-row justify-content-center mt-2">
               <div class="p-1"><a href="https://twitter.com/share?url=https://covid19.asahikawa-opendata.morori.jp/" target="_blank" rel="nofollow"><img src="{{ url_for('static', filename='images/Twittersocialicons-circle-blue.png') }}" alt="このサイトをTwitterでシェア" title="このサイトをTwitterでシェア" width="32" height="32"></a></div>
               <div class="p-1"><a href="http://www.facebook.com/share.php?u=https://covid19.asahikawa-opendata.morori.jp/" target="_blank" rel="nofollow"><img src="{{ url_for('static', filename='images/f_logo_RGB-Blue_58.png') }}" alt="このサイトをFacebookでシェア" title="このサイトをFacebookでシェア" width="32" height="32"></a></div>
-              <div class="p-1">
-                <div class="line-it-button" data-lang="ja" data-type="share-c" data-env="REAL" data-url="https://covid19.asahikawa-opendata.morori.jp/" data-color="default" data-size="small" data-count="false" data-ver="3" style="display: none;"></div>
-              </div>
             </div>
           </div>
         </div>
@@ -90,8 +89,5 @@
     </main>
     <footer class="footer">
     </footer>
-    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
-    <script src="https://kit.fontawesome.com/af6896cda7.js" crossorigin="anonymous" async="async" defer="defer"></script>
-    <script src="https://www.line-website.com/social-plugins/js/thirdparty/loader.min.js" async="async" defer="defer"></script>
   </body>
 </html>

@@ -20,14 +20,14 @@ def add_security_headers(response):
         + "unpkg.com "
         + "'unsafe-inline'; "
         + "script-src 'self' "
-        + "unpkg.com www.googletagmanager.com www.line-website.com "
+        + "unpkg.com www.googletagmanager.com "
         + "kit.fontawesome.com "
         + "'nonce-Pbq-X7F-632oxHhPe6mzMC-LHYE'; "
         + "connect-src www.google-analytics.com ka-f.fontawesome.com; "
         + "font-src 'self' ka-f.fontawesome.com; "
         + "img-src 'self' i.creativecommons.org licensebuttons.net "
         + "data: https:; "
-        + "frame-src docs.google.com social-plugins.line.me;"
+        + "frame-src docs.google.com; "
         + "base-uri 'self';"
     )
     response.headers.add("Content-Security-Policy", csp)
