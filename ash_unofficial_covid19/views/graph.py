@@ -311,10 +311,10 @@ class ByAgeView(GraphView):
         by_age_label = [row[0] for row in self.__by_age_data]
         by_age_x = [row[1] for row in self.__by_age_data]
         pie_colors = [
-            "#0031D8",
             "#0946F1",
+            "#4979F5",
             "#7096F8",
-            "#C5D7FB",
+            "#9DB7F9",
             "#FF5838",
             "#FFA28B",
             "#FFE7E6",
@@ -543,10 +543,10 @@ class WeeklyPerAgeView(GraphView):
             fig = plt.figure()
         ax = fig.add_subplot()
         colors = [
-            "#0031D8",
             "#0946F1",
+            "#4979F5",
             "#7096F8",
-            "#C5D7FB",
+            "#9DB7F9",
             "#FF5838",
             "#FFA28B",
             "#FFE7E6",
