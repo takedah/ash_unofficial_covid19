@@ -167,7 +167,7 @@ class DailyTotalView(GraphView):
         ax = fig.add_subplot()
         day_x = [row[0] for row in self.__daily_total_data]
         day_y = [row[1] for row in self.__daily_total_data]
-        ax.bar(day_x, day_y, color="#64B5F6")
+        ax.bar(day_x, day_y, color="#4979F5")
         ax.yaxis.set_major_locator(MultipleLocator(50))
         ax.xaxis.set_major_locator(mdates.MonthLocator())
         ax.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d"))
@@ -251,7 +251,7 @@ class MonthTotalView(GraphView):
         ax = fig.add_subplot()
         month_total_x = [row[0].strftime("%Y-%m") for row in month_total_data]
         month_total_y = [row[1] for row in month_total_data]
-        ax.bar(month_total_x, month_total_y, facecolor="#64B5F6")
+        ax.bar(month_total_x, month_total_y, facecolor="#4979F5")
         ax.yaxis.set_major_locator(MultipleLocator(3000))
         ax.tick_params(labelsize=8)
         ax.tick_params(axis="x", rotation=45)
@@ -300,7 +300,7 @@ class ByAgeView(GraphView):
 
         """
         font = FontProperties(
-            fname="./ash_unofficial_covid19/static/fonts/BIZUDPGothic-Regular.ttf",
+            fname="./ash_unofficial_covid19/static/fonts/NotoSansJP-Regular.otf",
             size=12,
         )
         if figsize:
@@ -311,16 +311,16 @@ class ByAgeView(GraphView):
         by_age_label = [row[0] for row in self.__by_age_data]
         by_age_x = [row[1] for row in self.__by_age_data]
         pie_colors = [
-            "#64B5F6",
-            "#FFF176",
-            "#81C784",
-            "#E57373",
-            "#BA68C8",
-            "#A1887F",
-            "#F06292",
-            "#E0E0E0",
-            "#AED581",
-            "#4DD0E1",
+            "#0031D8",
+            "#0946F1",
+            "#7096F8",
+            "#C5D7FB",
+            "#FF5838",
+            "#FFA28B",
+            "#FFE7E6",
+            "#F1F1F4",
+            "#D8D8DB",
+            "#949497",
         ]
         ax.pie(
             by_age_x,
@@ -426,7 +426,7 @@ class PerHundredThousandPopulationView(GraphView):
             graph_image (BytesIO): グラフの画像データ
 
         """
-        font_file = "./ash_unofficial_covid19/static/fonts/BIZUDPGothic-Regular.ttf"
+        font_file = "./ash_unofficial_covid19/static/fonts/NotoSansJP-Regular.otf"
         legend_font = FontProperties(fname=font_file, size=10)
         if figsize:
             fig = plt.figure(figsize=figsize)
@@ -440,7 +440,7 @@ class PerHundredThousandPopulationView(GraphView):
         ax.plot(
             per_hundred_thousand_population_x,
             per_hundred_thousand_population_y,
-            color="#64B5F6",
+            color="#4979F5",
             label="旭川市",
         )
         sapporo_per_hundred_thousand_population_x = [
@@ -452,7 +452,7 @@ class PerHundredThousandPopulationView(GraphView):
         ax.plot(
             sapporo_per_hundred_thousand_population_x,
             sapporo_per_hundred_thousand_population_y,
-            color="lightgray",
+            color="#949497",
             label="札幌市",
         )
         ax.yaxis.set_major_locator(MultipleLocator(50))
@@ -535,7 +535,7 @@ class WeeklyPerAgeView(GraphView):
 
         """
         df = self.__aggregate_by_weeks_per_age.transpose()
-        font_file = "./ash_unofficial_covid19/static/fonts/BIZUDPGothic-Regular.ttf"
+        font_file = "./ash_unofficial_covid19/static/fonts/NotoSansJP-Regular.otf"
         legend_font = FontProperties(fname=font_file, size=10)
         if figsize:
             fig = plt.figure(figsize=figsize)
@@ -543,17 +543,17 @@ class WeeklyPerAgeView(GraphView):
             fig = plt.figure()
         ax = fig.add_subplot()
         colors = [
-            "#64B5F6",
-            "#FFF176",
-            "#81C784",
-            "#E57373",
-            "#BA68C8",
-            "#A1887F",
-            "#F06292",
-            "#E0E0E0",
-            "#AED581",
-            "#4DD0E1",
-            "#1976D2",
+            "#0031D8",
+            "#0946F1",
+            "#7096F8",
+            "#C5D7FB",
+            "#FF5838",
+            "#FFA28B",
+            "#FFE7E6",
+            "#F1F1F4",
+            "#D8D8DB",
+            "#949497",
+            "#626264",
         ]
         cols = list(map(lambda x: x.strftime("%m-%d") + "~", df.columns.tolist()))
         for i in range(len(df)):

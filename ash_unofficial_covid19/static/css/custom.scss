@@ -1,0 +1,69 @@
+// Custom.scss
+// Option A: Include all of Bootstrap
+
+// Include any default variable overrides here (though functions won't be available)
+$gray-100: #F8F8FB;
+$gray-200: #F1F1F4;
+$gray-300: #E8E8EB;
+$gray-400: #D8D8DB;
+$gray-500: #B4B4B7;
+$gray-600: #949497;
+$gray-700: #757578;
+$gray-800: #626264;
+$gray-900: #414143;
+$black:    #1A1A1C;
+$blue:    #003EE5;
+$indigo:  #4979F5;
+$red:     #EC0000;
+$yellow:  #C16800;
+$green:   #259D63;
+
+// scss-docs-start import-stack
+// Configuration
+@import "../sass/bootstrap-5.2.2/scss/functions";
+@import "../sass/bootstrap-5.2.2/scss/variables";
+@import "../sass/bootstrap-5.2.2/scss/maps";
+@import "../sass/bootstrap-5.2.2/scss/mixins";
+@import "../sass/bootstrap-5.2.2/scss/utilities";
+
+// Layout & components
+@import "../sass/bootstrap-5.2.2/scss/root";
+@import "../sass/bootstrap-5.2.2/scss/reboot";
+@import "../sass/bootstrap-5.2.2/scss/type";
+@import "../sass/bootstrap-5.2.2/scss/images";
+@import "../sass/bootstrap-5.2.2/scss/containers";
+@import "../sass/bootstrap-5.2.2/scss/grid";
+@import "../sass/bootstrap-5.2.2/scss/tables";
+@import "../sass/bootstrap-5.2.2/scss/forms";
+@import "../sass/bootstrap-5.2.2/scss/buttons";
+@import "../sass/bootstrap-5.2.2/scss/transitions";
+@import "../sass/bootstrap-5.2.2/scss/dropdown";
+// @import "../sass/bootstrap-5.2.2/scss/button-group";
+@import "../sass/bootstrap-5.2.2/scss/nav";
+@import "../sass/bootstrap-5.2.2/scss/navbar";
+@import "../sass/bootstrap-5.2.2/scss/card";
+// @import "../sass/bootstrap-5.2.2/scss/accordion";
+// @import "../sass/bootstrap-5.2.2/scss/breadcrumb";
+// @import "../sass/bootstrap-5.2.2/scss/pagination";
+// @import "../sass/bootstrap-5.2.2/scss/badge";
+@import "../sass/bootstrap-5.2.2/scss/alert";
+// @import "../sass/bootstrap-5.2.2/scss/progress";
+@import "../sass/bootstrap-5.2.2/scss/list-group";
+@import "../sass/bootstrap-5.2.2/scss/close";
+// @import "../sass/bootstrap-5.2.2/scss/toasts";
+// @import "../sass/bootstrap-5.2.2/scss/modal";
+// @import "../sass/bootstrap-5.2.2/scss/tooltip";
+// @import "../sass/bootstrap-5.2.2/scss/popover";
+// @import "../sass/bootstrap-5.2.2/scss/carousel";
+// @import "../sass/bootstrap-5.2.2/scss/spinners";
+// @import "../sass/bootstrap-5.2.2/scss/offcanvas";
+// @import "../sass/bootstrap-5.2.2/scss/placeholders";
+
+// Helpers
+@import "../sass/bootstrap-5.2.2/scss/helpers";
+
+// Utilities
+@import "../sass/bootstrap-5.2.2/scss/utilities/api";
+// scss-docs-end import-stack
+
+// Then add additional custom code here

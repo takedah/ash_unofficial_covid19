@@ -27,7 +27,6 @@ def add_security_headers(response):
         + "font-src 'self' ka-f.fontawesome.com; "
         + "img-src 'self' i.creativecommons.org licensebuttons.net "
         + "data: https:; "
-        + "frame-src docs.google.com; "
         + "base-uri 'self';"
     )
     response.headers.add("Content-Security-Policy", csp)

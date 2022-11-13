@@ -3,13 +3,13 @@
  * https://fonts.google.com/specimen/BIZ+UDPGothic/about
  */
 @font-face {
-  font-family: 'BIZ UDPGothic';
-  src: url('/static/fonts/BIZUDPGothic-Regular.ttf') format('truetype');
+  font-family: 'Noto Sans JP';
+  src: url('/static/fonts/NotoSansJP-Regular.otf') format('truetype');
   font-display: swap;
 }
 body {
-  padding-top: 88px;
-  font-family: 'BIZ UDPGothic', sans-serif;
+  padding-top: 96px;
+  font-family: 'Noto Sans JP', sans-serif;
 }
 #mapid {
   height: 480px;
@@ -21,21 +21,20 @@ body {
   max-height: 420px;
 }
 .map_primary_icon {
-  color: #1976D2;
+  color: #003EE5;
   background-color: transparent;
   font-size: 32px;
 }
 .map_warning_icon {
-  color: #FBC02D;
+  color: #C16800;
   background-color: transparent;
   font-size: 32px;
 }
 .map_danger_icon {
-  color: #D32F2F;
+  color: #EC0000;
   background-color: transparent;
   font-size: 32px;
 }
-.bgx-primary {
-  color: #FFF;
-  background-color: #64B5F6;
+.leaflet-popup-content {
+  font-family: 'Noto Sans JP', sans-serif;
 }

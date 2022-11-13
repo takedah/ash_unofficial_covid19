@@ -39,20 +39,20 @@
   </head>
   <body>
     <header>
-      <nav class="navbar fixed-top navbar-dark bgx-primary">
+      <nav class="navbar fixed-top navbar-light bg-light">
         <div class="container-fluid">
-          <a class="navbar-brand" href="/"><img src="{{ url_for('static', filename='images/title.png') }}" alt="STOP COVID-19 ASAHIKAWA 新型コロナウイルスまとめサイト" title="STOP COVID-19 ASAHIKAWA 新型コロナウイルスまとめサイト" width="180" height="40"></a>
+          <a class="navbar-brand" href="/"><img src="{{ url_for('static', filename='images/title.png') }}" alt="STOP COVID-19 ASAHIKAWA 新型コロナウイルスまとめサイト" title="STOP COVID-19 ASAHIKAWA 新型コロナウイルスまとめサイト" width="214" height="48"></a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarToggler">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 small">
-              <li class="nav-item"><a href="/" title="旭川市新型コロナウイルス感染症状況の最新動向へ" class="nav-link text-white">旭川市内感染状況の最新動向</a></li>
-              <li class="nav-item"><a href="/about" title="旭川市新型コロナウイルスまとめサイトについてへ" class="nav-link text-white">このサイトについて</a></li>
-              <li class="nav-item"><a href="/reservation_statuses" title="旭川市コロナワクチンマップ（追加接種（オミクロン対応ワクチン））へ" class="nav-link text-white">コロナワクチンマップ（追加接種（オミクロン対応ワクチン））</a></li>
-              <li class="nav-item"><a href="/first_reservation_statuses" title="旭川市コロナワクチンマップ（1・2回目接種）へ" class="nav-link text-white">コロナワクチンマップ（1・2回目接種）</a></li>
-              <li class="nav-item"><a href="/child_reservation_statuses" title="旭川市コロナワクチンマップ（5歳から11歳接種）へ" class="nav-link text-white">コロナワクチンマップ（5歳から11歳接種）</a></li>
-              <li class="nav-item"><a href="/opendata" title="旭川市新型コロナウイルス感染症非公式オープンデータへ" class="nav-link text-white">非公式オープンデータ</a></li>
+              <li class="nav-item"><a href="/" title="旭川市新型コロナウイルス感染症状況の最新動向へ" class="nav-link">旭川市内感染状況の最新動向</a></li>
+              <li class="nav-item"><a href="/about" title="旭川市新型コロナウイルスまとめサイトについてへ" class="nav-link">このサイトについて</a></li>
+              <li class="nav-item"><a href="/reservation_statuses" title="旭川市コロナワクチンマップ（追加接種（オミクロン対応ワクチン））へ" class="nav-link">コロナワクチンマップ（追加接種（オミクロン対応ワクチン））</a></li>
+              <li class="nav-item"><a href="/first_reservation_statuses" title="旭川市コロナワクチンマップ（1・2回目接種）へ" class="nav-link">コロナワクチンマップ（1・2回目接種）</a></li>
+              <li class="nav-item"><a href="/child_reservation_statuses" title="旭川市コロナワクチンマップ（5歳から11歳接種）へ" class="nav-link">コロナワクチンマップ（5歳から11歳接種）</a></li>
+              <li class="nav-item"><a href="/opendata" title="旭川市新型コロナウイルス感染症非公式オープンデータへ" class="nav-link">非公式オープンデータ</a></li>
             </ul>
           </div>
         </div>
@@ -80,6 +80,7 @@
               </div>
             </nav>
             <div class="d-flex flex-row justify-content-center mt-2">
+              <div class="p-1"><a href="https://github.com/takedah/ash_unofficial_covid19" target="_blank" rel="nofollow"><img src="{{ url_for('static', filename='images/GitHub-Mark-32px.png') }}" alt="" title="Github" width="32" height="32"></a></div>
               <div class="p-1"><a href="https://twitter.com/share?url=https://covid19.asahikawa-opendata.morori.jp/" target="_blank" rel="nofollow"><img src="{{ url_for('static', filename='images/Twittersocialicons-circle-blue.png') }}" alt="このサイトをTwitterでシェア" title="このサイトをTwitterでシェア" width="32" height="32"></a></div>
               <div class="p-1"><a href="http://www.facebook.com/share.php?u=https://covid19.asahikawa-opendata.morori.jp/" target="_blank" rel="nofollow"><img src="{{ url_for('static', filename='images/f_logo_RGB-Blue_58.png') }}" alt="このサイトをFacebookでシェア" title="このサイトをFacebookでシェア" width="32" height="32"></a></div>
             </div>
