@@ -1,18 +1,6 @@
 <!doctype html>
 <html lang="ja">
   <head>
-    {% if gtag_id is not none %}
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script defer src="https://www.googletagmanager.com/gtag/js?id={{ gtag_id }}"></script>
-    <script defer nonce="Pbq-X7F-632oxHhPe6mzMC-LHYE">
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag('js', new Date());
-      gtag('config', '{{ gtag_id }}');
-    </script>
-    {% endif %}
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="twitter:card" content="summary_large_image">
@@ -36,6 +24,17 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/add.css') }}">
     <script defer src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
     <script defer src="https://kit.fontawesome.com/af6896cda7.js" crossorigin="anonymous"></script>
+    {% if gtag_id is not none %}
+    <script defer src="https://www.googletagmanager.com/gtag/js?id={{ gtag_id }}"></script>
+    <script defer nonce="Pbq-X7F-632oxHhPe6mzMC-LHYE">
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', '{{ gtag_id }}');
+    </script>
+    {% endif %}
   </head>
   <body>
     <header>
