@@ -22,8 +22,6 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon-16x16.png') }}">
     <link rel="manifest" href="/site.webmanifest">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/add.css') }}">
-    <script defer src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
-    <script defer src="https://kit.fontawesome.com/af6896cda7.js" crossorigin="anonymous"></script>
     {% if gtag_id is not none %}
     <script defer src="https://www.googletagmanager.com/gtag/js?id={{ gtag_id }}"></script>
     <script defer src="./gtag.js"></script>
@@ -82,5 +80,7 @@
     </main>
     <footer class="footer">
     </footer>
+    <script async src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    <script async src="https://kit.fontawesome.com/af6896cda7.js" crossorigin="anonymous"></script>
   </body>
 </html>
