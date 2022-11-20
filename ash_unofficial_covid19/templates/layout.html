@@ -26,14 +26,7 @@
     <script defer src="https://kit.fontawesome.com/af6896cda7.js" crossorigin="anonymous"></script>
     {% if gtag_id is not none %}
     <script defer src="https://www.googletagmanager.com/gtag/js?id={{ gtag_id }}"></script>
-    <script nonce="Pbq-X7F-632oxHhPe6mzMC-LHYE">
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag('js', new Date());
-      gtag('config', '{{ gtag_id }}');
-    </script>
+    <script defer src="./gtag.js"></script>
     {% endif %}
   </head>
   <body>

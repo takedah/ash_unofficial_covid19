@@ -26,8 +26,7 @@ def add_security_headers(response):
         + "'unsafe-inline'; "
         + "script-src 'self' "
         + "unpkg.com www.googletagmanager.com "
-        + "kit.fontawesome.com "
-        + "'nonce-Pbq-X7F-632oxHhPe6mzMC-LHYE'; "
+        + "kit.fontawesome.com; "
         + "connect-src www.google-analytics.com ka-f.fontawesome.com; "
         + "font-src 'self' ka-f.fontawesome.com; "
         + "img-src 'self' i.creativecommons.org licensebuttons.net "
@@ -704,6 +703,15 @@ def sitemap_xml():
 @app.route("/site.webmanifest")
 def site_webmanifest():
     return render_template("site.webmanifest"), 200, {"Content-Type": "application/json; charset=UTF-8"}
+
+
+@app.route("/gtag.js")
+def gtag():
+    return (
+        render_template("gtag.js", gtag_id=Config.GTAG_ID),
+        200,
+        {"Content-Type": "application/javascript; charset=UTF-8"},
+    )
 
 
 if __name__ == "__main__":
