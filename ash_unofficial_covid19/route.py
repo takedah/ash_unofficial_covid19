@@ -14,6 +14,8 @@ from .views.xml import AtomView, RssView
 mimetypes.add_type("image/webp", ".webp")
 mimetypes.add_type("font/otf", ".otf")
 mimetypes.add_type("font/woff2", ".woff2")
+mimetypes.add_type("text/css", ".css")
+mimetypes.add_type("application/javascript", ".js")
 app = Flask(__name__)
 
 
