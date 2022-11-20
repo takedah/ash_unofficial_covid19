@@ -11,6 +11,7 @@ from matplotlib import pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.font_manager import FontProperties
 from matplotlib.ticker import MultipleLocator
+from PIL import Image
 
 from ..errors import DatabaseConnectionError
 from ..services.patients_number import PatientsNumberService
@@ -96,6 +97,22 @@ class GraphView(metaclass=ABCMeta):
 
         return date_string + " (" + day_of_week_kanji + ") "
 
+    @staticmethod
+    def _png_to_webp(png_data: BytesIO) -> BytesIO:
+        """PNG形式のBytesIOをWebp形式に変換する。
+
+        Args:
+            png_data (BytesIO): PNG形式のBytesIOデータ
+
+        Returns:
+            webp_data (BytesIO): Webp形式のBytesIOデータ
+
+        """
+        image = Image.open(png_data)
+        webp_data = BytesIO()
+        image.save(webp_data, format="Webp")
+        return webp_data
+
 
 class DailyTotalView(GraphView):
     """日別累計患者数グラフ
@@ -176,12 +193,12 @@ class DailyTotalView(GraphView):
         ax.tick_params(axis="x", rotation=45)
         fig.tight_layout()
         canvas = FigureCanvasAgg(fig)
-        im = BytesIO()
-        canvas.print_png(im)
+        png_data = BytesIO()
+        canvas.print_png(png_data)
         plt.cla()
         plt.clf()
         plt.close()
-        return im
+        return self._png_to_webp(png_data)
 
 
 class MonthTotalView(GraphView):
@@ -257,12 +274,12 @@ class MonthTotalView(GraphView):
         ax.tick_params(axis="x", rotation=45)
         fig.tight_layout()
         canvas = FigureCanvasAgg(fig)
-        im = BytesIO()
-        canvas.print_png(im)
+        png_data = BytesIO()
+        canvas.print_png(png_data)
         plt.cla()
         plt.clf()
         plt.close()
-        return im
+        return self._png_to_webp(png_data)
 
 
 class ByAgeView(GraphView):
@@ -337,12 +354,12 @@ class ByAgeView(GraphView):
         )
         fig.tight_layout()
         canvas = FigureCanvasAgg(fig)
-        im = BytesIO()
-        canvas.print_png(im)
+        png_data = BytesIO()
+        canvas.print_png(png_data)
         plt.cla()
         plt.clf()
         plt.close()
-        return im
+        return self._png_to_webp(png_data)
 
 
 class PerHundredThousandPopulationView(GraphView):
@@ -462,12 +479,12 @@ class PerHundredThousandPopulationView(GraphView):
         ax.legend(prop=legend_font, loc=0)
         fig.tight_layout()
         canvas = FigureCanvasAgg(fig)
-        im = BytesIO()
-        canvas.print_png(im)
+        png_data = BytesIO()
+        canvas.print_png(png_data)
         plt.cla()
         plt.clf()
         plt.close()
-        return im
+        return self._png_to_webp(png_data)
 
     @staticmethod
     def _get_alert_level(per_hundred_thousand_population: float) -> str:
@@ -576,9 +593,9 @@ class WeeklyPerAgeView(GraphView):
         ax.legend(df.index.tolist(), prop=legend_font, loc=4)
         fig.tight_layout()
         canvas = FigureCanvasAgg(fig)
-        im = BytesIO()
-        canvas.print_png(im)
+        png_data = BytesIO()
+        canvas.print_png(png_data)
         plt.cla()
         plt.clf()
         plt.close()
-        return im
+        return self._png_to_webp(png_data)

@@ -24,6 +24,7 @@
 - opencv-python
 - opencv-python-headless
 - ghostscript
+- pillow
 - pytest
 - pytest-mock
 

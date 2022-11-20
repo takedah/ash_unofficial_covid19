@@ -1,4 +1,5 @@
 from datetime import date
+from pathlib import Path
 
 from .config import Config
 from .errors import DatabaseConnectionError, HTTPDownloadError, ScrapeError, ServiceError
@@ -12,6 +13,14 @@ from .services.patient import AsahikawaPatientService
 from .services.patients_number import PatientsNumberService
 from .services.press_release_link import PressReleaseLinkService
 from .services.sapporo_patients_number import SapporoPatientsNumberService
+from .views.graph import (
+    ByAgeView,
+    DailyTotalView,
+    GraphView,
+    MonthTotalView,
+    PerHundredThousandPopulationView,
+    WeeklyPerAgeView,
+)
 
 
 def _import_press_release_link(url: str, target_year: int) -> None:
@@ -219,5 +228,37 @@ def import_past_from_patients():
         return
 
 
+def _save_graph_images(graph_view: GraphView, file_name: str, twitter_card: bool = False) -> None:
+    """
+    グラフ画像データを公開ディレクトリに保存する。
+    """
+    if twitter_card:
+        graph_image = graph_view.get_graph_image(figsize=(6.0, 3.15))
+    else:
+        graph_image = graph_view.get_graph_image()
+    save_path = Path(__file__).resolve().parent.joinpath("static", "images", file_name)
+    with open(save_path, mode="wb") as f:
+        f.write(graph_image.getvalue())
+    return
+
+
+def create_graph_data() -> None:
+    """
+    トップページに表示するグラフ画像データを公開ディレクトリに保存する。
+    """
+    daily_total = DailyTotalView()
+    _save_graph_images(daily_total, "daily_total.webp")
+    by_age = ByAgeView()
+    _save_graph_images(by_age, "by_age.webp")
+    month_total = MonthTotalView()
+    _save_graph_images(month_total, "month_total.webp")
+    _save_graph_images(month_total, "month_total_for_card.webp", True)
+    per_hundred_thousand_population = PerHundredThousandPopulationView()
+    _save_graph_images(per_hundred_thousand_population, "per_hundred_thousand_population.webp")
+    weekly_per_age = WeeklyPerAgeView()
+    _save_graph_images(weekly_per_age, "weekly_per_age.webp")
+
+
 if __name__ == "__main__":
     import_latest()
+    create_graph_data()
