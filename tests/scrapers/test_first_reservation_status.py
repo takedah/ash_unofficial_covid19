@@ -21,7 +21,7 @@ def html_content():
 <th class="column-7">かかりつけ<br />
 </th><th class="column-8">かかりつけ<br />
 以外</th>
-<th class="column-9">その他</th><th class="column-10">備考</th>
+<th class="column-9">備考</th>
 </tr>
 </thead>
 <tbody class="row-hover">
@@ -35,8 +35,7 @@ def html_content():
 <td class="column-6">―</td>
 <td class="column-7">×</td>
 <td class="column-8">×</td>
-<td class="column-9">当院の患者IDをお持ちの方</td>
-<td class="column-10">当院ホームページをご確認ください</td>
+<td class="column-9">当院ホームページをご確認ください</td>
 </tr>
 <tr class="row-68 even">
 <td class="column-1">花咲町・末広・末広東・東鷹栖地区</td>
@@ -51,8 +50,7 @@ def html_content():
 <td class="column-6">18歳以上</td>
 <td class="column-7">○</td>
 <td class="column-8">×</td>
-<td class="column-9">―</td>
-<td class="column-10"></td>
+<td class="column-9"></td>
 </tr>
 </tbody>
 </table>
@@ -69,8 +67,7 @@ def html_content():
 <th class="column-7">かかりつけ<br />
 以外</th>
 <th class="column-8">市外可</th>
-<th class="column-9">その他</th>
-<th class="column-10">備考</th>
+<th class="column-9">備考</th>
 </tr>
 </thead>
 <tbody class="row-hover">
@@ -84,8 +81,7 @@ def html_content():
 <td class="column-6">―</td>
 <td class="column-7">―</td>
 <td class="column-8">―</td>
-<td class="column-9">―</td>
-<td class="column-10">病院に直接お問い合わせください。</td>
+<td class="column-9">病院に直接お問い合わせください。</td>
 </tr>
 <tr class="row-31 odd">
 <td class="column-1">各条１７～２６丁目・宮前・南地区</td><td class="column-2">森山病院<br />
@@ -97,8 +93,7 @@ def html_content():
 <td class="column-6">○</td>
 <td class="column-7">×</td>
 <td class="column-8">○</td>
-<td class="column-9"></td>
-<td class="column-10">月・水　14:00～15:00</td>
+<td class="column-9">月・水　14:00～15:00</td>
 </tr>
 </tbody>
 </table>

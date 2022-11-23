@@ -65,7 +65,7 @@ class ScrapeChildReservationStatus(ScrapeReservationStatus):
             is_target_family = family["available"]
             is_target_not_family = not_family["available"]
             is_target_suberb = suberb["available"]
-            memo = family["text"] + " " + not_family["text"] + " " + row[10]
+            memo = family["text"] + " " + not_family["text"] + " " + row[9]
             memo = memo.strip()
             status = row[4].replace("―", "")
             # 予約受付状況が空欄の場合、備考の値をセットする。
@@ -85,7 +85,7 @@ class ScrapeChildReservationStatus(ScrapeReservationStatus):
                 "is_target_family": is_target_family,
                 "is_target_not_family": is_target_not_family,
                 "is_target_suberb": is_target_suberb,
-                "target_other": row[9].replace("―", ""),
+                "target_other": "",
                 "memo": memo,
             }
             return status_data
