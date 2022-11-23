@@ -1,6 +1,6 @@
 import mimetypes
 
-from flask import Flask, abort, escape, g, make_response, render_template, request
+from flask import Flask, abort, escape, make_response, render_template, request
 
 from .config import Config
 from .errors import DataModelError
@@ -43,58 +43,47 @@ def add_security_headers(response):
 
 
 def get_patients_numbers():
-    g.patients_numbers = PatientsNumberView()
-    return g.patients_numbers
+    return PatientsNumberView()
 
 
 def get_reservation_statuses():
-    g.reservation_statuses = ReservationStatusView()
-    return g.reservation_statuses
+    return ReservationStatusView()
 
 
 def get_first_reservation_statuses():
-    g.first_reservation_statuses = FirstReservationStatusView()
-    return g.first_reservation_statuses
+    return FirstReservationStatusView()
 
 
 def get_child_reservation_statuses():
-    g.child_reservation_statuses = ChildReservationStatusView()
-    return g.child_reservation_statuses
+    return ChildReservationStatusView()
 
 
 def get_daily_total():
-    g.daily_total = DailyTotalView()
-    return g.daily_total
+    return DailyTotalView()
 
 
 def get_month_total():
-    g.month_total = MonthTotalView()
-    return g.month_total
+    return MonthTotalView()
 
 
 def get_by_age():
-    g.by_age = ByAgeView()
-    return g.by_age
+    return ByAgeView()
 
 
 def get_per_hundred_thousand_population():
-    g.per_hundred_thousand_population = PerHundredThousandPopulationView()
-    return g.per_hundred_thousand_population
+    return PerHundredThousandPopulationView()
 
 
 def get_weekly_per_age():
-    g.weekly_per_age = WeeklyPerAgeView()
-    return g.weekly_per_age
+    return WeeklyPerAgeView()
 
 
 def get_atom():
-    g.atom = AtomView()
-    return g.atom
+    return AtomView()
 
 
 def get_rss():
-    g.rss = RssView()
-    return g.rss
+    return RssView()
 
 
 @app.route("/")
