@@ -1,6 +1,8 @@
 import urllib.parse
+from datetime import datetime
 from typing import Optional
 
+from ..errors import DataModelError, ViewError
 from ..models.child_reservation_status import ChildReservationStatusLocationFactory
 from ..models.point import PointFactory
 from ..services.child_reservation_status import ChildReservationStatusService
@@ -20,12 +22,15 @@ class ChildReservationStatusView(View):
 
     def __init__(self):
         self.__service = ChildReservationStatusService()
-        last_updated = self.__service.get_last_updated()
-        self.__last_updated = last_updated.strftime("%Y/%m/%d %H:%M")
 
-    @property
-    def last_updated(self):
-        return self.__last_updated
+    def get_last_updated(self) -> datetime:
+        """テーブルの最終更新日を返す。
+
+        Returns:
+            last_updated (datetime.datetime): 最終更新日
+
+        """
+        return self.__service.get_last_updated()
 
     def find(
         self, medical_institution_name: Optional[str] = None, area: Optional[str] = None
@@ -120,6 +125,10 @@ class ChildReservationStatusView(View):
 
         """
         point_factory = PointFactory()
-        current_point = point_factory.create(longitude=longitude, latitude=latitude)
+        try:
+            current_point = point_factory.create(longitude=longitude, latitude=latitude)
+        except DataModelError as e:
+            raise ViewError(e.message)
+
         reservation_statuses = self.__service.find()
         return LocationService.get_near_locations(locations=reservation_statuses, current_point=current_point)

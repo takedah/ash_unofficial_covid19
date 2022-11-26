@@ -14,6 +14,34 @@ class TestPatientsNumberService:
     def service(self):
         test_data = [
             {
+                "publication_date": date(2020, 2, 23),
+                "age_under_10": 12,
+                "age_10s": 19,
+                "age_20s": 12,
+                "age_30s": 14,
+                "age_40s": 13,
+                "age_50s": 15,
+                "age_60s": 3,
+                "age_70s": 2,
+                "age_80s": 2,
+                "age_over_90": 0,
+                "investigating": 5,
+            },
+            {
+                "publication_date": date(2020, 2, 24),
+                "age_under_10": 18,
+                "age_10s": 19,
+                "age_20s": 14,
+                "age_30s": 14,
+                "age_40s": 16,
+                "age_50s": 8,
+                "age_60s": 5,
+                "age_70s": 2,
+                "age_80s": 1,
+                "age_over_90": 0,
+                "investigating": 5,
+            },
+            {
                 "publication_date": date(2022, 1, 28),
                 "age_under_10": 12,
                 "age_10s": 19,
@@ -61,9 +89,9 @@ class TestPatientsNumberService:
         # 全件検索
         results = service.find()
         first_result = results.items[0]
-        assert first_result.publication_date == date(2022, 1, 28)
+        assert first_result.publication_date == date(2020, 2, 23)
         second_result = results.items[1]
-        assert second_result.publication_date == date(2022, 1, 29)
+        assert second_result.publication_date == date(2020, 2, 24)
 
         # 報道発表日別検索
         results = service.find(date(2022, 1, 29))

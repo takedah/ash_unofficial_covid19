@@ -1,6 +1,6 @@
 import re
-from abc import ABCMeta, abstractmethod
-from datetime import date, datetime, timedelta, timezone
+from abc import abstractmethod
+from datetime import date
 from decimal import ROUND_HALF_UP, Decimal
 from io import BytesIO
 from typing import Optional
@@ -13,43 +13,17 @@ from matplotlib.font_manager import FontProperties
 from matplotlib.ticker import MultipleLocator
 from PIL import Image
 
-from ..errors import DatabaseConnectionError
 from ..services.patients_number import PatientsNumberService
-from ..services.press_release_link import PressReleaseLinkService
 from ..services.sapporo_patients_number import SapporoPatientsNumberService
+from ..views.view import View
 
 
-class GraphView(metaclass=ABCMeta):
+class GraphView(View):
     """グラフを出力するクラスの基底クラス"""
-
-    @abstractmethod
-    def get_graph_alt(self) -> str:
-        pass
 
     @abstractmethod
     def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
         pass
-
-    @staticmethod
-    def get_today() -> date:
-        """グラフの基準となる最新の報道発表日の日付を返す
-
-        Returns:
-            today (date): 最新の報道発表日の日付データ
-
-        """
-        now = datetime.now(timezone(timedelta(hours=+9), "JST"))
-        try:
-            press_release_link_service = PressReleaseLinkService()
-            today = press_release_link_service.get_latest_publication_date()
-        except DatabaseConnectionError:
-            # エラーが起きた場合現在日付を基準とする。
-            # このとき市の発表が16時になることが多いので16時より前なら前日を基準とする。
-            today = now.date()
-            if now.hour < 16:
-                today = today - relativedelta(days=1)
-
-        return today
 
     @staticmethod
     def format_date_style(target_date: date) -> str:
@@ -120,18 +94,24 @@ class DailyTotalView(GraphView):
     Attributes:
         today (str): 直近の日付
         most_recent (str): 直近の日別累積患者数
-        day_before_most_recent (str): 直近の前日の日別累積患者数
-        increase_from_day_before (str): 直近の前日からの増加数
-        reproduction_number (str): 実行再生産数の簡易推定値
+        seven_days_before_most_recent (str): 1週間前の日別累積患者数
+        increase_from_seven_days_before (str): 1週間前の前日からの増加数
+        graph_alt (str): グラフ画像の代替テキスト
 
     """
 
-    def __init__(self):
+    def __init__(self, today: date):
+        """
+        Args:
+            today (date): グラフを作成する基準日
+
+        """
         service = PatientsNumberService()
-        today = self.get_today()
-        self.__daily_total_data = service.get_aggregate_by_days(
-            from_date=today - relativedelta(months=3), to_date=today
-        )
+        from_date = today - relativedelta(months=3)
+        # 起算日が2020年2月23日の一週間より前の日付になってしまう場合は調整する。
+        if from_date < date(2020, 2, 16):
+            from_date = date(2020, 2, 16)
+        self.__daily_total_data = service.get_aggregate_by_days(from_date=from_date, to_date=today)
         self.__today = self.format_date_style(today)
         most_recent = self.__daily_total_data[-1][1]
         seven_days_before_most_recent = self.__daily_total_data[-8][1]
@@ -139,6 +119,9 @@ class DailyTotalView(GraphView):
         self.__most_recent = "{:,}".format(most_recent)
         self.__seven_days_before_most_recent = "{:,}".format(seven_days_before_most_recent)
         self.__increase_from_seven_days_before = "{:+,}".format(increase_from_seven_days_before)
+        self.__graph_alt = ", ".join(
+            ["{0} {1}人".format(row[0].strftime("%Y年%m月%d日"), row[1]) for row in self.__daily_total_data[-7:]]
+        )
 
     @property
     def today(self):
@@ -156,16 +139,9 @@ class DailyTotalView(GraphView):
     def increase_from_seven_days_before(self):
         return self.__increase_from_seven_days_before
 
-    def get_graph_alt(self) -> str:
-        """グラフの代替テキストを生成
-
-        Returns:
-            graph_alt (str): グラフの代替テキスト
-
-        """
-        return ", ".join(
-            ["{0} {1}人".format(row[0].strftime("%Y年%m月%d日"), row[1]) for row in self.__daily_total_data[-14:]]
-        )
+    @property
+    def graph_alt(self):
+        return self.__graph_alt
 
     def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
         """グラフの画像を生成
@@ -209,12 +185,17 @@ class MonthTotalView(GraphView):
         this_month (str): 今月の月別累積患者数
         last_month (str): 前月の日別累積患者数
         increase_from_last_month (str): 前月からの増加数
+        graph_alt (str): グラフ画像の代替テキスト
 
     """
 
-    def __init__(self):
+    def __init__(self, today: date):
+        """
+        Args:
+            today (date): グラフを作成する基準日
+
+        """
         service = PatientsNumberService()
-        today = self.get_today()
         self.__month_total_data = service.get_total_by_months(from_date=date(2020, 1, 1), to_date=today)
         self.__today = self.format_date_style(today)
         this_month = self.__month_total_data[-1][1]
@@ -223,6 +204,9 @@ class MonthTotalView(GraphView):
         self.__this_month = "{:,}".format(this_month)
         self.__last_month = "{:,}".format(last_month)
         self.__increase_from_last_month = "{:+,}".format(increase_from_last_month)
+        self.__graph_alt = ", ".join(
+            ["{0} {1}人".format(row[0].strftime("%Y年%m月"), row[1]) for row in self.__month_total_data[-6:]]
+        )
 
     @property
     def today(self):
@@ -240,14 +224,9 @@ class MonthTotalView(GraphView):
     def increase_from_last_month(self):
         return self.__increase_from_last_month
 
-    def get_graph_alt(self) -> str:
-        """グラフの代替テキストを生成
-
-        Returns:
-            graph_alt (str): グラフの代替テキスト
-
-        """
-        return ", ".join(["{0} {1}人".format(row[0].strftime("%Y年%m月"), row[1]) for row in self.__month_total_data])
+    @property
+    def graph_alt(self):
+        return self.__graph_alt
 
     def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
         """グラフの画像を生成
@@ -283,28 +262,30 @@ class MonthTotalView(GraphView):
 
 
 class ByAgeView(GraphView):
-    """年代別患者数割合グラフ"""
+    """年代別患者数割合グラフ
 
-    def __init__(self):
-        service = PatientsNumberService()
-        today = self.get_today()
-        self.__by_age_data = service.get_patients_number_by_age(
-            from_date=today - relativedelta(months=1, days=-1), to_date=today
-        )
-        self.__today = self.format_date_style(today)
+    Attributes:
+        graph_alt (str): グラフ画像の代替テキスト
 
-    @property
-    def today(self):
-        return self.__today
+    """
 
-    def get_graph_alt(self) -> str:
-        """グラフの代替テキストを生成
-
-        Returns:
-            graph_alt (str): グラフの代替テキスト
+    def __init__(self, today: date):
+        """
+        Args:
+            today (date): グラフを作成する基準日
 
         """
-        return ", ".join(["{0} {1}人".format(row[0], row[1]) for row in self.__by_age_data])
+        service = PatientsNumberService()
+        from_date = today - relativedelta(months=1, days=-1)
+        # 起算日が2020年2月23日より前の日付になってしまう場合は調整する。
+        if from_date < date(2020, 2, 23):
+            from_date = date(2020, 2, 23)
+        self.__by_age_data = service.get_patients_number_by_age(from_date=from_date, to_date=today)
+        self.__graph_alt = ", ".join(["{0} {1}人".format(row[0], row[1]) for row in self.__by_age_data])
+
+    @property
+    def graph_alt(self):
+        return self.__graph_alt
 
     def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
         """グラフの画像を生成
@@ -366,26 +347,32 @@ class PerHundredThousandPopulationView(GraphView):
     """1週間の人口10万人あたり患者数グラフ
 
     Attributes:
-        today (str): 直近の日付
         this_week (str): 今週の人口10万人あたり患者数
         last_week (str): 先週の人口10万人あたり患者数
         increase_from_last_week (str): 先週からの増加数
-        alert_level (str): 警戒レベル
-            1週間の人口10万人あたり患者数を基準とした北海道の警戒レベル
+        graph_alt (str): グラフ画像の代替テキスト
 
     """
 
-    def __init__(self):
+    def __init__(self, today: date):
+        """
+        Args:
+            today (date): グラフを作成する基準日
+
+        """
         service = PatientsNumberService()
         sapporo_service = SapporoPatientsNumberService()
-        today = self.get_today()
+        from_date = today - relativedelta(weeks=16, days=-1)
+        # 起算日が2020年2月23日の二週間前より前の日付になってしまう場合は調整する。
+        if from_date < date(2020, 2, 9):
+            from_date = date(2020, 2, 9)
         sapporo_last_update_date = sapporo_service.get_last_update_date()
         self.__per_hundred_thousand_population_data = service.get_per_hundred_thousand_population_per_week(
-            from_date=today - relativedelta(weeks=16, days=-1),
+            from_date=from_date,
             to_date=today,
         )
         sapporo_per_hundred_thousand_population_data = sapporo_service.get_per_hundred_thousand_population_per_week(
-            from_date=today - relativedelta(weeks=16, days=-1),
+            from_date=from_date,
             to_date=sapporo_last_update_date,
         )
         if sapporo_last_update_date < today:
@@ -397,11 +384,15 @@ class PerHundredThousandPopulationView(GraphView):
         increase_from_last_week = float(
             Decimal(str(this_week - last_week)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
         )
-        alert_level = self._get_alert_level(this_week)
         self.__this_week = "{:,}".format(this_week)
         self.__last_week = "{:,}".format(last_week)
         self.__increase_from_last_week = "{:+,}".format(increase_from_last_week)
-        self.__alert_level = alert_level
+        self.__graph_alt = ", ".join(
+            [
+                "{0} {1}人".format(row[0].strftime("%Y年%m月%d日"), row[1])
+                for row in self.__per_hundred_thousand_population_data
+            ]
+        )
 
     @property
     def this_week(self):
@@ -416,22 +407,8 @@ class PerHundredThousandPopulationView(GraphView):
         return self.__increase_from_last_week
 
     @property
-    def alert_level(self):
-        return self.__alert_level
-
-    def get_graph_alt(self) -> str:
-        """グラフの代替テキストを生成
-
-        Returns:
-            graph_alt (str): グラフの代替テキスト
-
-        """
-        return ", ".join(
-            [
-                "{0} {1}人".format(row[0].strftime("%Y年%m月%d日"), row[1])
-                for row in self.__per_hundred_thousand_population_data
-            ]
-        )
+    def graph_alt(self):
+        return self.__graph_alt
 
     def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
         """グラフの画像を生成
@@ -486,44 +463,40 @@ class PerHundredThousandPopulationView(GraphView):
         plt.close()
         return self._png_to_webp(png_data)
 
-    @staticmethod
-    def _get_alert_level(per_hundred_thousand_population: float) -> str:
-        """北海道の警戒ステージレベルを返す
-
-        Args:
-            per_hundred_thousand_population (float): 1週間の人口10万人あたり新規陽性患者数
-
-        Returns:
-            alert_level (str): 北海道の警戒ステージレベル
-
-        """
-        if per_hundred_thousand_population >= 15:
-            return "警戒を強化すべきレベル"
-        else:
-            return ""
-
 
 class WeeklyPerAgeView(GraphView):
-    """1週間ごとの年代別新規陽性患者数グラフ"""
+    """1週間ごとの年代別新規陽性患者数グラフ
 
-    def __init__(self):
+    Attributes:
+        graph_alt (str): グラフ画像の代替テキスト
+
+    """
+
+    def __init__(self, today: date):
+        """
+        Args:
+            today (date): グラフを作成する基準日
+
+        """
         service = PatientsNumberService()
-        today = self.get_today()
         from_date = today - relativedelta(weeks=4, days=-1)
+        # 起算日が2020年2月23日より前の日付になってしまう場合は調整する。
+        if from_date < date(2020, 2, 23):
+            from_date = date(2020, 2, 23)
         df = service.get_aggregate_by_weeks_per_age(from_date=from_date, to_date=today)
         self.__aggregate_by_weeks_per_age = df
-        self.__today = self.format_date_style(today)
         self.__from_date = self.format_date_style(from_date)
-
-    @property
-    def today(self):
-        return self.__today
+        self.__graph_alt = self._get_graph_alt()
 
     @property
     def from_date(self):
         return self.__from_date
 
-    def get_graph_alt(self) -> str:
+    @property
+    def graph_alt(self):
+        return self.__graph_alt
+
+    def _get_graph_alt(self) -> str:
         """グラフの代替テキストを生成
 
         Returns:

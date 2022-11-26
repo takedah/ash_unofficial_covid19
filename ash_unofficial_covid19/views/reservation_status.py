@@ -1,6 +1,8 @@
 import urllib.parse
+from datetime import datetime
 from typing import Optional
 
+from ..errors import DataModelError, ViewError
 from ..models.point import PointFactory
 from ..models.reservation_status import ReservationStatusLocationFactory
 from ..services.location import LocationService
@@ -13,19 +15,18 @@ class ReservationStatusView(View):
 
     旭川市新型コロナワクチン接種医療機関予約受付状況データをFlaskへ渡すデータにする
 
-    Attributes:
-        last_updated (str): 最終更新日の文字列
-
     """
 
     def __init__(self):
         self.__service = ReservationStatusService()
-        last_updated = self.__service.get_last_updated()
-        self.__last_updated = last_updated.strftime("%Y/%m/%d %H:%M")
 
-    @property
-    def last_updated(self):
-        return self.__last_updated
+    def get_last_updated(self) -> datetime:
+        """
+        Returns:
+            last_updated (datetime.datetime): 最終更新日
+
+        """
+        return self.__service.get_last_updated()
 
     def find(
         self, medical_institution_name: Optional[str] = None, area: Optional[str] = None
@@ -120,6 +121,10 @@ class ReservationStatusView(View):
 
         """
         point_factory = PointFactory()
-        current_point = point_factory.create(longitude=longitude, latitude=latitude)
+        try:
+            current_point = point_factory.create(longitude=longitude, latitude=latitude)
+        except DataModelError as e:
+            raise ViewError(e.message)
+
         reservation_statuses = self.__service.find()
         return LocationService.get_near_locations(locations=reservation_statuses, current_point=current_point)

@@ -168,7 +168,7 @@ class TestRssView:
             "get_last_updated",
             return_value=datetime(2022, 3, 20, 0, 0, tzinfo=timezone.utc),
         )
-        rss = RssView()
+        rss = RssView(date(2022, 1, 29))
         expect = {
             "title": "旭川市新型コロナウイルスまとめサイト",
             "link": "https://covid19.asahikawa-opendata.morori.jp/",
@@ -396,7 +396,7 @@ class TestAtomView:
             "get_last_updated",
             return_value=datetime(2022, 3, 20, 0, 0, tzinfo=timezone.utc),
         )
-        atom = AtomView()
+        atom = AtomView(date(2022, 1, 29))
         expect = {
             "id": "https://covid19.asahikawa-opendata.morori.jp/",
             "title": "旭川市新型コロナウイルスまとめサイト",

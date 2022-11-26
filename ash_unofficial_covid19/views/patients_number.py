@@ -1,10 +1,6 @@
-from datetime import date, datetime, timedelta, timezone
+from datetime import date
 
-from dateutil.relativedelta import relativedelta
-
-from ..errors import DatabaseConnectionError
 from ..services.patients_number import PatientsNumberService
-from ..services.press_release_link import PressReleaseLinkService
 from ..views.view import View
 
 
@@ -14,12 +10,19 @@ class PatientsNumberView(View):
     旭川市新型コロナウイルス感染症陽性患者数データをFlaskへ渡すデータにする
 
     Attributes:
+        today (date): データを作成する基準日
         last_updated (str): 最終更新日の文字列
 
     """
 
-    def __init__(self):
+    def __init__(self, today: date):
+        """
+        Args:
+            today (date): データを作成する基準日
+
+        """
         self.__service = PatientsNumberService()
+        self.__today = today
         last_updated = self.__service.get_last_updated()
         self.__last_updated = last_updated.strftime("%Y/%m/%d %H:%M")
 
@@ -27,41 +30,15 @@ class PatientsNumberView(View):
     def last_updated(self):
         return self.__last_updated
 
-    @staticmethod
-    def get_today() -> date:
-        """グラフの基準となる最新の報道発表日の日付を返す
-
-        Returns:
-            today (date): 最新の報道発表日の日付データ
-
-        """
-        now = datetime.now(timezone(timedelta(hours=+9), "JST"))
-        try:
-            press_release_link_service = PressReleaseLinkService()
-            today = press_release_link_service.get_latest_publication_date()
-        except DatabaseConnectionError:
-            # エラーが起きた場合現在日付を基準とする。
-            # このとき市の発表が16時になることが多いので16時より前なら前日を基準とする。
-            today = now.date()
-            if now.hour < 16:
-                today = today - relativedelta(days=1)
-
-        return today
-
     def get_daily_total_csv(self) -> str:
         """陽性患者日計CSVファイルの文字列データを返す
-
-        Args:
-            from_date (obj:`date`): 集計の始期
-            to_date (obj:`date`): 集計の終期
 
         Returns:
             csv_data (str): 陽性患者日計CSVファイルの文字列データ
 
         """
         from_date = date(2020, 2, 23)
-        to_date = self.get_today()
-        csv_data = self.__service.get_aggregate_by_days(from_date=from_date, to_date=to_date)
+        csv_data = self.__service.get_aggregate_by_days(from_date=from_date, to_date=self.__today)
         csv_data.insert(
             0,
             [
@@ -74,34 +51,24 @@ class PatientsNumberView(View):
     def get_daily_total_json(self) -> str:
         """陽性患者日計JSONファイルの文字列データを返す
 
-        Args:
-            from_date (obj:`date`): 集計の始期
-            to_date (obj:`date`): 集計の終期
-
         Returns:
             json_data (str): 陽性患者日計JSONファイルの文字列データ
 
         """
         from_date = date(2020, 2, 23)
-        to_date = self.get_today()
-        aggregate_by_days = self.__service.get_aggregate_by_days(from_date=from_date, to_date=to_date)
+        aggregate_by_days = self.__service.get_aggregate_by_days(from_date=from_date, to_date=self.__today)
         json_data = dict((d.strftime("%Y-%m-%d"), n) for d, n in aggregate_by_days)
         return self.dict_to_json(json_data)
 
     def get_daily_total_per_age_csv(self) -> str:
         """陽性患者年代別日計CSVファイルの文字列データを返す
 
-        Args:
-            from_date (obj:`date`): 集計の始期
-            to_date (obj:`date`): 集計の終期
-
         Returns:
             json_data (str): 日別年代別陽性患者数JSONファイルの文字列データ
 
         """
         from_date = date(2020, 2, 23)
-        to_date = self.get_today()
-        csv_data = self.__service.get_lists(from_date=from_date, to_date=to_date)
+        csv_data = self.__service.get_lists(from_date=from_date, to_date=self.__today)
         csv_data.insert(
             0,
             ["公表日", "10歳未満", "10代", "20代", "30代", "40代", "50代", "60代", "70代", "80代", "90歳以上", "調査中等"],
@@ -111,15 +78,10 @@ class PatientsNumberView(View):
     def get_daily_total_per_age_json(self) -> str:
         """陽性患者年代別日計JSONファイルの文字列データを返す
 
-        Args:
-            from_date (obj:`date`): 集計の始期
-            to_date (obj:`date`): 集計の終期
-
         Returns:
             json_data (str): 日別年代別陽性患者数JSONファイルの文字列データ
 
         """
         from_date = date(2020, 2, 23)
-        to_date = self.get_today()
-        json_data = self.__service.get_dicts(from_date=from_date, to_date=to_date)
+        json_data = self.__service.get_dicts(from_date=from_date, to_date=self.__today)
         return self.dict_to_json(json_data)

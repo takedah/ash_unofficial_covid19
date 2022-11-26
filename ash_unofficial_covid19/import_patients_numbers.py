@@ -21,6 +21,7 @@ from .views.graph import (
     PerHundredThousandPopulationView,
     WeeklyPerAgeView,
 )
+from .views.press_release import PressReleaseView
 
 
 def _import_press_release_link(url: str, target_year: int) -> None:
@@ -246,16 +247,18 @@ def create_graph_data() -> None:
     """
     トップページに表示するグラフ画像データを公開ディレクトリに保存する。
     """
-    daily_total = DailyTotalView()
+    press_release = PressReleaseView()
+    today = press_release.latest_date
+    daily_total = DailyTotalView(today)
     _save_graph_images(daily_total, "daily_total.webp")
-    by_age = ByAgeView()
+    by_age = ByAgeView(today)
     _save_graph_images(by_age, "by_age.webp")
-    month_total = MonthTotalView()
+    month_total = MonthTotalView(today)
     _save_graph_images(month_total, "month_total.webp")
     _save_graph_images(month_total, "month_total_for_card.webp", True)
-    per_hundred_thousand_population = PerHundredThousandPopulationView()
+    per_hundred_thousand_population = PerHundredThousandPopulationView(today)
     _save_graph_images(per_hundred_thousand_population, "per_hundred_thousand_population.webp")
-    weekly_per_age = WeeklyPerAgeView()
+    weekly_per_age = WeeklyPerAgeView(today)
     _save_graph_images(weekly_per_age, "weekly_per_age.webp")
 
 

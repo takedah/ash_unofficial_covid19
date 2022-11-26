@@ -1,22 +1,20 @@
 from datetime import date, datetime, time, timezone
-from decimal import ROUND_HALF_UP, Decimal
-
-from dateutil.relativedelta import relativedelta
 
 from ..config import Config
-from ..services.child_reservation_status import ChildReservationStatusService
-from ..services.first_reservation_status import FirstReservationStatusService
-from ..services.patients_number import PatientsNumberService
-from ..services.press_release_link import PressReleaseLinkService
-from ..services.reservation_status import ReservationStatusService
 from ..views.child_reservation_status import ChildReservationStatusView
 from ..views.first_reservation_status import FirstReservationStatusView
+from ..views.graph import DailyTotalView, PerHundredThousandPopulationView
 from ..views.reservation_status import ReservationStatusView
+from ..views.view import View
 
 
-class XmlView:
-    def __init__(self):
-        today = self._get_today()
+class XmlView(View):
+    def __init__(self, today: date):
+        """
+        Args:
+            today (date): グラフを作成する基準日
+
+        """
         self.__today = today
         last_modified = self._get_last_modified()
         self.__last_modified = last_modified
@@ -34,10 +32,6 @@ class XmlView:
         self.__first_reservation_status_feed = self._get_first_reservation_status_feed()
         self.__child_reservation_status_feed = self._get_child_reservation_status_feed()
         self.__opendata_feed = self._get_opendata_feed()
-
-    @property
-    def today(self):
-        return self.__today
 
     @property
     def last_modified(self):
@@ -96,16 +90,6 @@ class XmlView:
         last_modified = self._get_last_modified()
         return last_modified.astimezone(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S GMT")
 
-    def _get_today(self) -> date:
-        """グラフの基準となる最新の報道発表日の日付を返す
-
-        Returns:
-            today (date): 最新の報道発表日の日付データ
-
-        """
-        press_release_link_service = PressReleaseLinkService()
-        return press_release_link_service.get_latest_publication_date()
-
     def _get_last_modified(self) -> datetime:
         """最新の報道発表日を返す
 
@@ -115,7 +99,7 @@ class XmlView:
             last_modified (datetime): 最終更新日の文字列
 
         """
-        last_modified_date = self._get_today()
+        last_modified_date = self.__today
         # 時刻は16時固定とするが、UTCとしたいので7時とする
         last_modified_time = time(7, 0, 0, tzinfo=timezone.utc)
         last_modified = datetime.combine(last_modified_date, last_modified_time)
@@ -129,38 +113,29 @@ class XmlView:
             feed_data (dict): トップページのFeed用データ
 
         """
-        title = self.today.strftime("%Y/%m/%d (%a)") + " の旭川市内感染状況の最新動向"
+        title = self.__today.strftime("%Y/%m/%d (%a)") + " の旭川市内感染状況の最新動向"
         link = "https://" + self.my_domain + "/"
-        last_week = self.today - relativedelta(days=7)
-        patients_number_service = PatientsNumberService()
-        daily_total_data = patients_number_service.get_aggregate_by_days(from_date=last_week, to_date=self.today)
-        most_recent = daily_total_data[-1][1]
-        seven_days_before_most_recent = daily_total_data[-8][1]
-        increase_from_seven_days_before = most_recent - seven_days_before_most_recent
-        week_before_last = self.today - relativedelta(weeks=2, days=-1)
-        per_hundred_thousand_population_data = patients_number_service.get_per_hundred_thousand_population_per_week(
-            from_date=week_before_last, to_date=self.today
-        )
-        this_week_per = per_hundred_thousand_population_data[-1][1]
-        last_week_per = per_hundred_thousand_population_data[-2][1]
-        increase_from_last_week_per = float(
-            Decimal(str(this_week_per - last_week_per)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-        )
+        daily_total = DailyTotalView(self.__today)
+        most_recent = daily_total.most_recent
+        increase_from_seven_days_before = daily_total.increase_from_seven_days_before
+        per_hundred_thousand_population = PerHundredThousandPopulationView(self.__today)
+        this_week = per_hundred_thousand_population.this_week
+        increase_from_last_week = per_hundred_thousand_population.increase_from_last_week
         description = (
-            self.today.strftime("%Y/%m/%d (%a)")
+            self.__today.strftime("%Y/%m/%d (%a)")
             + " の旭川市の新型コロナ新規感染者数は"
-            + "{:,}".format(most_recent)
+            + most_recent
             + "人で、先週の同じ曜日から"
-            + "{:+,}".format(increase_from_seven_days_before)
+            + increase_from_seven_days_before
             + "人でした。"
             + "直近1週間の人口10万人あたりの新規感染者数は"
-            + "{:,}".format(this_week_per)
+            + this_week
             + "人で、先週から"
-            + "{:+,}".format(increase_from_last_week_per)
+            + increase_from_last_week
             + "人となっています。"
         )
         pub_date = self.last_modified
-        guid = "tag:" + self.my_domain + "," + self.today.strftime("%Y-%m-%d") + ":/"
+        guid = "tag:" + self.my_domain + "," + self.__today.strftime("%Y-%m-%d") + ":/"
         return {
             "title": title,
             "link": link,
@@ -199,8 +174,8 @@ class XmlView:
         title = "旭川市のコロナワクチンマップ（追加接種（オミクロン対応ワクチン））"
         link = "https://" + self.my_domain + "/reservation_statuses"
         description = "旭川市の新型コロナワクチン接種医療機関（追加接種（オミクロン対応ワクチン））の予約受付状況などの情報を、地図から探すことができます。"
-        service = ReservationStatusService()
-        pub_date = service.get_last_updated()
+        view = ReservationStatusView()
+        pub_date = view.get_last_updated()
         pub_date = pub_date.astimezone(timezone.utc)
         guid = "tag:" + self.my_domain + "," + pub_date.strftime("%Y-%m-%d") + ":/reservation_statuses"
         return {
@@ -221,8 +196,8 @@ class XmlView:
         title = "旭川市のコロナワクチンマップ（1・2回目接種）"
         link = "https://" + self.my_domain + "/first_reservation_statuses"
         description = "旭川市の新型コロナワクチン接種医療機関（1・2回目接種）の予約受付状況などの情報を、地図から探すことができます。"
-        service = FirstReservationStatusService()
-        pub_date = service.get_last_updated()
+        view = FirstReservationStatusView()
+        pub_date = view.get_last_updated()
         pub_date = pub_date.astimezone(timezone.utc)
         guid = "tag:" + self.my_domain + "," + pub_date.strftime("%Y-%m-%d") + ":/first_reservation_statuses"
         return {
@@ -243,8 +218,8 @@ class XmlView:
         title = "旭川市のコロナワクチンマップ（5～11歳接種）"
         link = "https://" + self.my_domain + "/first_reservation_statuses"
         description = "旭川市の新型コロナワクチン接種医療機関（5～11歳接種）の予約受付状況などの情報を、地図から探すことができます。"
-        service = ChildReservationStatusService()
-        pub_date = service.get_last_updated()
+        view = ChildReservationStatusView()
+        pub_date = view.get_last_updated()
         pub_date = pub_date.astimezone(timezone.utc)
         guid = "tag:" + self.my_domain + "," + pub_date.strftime("%Y-%m-%d") + ":/child_reservation_statuses"
         return {
@@ -286,7 +261,6 @@ class XmlView:
             feed_data_list (list): コロナワクチンマップ（追加接種（オミクロン対応ワクチン））の地区一覧Feed用データのリスト
 
         """
-        service = ReservationStatusService()
         view = ReservationStatusView()
         area_list = view.get_area_list()
         feed_data_list = list()
@@ -294,7 +268,7 @@ class XmlView:
             title = area["name"] + "の新型コロナワクチン接種医療機関（追加接種（オミクロン対応ワクチン））の検索結果"
             link = "https://" + self.my_domain + "/reservation_status/area/" + area["url"]
             description = title + "です。"
-            pub_date = service.get_last_updated()
+            pub_date = view.get_last_updated()
             pub_date = pub_date.astimezone(timezone.utc)
             guid = link
             feed_data_list.append(
@@ -316,7 +290,6 @@ class XmlView:
             feed_data_list (list): コロナワクチンマップ（追加接種（オミクロン対応ワクチン））の医療機関一覧Feed用データのリスト
 
         """
-        service = ReservationStatusService()
         view = ReservationStatusView()
         medical_institution_list = view.get_medical_institution_list()
         feed_data_list = list()
@@ -326,7 +299,7 @@ class XmlView:
                 "https://" + self.my_domain + "/reservation_status/medical_institution/" + medical_institution["url"]
             )
             description = title + "です。"
-            pub_date = service.get_last_updated()
+            pub_date = view.get_last_updated()
             pub_date = pub_date.astimezone(timezone.utc)
             guid = link
             feed_data_list.append(
@@ -348,7 +321,6 @@ class XmlView:
             feed_data_list (list): コロナワクチンマップ（1・2回目接種）の地区一覧Feed用データのリスト
 
         """
-        service = FirstReservationStatusService()
         view = FirstReservationStatusView()
         area_list = view.get_area_list()
         feed_data_list = list()
@@ -356,7 +328,7 @@ class XmlView:
             title = area["name"] + "の新型コロナワクチン接種医療機関（1・2回目接種）の検索結果"
             link = "https://" + self.my_domain + "/first_reservation_status/area/" + area["url"]
             description = title + "です。"
-            pub_date = service.get_last_updated()
+            pub_date = view.get_last_updated()
             pub_date = pub_date.astimezone(timezone.utc)
             guid = link
             feed_data_list.append(
@@ -378,7 +350,6 @@ class XmlView:
             feed_data_list (list): コロナワクチンマップ（1・2回目接種）の医療機関一覧Feed用データのリスト
 
         """
-        service = FirstReservationStatusService()
         view = FirstReservationStatusView()
         medical_institution_list = view.get_medical_institution_list()
         feed_data_list = list()
@@ -391,7 +362,7 @@ class XmlView:
                 + medical_institution["url"]
             )
             description = title + "です。"
-            pub_date = service.get_last_updated()
+            pub_date = view.get_last_updated()
             pub_date = pub_date.astimezone(timezone.utc)
             guid = link
             feed_data_list.append(
@@ -413,7 +384,6 @@ class XmlView:
             feed_data_list (list): コロナワクチンマップ（5～11歳接種）の地区一覧Feed用データのリスト
 
         """
-        service = ChildReservationStatusService()
         view = ChildReservationStatusView()
         area_list = view.get_area_list()
         feed_data_list = list()
@@ -421,7 +391,7 @@ class XmlView:
             title = area["name"] + "の新型コロナワクチン接種医療機関（5～11歳接種）の検索結果"
             link = "https://" + self.my_domain + "/child_reservation_status/area/" + area["url"]
             description = title + "です。"
-            pub_date = service.get_last_updated()
+            pub_date = view.get_last_updated()
             pub_date = pub_date.astimezone(timezone.utc)
             guid = link
             feed_data_list.append(
@@ -443,7 +413,6 @@ class XmlView:
             feed_data_list (list): コロナワクチンマップ（5～11歳接種）の医療機関一覧Feed用データのリスト
 
         """
-        service = ChildReservationStatusService()
         view = ChildReservationStatusView()
         medical_institution_list = view.get_medical_institution_list()
         feed_data_list = list()
@@ -456,7 +425,7 @@ class XmlView:
                 + medical_institution["url"]
             )
             description = title + "です。"
-            pub_date = service.get_last_updated()
+            pub_date = view.get_last_updated()
             pub_date = pub_date.astimezone(timezone.utc)
             guid = link
             feed_data_list.append(
@@ -473,8 +442,13 @@ class XmlView:
 
 
 class RssView(XmlView):
-    def __init__(self):
-        XmlView.__init__(self)
+    def __init__(self, today: date):
+        """
+        Args:
+            today (date): 基準日
+
+        """
+        XmlView.__init__(self, today)
 
     def get_feed(self) -> dict:
         """RSS Feed文字列を返す
@@ -551,8 +525,13 @@ class RssView(XmlView):
 
 
 class AtomView(XmlView):
-    def __init__(self):
-        XmlView.__init__(self)
+    def __init__(self, today: date):
+        """
+        Args:
+            today (date): 基準日
+
+        """
+        XmlView.__init__(self, today)
 
     def get_feed(self) -> dict:
         """ATOM Feedデータ返す
