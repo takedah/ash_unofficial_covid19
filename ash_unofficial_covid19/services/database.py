@@ -74,7 +74,7 @@ class CursorFromConnectionPool:
         return self.__cursor
 
     def __exit__(self, exc_type, exc_value, traceback):
-        if exc_value is None:
+        if exc_value is not None:
             self.__connection.rollback()
         else:
             self.__cursor.close()
