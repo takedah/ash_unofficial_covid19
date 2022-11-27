@@ -3,7 +3,7 @@ from datetime import date, datetime, time, timezone
 from ..config import Config
 from ..views.child_reservation_status import ChildReservationStatusView
 from ..views.first_reservation_status import FirstReservationStatusView
-from ..views.graph import DailyTotalView, PerHundredThousandPopulationView
+from ..views.patients_number import DailyTotalView, PerHundredThousandPopulationView
 from ..views.reservation_status import ReservationStatusView
 from ..views.view import View
 

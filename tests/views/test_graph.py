@@ -6,15 +6,15 @@ import pytest
 from ash_unofficial_covid19.models.patients_number import PatientsNumberFactory
 from ash_unofficial_covid19.services.patients_number import PatientsNumberService
 from ash_unofficial_covid19.views.graph import (
-    ByAgeView,
-    DailyTotalView,
-    MonthTotalView,
-    PerHundredThousandPopulationView,
-    WeeklyPerAgeView,
+    ByAgeGraphView,
+    DailyTotalGraphView,
+    MonthTotalGraphView,
+    PerHundredThousandPopulationGraphView,
+    WeeklyPerAgeGraphView,
 )
 
 
-class TestDailyTotalView:
+class TestDailyTotalGraphView:
     @pytest.fixture()
     def view(self):
         test_data = [
@@ -80,96 +80,57 @@ class TestDailyTotalView:
             factory.create(**row)
         service = PatientsNumberService()
         service.create(factory)
-        view = DailyTotalView(date(2020, 2, 24))
+        view = DailyTotalGraphView(date(2020, 2, 24))
 
         yield view
-
-    def test_daily_total_property(self, view):
-        assert view.today == "2020/02/24 (月) "
-        assert view.most_recent == "102"
-        assert view.seven_days_before_most_recent == "0"
-        assert view.increase_from_seven_days_before == "+102"
-        assert (
-            view.graph_alt
-            == "2020年02月18日 0人, 2020年02月19日 0人, 2020年02月20日 0人, "
-            + "2020年02月21日 0人, 2020年02月22日 0人, 2020年02月23日 97人, "
-            + "2020年02月24日 102人"
-        )
 
     def test_get_graph_image(self, view):
         graph_image = view.get_graph_image()
         assert type(graph_image) is BytesIO
 
 
-class TestMonthTotalView:
+class TestMonthTotalGraphView:
     @pytest.fixture()
     def view(self):
-        view = MonthTotalView(date(2020, 2, 24))
+        view = MonthTotalGraphView(date(2020, 2, 24))
 
         yield view
-
-    def test_month_total_property(self, view):
-        assert view.today == "2020/02/24 (月) "
-        assert view.this_month == "199"
-        assert view.last_month == "0"
-        assert view.increase_from_last_month == "+199"
-        assert view.graph_alt == "2020年01月 0人, 2020年02月 199人"
 
     def test_get_graph_image(self, view):
         graph_image = view.get_graph_image()
         assert type(graph_image) is BytesIO
 
 
-class TestByAgeView:
+class TestByAgeGraphView:
     @pytest.fixture()
     def view(self):
-        view = ByAgeView(date(2020, 2, 24))
+        view = ByAgeGraphView(date(2020, 2, 24))
 
         yield view
-
-    def test_by_age_property(self, view):
-        assert (
-            view.graph_alt
-            == "10歳未満 30人, 10代 38人, 20代 26人, 30代 28人, " + "40代 29人, 50代 23人, 60代 8人, 70代 4人, " + "80代 3人, 90歳以上 0人"
-        )
 
     def test_get_graph_image(self, view):
         graph_image = view.get_graph_image()
         assert type(graph_image) is BytesIO
 
 
-class TestPerHundredThousandPopulationView:
+class TestPerHundredThousandPopulationGraphView:
     @pytest.fixture()
     def view(self):
-        view = PerHundredThousandPopulationView(date(2020, 2, 24))
+        view = PerHundredThousandPopulationGraphView(date(2020, 2, 24))
 
         yield view
-
-    def test_per_hundred_thousand_population_property(self, view):
-        assert view.this_week == "60.68"
-        assert view.last_week == "0.0"
-        assert view.increase_from_last_week == "+60.68"
-        assert view.graph_alt == "2020年02月09日 0.0人, 2020年02月16日 0.0人, 2020年02月23日 60.68人"
 
     def test_get_graph_image(self, view):
         graph_image = view.get_graph_image()
         assert type(graph_image) is BytesIO
 
 
-class TestWeeklyPerAgeView:
+class TestWeeklyPerAgeGraphView:
     @pytest.fixture()
     def view(self):
-        view = WeeklyPerAgeView(date(2020, 2, 24))
+        view = WeeklyPerAgeGraphView(date(2020, 2, 24))
 
         yield view
-
-    def test_weekly_per_age_property(self, view):
-        assert (
-            view.graph_alt
-            == "02月23日以降 10歳未満: 30人,10代: 38人,20代: 26人,30代: 28人,40代: 29人,"
-            + "50代: 23人,60代: 8人,70代: 4人,80代: 3人,"
-            + "90歳以上: 0人,調査中等: 10人,"
-        )
 
     def test_get_graph_image(self, view):
         graph_image = view.get_graph_image()

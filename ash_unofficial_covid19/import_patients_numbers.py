@@ -14,12 +14,12 @@ from .services.patients_number import PatientsNumberService
 from .services.press_release_link import PressReleaseLinkService
 from .services.sapporo_patients_number import SapporoPatientsNumberService
 from .views.graph import (
-    ByAgeView,
-    DailyTotalView,
+    ByAgeGraphView,
+    DailyTotalGraphView,
     GraphView,
-    MonthTotalView,
-    PerHundredThousandPopulationView,
-    WeeklyPerAgeView,
+    MonthTotalGraphView,
+    PerHundredThousandPopulationGraphView,
+    WeeklyPerAgeGraphView,
 )
 from .views.press_release import PressReleaseView
 
@@ -249,16 +249,16 @@ def create_graph_data() -> None:
     """
     press_release = PressReleaseView()
     today = press_release.latest_date
-    daily_total = DailyTotalView(today)
+    daily_total = DailyTotalGraphView(today)
     _save_graph_images(daily_total, "daily_total.webp")
-    by_age = ByAgeView(today)
+    by_age = ByAgeGraphView(today)
     _save_graph_images(by_age, "by_age.webp")
-    month_total = MonthTotalView(today)
+    month_total = MonthTotalGraphView(today)
     _save_graph_images(month_total, "month_total.webp")
     _save_graph_images(month_total, "month_total_for_card.webp", True)
-    per_hundred_thousand_population = PerHundredThousandPopulationView(today)
+    per_hundred_thousand_population = PerHundredThousandPopulationGraphView(today)
     _save_graph_images(per_hundred_thousand_population, "per_hundred_thousand_population.webp")
-    weekly_per_age = WeeklyPerAgeView(today)
+    weekly_per_age = WeeklyPerAgeGraphView(today)
     _save_graph_images(weekly_per_age, "weekly_per_age.webp")
 
 

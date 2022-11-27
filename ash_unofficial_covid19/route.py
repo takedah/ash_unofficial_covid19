@@ -6,8 +6,14 @@ from .config import Config
 from .errors import ViewError
 from .views.child_reservation_status import ChildReservationStatusView
 from .views.first_reservation_status import FirstReservationStatusView
-from .views.graph import ByAgeView, DailyTotalView, MonthTotalView, PerHundredThousandPopulationView, WeeklyPerAgeView
-from .views.patients_number import PatientsNumberView
+from .views.patients_number import (
+    ByAgeView,
+    DailyTotalView,
+    MonthTotalView,
+    PatientsNumberView,
+    PerHundredThousandPopulationView,
+    WeeklyPerAgeView,
+)
 from .views.press_release import PressReleaseView
 from .views.reservation_status import ReservationStatusView
 from .views.xml import AtomView, RssView
