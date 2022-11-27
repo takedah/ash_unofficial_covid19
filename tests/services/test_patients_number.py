@@ -6,6 +6,7 @@ from pandas._testing import assert_frame_equal
 
 from ash_unofficial_covid19.errors import ServiceError
 from ash_unofficial_covid19.models.patients_number import PatientsNumberFactory
+from ash_unofficial_covid19.services.database import ConnectionPool
 from ash_unofficial_covid19.services.patients_number import PatientsNumberService
 
 
@@ -73,10 +74,14 @@ class TestPatientsNumberService:
         factory = PatientsNumberFactory()
         for row in test_data:
             factory.create(**row)
-        service = PatientsNumberService()
+
+        conn = ConnectionPool()
+        service = PatientsNumberService(conn)
         service.create(factory)
 
         yield service
+
+        conn.close_connection()
 
     def test_delete(self, service):
         assert service.delete(publication_date=date(2022, 1, 28))

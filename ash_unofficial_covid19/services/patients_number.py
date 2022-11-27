@@ -4,19 +4,25 @@ from typing import Optional
 
 import pandas as pd
 import psycopg2
-from psycopg2.extras import DictCursor
 
 from ..config import Config
 from ..errors import ServiceError
 from ..models.patients_number import PatientsNumberFactory
+from ..services.database import ConnectionPool
 from ..services.service import Service
 
 
 class PatientsNumberService(Service):
     """旭川市の新型コロナウイルス感染症日別年代別陽性患者数データを扱うサービス"""
 
-    def __init__(self):
-        Service.__init__(self, "patients_numbers")
+    def __init__(self, pool: ConnectionPool):
+        """
+        Args:
+            table_name (str): テーブル名
+            pool (:obj:`ConnectionPool`): SimpleConnectionPoolを要素に持つオブジェクト
+
+        """
+        Service.__init__(self, "patients_numbers", pool)
 
     @staticmethod
     def _date_range_validator(from_date: date, to_date: date) -> None:
@@ -105,22 +111,21 @@ class PatientsNumberService(Service):
         state = "DELETE from" + " " + self.table_name + " " + "WHERE publication_date = %s;"
         values = (publication_date,)
         result = False
-        with self.get_connection() as conn:
-            try:
-                with conn.cursor(cursor_factory=DictCursor) as cur:
-                    cur.execute(state, values)
-                    if cur.statusmessage == "DELETE 1":
-                        result = True
-                        self.info_log(publication_date.strftime("%Y-%m-%d") + "のデータを削除しました。")
-                    else:
-                        self.error_log(publication_date.strftime("%Y-%m-%d") + "のデータを削除できませんでした。")
-            except (
-                psycopg2.DataError,
-                psycopg2.IntegrityError,
-                psycopg2.InternalError,
-            ) as e:
-                self.error_log(e.args[0])
-                raise ServiceError("日別年代別陽性患者数データの削除に失敗しました。")
+        try:
+            with self.get_connection() as cur:
+                cur.execute(state, values)
+                if cur.statusmessage == "DELETE 1":
+                    result = True
+                    self.info_log(publication_date.strftime("%Y-%m-%d") + "のデータを削除しました。")
+                else:
+                    self.error_log(publication_date.strftime("%Y-%m-%d") + "のデータを削除できませんでした。")
+        except (
+            psycopg2.DataError,
+            psycopg2.IntegrityError,
+            psycopg2.InternalError,
+        ) as e:
+            self.error_log(e.args[0])
+            raise ServiceError("日別年代別陽性患者数データの削除に失敗しました。")
 
         return result
 
@@ -161,15 +166,14 @@ class PatientsNumberService(Service):
         where_sentence = " " + "WHERE publication_date = %s"
         order_sentence = " " + "ORDER BY publication_date ASC;"
         factory = PatientsNumberFactory()
-        with self.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                if publication_date is None:
-                    cur.execute(state + order_sentence)
-                else:
-                    cur.execute(state + where_sentence + order_sentence, target_date_list)
+        with self.get_connection() as cur:
+            if publication_date is None:
+                cur.execute(state + order_sentence)
+            else:
+                cur.execute(state + where_sentence + order_sentence, target_date_list)
 
-                for dict_cursor in cur.fetchall():
-                    factory.create(**dict(dict_cursor))
+            for dict_cursor in cur.fetchall():
+                factory.create(**dict(dict_cursor))
 
         return factory
 
@@ -212,26 +216,25 @@ class PatientsNumberService(Service):
             + "< to_day ORDER BY publication_date;"
         )
         lists = list()
-        with self.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
-                for row in cur.fetchall():
-                    tmp = [
-                        row["publication_date"].strftime("%Y-%m-%d"),
-                        row["age_under_10"],
-                        row["age_10s"],
-                        row["age_20s"],
-                        row["age_30s"],
-                        row["age_40s"],
-                        row["age_50s"],
-                        row["age_60s"],
-                        row["age_70s"],
-                        row["age_80s"],
-                        row["age_over_90"],
-                        row["investigating"],
-                    ]
-                    values = list(map(lambda v: 0 if v is None else v, tmp))
-                    lists.append(values)
+        with self.get_connection() as cur:
+            cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
+            for row in cur.fetchall():
+                tmp = [
+                    row["publication_date"].strftime("%Y-%m-%d"),
+                    row["age_under_10"],
+                    row["age_10s"],
+                    row["age_20s"],
+                    row["age_30s"],
+                    row["age_40s"],
+                    row["age_50s"],
+                    row["age_60s"],
+                    row["age_70s"],
+                    row["age_80s"],
+                    row["age_over_90"],
+                    row["investigating"],
+                ]
+                values = list(map(lambda v: 0 if v is None else v, tmp))
+                lists.append(values)
 
         return lists
 
@@ -274,14 +277,13 @@ class PatientsNumberService(Service):
             + "< to_day ORDER BY publication_date;"
         )
         dicts = dict()
-        with self.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
-                for row in cur.fetchall():
-                    key = row["publication_date"].strftime("%Y-%m-%d")
-                    value = {k: 0 if v is None else v for (k, v) in dict(row).items()}
-                    del value["publication_date"]
-                    dicts[key] = value
+        with self.get_connection() as cur:
+            cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
+            for row in cur.fetchall():
+                key = row["publication_date"].strftime("%Y-%m-%d")
+                value = {k: 0 if v is None else v for (k, v) in dict(row).items()}
+                del value["publication_date"]
+                dicts[key] = value
 
         return dicts
 
@@ -315,16 +317,16 @@ class PatientsNumberService(Service):
             + "ORDER BY publication_date;"
         )
         aggregate_by_days = list()
-        with self.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
-                for row in cur.fetchall():
-                    publication_date = row["publication_date"]
-                    if row["patients_number"] is None:
-                        patients_number = 0
-                    else:
-                        patients_number = row["patients_number"]
-                    aggregate_by_days.append((publication_date, patients_number))
+        with self.get_connection() as cur:
+            cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
+            for row in cur.fetchall():
+                publication_date = row["publication_date"]
+                if row["patients_number"] is None:
+                    patients_number = 0
+                else:
+                    patients_number = row["patients_number"]
+                aggregate_by_days.append((publication_date, patients_number))
+
         return aggregate_by_days
 
     def get_aggregate_by_weeks(self, from_date: date, to_date: date) -> list:
@@ -357,16 +359,16 @@ class PatientsNumberService(Service):
             + "ORDER BY weeks;"
         )
         aggregate_by_weeks = list()
-        with self.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
-                for row in cur.fetchall():
-                    weeks = row["weeks"]
-                    if row["patients_number"] is None:
-                        patients_number = 0
-                    else:
-                        patients_number = row["patients_number"]
-                    aggregate_by_weeks.append((weeks, patients_number))
+        with self.get_connection() as cur:
+            cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
+            for row in cur.fetchall():
+                weeks = row["weeks"]
+                if row["patients_number"] is None:
+                    patients_number = 0
+                else:
+                    patients_number = row["patients_number"]
+                aggregate_by_weeks.append((weeks, patients_number))
+
         return aggregate_by_weeks
 
     def get_per_hundred_thousand_population_per_week(self, from_date: date, to_date: date) -> list:
@@ -437,21 +439,20 @@ class PatientsNumberService(Service):
                 "調査中等",
             ]
         )
-        with self.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
-                for row in cur.fetchall():
-                    df.at[row["weeks"], "10歳未満"] = row["age_under_10"]
-                    df.at[row["weeks"], "10代"] = row["age_10s"]
-                    df.at[row["weeks"], "20代"] = row["age_20s"]
-                    df.at[row["weeks"], "30代"] = row["age_30s"]
-                    df.at[row["weeks"], "40代"] = row["age_40s"]
-                    df.at[row["weeks"], "50代"] = row["age_50s"]
-                    df.at[row["weeks"], "60代"] = row["age_60s"]
-                    df.at[row["weeks"], "70代"] = row["age_70s"]
-                    df.at[row["weeks"], "80代"] = row["age_80s"]
-                    df.at[row["weeks"], "90歳以上"] = row["age_over_90"]
-                    df.at[row["weeks"], "調査中等"] = row["investigating"]
+        with self.get_connection() as cur:
+            cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
+            for row in cur.fetchall():
+                df.at[row["weeks"], "10歳未満"] = row["age_under_10"]
+                df.at[row["weeks"], "10代"] = row["age_10s"]
+                df.at[row["weeks"], "20代"] = row["age_20s"]
+                df.at[row["weeks"], "30代"] = row["age_30s"]
+                df.at[row["weeks"], "40代"] = row["age_40s"]
+                df.at[row["weeks"], "50代"] = row["age_50s"]
+                df.at[row["weeks"], "60代"] = row["age_60s"]
+                df.at[row["weeks"], "70代"] = row["age_70s"]
+                df.at[row["weeks"], "80代"] = row["age_80s"]
+                df.at[row["weeks"], "90歳以上"] = row["age_over_90"]
+                df.at[row["weeks"], "調査中等"] = row["investigating"]
 
         df.fillna(0, inplace=True)
         return df.fillna(0)
@@ -480,22 +481,22 @@ class PatientsNumberService(Service):
             + "FROM patients_numbers WHERE DATE(publication_date) "
             + "BETWEEN %s AND %s;"
         )
-        with self.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
-                for row in cur.fetchall():
-                    patients_number_by_age = [
-                        ("10歳未満", row["age_under_10"]),
-                        ("10代", row["age_10s"]),
-                        ("20代", row["age_20s"]),
-                        ("30代", row["age_30s"]),
-                        ("40代", row["age_40s"]),
-                        ("50代", row["age_50s"]),
-                        ("60代", row["age_60s"]),
-                        ("70代", row["age_70s"]),
-                        ("80代", row["age_80s"]),
-                        ("90歳以上", row["age_over_90"]),
-                    ]
+        with self.get_connection() as cur:
+            cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
+            for row in cur.fetchall():
+                patients_number_by_age = [
+                    ("10歳未満", row["age_under_10"]),
+                    ("10代", row["age_10s"]),
+                    ("20代", row["age_20s"]),
+                    ("30代", row["age_30s"]),
+                    ("40代", row["age_40s"]),
+                    ("50代", row["age_50s"]),
+                    ("60代", row["age_60s"]),
+                    ("70代", row["age_70s"]),
+                    ("80代", row["age_80s"]),
+                    ("90歳以上", row["age_over_90"]),
+                ]
+
         return patients_number_by_age
 
     def get_total_by_months(self, from_date: date, to_date: date) -> list:
@@ -533,14 +534,15 @@ class PatientsNumberService(Service):
             + ") AS aggregate_patients;"
         )
         total_by_months = list()
-        with self.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
-                for row in cur.fetchall():
-                    month = row["month"]
-                    if row["total_patients"] is None:
-                        total_patients = 0
-                    else:
-                        total_patients = int(row["total_patients"])
-                    total_by_months.append((month, total_patients))
+        with self.get_connection() as cur:
+            cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
+            for row in cur.fetchall():
+                month = row["month"]
+                if row["total_patients"] is None:
+                    total_patients = 0
+                else:
+                    total_patients = int(row["total_patients"])
+
+                total_by_months.append((month, total_patients))
+
         return total_by_months

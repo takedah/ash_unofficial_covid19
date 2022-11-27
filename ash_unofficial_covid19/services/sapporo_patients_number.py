@@ -1,19 +1,24 @@
 from datetime import date, datetime, timedelta, timezone
 from decimal import ROUND_HALF_UP, Decimal
 
-from psycopg2.extras import DictCursor
-
 from ..config import Config
 from ..errors import ServiceError
 from ..models.sapporo_patients_number import SapporoPatientsNumberFactory
+from ..services.database import ConnectionPool
 from ..services.service import Service
 
 
 class SapporoPatientsNumberService(Service):
     """札幌市の新型コロナウイルス感染症日別新規患者数のデータを扱うサービス"""
 
-    def __init__(self):
-        Service.__init__(self, "sapporo_patients_numbers")
+    def __init__(self, pool: ConnectionPool):
+        """
+        Args:
+            table_name (str): テーブル名
+            pool (:obj:`ConnectionPool`): SimpleConnectionPoolを要素に持つオブジェクト
+
+        """
+        Service.__init__(self, "sapporo_patients_numbers", pool)
 
     def create(self, sapporo_patients_numbers: SapporoPatientsNumberFactory) -> None:
         """データベースへ札幌市の新型コロナウイルス感染症日別新規患者数のデータを保存
@@ -69,11 +74,11 @@ class SapporoPatientsNumberService(Service):
             + ";"
         )
         factory = SapporoPatientsNumberFactory()
-        with self.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state)
-                for row in cur.fetchall():
-                    factory.create(**row)
+        with self.get_connection() as cur:
+            cur.execute(state)
+            for row in cur.fetchall():
+                factory.create(**row)
+
         return factory
 
     def get_aggregate_by_weeks(self, from_date: date, to_date: date) -> list:
@@ -109,11 +114,11 @@ class SapporoPatientsNumberService(Service):
             + "ORDER BY weeks;"
         )
         aggregate_by_weeks = list()
-        with self.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
-                for row in cur.fetchall():
-                    aggregate_by_weeks.append((row["weeks"], row["patients"]))
+        with self.get_connection() as cur:
+            cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
+            for row in cur.fetchall():
+                aggregate_by_weeks.append((row["weeks"], row["patients"]))
+
         return aggregate_by_weeks
 
     def get_per_hundred_thousand_population_per_week(self, from_date: date, to_date: date) -> list:
@@ -152,9 +157,9 @@ class SapporoPatientsNumberService(Service):
 
         """
         state = "SELECT MAX(publication_date) FROM " + self.table_name + ";"
-        with self.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state)
-                for row in cur.fetchall():
-                    last_update_date = row["max"]
+        with self.get_connection() as cur:
+            cur.execute(state)
+            for row in cur.fetchall():
+                last_update_date = row["max"]
+
         return last_update_date

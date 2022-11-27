@@ -2,24 +2,25 @@ from abc import ABCMeta
 from datetime import datetime
 
 import psycopg2
-from psycopg2.extras import DictCursor, execute_values
+from psycopg2.extras import execute_values
 
-from ..config import Config
-from ..errors import DatabaseConnectionError, ServiceError
+from ..errors import ServiceError
 from ..logs import AppLog
+from ..services.database import ConnectionPool, CursorFromConnectionPool
 
 
 class Service(metaclass=ABCMeta):
     """新型コロナウイルス関連データを扱うサービスクラス"""
 
-    def __init__(self, table_name: str):
+    def __init__(self, table_name: str, pool: ConnectionPool):
         """
         Args:
             table_name (str): テーブル名
+            pool (:obj:`ConnectionPool`): SimpleConnectionPoolを要素に持つオブジェクト
 
         """
         self.__table_name = table_name
-        self.__dsn = Config.DATABASE_URL
+        self.__pool = pool
         self.__logger = AppLog()
 
     @property
@@ -29,16 +30,13 @@ class Service(metaclass=ABCMeta):
     def get_connection(self):
         """データベース接続オブジェクトを返す
 
+        Args:
+
         Returns:
-            conn (:obj:`psycopg2.connection`): psycopg2.connectionオブジェクト
+            conn (:obj:`CursorFromConnectionPool`): with句でDictCursorを返すオブジェクト
 
         """
-        try:
-            conn = psycopg2.connect(self.__dsn)
-        except (psycopg2.DatabaseError, psycopg2.OperationalError) as e:
-            self.error_log("データベースに接続できませんでした。")
-            raise DatabaseConnectionError(e.args[0])
-        return conn
+        return CursorFromConnectionPool(self.__pool)
 
     def upsert(self, items: tuple, primary_key: str, data_lists: list) -> None:
         """データベースのテーブルへデータをバルクインサートでUPSERT登録する。
@@ -77,20 +75,19 @@ class Service(metaclass=ABCMeta):
             + upsert[1:]
         )
 
-        with self.get_connection() as conn:
-            try:
-                with conn.cursor(cursor_factory=DictCursor) as cur:
-                    execute_values(cur, state, data_lists)
-                conn.commit()
-                data_number = len(data_lists)
-                self.info_log(self.table_name + "テーブルへ" + str(data_number) + "件データを登録しました。")
-            except (
-                psycopg2.DataError,
-                psycopg2.IntegrityError,
-                psycopg2.InternalError,
-            ) as e:
-                self.error_log(self.table_name + "テーブルへデータを登録できませんでした。")
-                raise ServiceError(e.args[0])
+        try:
+            with self.get_connection() as cur:
+                execute_values(cur, state, data_lists)
+
+            data_number = len(data_lists)
+            self.info_log(self.table_name + "テーブルへ" + str(data_number) + "件データを登録しました。")
+        except (
+            psycopg2.DataError,
+            psycopg2.IntegrityError,
+            psycopg2.InternalError,
+        ) as e:
+            self.error_log(self.table_name + "テーブルへデータを登録できませんでした。")
+            raise ServiceError(e.args[0])
 
     def get_last_updated(self) -> datetime:
         """テーブルの最終更新日を返す
@@ -101,10 +98,9 @@ class Service(metaclass=ABCMeta):
 
         """
         state = "SELECT max(updated_at) FROM " + self.table_name + ";"
-        with self.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state)
-                result = cur.fetchone()
+        with self.get_connection() as cur:
+            cur.execute(state)
+            result = cur.fetchone()
 
         if result["max"] is None:
             return datetime(1970, 1, 1, 0, 0, 0)

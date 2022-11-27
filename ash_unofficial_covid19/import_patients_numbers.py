@@ -9,6 +9,7 @@ from .models.sapporo_patients_number import SapporoPatientsNumberFactory
 from .scrapers.patients_number import ScrapePatientsNumber
 from .scrapers.press_release_link import ScrapePressReleaseLink
 from .scrapers.sapporo_patients_number import ScrapeSapporoPatientsNumber
+from .services.database import ConnectionPool
 from .services.patient import AsahikawaPatientService
 from .services.patients_number import PatientsNumberService
 from .services.press_release_link import PressReleaseLinkService
@@ -22,6 +23,8 @@ from .views.graph import (
     WeeklyPerAgeGraphView,
 )
 from .views.press_release import PressReleaseView
+
+conn = ConnectionPool()
 
 
 def _import_press_release_link(url: str, target_year: int) -> None:
@@ -49,7 +52,7 @@ def _import_press_release_link(url: str, target_year: int) -> None:
         print(e.args[0])
         return
 
-    service = PressReleaseLinkService()
+    service = PressReleaseLinkService(conn)
     try:
         service.create(factory)
     except (DatabaseConnectionError, ServiceError) as e:
@@ -66,7 +69,7 @@ def _get_press_release_links() -> PressReleaseLinkFactory:
             要素に持つオブジェクト
 
     """
-    press_release_link_service = PressReleaseLinkService()
+    press_release_link_service = PressReleaseLinkService(conn)
     return press_release_link_service.find_all()
 
 
@@ -95,7 +98,7 @@ def _import_asahikawa_data_from_press_release(pdf_url: str, publication_date: da
         return
 
     try:
-        service = PatientsNumberService()
+        service = PatientsNumberService(conn)
         service.create(factory)
     except (DatabaseConnectionError, ServiceError) as e:
         print(e.message)
@@ -115,7 +118,7 @@ def _import_sapporo_patients_number(url: str) -> None:
         print(e.message)
         return
 
-    service = SapporoPatientsNumberService()
+    service = SapporoPatientsNumberService(conn)
     factory = SapporoPatientsNumberFactory()
     for row in scraped_data.lists:
         factory.create(**row)
@@ -172,7 +175,7 @@ def _fix_asahikawa_data() -> None:
     }
     factory.create(**fix_20220326)
     try:
-        service = PatientsNumberService()
+        service = PatientsNumberService(conn)
         service.create(factory)
     except (DatabaseConnectionError, ServiceError) as e:
         print(e.message)
@@ -212,7 +215,7 @@ def import_latest():
 
 def import_past_from_patients():
     # 過去の陽性患者属性データベースから日別年代別陽性患者数データをデータベースへ登録
-    service = AsahikawaPatientService()
+    service = AsahikawaPatientService(conn)
     factory = PatientsNumberFactory()
     try:
         for row in service.get_aggregate_by_days_per_age(date(2020, 2, 23), date(2022, 1, 27)):
@@ -222,7 +225,7 @@ def import_past_from_patients():
         return
 
     try:
-        service = PatientsNumberService()
+        service = PatientsNumberService(conn)
         service.create(factory)
     except (DatabaseConnectionError, ServiceError) as e:
         print(e.message)
@@ -247,21 +250,24 @@ def create_graph_data() -> None:
     """
     トップページに表示するグラフ画像データを公開ディレクトリに保存する。
     """
-    press_release = PressReleaseView()
+    press_release = PressReleaseView(conn)
     today = press_release.latest_date
-    daily_total = DailyTotalGraphView(today)
+    daily_total = DailyTotalGraphView(today, conn)
     _save_graph_images(daily_total, "daily_total.webp")
-    by_age = ByAgeGraphView(today)
+    by_age = ByAgeGraphView(today, conn)
     _save_graph_images(by_age, "by_age.webp")
-    month_total = MonthTotalGraphView(today)
+    month_total = MonthTotalGraphView(today, conn)
     _save_graph_images(month_total, "month_total.webp")
     _save_graph_images(month_total, "month_total_for_card.webp", True)
-    per_hundred_thousand_population = PerHundredThousandPopulationGraphView(today)
+    per_hundred_thousand_population = PerHundredThousandPopulationGraphView(today, conn)
     _save_graph_images(per_hundred_thousand_population, "per_hundred_thousand_population.webp")
-    weekly_per_age = WeeklyPerAgeGraphView(today)
+    weekly_per_age = WeeklyPerAgeGraphView(today, conn)
     _save_graph_images(weekly_per_age, "weekly_per_age.webp")
 
 
 if __name__ == "__main__":
-    import_latest()
-    create_graph_data()
+    try:
+        import_latest()
+        create_graph_data()
+    finally:
+        conn.close_connection()

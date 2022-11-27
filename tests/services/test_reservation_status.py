@@ -2,6 +2,7 @@ import pytest
 
 from ash_unofficial_covid19.models.location import LocationFactory
 from ash_unofficial_covid19.models.reservation_status import ReservationStatusFactory
+from ash_unofficial_covid19.services.database import ConnectionPool
 from ash_unofficial_covid19.services.location import LocationService
 from ash_unofficial_covid19.services.reservation_status import ReservationStatusService
 
@@ -29,7 +30,9 @@ def service():
     location_factory = LocationFactory()
     for row in test_locations_data:
         location_factory.create(**row)
-    location_service = LocationService()
+
+    conn = ConnectionPool()
+    location_service = LocationService(conn)
     location_service.create(location_factory)
 
     # 予約受付状況のセットアップ
@@ -68,9 +71,13 @@ def service():
     factory = ReservationStatusFactory()
     for row in test_data:
         factory.create(**row)
-    service = ReservationStatusService()
+
+    service = ReservationStatusService(conn)
     service.create(factory)
+
     yield service
+
+    conn.close_connection()
 
 
 def test_delete(service):

@@ -6,6 +6,7 @@ from ash_unofficial_covid19.models.child_reservation_status import ChildReservat
 from ash_unofficial_covid19.models.first_reservation_status import FirstReservationStatusFactory
 from ash_unofficial_covid19.models.reservation_status import ReservationStatusFactory
 from ash_unofficial_covid19.services.child_reservation_status import ChildReservationStatusService
+from ash_unofficial_covid19.services.database import ConnectionPool
 from ash_unofficial_covid19.services.first_reservation_status import FirstReservationStatusService
 from ash_unofficial_covid19.services.patients_number import PatientsNumberService
 from ash_unofficial_covid19.services.press_release_link import PressReleaseLinkService
@@ -14,7 +15,7 @@ from ash_unofficial_covid19.views.xml import AtomView, RssView
 
 
 @pytest.fixture()
-def setup():
+def conn():
     # 追加接種（オミクロン対応ワクチン）予約受付状況のセットアップ
     test_data = [
         {
@@ -50,7 +51,8 @@ def setup():
     for row in test_data:
         factory.create(**row)
 
-    service = ReservationStatusService()
+    conn = ConnectionPool()
+    service = ReservationStatusService(conn)
     service.create(factory)
 
     # 1・2回目予約受付状況のセットアップ
@@ -90,7 +92,7 @@ def setup():
     for row in test_data:
         factory.create(**row)
 
-    service = FirstReservationStatusService()
+    service = FirstReservationStatusService(conn)
     service.create(factory)
 
     # 5～11歳予約受付状況のセットアップ
@@ -128,12 +130,16 @@ def setup():
     for row in test_data:
         factory.create(**row)
 
-    service = ChildReservationStatusService()
+    service = ChildReservationStatusService(conn)
     service.create(factory)
+
+    yield conn
+
+    conn.close_connection()
 
 
 class TestRssView:
-    def test_get_feed(self, setup, mocker):
+    def test_get_feed(self, conn, mocker):
         aggregate_by_days = [
             (date(2022, 1, 21), 0),
             (date(2022, 1, 22), 0),
@@ -168,7 +174,7 @@ class TestRssView:
             "get_last_updated",
             return_value=datetime(2022, 3, 20, 0, 0, tzinfo=timezone.utc),
         )
-        rss = RssView(date(2022, 1, 29))
+        rss = RssView(date(2022, 1, 29), conn)
         expect = {
             "title": "旭川市新型コロナウイルスまとめサイト",
             "link": "https://covid19.asahikawa-opendata.morori.jp/",
@@ -361,7 +367,7 @@ class TestRssView:
 
 
 class TestAtomView:
-    def test_get_feed(self, setup, mocker):
+    def test_get_feed(self, conn, mocker):
         aggregate_by_days = [
             (date(2022, 1, 21), 0),
             (date(2022, 1, 22), 0),
@@ -396,7 +402,7 @@ class TestAtomView:
             "get_last_updated",
             return_value=datetime(2022, 3, 20, 0, 0, tzinfo=timezone.utc),
         )
-        atom = AtomView(date(2022, 1, 29))
+        atom = AtomView(date(2022, 1, 29), conn)
         expect = {
             "id": "https://covid19.asahikawa-opendata.morori.jp/",
             "title": "旭川市新型コロナウイルスまとめサイト",

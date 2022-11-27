@@ -3,21 +3,27 @@ from decimal import ROUND_HALF_UP, Decimal
 from typing import TypedDict, Union
 
 import numpy as np
-from psycopg2.extras import DictCursor
 
 from ..models.child_reservation_status import ChildReservationStatusLocationFactory
 from ..models.first_reservation_status import FirstReservationStatusLocationFactory
 from ..models.location import LocationFactory
 from ..models.point import Point
 from ..models.reservation_status import ReservationStatusLocation, ReservationStatusLocationFactory
+from ..services.database import ConnectionPool
 from ..services.service import Service
 
 
 class LocationService(Service):
     """医療機関の緯度経度データを扱うサービス"""
 
-    def __init__(self):
-        Service.__init__(self, "locations")
+    def __init__(self, pool: ConnectionPool):
+        """
+        Args:
+            table_name (str): テーブル名
+            pool (:obj:`ConnectionPool`): SimpleConnectionPoolを要素に持つオブジェクト
+
+        """
+        Service.__init__(self, "locations", pool)
 
     def create(self, locations: LocationFactory) -> None:
         """データベースへ医療機関の緯度経度データを保存
@@ -73,11 +79,11 @@ class LocationService(Service):
             + ";"
         )
         factory = LocationFactory()
-        with self.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state)
-                for row in cur.fetchall():
-                    factory.create(**row)
+        with self.get_connection() as cur:
+            cur.execute(state)
+            for row in cur.fetchall():
+                factory.create(**row)
+
         return factory
 
     @staticmethod

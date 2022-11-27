@@ -3,6 +3,7 @@ from datetime import date
 import pytest
 
 from ash_unofficial_covid19.models.press_release_link import PressReleaseLinkFactory
+from ash_unofficial_covid19.services.database import ConnectionPool
 from ash_unofficial_covid19.services.press_release_link import PressReleaseLinkService
 
 
@@ -17,9 +18,14 @@ def service():
     factory = PressReleaseLinkFactory()
     for row in test_data:
         factory.create(**row)
-    service = PressReleaseLinkService()
+
+    conn = ConnectionPool()
+    service = PressReleaseLinkService(conn)
     service.create(factory)
+
     yield service
+
+    conn.close_connection()
 
 
 def test_find_all(service):

@@ -4,6 +4,7 @@ import pytest
 
 from ash_unofficial_covid19.errors import ServiceError
 from ash_unofficial_covid19.models.patient import AsahikawaPatientFactory, HokkaidoPatientFactory
+from ash_unofficial_covid19.services.database import ConnectionPool
 from ash_unofficial_covid19.services.patient import AsahikawaPatientService, HokkaidoPatientService
 from ash_unofficial_covid19.views.patient import AsahikawaPatientView
 
@@ -68,7 +69,9 @@ class TestAsahikawaPatientView:
         hokkaido_factory = HokkaidoPatientFactory()
         for row in test_hokkaido_data:
             hokkaido_factory.create(**row)
-        hokkaido_service = HokkaidoPatientService()
+
+        conn = ConnectionPool()
+        hokkaido_service = HokkaidoPatientService(conn)
         hokkaido_service.create(hokkaido_factory)
 
         # 旭川市の新型コロナウイルス感染症患者データのセットアップ
@@ -197,11 +200,14 @@ class TestAsahikawaPatientView:
         factory = AsahikawaPatientFactory()
         for row in test_asahikawa_data:
             factory.create(**row)
-        service = AsahikawaPatientService()
+
+        service = AsahikawaPatientService(conn)
         service.create(factory)
-        view = AsahikawaPatientView()
+        view = AsahikawaPatientView(conn)
 
         yield view
+
+        conn.close_connection()
 
     def test_find(self, view):
         results = view.find(page=1, desc=False)

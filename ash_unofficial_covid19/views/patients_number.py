@@ -4,6 +4,7 @@ from decimal import ROUND_HALF_UP, Decimal
 
 from dateutil.relativedelta import relativedelta
 
+from ..services.database import ConnectionPool
 from ..services.patients_number import PatientsNumberService
 from ..services.sapporo_patients_number import SapporoPatientsNumberService
 from ..views.view import View
@@ -20,13 +21,14 @@ class PatientsNumberView(View):
 
     """
 
-    def __init__(self, today: date):
+    def __init__(self, today: date, pool: ConnectionPool):
         """
         Args:
             today (date): データを作成する基準日
+            pool (:obj:`ConnectionPool`): SimpleConnectionPoolを要素に持つオブジェクト
 
         """
-        self._service = PatientsNumberService()
+        self._service = PatientsNumberService(pool)
         self._today = today
         last_updated = self._service.get_last_updated()
         self.__last_updated = last_updated.strftime("%Y/%m/%d %H:%M")
@@ -151,13 +153,14 @@ class DailyTotalView(PatientsNumberView):
 
     """
 
-    def __init__(self, today: date):
+    def __init__(self, today: date, pool: ConnectionPool):
         """
         Args:
             today (date): グラフを作成する基準日
+            pool (:obj:`ConnectionPool`): SimpleConnectionPoolを要素に持つオブジェクト
 
         """
-        PatientsNumberView.__init__(self, today)
+        PatientsNumberView.__init__(self, today, pool)
         from_date = today - relativedelta(months=3)
         # 起算日が2020年2月23日の一週間より前の日付になってしまう場合は調整する。
         if from_date < date(2020, 2, 16):
@@ -212,13 +215,14 @@ class MonthTotalView(PatientsNumberView):
 
     """
 
-    def __init__(self, today: date):
+    def __init__(self, today: date, pool: ConnectionPool):
         """
         Args:
             today (date): グラフを作成する基準日
+            pool (:obj:`ConnectionPool`): SimpleConnectionPoolを要素に持つオブジェクト
 
         """
-        PatientsNumberView.__init__(self, today)
+        PatientsNumberView.__init__(self, today, pool)
         self.__month_total_data = self._service.get_total_by_months(from_date=date(2020, 1, 1), to_date=today)
         self.__reference_date = self.format_date_style(today)
         this_month = self.__month_total_data[-1][1]
@@ -265,13 +269,14 @@ class ByAgeView(PatientsNumberView):
 
     """
 
-    def __init__(self, today: date):
+    def __init__(self, today: date, pool: ConnectionPool):
         """
         Args:
             today (date): グラフを作成する基準日
+            pool (:obj:`ConnectionPool`): SimpleConnectionPoolを要素に持つオブジェクト
 
         """
-        PatientsNumberView.__init__(self, today)
+        PatientsNumberView.__init__(self, today, pool)
         from_date = today - relativedelta(months=1, days=-1)
         # 起算日が2020年2月23日より前の日付になってしまう場合は調整する。
         if from_date < date(2020, 2, 23):
@@ -301,14 +306,15 @@ class PerHundredThousandPopulationView(PatientsNumberView):
 
     """
 
-    def __init__(self, today: date):
+    def __init__(self, today: date, pool: ConnectionPool):
         """
         Args:
             today (date): グラフを作成する基準日
+            pool (:obj:`ConnectionPool`): SimpleConnectionPoolを要素に持つオブジェクト
 
         """
-        PatientsNumberView.__init__(self, today)
-        sapporo_service = SapporoPatientsNumberService()
+        PatientsNumberView.__init__(self, today, pool)
+        sapporo_service = SapporoPatientsNumberService(pool)
         from_date = today - relativedelta(weeks=16, days=-1)
         # 起算日が2020年2月23日の二週間前より前の日付になってしまう場合は調整する。
         if from_date < date(2020, 2, 9):
@@ -375,18 +381,19 @@ class WeeklyPerAgeView(PatientsNumberView):
 
     """
 
-    def __init__(self, today: date):
+    def __init__(self, today: date, pool: ConnectionPool):
         """
         Args:
             today (date): グラフを作成する基準日
+            pool (:obj:`ConnectionPool`): SimpleConnectionPoolを要素に持つオブジェクト
 
         """
-        service = PatientsNumberService()
+        PatientsNumberView.__init__(self, today, pool)
         from_date = today - relativedelta(weeks=4, days=-1)
         # 起算日が2020年2月23日より前の日付になってしまう場合は調整する。
         if from_date < date(2020, 2, 23):
             from_date = date(2020, 2, 23)
-        df = service.get_aggregate_by_weeks_per_age(from_date=from_date, to_date=today)
+        df = self._service.get_aggregate_by_weeks_per_age(from_date=from_date, to_date=today)
         self.__weekly_per_age_data = df
         self.__from_date = self.format_date_style(from_date)
         self.__graph_alt = self._get_graph_alt()

@@ -5,6 +5,7 @@ from typing import Optional
 from ..errors import DataModelError, ViewError
 from ..models.point import PointFactory
 from ..models.reservation_status import ReservationStatusLocationFactory
+from ..services.database import ConnectionPool
 from ..services.location import LocationService
 from ..services.reservation_status import ReservationStatusService
 from ..views.view import View
@@ -17,8 +18,14 @@ class ReservationStatusView(View):
 
     """
 
-    def __init__(self):
-        self.__service = ReservationStatusService()
+    def __init__(self, pool: ConnectionPool):
+        """
+        Args:
+            table_name (str): テーブル名
+            pool (:obj:`ConnectionPool`): SimpleConnectionPoolを要素に持つオブジェクト
+
+        """
+        self.__service = ReservationStatusService(pool)
 
     def get_last_updated(self) -> datetime:
         """

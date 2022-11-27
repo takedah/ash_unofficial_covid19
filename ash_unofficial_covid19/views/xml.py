@@ -1,6 +1,7 @@
 from datetime import date, datetime, time, timezone
 
 from ..config import Config
+from ..services.database import ConnectionPool
 from ..views.child_reservation_status import ChildReservationStatusView
 from ..views.first_reservation_status import FirstReservationStatusView
 from ..views.patients_number import DailyTotalView, PerHundredThousandPopulationView
@@ -9,13 +10,15 @@ from ..views.view import View
 
 
 class XmlView(View):
-    def __init__(self, today: date):
+    def __init__(self, today: date, pool: ConnectionPool):
         """
         Args:
             today (date): グラフを作成する基準日
+            pool (:obj:`ConnectionPool`): SimpleConnectionPoolを要素に持つオブジェクト
 
         """
         self.__today = today
+        self.__pool = pool
         last_modified = self._get_last_modified()
         self.__last_modified = last_modified
         self.__my_domain = Config.MY_DOMAIN
@@ -115,10 +118,10 @@ class XmlView(View):
         """
         title = self.__today.strftime("%Y/%m/%d (%a)") + " の旭川市内感染状況の最新動向"
         link = "https://" + self.my_domain + "/"
-        daily_total = DailyTotalView(self.__today)
+        daily_total = DailyTotalView(self.__today, self.__pool)
         most_recent = daily_total.most_recent
         increase_from_seven_days_before = daily_total.increase_from_seven_days_before
-        per_hundred_thousand_population = PerHundredThousandPopulationView(self.__today)
+        per_hundred_thousand_population = PerHundredThousandPopulationView(self.__today, self.__pool)
         this_week = per_hundred_thousand_population.this_week
         increase_from_last_week = per_hundred_thousand_population.increase_from_last_week
         description = (
@@ -174,7 +177,7 @@ class XmlView(View):
         title = "旭川市のコロナワクチンマップ（追加接種（オミクロン対応ワクチン））"
         link = "https://" + self.my_domain + "/reservation_statuses"
         description = "旭川市の新型コロナワクチン接種医療機関（追加接種（オミクロン対応ワクチン））の予約受付状況などの情報を、地図から探すことができます。"
-        view = ReservationStatusView()
+        view = ReservationStatusView(self.__pool)
         pub_date = view.get_last_updated()
         pub_date = pub_date.astimezone(timezone.utc)
         guid = "tag:" + self.my_domain + "," + pub_date.strftime("%Y-%m-%d") + ":/reservation_statuses"
@@ -196,7 +199,7 @@ class XmlView(View):
         title = "旭川市のコロナワクチンマップ（1・2回目接種）"
         link = "https://" + self.my_domain + "/first_reservation_statuses"
         description = "旭川市の新型コロナワクチン接種医療機関（1・2回目接種）の予約受付状況などの情報を、地図から探すことができます。"
-        view = FirstReservationStatusView()
+        view = FirstReservationStatusView(self.__pool)
         pub_date = view.get_last_updated()
         pub_date = pub_date.astimezone(timezone.utc)
         guid = "tag:" + self.my_domain + "," + pub_date.strftime("%Y-%m-%d") + ":/first_reservation_statuses"
@@ -218,7 +221,7 @@ class XmlView(View):
         title = "旭川市のコロナワクチンマップ（5～11歳接種）"
         link = "https://" + self.my_domain + "/first_reservation_statuses"
         description = "旭川市の新型コロナワクチン接種医療機関（5～11歳接種）の予約受付状況などの情報を、地図から探すことができます。"
-        view = ChildReservationStatusView()
+        view = ChildReservationStatusView(self.__pool)
         pub_date = view.get_last_updated()
         pub_date = pub_date.astimezone(timezone.utc)
         guid = "tag:" + self.my_domain + "," + pub_date.strftime("%Y-%m-%d") + ":/child_reservation_statuses"
@@ -261,7 +264,7 @@ class XmlView(View):
             feed_data_list (list): コロナワクチンマップ（追加接種（オミクロン対応ワクチン））の地区一覧Feed用データのリスト
 
         """
-        view = ReservationStatusView()
+        view = ReservationStatusView(self.__pool)
         area_list = view.get_area_list()
         feed_data_list = list()
         for area in area_list:
@@ -290,7 +293,7 @@ class XmlView(View):
             feed_data_list (list): コロナワクチンマップ（追加接種（オミクロン対応ワクチン））の医療機関一覧Feed用データのリスト
 
         """
-        view = ReservationStatusView()
+        view = ReservationStatusView(self.__pool)
         medical_institution_list = view.get_medical_institution_list()
         feed_data_list = list()
         for medical_institution in medical_institution_list:
@@ -321,7 +324,7 @@ class XmlView(View):
             feed_data_list (list): コロナワクチンマップ（1・2回目接種）の地区一覧Feed用データのリスト
 
         """
-        view = FirstReservationStatusView()
+        view = FirstReservationStatusView(self.__pool)
         area_list = view.get_area_list()
         feed_data_list = list()
         for area in area_list:
@@ -350,7 +353,7 @@ class XmlView(View):
             feed_data_list (list): コロナワクチンマップ（1・2回目接種）の医療機関一覧Feed用データのリスト
 
         """
-        view = FirstReservationStatusView()
+        view = FirstReservationStatusView(self.__pool)
         medical_institution_list = view.get_medical_institution_list()
         feed_data_list = list()
         for medical_institution in medical_institution_list:
@@ -384,7 +387,7 @@ class XmlView(View):
             feed_data_list (list): コロナワクチンマップ（5～11歳接種）の地区一覧Feed用データのリスト
 
         """
-        view = ChildReservationStatusView()
+        view = ChildReservationStatusView(self.__pool)
         area_list = view.get_area_list()
         feed_data_list = list()
         for area in area_list:
@@ -413,7 +416,7 @@ class XmlView(View):
             feed_data_list (list): コロナワクチンマップ（5～11歳接種）の医療機関一覧Feed用データのリスト
 
         """
-        view = ChildReservationStatusView()
+        view = ChildReservationStatusView(self.__pool)
         medical_institution_list = view.get_medical_institution_list()
         feed_data_list = list()
         for medical_institution in medical_institution_list:
@@ -442,13 +445,13 @@ class XmlView(View):
 
 
 class RssView(XmlView):
-    def __init__(self, today: date):
+    def __init__(self, today: date, pool: ConnectionPool):
         """
         Args:
             today (date): 基準日
 
         """
-        XmlView.__init__(self, today)
+        XmlView.__init__(self, today, pool)
 
     def get_feed(self) -> dict:
         """RSS Feed文字列を返す
@@ -525,13 +528,13 @@ class RssView(XmlView):
 
 
 class AtomView(XmlView):
-    def __init__(self, today: date):
+    def __init__(self, today: date, pool: ConnectionPool):
         """
         Args:
             today (date): 基準日
 
         """
-        XmlView.__init__(self, today)
+        XmlView.__init__(self, today, pool)
 
     def get_feed(self) -> dict:
         """ATOM Feedデータ返す

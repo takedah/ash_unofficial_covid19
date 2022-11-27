@@ -9,9 +9,12 @@ from .models.sapporo_patients_number import SapporoPatientsNumberFactory
 from .scrapers.patient import ScrapeAsahikawaPatients, ScrapeAsahikawaPatientsPDF, ScrapeHokkaidoPatients
 from .scrapers.press_release_link import ScrapePressReleaseLink
 from .scrapers.sapporo_patients_number import ScrapeSapporoPatientsNumber
+from .services.database import ConnectionPool
 from .services.patient import AsahikawaPatientService, HokkaidoPatientService
 from .services.press_release_link import PressReleaseLinkService
 from .services.sapporo_patients_number import SapporoPatientsNumberService
+
+conn = ConnectionPool()
 
 
 def _get_download_lists() -> list:
@@ -64,7 +67,7 @@ def _import_hokkaido_patients(url: str) -> None:
         print(e.message)
         return
 
-    service = HokkaidoPatientService()
+    service = HokkaidoPatientService(conn)
     try:
         service.create(patients_factory)
     except (DatabaseConnectionError, ServiceError) as e:
@@ -96,7 +99,7 @@ def _import_asahikawa_patients(url: str, target_year: int) -> None:
         print(e.message)
         return
 
-    service = AsahikawaPatientService()
+    service = AsahikawaPatientService(conn)
     try:
         service.create(patients_factory)
     except (DatabaseConnectionError, ServiceError) as e:
@@ -129,7 +132,7 @@ def _import_additional_asahikawa_patients() -> None:
     }
     patients_factory.create(**additional_data)
 
-    service = AsahikawaPatientService()
+    service = AsahikawaPatientService(conn)
     try:
         service.create(patients_factory)
     except (DatabaseConnectionError, ServiceError) as e:
@@ -162,7 +165,7 @@ def _import_press_release_link(url: str, target_year: int) -> None:
         print(e.message)
         return
 
-    service = PressReleaseLinkService()
+    service = PressReleaseLinkService(conn)
     try:
         service.create(press_release_link_factory)
     except (DatabaseConnectionError, ServiceError) as e:
@@ -179,7 +182,7 @@ def _get_press_release_links() -> Optional[PressReleaseLinkFactory]:
             要素に持つオブジェクト
 
     """
-    press_release_link_service = PressReleaseLinkService()
+    press_release_link_service = PressReleaseLinkService(conn)
     try:
         return press_release_link_service.find_all()
     except (DatabaseConnectionError, ServiceError) as e:
@@ -204,7 +207,7 @@ def _import_asahikawa_data_from_press_release(pdf_url: str, publication_date: da
         print(e.message)
         return
 
-    service = AsahikawaPatientService()
+    service = AsahikawaPatientService(conn)
     try:
         for row in scraped_data.lists:
             patients_factory = AsahikawaPatientFactory()
@@ -228,7 +231,7 @@ def _import_sapporo_patients_number(url: str) -> None:
         print(e.message)
         return
 
-    service = SapporoPatientsNumberService()
+    service = SapporoPatientsNumberService(conn)
     sapporo_patients_number_factory = SapporoPatientsNumberFactory()
     for row in scraped_data.lists:
         sapporo_patients_number_factory.create(**row)
@@ -314,7 +317,7 @@ def delete_patients(patient_number: int):
         patient_number (int): 削除したい番号
 
     """
-    service = AsahikawaPatientService()
+    service = AsahikawaPatientService(conn)
     try:
         service.delete(patient_number)
     except (DatabaseConnectionError, ServiceError) as e:
@@ -323,4 +326,7 @@ def delete_patients(patient_number: int):
 
 
 if __name__ == "__main__":
-    import_latest()
+    try:
+        import_latest()
+    finally:
+        conn.close_connection()

@@ -6,6 +6,7 @@ from pandas._testing import assert_frame_equal
 
 from ash_unofficial_covid19.errors import ServiceError
 from ash_unofficial_covid19.models.patient import AsahikawaPatientFactory, HokkaidoPatientFactory
+from ash_unofficial_covid19.services.database import ConnectionPool
 from ash_unofficial_covid19.services.patient import AsahikawaPatientService, HokkaidoPatientService
 
 
@@ -69,7 +70,9 @@ class TestAsahikawaPatientService:
         hokkaido_factory = HokkaidoPatientFactory()
         for row in test_hokkaido_data:
             hokkaido_factory.create(**row)
-        hokkaido_service = HokkaidoPatientService()
+
+        conn = ConnectionPool()
+        hokkaido_service = HokkaidoPatientService(conn)
         hokkaido_service.create(hokkaido_factory)
 
         # 旭川市の新型コロナウイルス感染症患者データのセットアップ
@@ -198,10 +201,13 @@ class TestAsahikawaPatientService:
         factory = AsahikawaPatientFactory()
         for row in test_asahikawa_data:
             factory.create(**row)
-        service = AsahikawaPatientService()
+
+        service = AsahikawaPatientService(conn)
         service.create(factory)
 
         yield service
+
+        conn.close_connection()
 
     def test_delete(self, service):
         assert service.delete(patient_number=1121)

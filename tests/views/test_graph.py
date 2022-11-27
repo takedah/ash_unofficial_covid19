@@ -4,6 +4,7 @@ from io import BytesIO
 import pytest
 
 from ash_unofficial_covid19.models.patients_number import PatientsNumberFactory
+from ash_unofficial_covid19.services.database import ConnectionPool
 from ash_unofficial_covid19.services.patients_number import PatientsNumberService
 from ash_unofficial_covid19.views.graph import (
     ByAgeGraphView,
@@ -78,11 +79,15 @@ class TestDailyTotalGraphView:
         factory = PatientsNumberFactory()
         for row in test_data:
             factory.create(**row)
-        service = PatientsNumberService()
+
+        conn = ConnectionPool()
+        service = PatientsNumberService(conn)
         service.create(factory)
-        view = DailyTotalGraphView(date(2020, 2, 24))
+        view = DailyTotalGraphView(date(2020, 2, 24), conn)
 
         yield view
+
+        conn.close_connection()
 
     def test_get_graph_image(self, view):
         graph_image = view.get_graph_image()
@@ -92,9 +97,12 @@ class TestDailyTotalGraphView:
 class TestMonthTotalGraphView:
     @pytest.fixture()
     def view(self):
-        view = MonthTotalGraphView(date(2020, 2, 24))
+        conn = ConnectionPool()
+        view = MonthTotalGraphView(date(2020, 2, 24), conn)
 
         yield view
+
+        conn.close_connection()
 
     def test_get_graph_image(self, view):
         graph_image = view.get_graph_image()
@@ -104,9 +112,12 @@ class TestMonthTotalGraphView:
 class TestByAgeGraphView:
     @pytest.fixture()
     def view(self):
-        view = ByAgeGraphView(date(2020, 2, 24))
+        conn = ConnectionPool()
+        view = ByAgeGraphView(date(2020, 2, 24), conn)
 
         yield view
+
+        conn.close_connection()
 
     def test_get_graph_image(self, view):
         graph_image = view.get_graph_image()
@@ -116,9 +127,12 @@ class TestByAgeGraphView:
 class TestPerHundredThousandPopulationGraphView:
     @pytest.fixture()
     def view(self):
-        view = PerHundredThousandPopulationGraphView(date(2020, 2, 24))
+        conn = ConnectionPool()
+        view = PerHundredThousandPopulationGraphView(date(2020, 2, 24), conn)
 
         yield view
+
+        conn.close_connection()
 
     def test_get_graph_image(self, view):
         graph_image = view.get_graph_image()
@@ -128,9 +142,12 @@ class TestPerHundredThousandPopulationGraphView:
 class TestWeeklyPerAgeGraphView:
     @pytest.fixture()
     def view(self):
-        view = WeeklyPerAgeGraphView(date(2020, 2, 24))
+        conn = ConnectionPool()
+        view = WeeklyPerAgeGraphView(date(2020, 2, 24), conn)
 
         yield view
+
+        conn.close_connection()
 
     def test_get_graph_image(self, view):
         graph_image = view.get_graph_image()

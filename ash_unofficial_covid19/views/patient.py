@@ -4,6 +4,7 @@ from dateutil.relativedelta import relativedelta
 
 from ..errors import DatabaseConnectionError
 from ..models.patient import AsahikawaPatientFactory
+from ..services.database import ConnectionPool
 from ..services.patient import AsahikawaPatientService
 from ..services.press_release_link import PressReleaseLinkService
 from ..views.view import View
@@ -19,17 +20,23 @@ class AsahikawaPatientView(View):
 
     """
 
-    def __init__(self):
-        self.__service = AsahikawaPatientService()
+    def __init__(self, pool: ConnectionPool):
+        """
+        Args:
+            table_name (str): テーブル名
+            pool (:obj:`ConnectionPool`): SimpleConnectionPoolを要素に持つオブジェクト
+
+        """
+        self.__service = AsahikawaPatientService(pool)
         last_updated = self.__service.get_last_updated()
         self.__last_updated = last_updated.strftime("%Y/%m/%d %H:%M")
+        self.__pool = pool
 
     @property
     def last_updated(self):
         return self.__last_updated
 
-    @staticmethod
-    def get_today() -> date:
+    def get_today(self) -> date:
         """グラフの基準となる最新の報道発表日の日付を返す
 
         Returns:
@@ -38,7 +45,7 @@ class AsahikawaPatientView(View):
         """
         now = datetime.now(timezone(timedelta(hours=+9), "JST"))
         try:
-            press_release_link_service = PressReleaseLinkService()
+            press_release_link_service = PressReleaseLinkService(self.__pool)
             today = press_release_link_service.get_latest_publication_date()
         except DatabaseConnectionError:
             # エラーが起きた場合現在日付を基準とする。

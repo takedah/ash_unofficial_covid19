@@ -5,6 +5,7 @@ from typing import Optional
 from ..errors import DataModelError, ViewError
 from ..models.first_reservation_status import FirstReservationStatusLocationFactory
 from ..models.point import PointFactory
+from ..services.database import ConnectionPool
 from ..services.first_reservation_status import FirstReservationStatusService
 from ..services.location import LocationService
 from ..views.view import View
@@ -17,8 +18,14 @@ class FirstReservationStatusView(View):
 
     """
 
-    def __init__(self):
-        self.__service = FirstReservationStatusService()
+    def __init__(self, pool: ConnectionPool):
+        """
+        Args:
+            table_name (str): テーブル名
+            pool (:obj:`ConnectionPool`): SimpleConnectionPoolを要素に持つオブジェクト
+
+        """
+        self.__service = FirstReservationStatusService(pool)
 
     def get_last_updated(self) -> datetime:
         """テーブルの最終更新日を返す。

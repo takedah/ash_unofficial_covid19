@@ -4,19 +4,25 @@ from decimal import ROUND_HALF_UP, Decimal
 import pandas as pd
 import psycopg2
 from dateutil.relativedelta import relativedelta
-from psycopg2.extras import DictCursor
 
 from ..config import Config
 from ..errors import ServiceError
 from ..models.patient import AsahikawaPatientFactory, HokkaidoPatientFactory
+from ..services.database import ConnectionPool
 from ..services.service import Service
 
 
 class AsahikawaPatientService(Service):
     """旭川市の公表する新型コロナウイルス感染症患者データを扱うサービス"""
 
-    def __init__(self):
-        Service.__init__(self, "asahikawa_patients")
+    def __init__(self, pool: ConnectionPool):
+        """
+        Args:
+            table_name (str): テーブル名
+            pool (:obj:`ConnectionPool`): SimpleConnectionPoolを要素に持つオブジェクト
+
+        """
+        Service.__init__(self, "asahikawa_patients", pool)
 
     def create(self, patients: AsahikawaPatientFactory) -> None:
         """データベースへ新型コロナウイルス感染症患者データを一括登録する
@@ -94,21 +100,21 @@ class AsahikawaPatientService(Service):
         state = "DELETE from asahikawa_patients WHERE patient_number = %s;"
         values = (patient_number,)
         result = False
-        with self.get_connection() as conn:
-            try:
-                with conn.cursor(cursor_factory=DictCursor) as cur:
-                    cur.execute(state, values)
-                    if cur.statusmessage == "DELETE 1":
-                        result = True
-                conn.commit()
-                self.info_log("市内番号" + str(patient_number) + "を削除しました。")
-            except (
-                psycopg2.DataError,
-                psycopg2.IntegrityError,
-                psycopg2.InternalError,
-            ) as e:
-                self.error_log(e.args[0])
-                raise ServiceError("陽性患者データを削除できませんでした。")
+        try:
+            with self.get_connection() as cur:
+                cur.execute(state, values)
+                if cur.statusmessage == "DELETE 1":
+                    result = True
+
+            self.info_log("市内番号" + str(patient_number) + "を削除しました。")
+        except (
+            psycopg2.DataError,
+            psycopg2.IntegrityError,
+            psycopg2.InternalError,
+        ) as e:
+            self.error_log(e.args[0])
+            raise ServiceError("陽性患者データを削除できませんでした。")
+
         return result
 
     def find_all(self) -> AsahikawaPatientFactory:
@@ -143,18 +149,18 @@ class AsahikawaPatientService(Service):
             + "ORDER BY a.patient_number ASC;"
         )
         factory = AsahikawaPatientFactory()
-        with self.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state)
-                for dict_cursor in cur.fetchall():
-                    row = dict(dict_cursor)
-                    # 北海道データがない場合、職業は旭川データの値をセット
-                    if row["h_occupation"] is None:
-                        row["occupation"] = row["a_occupation"]
-                    else:
-                        row["occupation"] = row["h_occupation"]
-                    del row["h_occupation"], row["a_occupation"]
-                    factory.create(**row)
+        with self.get_connection() as cur:
+            cur.execute(state)
+            for dict_cursor in cur.fetchall():
+                row = dict(dict_cursor)
+                # 北海道データがない場合、職業は旭川データの値をセット
+                if row["h_occupation"] is None:
+                    row["occupation"] = row["a_occupation"]
+                else:
+                    row["occupation"] = row["h_occupation"]
+                del row["h_occupation"], row["a_occupation"]
+                factory.create(**row)
+
         return factory
 
     def find(self, page: int = 1, desc: bool = True) -> tuple[AsahikawaPatientFactory, int]:
@@ -177,10 +183,10 @@ class AsahikawaPatientService(Service):
         max_page = 1
 
         count_state = "SELECT" + " " + "count(patient_number)" + " " + "FROM" + " " + self.table_name + ";"
-        with self.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(count_state)
-                res = cur.fetchone()
+        with self.get_connection() as cur:
+            cur.execute(count_state)
+            res = cur.fetchone()
+
         results_number = res["count"]
         # 検索結果の最大ページ数を取得
         max_view_number = 100
@@ -191,11 +197,13 @@ class AsahikawaPatientService(Service):
                 max_page = divmod(results_number, max_view_number)[0]
             else:
                 max_page = divmod(results_number, max_view_number)[0] + 1
+
         # 指定されたページ数の検索結果を表示するためにスキップするレコード数を取得
         if max_page < page:
             raise ServiceError("指定したページ数が上限を超えています。")
         else:
             skip_record_number = (page - 1) * max_view_number
+
         # ページネーション用の追加SQL文字列を生成
         pagenation_option = " LIMIT " + str(max_view_number)
         if 1 < page:
@@ -205,6 +213,7 @@ class AsahikawaPatientService(Service):
             order = "DESC"
         else:
             order = "ASC"
+
         state = (
             "SELECT"
             + " "
@@ -230,11 +239,11 @@ class AsahikawaPatientService(Service):
         )
         state += pagenation_option + ";"
         factory = AsahikawaPatientFactory()
-        with self.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state)
-                for row in cur.fetchall():
-                    factory.create(**row)
+        with self.get_connection() as cur:
+            cur.execute(state)
+            for row in cur.fetchall():
+                factory.create(**row)
+
         return (factory, max_page)
 
     def get_rows(self) -> list:
@@ -331,11 +340,10 @@ class AsahikawaPatientService(Service):
             + "ORDER BY from_day;"
         )
         aggregate_by_days_per_age = list()
-        with self.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
-                for row in cur.fetchall():
-                    aggregate_by_days_per_age.append(dict(row))
+        with self.get_connection() as cur:
+            cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
+            for row in cur.fetchall():
+                aggregate_by_days_per_age.append(dict(row))
 
         return aggregate_by_days_per_age
 
@@ -365,11 +373,11 @@ class AsahikawaPatientService(Service):
             + "asahikawa_patients.publication_date < to_day GROUP BY from_day;"
         )
         aggregate_by_days = list()
-        with self.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
-                for row in cur.fetchall():
-                    aggregate_by_days.append((row[0], row[1]))
+        with self.get_connection() as cur:
+            cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
+            for row in cur.fetchall():
+                aggregate_by_days.append((row[0], row[1]))
+
         return aggregate_by_days
 
     def get_aggregate_by_weeks(self, from_date: date, to_date: date) -> list:
@@ -398,11 +406,11 @@ class AsahikawaPatientService(Service):
             + "asahikawa_patients.publication_date < to_week GROUP BY from_week;"
         )
         aggregate_by_weeks = list()
-        with self.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
-                for row in cur.fetchall():
-                    aggregate_by_weeks.append((row[0], row[1]))
+        with self.get_connection() as cur:
+            cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
+            for row in cur.fetchall():
+                aggregate_by_weeks.append((row[0], row[1]))
+
         return aggregate_by_weeks
 
     def get_aggregate_by_weeks_per_age(self, from_date: date, to_date: date) -> pd.DataFrame:
@@ -446,16 +454,15 @@ class AsahikawaPatientService(Service):
                 "非公表",
             ]
         )
-        with self.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
-                for row in cur.fetchall():
-                    if row["age"] is None:
-                        df.loc[row["weeks"]] = 0
-                    elif row["age"] == "":
-                        df.at[row["weeks"], "非公表"] = row["patients"]
-                    else:
-                        df.at[row["weeks"], row["age"]] = row["patients"]
+        with self.get_connection() as cur:
+            cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
+            for row in cur.fetchall():
+                if row["age"] is None:
+                    df.loc[row["weeks"]] = 0
+                elif row["age"] == "":
+                    df.at[row["weeks"], "非公表"] = row["patients"]
+                else:
+                    df.at[row["weeks"], row["age"]] = row["patients"]
 
         return df.fillna(0)
 
@@ -572,11 +579,11 @@ class AsahikawaPatientService(Service):
             + ") AS aggregate_patients;"
         )
         total_by_months = list()
-        with self.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
-                for row in cur.fetchall():
-                    total_by_months.append((row[0], row[1]))
+        with self.get_connection() as cur:
+            cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
+            for row in cur.fetchall():
+                total_by_months.append((row[0], row[1]))
+
         return total_by_months
 
     def get_patients_number_by_age(self, from_date: date, to_date: date) -> list:
@@ -610,30 +617,29 @@ class AsahikawaPatientService(Service):
             ("80代", 0),
             ("90歳以上", 0),
         ]
-        with self.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
-                for row in cur.fetchall():
-                    if row[0] == "10歳未満":
-                        patients_number_by_age[0] = (row[0], row[1])
-                    elif row[0] == "10代":
-                        patients_number_by_age[1] = (row[0], row[1])
-                    elif row[0] == "20代":
-                        patients_number_by_age[2] = (row[0], row[1])
-                    elif row[0] == "30代":
-                        patients_number_by_age[3] = (row[0], row[1])
-                    elif row[0] == "40代":
-                        patients_number_by_age[4] = (row[0], row[1])
-                    elif row[0] == "50代":
-                        patients_number_by_age[5] = (row[0], row[1])
-                    elif row[0] == "60代":
-                        patients_number_by_age[6] = (row[0], row[1])
-                    elif row[0] == "70代":
-                        patients_number_by_age[7] = (row[0], row[1])
-                    elif row[0] == "80代":
-                        patients_number_by_age[8] = (row[0], row[1])
-                    elif row[0] == "90歳以上":
-                        patients_number_by_age[9] = (row[0], row[1])
+        with self.get_connection() as cur:
+            cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
+            for row in cur.fetchall():
+                if row[0] == "10歳未満":
+                    patients_number_by_age[0] = (row[0], row[1])
+                elif row[0] == "10代":
+                    patients_number_by_age[1] = (row[0], row[1])
+                elif row[0] == "20代":
+                    patients_number_by_age[2] = (row[0], row[1])
+                elif row[0] == "30代":
+                    patients_number_by_age[3] = (row[0], row[1])
+                elif row[0] == "40代":
+                    patients_number_by_age[4] = (row[0], row[1])
+                elif row[0] == "50代":
+                    patients_number_by_age[5] = (row[0], row[1])
+                elif row[0] == "60代":
+                    patients_number_by_age[6] = (row[0], row[1])
+                elif row[0] == "70代":
+                    patients_number_by_age[7] = (row[0], row[1])
+                elif row[0] == "80代":
+                    patients_number_by_age[8] = (row[0], row[1])
+                elif row[0] == "90歳以上":
+                    patients_number_by_age[9] = (row[0], row[1])
 
         return patients_number_by_age
 
@@ -648,10 +654,9 @@ class AsahikawaPatientService(Service):
 
         """
         state = "SELECT COUNT(patient_number) FROM" + " " + self.table_name + " " + "WHERE publication_date = %s;"
-        with self.get_connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute(state, (target_date,))
-                res = cur.fetchone()
+        with self.get_connection() as cur:
+            cur.execute(state, (target_date,))
+            res = cur.fetchone()
 
         patients_number = res[0]
         if isinstance(patients_number, int):
@@ -663,8 +668,14 @@ class AsahikawaPatientService(Service):
 class HokkaidoPatientService(Service):
     """北海道の公表する新型コロナウイルス感染症患者データを扱うサービス"""
 
-    def __init__(self):
-        Service.__init__(self, "hokkaido_patients")
+    def __init__(self, pool: ConnectionPool):
+        """
+        Args:
+            table_name (str): テーブル名
+            pool (:obj:`ConnectionPool`): SimpleConnectionPoolを要素に持つオブジェクト
+
+        """
+        Service.__init__(self, "hokkaido_patients", pool)
 
     def create(self, patients: HokkaidoPatientFactory) -> None:
         """データベースへ新型コロナウイルス感染症患者データを保存

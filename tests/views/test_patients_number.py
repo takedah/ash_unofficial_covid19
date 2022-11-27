@@ -3,6 +3,7 @@ from datetime import date
 import pytest
 
 from ash_unofficial_covid19.models.patients_number import PatientsNumberFactory
+from ash_unofficial_covid19.services.database import ConnectionPool
 from ash_unofficial_covid19.services.patients_number import PatientsNumberService
 from ash_unofficial_covid19.views.patients_number import (
     ByAgeView,
@@ -78,11 +79,15 @@ class TestPatientsNumberView:
         factory = PatientsNumberFactory()
         for row in test_data:
             factory.create(**row)
-        service = PatientsNumberService()
+
+        conn = ConnectionPool()
+        service = PatientsNumberService(conn)
         service.create(factory)
-        view = PatientsNumberView(date(2020, 2, 25))
+        view = PatientsNumberView(date(2020, 2, 25), conn)
 
         yield view
+
+        conn.close_connection()
 
     def test_get_daily_total_csv(self, view):
         result = view.get_daily_total_csv()
@@ -184,11 +189,15 @@ class TestDailyTotalView:
         factory = PatientsNumberFactory()
         for row in test_data:
             factory.create(**row)
-        service = PatientsNumberService()
+
+        conn = ConnectionPool()
+        service = PatientsNumberService(conn)
         service.create(factory)
-        view = DailyTotalView(date(2020, 2, 24))
+        view = DailyTotalView(date(2020, 2, 24), conn)
 
         yield view
+
+        conn.close_connection()
 
     def test_daily_total_property(self, view):
         assert view.reference_date == "2020/02/24 (月) "
@@ -206,9 +215,12 @@ class TestDailyTotalView:
 class TestMonthTotalView:
     @pytest.fixture()
     def view(self):
-        view = MonthTotalView(date(2020, 2, 24))
+        conn = ConnectionPool()
+        view = MonthTotalView(date(2020, 2, 24), conn)
 
         yield view
+
+        conn.close_connection()
 
     def test_month_total_property(self, view):
         assert view.reference_date == "2020/02/24 (月) "
@@ -221,9 +233,12 @@ class TestMonthTotalView:
 class TestByAgeView:
     @pytest.fixture()
     def view(self):
-        view = ByAgeView(date(2020, 2, 24))
+        conn = ConnectionPool()
+        view = ByAgeView(date(2020, 2, 24), conn)
 
         yield view
+
+        conn.close_connection()
 
     def test_by_age_property(self, view):
         assert (
@@ -235,9 +250,12 @@ class TestByAgeView:
 class TestPerHundredThousandPopulationView:
     @pytest.fixture()
     def view(self):
-        view = PerHundredThousandPopulationView(date(2020, 2, 24))
+        conn = ConnectionPool()
+        view = PerHundredThousandPopulationView(date(2020, 2, 24), conn)
 
         yield view
+
+        conn.close_connection()
 
     def test_per_hundred_thousand_population_property(self, view):
         assert view.this_week == "60.68"
@@ -249,9 +267,12 @@ class TestPerHundredThousandPopulationView:
 class TestWeeklyPerAgeView:
     @pytest.fixture()
     def view(self):
-        view = WeeklyPerAgeView(date(2020, 2, 24))
+        conn = ConnectionPool()
+        view = WeeklyPerAgeView(date(2020, 2, 24), conn)
 
         yield view
+
+        conn.close_connection()
 
     def test_weekly_per_age_property(self, view):
         assert (

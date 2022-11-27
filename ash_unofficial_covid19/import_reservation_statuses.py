@@ -11,9 +11,12 @@ from .scrapers.first_reservation_status import ScrapeFirstReservationStatus
 from .scrapers.location import ScrapeYOLPLocation
 from .scrapers.reservation_status import ScrapeReservationStatus
 from .services.child_reservation_status import ChildReservationStatusService
+from .services.database import ConnectionPool
 from .services.first_reservation_status import FirstReservationStatusService
 from .services.location import LocationService
 from .services.reservation_status import ReservationStatusService
+
+conn = ConnectionPool()
 
 
 def import_reservation_statuses(html_url: str) -> None:
@@ -37,7 +40,7 @@ def import_reservation_statuses(html_url: str) -> None:
     for row in scraped_data.lists:
         factory.create(**row)
 
-    service = ReservationStatusService()
+    service = ReservationStatusService(conn)
     current_name_list = service.get_medical_institution_list()
     added_names = list()
     for new_name in new_name_list:
@@ -84,7 +87,7 @@ def import_first_reservation_statuses(html_url: str) -> None:
     for row in scraped_data.lists:
         factory.create(**row)
 
-    service = FirstReservationStatusService()
+    service = FirstReservationStatusService(conn)
     current_name_list = service.get_medical_institution_list()
     added_names = list()
     for new_name in new_name_list:
@@ -131,7 +134,7 @@ def import_child_reservation_statuses(html_url: str) -> None:
     for row in scraped_data.lists:
         factory.create(**row)
 
-    service = ChildReservationStatusService()
+    service = ChildReservationStatusService(conn)
     current_name_list = service.get_medical_institution_list()
     added_names = list()
     for new_name in new_name_list:
@@ -177,7 +180,7 @@ def import_locations(medical_institution_name_list: list) -> None:
         locations_factory.create(**row)
         time.sleep(1)
 
-    service = LocationService()
+    service = LocationService(conn)
     try:
         service.create(locations_factory)
     except (DatabaseConnectionError, ServiceError) as e:
@@ -294,6 +297,9 @@ def import_locations(medical_institution_name_list: list) -> None:
 
 
 if __name__ == "__main__":
-    import_reservation_statuses(Config.RESERVATION_STATUSES_URL)
-    import_first_reservation_statuses(Config.RESERVATION_STATUSES_URL)
-    import_child_reservation_statuses(Config.RESERVATION_STATUSES_URL)
+    try:
+        import_reservation_statuses(Config.RESERVATION_STATUSES_URL)
+        import_first_reservation_statuses(Config.RESERVATION_STATUSES_URL)
+        import_child_reservation_statuses(Config.RESERVATION_STATUSES_URL)
+    finally:
+        conn.close_connection()

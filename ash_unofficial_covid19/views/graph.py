@@ -10,6 +10,7 @@ from matplotlib.font_manager import FontProperties
 from matplotlib.ticker import MultipleLocator
 from PIL import Image
 
+from ..services.database import ConnectionPool
 from ..views.patients_number import (
     ByAgeView,
     DailyTotalView,
@@ -47,13 +48,14 @@ class GraphView(View):
 class DailyTotalGraphView(GraphView):
     """日別累計患者数グラフ"""
 
-    def __init__(self, today: date):
+    def __init__(self, today: date, pool: ConnectionPool):
         """
         Args:
             today (date): グラフを作成する基準日
+            pool (:obj:`ConnectionPool`): SimpleConnectionPoolを要素に持つオブジェクト
 
         """
-        patients_numbers = DailyTotalView(today)
+        patients_numbers = DailyTotalView(today, pool)
         self._patients_numbers = patients_numbers
 
     def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
@@ -93,13 +95,14 @@ class DailyTotalGraphView(GraphView):
 class MonthTotalGraphView(GraphView):
     """月別累計患者数グラフ"""
 
-    def __init__(self, today: date):
+    def __init__(self, today: date, pool: ConnectionPool):
         """
         Args:
             today (date): グラフを作成する基準日
+            pool (:obj:`ConnectionPool`): SimpleConnectionPoolを要素に持つオブジェクト
 
         """
-        patients_numbers = MonthTotalView(today)
+        patients_numbers = MonthTotalView(today, pool)
         self._patients_numbers = patients_numbers
 
     def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
@@ -138,13 +141,14 @@ class MonthTotalGraphView(GraphView):
 class ByAgeGraphView(GraphView):
     """年代別患者数割合グラフ"""
 
-    def __init__(self, today: date):
+    def __init__(self, today: date, pool: ConnectionPool):
         """
         Args:
             today (date): グラフを作成する基準日
+            pool (:obj:`ConnectionPool`): SimpleConnectionPoolを要素に持つオブジェクト
 
         """
-        patients_numbers = ByAgeView(today)
+        patients_numbers = ByAgeView(today, pool)
         self._patients_numbers = patients_numbers
 
     def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
@@ -206,13 +210,14 @@ class ByAgeGraphView(GraphView):
 class PerHundredThousandPopulationGraphView(GraphView):
     """1週間の人口10万人あたり患者数グラフ"""
 
-    def __init__(self, today: date):
+    def __init__(self, today: date, pool: ConnectionPool):
         """
         Args:
             today (date): グラフを作成する基準日
+            pool (:obj:`ConnectionPool`): SimpleConnectionPoolを要素に持つオブジェクト
 
         """
-        patients_numbers = PerHundredThousandPopulationView(today)
+        patients_numbers = PerHundredThousandPopulationView(today, pool)
         self._patients_numbers = patients_numbers
 
     def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
@@ -275,13 +280,14 @@ class PerHundredThousandPopulationGraphView(GraphView):
 class WeeklyPerAgeGraphView(GraphView):
     """1週間ごとの年代別新規陽性患者数グラフ"""
 
-    def __init__(self, today: date):
+    def __init__(self, today: date, pool: ConnectionPool):
         """
         Args:
             today (date): グラフを作成する基準日
+            pool (:obj:`ConnectionPool`): SimpleConnectionPoolを要素に持つオブジェクト
 
         """
-        patients_numbers = WeeklyPerAgeView(today)
+        patients_numbers = WeeklyPerAgeView(today, pool)
         self._patients_numbers = patients_numbers
 
     def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:

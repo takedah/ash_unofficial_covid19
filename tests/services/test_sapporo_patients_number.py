@@ -3,6 +3,7 @@ from datetime import date
 import pytest
 
 from ash_unofficial_covid19.models.sapporo_patients_number import SapporoPatientsNumberFactory
+from ash_unofficial_covid19.services.database import ConnectionPool
 from ash_unofficial_covid19.services.sapporo_patients_number import SapporoPatientsNumberService
 
 
@@ -45,9 +46,14 @@ def service():
     factory = SapporoPatientsNumberFactory()
     for row in test_data:
         factory.create(**row)
-    service = SapporoPatientsNumberService()
+
+    conn = ConnectionPool()
+    service = SapporoPatientsNumberService(conn)
     service.create(factory)
+
     yield service
+
+    conn.close_connection()
 
 
 def test_find_all(service):

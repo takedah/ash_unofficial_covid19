@@ -4,6 +4,7 @@ from flask import Flask, abort, escape, g, make_response, render_template, reque
 
 from .config import Config
 from .errors import ViewError
+from .services.database import ConnectionPool
 from .views.child_reservation_status import ChildReservationStatusView
 from .views.first_reservation_status import FirstReservationStatusView
 from .views.patients_number import (
@@ -49,63 +50,89 @@ def add_security_headers(response):
     return response
 
 
+def get_connection():
+    if "db" not in g:
+        g.db = ConnectionPool()
+
+    return g.db
+
+
+@app.teardown_appcontext
+def close_connection(e):
+    db = g.pop("db", None)
+    if db is not None:
+        db.close_connection()
+
+
 def get_today():
     if "today" not in g:
-        press_release = PressReleaseView()
+        conn = get_connection()
+        press_release = PressReleaseView(conn)
         g.today = press_release.latest_date
     return g.today
 
 
 def get_patients_numbers():
+    conn = get_connection()
     today = get_today()
-    return PatientsNumberView(today)
+    return PatientsNumberView(today, conn)
 
 
 def get_reservation_statuses():
-    return ReservationStatusView()
+    conn = get_connection()
+    return ReservationStatusView(conn)
 
 
 def get_first_reservation_statuses():
-    return FirstReservationStatusView()
+    conn = get_connection()
+    return FirstReservationStatusView(conn)
 
 
 def get_child_reservation_statuses():
-    return ChildReservationStatusView()
+    conn = get_connection()
+    return ChildReservationStatusView(conn)
 
 
 def get_daily_total():
+    conn = get_connection()
     today = get_today()
-    return DailyTotalView(today)
+    return DailyTotalView(today, conn)
 
 
 def get_month_total():
+    conn = get_connection()
     today = get_today()
-    return MonthTotalView(today)
+    return MonthTotalView(today, conn)
 
 
 def get_by_age():
+    conn = get_connection()
     today = get_today()
-    return ByAgeView(today)
+    return ByAgeView(today, conn)
 
 
 def get_per_hundred_thousand_population():
+    conn = get_connection()
     today = get_today()
-    return PerHundredThousandPopulationView(today)
+    return PerHundredThousandPopulationView(today, conn)
 
 
 def get_weekly_per_age():
+    conn = get_connection()
     today = get_today()
-    return WeeklyPerAgeView(today)
+    return WeeklyPerAgeView(today, conn)
 
 
 def get_atom():
+    conn = get_connection()
     today = get_today()
-    return AtomView(today)
+    return AtomView(today, conn)
 
 
 def get_rss():
+    conn = get_connection()
     today = get_today()
-    return RssView(today)
+    return RssView(today, conn)
 
 
 @app.route("/")

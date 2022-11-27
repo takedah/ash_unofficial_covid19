@@ -2,10 +2,10 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 import psycopg2
-from psycopg2.extras import DictCursor
 
 from ..errors import ServiceError
 from ..models.first_reservation_status import FirstReservationStatusFactory, FirstReservationStatusLocationFactory
+from ..services.database import ConnectionPool
 from ..services.service import Service
 
 
@@ -16,9 +16,15 @@ class FirstReservationStatusService(Service):
 
     """
 
-    def __init__(self):
+    def __init__(self, pool: ConnectionPool):
+        """
+        Args:
+            table_name (str): テーブル名
+            pool (:obj:`ConnectionPool`): SimpleConnectionPoolを要素に持つオブジェクト
+
+        """
         table_name = "first_reservation_statuses"
-        Service.__init__(self, table_name)
+        Service.__init__(self, table_name, pool)
 
     def create(self, first_reservation_statuses: FirstReservationStatusFactory) -> None:
         """データベースへ新型コロナワクチン1・2回目接種医療機関の予約受付状況データを保存
@@ -88,24 +94,23 @@ class FirstReservationStatusService(Service):
 
         state = "DELETE FROM " + self.table_name + " " + "WHERE medical_institution_name=%s;"
         log_message = self.table_name + "テーブルから" + " " + target_value + " " + "を"
-        with self.get_connection() as conn:
-            try:
-                with conn.cursor(cursor_factory=DictCursor) as cur:
-                    cur.execute(state, (target_value,))
-                    result = cur.rowcount
-                if result:
-                    self.info_log(log_message + "削除しました。")
-                    return True
-                else:
-                    self.error_log(log_message + "削除できませんでした。")
-                    return False
-            except (
-                psycopg2.DataError,
-                psycopg2.IntegrityError,
-                psycopg2.InternalError,
-            ) as e:
+        try:
+            with self.get_connection() as cur:
+                cur.execute(state, (target_value,))
+                result = cur.rowcount
+            if result:
+                self.info_log(log_message + "削除しました。")
+                return True
+            else:
                 self.error_log(log_message + "削除できませんでした。")
-                raise ServiceError(e.args[0])
+                return False
+        except (
+            psycopg2.DataError,
+            psycopg2.IntegrityError,
+            psycopg2.InternalError,
+        ) as e:
+            self.error_log(log_message + "削除できませんでした。")
+            raise ServiceError(e.args[0])
 
     def get_medical_institution_list(self) -> list:
         """新型コロナワクチン1・2回目接種医療機関一覧を取得
@@ -125,11 +130,11 @@ class FirstReservationStatusService(Service):
             + "ORDER BY medical_institution_name;"
         )
         medical_institution_list = list()
-        with self.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state)
-                for row in cur.fetchall():
-                    medical_institution_list.append(row["medical_institution_name"])
+        with self.get_connection() as cur:
+            cur.execute(state)
+            for row in cur.fetchall():
+                medical_institution_list.append(row["medical_institution_name"])
+
         return medical_institution_list
 
     def get_dicts(self) -> dict:
@@ -152,15 +157,14 @@ class FirstReservationStatusService(Service):
             + "ORDER BY area,address;"
         )
         dicts = dict()
-        with self.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state)
-                i = 0
-                for row in cur.fetchall():
-                    key = "row" + str(i)
-                    value = dict(row)
-                    dicts[key] = value
-                    i += 1
+        with self.get_connection() as cur:
+            cur.execute(state)
+            i = 0
+            for row in cur.fetchall():
+                key = "row" + str(i)
+                value = dict(row)
+                dicts[key] = value
+                i += 1
 
         return dicts
 
@@ -217,14 +221,13 @@ class FirstReservationStatusService(Service):
         )
         order_sentence = " " + "ORDER BY area,address;"
         factory = FirstReservationStatusLocationFactory()
-        with self.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                if len(search_args) == 0:
-                    cur.execute(state + order_sentence)
-                else:
-                    cur.execute(state + where_sentence + order_sentence, search_args)
-                for row in cur.fetchall():
-                    factory.create(**row)
+        with self.get_connection() as cur:
+            if len(search_args) == 0:
+                cur.execute(state + order_sentence)
+            else:
+                cur.execute(state + where_sentence + order_sentence, search_args)
+            for row in cur.fetchall():
+                factory.create(**row)
 
         return factory
 
@@ -237,10 +240,9 @@ class FirstReservationStatusService(Service):
         """
         state = "SELECT DISTINCT(area)" + " " + "FROM" + " " + self.table_name + " " + "ORDER BY area;"
         area_list = list()
-        with self.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute(state)
-                for row in cur.fetchall():
-                    area_list.append(row["area"])
+        with self.get_connection() as cur:
+            cur.execute(state)
+            for row in cur.fetchall():
+                area_list.append(row["area"])
 
         return area_list

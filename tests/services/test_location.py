@@ -3,6 +3,7 @@ import pytest
 from ash_unofficial_covid19.models.location import LocationFactory
 from ash_unofficial_covid19.models.point import PointFactory
 from ash_unofficial_covid19.models.reservation_status import ReservationStatusLocationFactory
+from ash_unofficial_covid19.services.database import ConnectionPool
 from ash_unofficial_covid19.services.location import LocationService
 
 
@@ -33,9 +34,14 @@ def service():
     factory = LocationFactory()
     for row in test_data:
         factory.create(**row)
-    service = LocationService()
+
+    conn = ConnectionPool()
+    service = LocationService(conn)
     service.create(factory)
+
     yield service
+
+    conn.close_connection()
 
 
 def test_find_all(service):
