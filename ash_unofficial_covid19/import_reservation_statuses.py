@@ -2,14 +2,17 @@ import time
 
 from .config import Config
 from .errors import DatabaseConnectionError, HTTPDownloadError, ScrapeError, ServiceError
+from .models.baby_reservation_status import BabyReservationStatusFactory
 from .models.child_reservation_status import ChildReservationStatusFactory
 from .models.first_reservation_status import FirstReservationStatusFactory
 from .models.location import LocationFactory
 from .models.reservation_status import ReservationStatusFactory
+from .scrapers.baby_reservation_status import ScrapeBabyReservationStatus
 from .scrapers.child_reservation_status import ScrapeChildReservationStatus
 from .scrapers.first_reservation_status import ScrapeFirstReservationStatus
 from .scrapers.location import ScrapeYOLPLocation
 from .scrapers.reservation_status import ScrapeReservationStatus
+from .services.baby_reservation_status import BabyReservationStatusService
 from .services.child_reservation_status import ChildReservationStatusService
 from .services.database import ConnectionPool
 from .services.first_reservation_status import FirstReservationStatusService
@@ -160,6 +163,53 @@ def import_child_reservation_statuses(html_url: str) -> None:
     return
 
 
+def import_baby_reservation_statuses(html_url: str) -> None:
+    """
+    旭川市公式ホームページから新型コロナワクチン接種医療機関の予約受付状況一覧を取得し、
+    データベースへ格納する。
+
+    Args:
+        html_url (str): ワクチン接種医療機関予約受付状況HTMLファイルのURL
+
+    """
+    factory = BabyReservationStatusFactory()
+
+    try:
+        scraped_data = ScrapeBabyReservationStatus(html_url)
+        new_name_list = scraped_data.get_medical_institution_list()
+    except HTTPDownloadError as e:
+        print(e.message)
+        return
+
+    for row in scraped_data.lists:
+        factory.create(**row)
+
+    service = BabyReservationStatusService(conn)
+    current_name_list = service.get_medical_institution_list()
+    added_names = list()
+    for new_name in new_name_list:
+        if new_name not in current_name_list:
+            added_names.append(new_name[0])
+
+    added_names = list(set(added_names))
+
+    deleted_names = list()
+    for current_name in current_name_list:
+        if current_name not in new_name_list:
+            deleted_names.append((current_name[0], current_name[1]))
+
+    try:
+        service.create(factory)
+        import_locations(added_names)
+        for deleted_name in deleted_names:
+            service.delete(deleted_name)
+    except (DatabaseConnectionError, ServiceError) as e:
+        print(e.message)
+        return
+
+    return
+
+
 def import_locations(medical_institution_name_list: list) -> None:
     """
     医療機関の名称一覧から緯度経度を取得し、データベースへ格納する。
@@ -284,6 +334,11 @@ def import_locations(medical_institution_name_list: list) -> None:
             "longitude": 142.38439872663736,
             "latitude": 43.801697594258115,
         },
+        {
+            "medical_institution_name": "みうら小児科クリニック",
+            "longitude": 142.33471821314035,
+            "latitude": 43.75955680467453,
+        },
     ]
     for add_data in add_data_list:
         add_locations_factory.create(**add_data)
@@ -301,5 +356,6 @@ if __name__ == "__main__":
         import_reservation_statuses(Config.RESERVATION_STATUSES_URL)
         import_first_reservation_statuses(Config.RESERVATION_STATUSES_URL)
         import_child_reservation_statuses(Config.RESERVATION_STATUSES_URL)
+        import_baby_reservation_statuses(Config.RESERVATION_STATUSES_URL)
     finally:
         conn.close_connection()

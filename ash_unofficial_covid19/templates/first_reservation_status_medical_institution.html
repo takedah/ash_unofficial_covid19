@@ -13,34 +13,21 @@
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
   </div>
   {% for search_result in search_results %}
-    {% if loop.index == 1 %}
-      <div class="card">
-        <div class="card-body">
-          <section>
-            <h2 class="h5 card-title mb-3">医療機関の情報</h2>
-            <table class="table table-bordered" id="results" data-length="{{ search_lengths|tojson }}">
-              <tbody>
-                <tr>
-                  <th class="table-active text-nowrap">医療機関名</th><td>{{ medical_institution }}</td>
-                </tr>
-                <tr>
-                  <th class="table-active text-nowrap">所在地</th><td>{{ search_result.address }}</td>
-                </tr>
-                <tr>
-                  <th class="table-active text-nowrap">電話番号</th><td>{{ search_result.phone_number }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </section>
-        </div>
-      </div>
-    {% endif %}
-    <div class="card mt-3">
+    <div class="card">
       <div class="card-body">
         <section>
-          <h2 class="h5 card-title mb-3">予約受付状況（1・2回目接種）</h2>
-          <table class="table">
+          <h2 class="h5 card-title mb-3">医療機関の情報</h2>
+          <table class="table table-bordered" id="results" data-length="{{ search_lengths|tojson }}">
             <tbody>
+              <tr>
+                <th class="text-nowrap">医療機関名</th><td>{{ medical_institution }}</td>
+              </tr>
+              <tr>
+                <th class="text-nowrap">所在地</th><td>{{ search_result.address }}</td>
+              </tr>
+              <tr>
+                <th class="text-nowrap">電話番号</th><td>{{ search_result.phone_number }}</td>
+              </tr>
               <tr id="order{{ loop.index }}" data-latitude="{{ search_result.latitude|tojson }}" data-longitude="{{ search_result.longitude|tojson }}" data-name="{{ search_result.medical_institution_name|safe }}" data-url="{{ search_result.medical_institution_name_url|safe }}" data-vaccine="{{ search_result.vaccine|safe }}" data-istargetnotfamily="{{ search_result.is_target_not_family|safe }}" data-status="{{ search_result.status|safe }}">
                 <th class="text-nowrap">予約受付開始時期</th><td>{{ search_result.status }}</td>
               </tr>
@@ -69,9 +56,6 @@
                 {% else %}
                   <td>NG</td>
                 {% endif %}
-              </tr>
-              <tr>
-                <th class="text-nowrap">その他条件</th><td>{{ search_result.target_other }}</td>
               </tr>
               <tr>
                 <th class="text-nowrap">備考</th><td>{{ search_result.memo }}</td>

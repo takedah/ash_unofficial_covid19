@@ -27,13 +27,14 @@
                 <th class="text-nowrap">接種可能時期</th>
                 <th class="text-nowrap">年齢</th>
                 <th class="text-nowrap">かかりつけ以外</th>
+                <th class="text-nowrap">市外の方</th>
                 <th class="text-nowrap">その他条件・備考など</th>
                 <th>距離</th>
               </tr>
             </thead>
             <tbody id="results" data-length="{{ search_lengths|tojson }}" data-currentlatitude="{{ current_latitude|tojson }}" data-currentlongitude="{{ current_longitude|tojson }}">
               {% for search_result in search_results %}
-              <tr id="order{{ loop.index }}" data-latitude="{{ search_result["location"].latitude|tojson }}" data-longitude="{{ search_result["location"].longitude|tojson }}" data-name="{{ search_result["location"].medical_institution_name|safe }}" data-url="{{ search_result["location"].medical_institution_name_url|safe }}" data-vaccine="{{ search_result["location"].vaccine|safe }}" data-istargetnotfamily="{{ search_result["location"].is_target_not_family|safe }}" data-status="{{ search_result["location"].status|safe }}">
+              <tr id="order{{ loop.index }}" data-latitude="{{ search_result["location"].latitude|tojson }}" data-longitude="{{ search_result["location"].longitude|tojson }}" data-name="{{ search_result["location"].medical_institution_name|safe }}" data-url="{{ search_result["location"].medical_institution_name_url|safe }}" data-vaccine="{{ search_result["location"].vaccine|safe }}" data-istargetnotfamily="{{ search_result["location"].is_target_not_family|safe }}" data-istargetsuberb="{{ search_result["location"].is_target_suberb|safe }}" data-status="{{ search_result["location"].status|safe }}">
                 <td>{{ search_result["order"] }}</td>
                 <td>
                   <strong><a href="/child_reservation_status/medical_institution/{{ search_result["location"].medical_institution_name_url }}" title="{{ search_result["location"].medical_institution_name }}">{{ search_result["location"].medical_institution_name }}</a></strong><br>
@@ -46,6 +47,13 @@
                 {% if search_result["location"].is_target_not_family is none %}
                   <td></td>
                 {% elif search_result["location"].is_target_not_family %}
+                  <td>OK</td>
+                {% else %}
+                  <td>NG</td>
+                {% endif %}
+                {% if search_result["location"].is_target_suberb is none %}
+                  <td></td>
+                {% elif search_result["location"].is_target_suberb %}
                   <td>OK</td>
                 {% else %}
                   <td>NG</td>

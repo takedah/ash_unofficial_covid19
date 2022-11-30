@@ -53,6 +53,8 @@ document.addEventListener(
         parentPath = "first_reservation_status";
       } else if (document.getElementById("childReservationStatus")) {
         parentPath = "child_reservation_status";
+      } else if (document.getElementById("babyReservationStatus")) {
+        parentPath = "baby_reservation_status";
       } else {
         parentPath = "reservation_status";
       }
@@ -142,7 +144,7 @@ document.addEventListener(
     } else if (document.getElementById("medicalInstitutionMap")) {
       zoomLevel = 16;
     } else {
-      if (document.getElementById("childReservationStatus")) {
+      if (document.getElementById("childReservationStatus") || document.getElementById("babyReservationStatus")) {
         zoomLevel = 12;
       } else {
         zoomLevel = 14;

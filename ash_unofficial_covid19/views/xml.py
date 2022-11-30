@@ -2,6 +2,7 @@ from datetime import date, datetime, time, timezone
 
 from ..config import Config
 from ..services.database import ConnectionPool
+from ..views.baby_reservation_status import BabyReservationStatusView
 from ..views.child_reservation_status import ChildReservationStatusView
 from ..views.first_reservation_status import FirstReservationStatusView
 from ..views.patients_number import DailyTotalView, PerHundredThousandPopulationView
@@ -34,6 +35,7 @@ class XmlView(View):
         self.__reservation_status_feed = self._get_reservation_status_feed()
         self.__first_reservation_status_feed = self._get_first_reservation_status_feed()
         self.__child_reservation_status_feed = self._get_child_reservation_status_feed()
+        self.__baby_reservation_status_feed = self._get_baby_reservation_status_feed()
         self.__opendata_feed = self._get_opendata_feed()
 
     @property
@@ -75,6 +77,10 @@ class XmlView(View):
     @property
     def child_reservation_status_feed(self):
         return self.__child_reservation_status_feed
+
+    @property
+    def baby_reservation_status_feed(self):
+        return self.__baby_reservation_status_feed
 
     @property
     def opendata_feed(self):
@@ -219,12 +225,34 @@ class XmlView(View):
 
         """
         title = "旭川市のコロナワクチンマップ（5～11歳接種）"
-        link = "https://" + self.my_domain + "/first_reservation_statuses"
+        link = "https://" + self.my_domain + "/child_reservation_statuses"
         description = "旭川市の新型コロナワクチン接種医療機関（5～11歳接種）の予約受付状況などの情報を、地図から探すことができます。"
         view = ChildReservationStatusView(self.__pool)
         pub_date = view.get_last_updated()
         pub_date = pub_date.astimezone(timezone.utc)
         guid = "tag:" + self.my_domain + "," + pub_date.strftime("%Y-%m-%d") + ":/child_reservation_statuses"
+        return {
+            "title": title,
+            "link": link,
+            "description": description,
+            "pub_date": pub_date,
+            "guid": guid,
+        }
+
+    def _get_baby_reservation_status_feed(self) -> dict:
+        """コロナワクチンマップ（生後6か月～4歳接種）のFeed用データを返す
+
+        Returns:
+            feed_data (dict): コロナワクチンマップ（生後6か月～4歳接種）のFeed用データ
+
+        """
+        title = "旭川市のコロナワクチンマップ（生後6か月～4歳接種）"
+        link = "https://" + self.my_domain + "/baby_reservation_statuses"
+        description = "旭川市の新型コロナワクチン接種医療機関（生後6か月～4歳接種）の予約受付状況などの情報を、地図から探すことができます。"
+        view = BabyReservationStatusView(self.__pool)
+        pub_date = view.get_last_updated()
+        pub_date = pub_date.astimezone(timezone.utc)
+        guid = "tag:" + self.my_domain + "," + pub_date.strftime("%Y-%m-%d") + ":/baby_reservation_statuses"
         return {
             "title": title,
             "link": link,
@@ -443,6 +471,69 @@ class XmlView(View):
 
         return feed_data_list
 
+    def get_baby_reservation_status_area_feed_list(self) -> list:
+        """コロナワクチンマップ（生後6か月～4歳接種）の地区一覧Feed用データを返す
+
+        Returns:
+            feed_data_list (list): コロナワクチンマップ（生後6か月～4歳接種）の地区一覧Feed用データのリスト
+
+        """
+        view = BabyReservationStatusView(self.__pool)
+        area_list = view.get_area_list()
+        feed_data_list = list()
+        for area in area_list:
+            title = area["name"] + "の新型コロナワクチン接種医療機関（生後6か月～4歳接種）の検索結果"
+            link = "https://" + self.my_domain + "/baby_reservation_status/area/" + area["url"]
+            description = title + "です。"
+            pub_date = view.get_last_updated()
+            pub_date = pub_date.astimezone(timezone.utc)
+            guid = link
+            feed_data_list.append(
+                {
+                    "title": title,
+                    "link": link,
+                    "description": description,
+                    "pub_date": pub_date,
+                    "guid": guid,
+                }
+            )
+
+        return feed_data_list
+
+    def get_baby_reservation_status_medical_institution_feed_list(self) -> list:
+        """コロナワクチンマップ（生後6か月～4歳接種）の医療機関一覧Feed用データを返す
+
+        Returns:
+            feed_data_list (list): コロナワクチンマップ（生後6か月～4歳接種）の医療機関一覧Feed用データのリスト
+
+        """
+        view = BabyReservationStatusView(self.__pool)
+        medical_institution_list = view.get_medical_institution_list()
+        feed_data_list = list()
+        for medical_institution in medical_institution_list:
+            title = medical_institution["name"] + "の新型コロナワクチン接種予約受付状況（生後6か月～4歳接種）"
+            link = (
+                "https://"
+                + self.my_domain
+                + "/baby_reservation_status/medical_institution/"
+                + medical_institution["url"]
+            )
+            description = title + "です。"
+            pub_date = view.get_last_updated()
+            pub_date = pub_date.astimezone(timezone.utc)
+            guid = link
+            feed_data_list.append(
+                {
+                    "title": title,
+                    "link": link,
+                    "description": description,
+                    "pub_date": pub_date,
+                    "guid": guid,
+                }
+            )
+
+        return feed_data_list
+
 
 class RssView(XmlView):
     def __init__(self, today: date, pool: ConnectionPool):
@@ -468,6 +559,7 @@ class RssView(XmlView):
             self._get_item(self.reservation_status_feed),
             self._get_item(self.first_reservation_status_feed),
             self._get_item(self.child_reservation_status_feed),
+            self._get_item(self.baby_reservation_status_feed),
             self._get_item(self.opendata_feed),
         ]
 
@@ -484,6 +576,10 @@ class RssView(XmlView):
         for area_feed in child_area_feed_list:
             items.append(self._get_item(area_feed))
 
+        baby_area_feed_list = self.get_baby_reservation_status_area_feed_list()
+        for area_feed in baby_area_feed_list:
+            items.append(self._get_item(area_feed))
+
         # 医療機関一覧を追加
         medical_institution_feed_list = self.get_reservation_status_medical_institution_feed_list()
         for medical_institution_feed in medical_institution_feed_list:
@@ -495,6 +591,10 @@ class RssView(XmlView):
 
         child_medical_institution_feed_list = self.get_child_reservation_status_medical_institution_feed_list()
         for medical_institution_feed in child_medical_institution_feed_list:
+            items.append(self._get_item(medical_institution_feed))
+
+        baby_medical_institution_feed_list = self.get_baby_reservation_status_medical_institution_feed_list()
+        for medical_institution_feed in baby_medical_institution_feed_list:
             items.append(self._get_item(medical_institution_feed))
 
         return {
@@ -551,6 +651,7 @@ class AtomView(XmlView):
             self._get_item(self.reservation_status_feed),
             self._get_item(self.first_reservation_status_feed),
             self._get_item(self.child_reservation_status_feed),
+            self._get_item(self.baby_reservation_status_feed),
             self._get_item(self.opendata_feed),
         ]
 
@@ -567,6 +668,10 @@ class AtomView(XmlView):
         for area_feed in child_area_feed_list:
             entries.append(self._get_item(area_feed))
 
+        baby_area_feed_list = self.get_baby_reservation_status_area_feed_list()
+        for area_feed in baby_area_feed_list:
+            entries.append(self._get_item(area_feed))
+
         # 医療機関一覧を追加
         medical_institution_feed_list = self.get_reservation_status_medical_institution_feed_list()
         for medical_institution_feed in medical_institution_feed_list:
@@ -578,6 +683,10 @@ class AtomView(XmlView):
 
         child_medical_institution_feed_list = self.get_child_reservation_status_medical_institution_feed_list()
         for medical_institution_feed in child_medical_institution_feed_list:
+            entries.append(self._get_item(medical_institution_feed))
+
+        baby_medical_institution_feed_list = self.get_baby_reservation_status_medical_institution_feed_list()
+        for medical_institution_feed in baby_medical_institution_feed_list:
             entries.append(self._get_item(medical_institution_feed))
 
         return {

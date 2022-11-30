@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 {% block content %}
-<article id="childReservationStatus">
+<article id="babyReservationStatus">
   <h1 class="h4 py-2">{{ title }}</h1>
   <div class="alert alert-success alert-dismissible fade show" role="alert">
     <p class="mb-0">{{ last_updated }}にダウンロードしたデータを元に表示しています。最新の情報は<a class="alert-link"
@@ -9,9 +9,9 @@
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
   </div>
   {% for search_result in search_results %}
-    <div class="card">
-      <div class="card-body">
-        <section>
+      <div class="card">
+        <div class="card-body">
+          <section>
           <h2 class="h5 card-title mb-3">医療機関の情報</h2>
           <table class="table table-bordered" id="results" data-length="{{ search_lengths|tojson }}">
             <tbody>
@@ -81,16 +81,16 @@
   <div class="card mt-3">
     <div class="card-body">
       <section>
-        <h2 class="h5 card-title mb-3">{{ medical_institution }}と同じ地区の医療機関（5歳から11歳接種）を探す</h2>
-        <p class="card-text"><a href="/child_reservation_status/area/{{ search_results[0].area_url }}" title="{{ search_results[0].area }}の新型コロナワクチン5歳から11歳接種医療機関一覧へ">{{ search_results[0].area }}の医療機関（5歳から11歳接種）一覧へ</a></p>
+        <h2 class="h5 card-title mb-3">{{ medical_institution }}と同じ地区の医療機関（生後6か月から4歳接種）を探す</h2>
+        <p class="card-text"><a href="/baby_reservation_status/area/{{ search_results[0].area_url }}" title="{{ search_results[0].area }}の新型コロナワクチン生後6か月から4歳接種医療機関一覧へ">{{ search_results[0].area }}の医療機関（生後6か月から4歳接種）一覧へ</a></p>
       </section>
     </div>
   </div>
   <div class="card mt-3">
     <div class="card-body">
       <section>
-        <h3 class="h5 card-title mb-3">他の地区から医療機関（5歳から11歳接種）を探す</h3>
-        <p class="card-text"><a href="/child_reservation_statuses" title="コロナワクチンマップ（5歳から11歳接種）へ">コロナワクチンマップ（5歳から11歳接種）へ</a></p>
+        <h3 class="h5 card-title mb-3">他の地区から医療機関（生後6か月から4歳接種）を探す</h3>
+        <p class="card-text"><a href="/baby_reservation_statuses" title="コロナワクチンマップ（生後6か月から4歳接種）へ">コロナワクチンマップ（生後6か月から4歳接種）へ</a></p>
       </section>
     </div>
   </div>

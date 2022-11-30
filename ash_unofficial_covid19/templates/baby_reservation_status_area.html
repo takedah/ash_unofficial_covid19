@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 {% block content %}
-<article id="childReservationStatus">
+<article id="babyReservationStatus">
   <h1 class="h4 py-2">{{ title }}</h1>
   <div class="alert alert-success alert-dismissible fade show" role="alert">
     <p class="mb-0">{{ last_updated }}にダウンロードしたデータを元に表示しています。最新の情報は<a class="alert-link"
@@ -11,7 +11,7 @@
   <div class="card">
     <div class="card-body">
       <section>
-        <h2 class="h5 card-title mb-3">{{ area }}の医療機関（5歳から11歳接種）の予約受付状況一覧</h2>
+        <h2 class="h5 card-title mb-3">{{ area }}の医療機関（生後6か月から4歳接種）の予約受付状況一覧</h2>
         <p class="card-text d-block d-sm-none"><i class="far fa-hand-point-right"></i> 横にスクロールできます。</p>
         <div class="table-responsive">
           <table class="table table-bordered">
@@ -70,7 +70,7 @@
   <div class="card mt-3">
     <div class="card-body">
       <section id="areaMap">
-        <h2 class="h5 card-title mb-3">{{ area }}の医療機関（5歳から11歳接種）の地図</h2>
+        <h2 class="h5 card-title mb-3">{{ area }}の医療機関（生後6か月から4歳接種）の地図</h2>
         <p class="card-text">地図の表示は目安となっています。正確な場所の情報は各医療機関のホームページ等でご確認ください。</p>
         <table class="table table-borderless table-sm">
           <tbody>
@@ -97,8 +97,8 @@
   <div class="card mt-3">
     <div class="card-body">
       <section>
-        <h3 class="h5 card-title mb-3">他の条件で医療機関（5歳から11歳接種）を探す</h3>
-        <p class="card-text"><a href="/child_reservation_statuses" title="コロナワクチンマップ（5歳から11歳接種）へ">コロナワクチンマップ（5歳から11歳接種）へ</a></p>
+        <h3 class="h5 card-title mb-3">他の条件で医療機関（生後6か月から4歳接種）を探す</h3>
+        <p class="card-text"><a href="/baby_reservation_statuses" title="コロナワクチンマップ（生後6か月から4歳接種）へ">コロナワクチンマップ（生後6か月から4歳接種）へ</a></p>
       </section>
     </div>
   </div>

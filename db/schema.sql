@@ -114,6 +114,26 @@ CREATE TABLE child_reservation_statuses(
     target_age TEXT,
     is_target_family BOOLEAN,
     is_target_not_family BOOLEAN,
+    is_target_suberb BOOLEAN,
+    target_other TEXT,
+    memo TEXT,
+    updated_at TIMESTAMPTZ NOT NULL,
+    PRIMARY KEY(medical_institution_name, vaccine)
+);
+DROP TABLE IF EXISTS baby_reservation_statuses;
+CREATE TABLE baby_reservation_statuses(
+    id SERIAL NOT NULL,
+    area TEXT,
+    medical_institution_name VARCHAR(256) NOT NULL,
+    address TEXT,
+    phone_number TEXT,
+    vaccine VARCHAR(256) NOT NULL,
+    status TEXT,
+    inoculation_time TEXT,
+    target_age TEXT,
+    is_target_family BOOLEAN,
+    is_target_not_family BOOLEAN,
+    is_target_suberb BOOLEAN,
     target_other TEXT,
     memo TEXT,
     updated_at TIMESTAMPTZ NOT NULL,

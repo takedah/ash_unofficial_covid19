@@ -4,6 +4,7 @@ from typing import TypedDict, Union
 
 import numpy as np
 
+from ..models.baby_reservation_status import BabyReservationStatusLocationFactory
 from ..models.child_reservation_status import ChildReservationStatusLocationFactory
 from ..models.first_reservation_status import FirstReservationStatusLocationFactory
 from ..models.location import LocationFactory
@@ -117,6 +118,7 @@ class LocationService(Service):
             ReservationStatusLocationFactory,
             FirstReservationStatusLocationFactory,
             ChildReservationStatusLocationFactory,
+            BabyReservationStatusLocationFactory,
         ],
         current_point: Point,
     ) -> list:

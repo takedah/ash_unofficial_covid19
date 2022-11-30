@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 {% block content %}
-<article id="childReservationStatus">
+<article id="babyReservationStatus">
   <h1 class="h4 py-2">{{ title }}</h1>
   <div class="alert alert-success alert-dismissible fade show" role="alert">
     <p class="mb-0">{{ last_updated }}にダウンロードしたデータを元に表示しています。最新の情報は<a class="alert-link"
@@ -11,12 +11,13 @@
   <div class="card">
     <div class="card-body">
       <section>
-        <h2 class="h5 card-title mb-3">{{ area }}の医療機関（5歳から11歳接種）の予約受付状況一覧</h2>
+        <h2 class="h5 card-title mb-3">現在地から近い医療機関（生後6か月から4歳接種）の予約受付状況一覧</h2>
         <p class="card-text d-block d-sm-none"><i class="far fa-hand-point-right"></i> 横にスクロールできます。</p>
         <div class="table-responsive">
           <table class="table table-bordered">
             <thead>
               <tr>
+                <th>近い順</th>
                 <th class="text-nowrap">
                     医療機関名<br>
                     住所<br>
@@ -24,54 +25,59 @@
                 </th>
                 <th class="text-nowrap">予約受付開始時期</th>
                 <th class="text-nowrap">接種可能時期</th>
+                <th class="text-nowrap">年齢</th>
                 <th class="text-nowrap">かかりつけ以外</th>
-                <th class="text-nowrap">市外の方</th>
                 <th class="text-nowrap">その他条件・備考など</th>
+                <th>距離</th>
               </tr>
             </thead>
-            <tbody id="results" data-length="{{ search_lengths|tojson }}">
+            <tbody id="results" data-length="{{ search_lengths|tojson }}" data-currentlatitude="{{ current_latitude|tojson }}" data-currentlongitude="{{ current_longitude|tojson }}">
               {% for search_result in search_results %}
-              <tr id="order{{ loop.index }}" data-latitude="{{ search_result.latitude|tojson }}" data-longitude="{{ search_result.longitude|tojson }}" data-name="{{ search_result.medical_institution_name|safe }}" data-url="{{ search_result.medical_institution_name_url|safe }}" data-vaccine="{{ search_result.vaccine|safe }}" data-istargetnotfamily="{{ search_result.is_target_not_family|safe }}" data-istargetsuberb="{{ search_result.is_target_suberb|safe }}" data-status="{{ search_result.status|safe }}">
+              <tr id="order{{ loop.index }}" data-latitude="{{ search_result["location"].latitude|tojson }}" data-longitude="{{ search_result["location"].longitude|tojson }}" data-name="{{ search_result["location"].medical_institution_name|safe }}" data-url="{{ search_result["location"].medical_institution_name_url|safe }}" data-vaccine="{{ search_result["location"].vaccine|safe }}" data-istargetnotfamily="{{ search_result["location"].is_target_not_family|safe }}" data-istargetsuberb="{{ search_result["location"].is_target_suberb|safe }}" data-status="{{ search_result["location"].status|safe }}">
+                <td>{{ search_result["order"] }}</td>
                 <td>
-                  <strong><a href="../medical_institution/{{ search_result.medical_institution_name_url }}" title="{{ search_result.medical_institution_name }}">{{ search_result.medical_institution_name }}</a></strong><br>
-                    {{ search_result.address }}<br>
-                    {{ search_result.phone_number }}<br>
+                  <strong><a href="/baby_reservation_status/medical_institution/{{ search_result["location"].medical_institution_name_url }}" title="{{ search_result["location"].medical_institution_name }}">{{ search_result["location"].medical_institution_name }}</a></strong><br>
+                    {{ search_result["location"].address }}<br>
+                    {{ search_result["location"].phone_number }}<br>
                 </td>
-                <td>{{ search_result.status }}</td>
-                <td>{{ search_result.inoculation_time }}</td>
-                {% if search_result.is_target_not_family is none %}
+                <td>{{ search_result["location"].status }}</td>
+                <td>{{ search_result["location"].inoculation_time }}</td>
+                <td>{{ search_result["location"].target_age }}</td>
+                {% if search_result["location"].is_target_not_family is none %}
                   <td></td>
-                {% elif search_result.is_target_not_family %}
+                {% elif search_result["location"].is_target_not_family %}
                   <td>OK</td>
                 {% else %}
                   <td>NG</td>
                 {% endif %}
-                {% if search_result.is_target_suberb is none %}
+                {% if search_result["location"].is_target_suberb is none %}
                   <td></td>
-                {% elif search_result.is_target_suberb %}
+                {% elif search_result["location"].is_target_suberb %}
                   <td>OK</td>
                 {% else %}
                   <td>NG</td>
                 {% endif %}
                 <td>
-                  {% if not search_result.target_other == "" %}
-                    <p>{{ search_result.target_other }}</p>
+                  {% if not search_result["location"].target_other == "" %}
+                    <p>{{ search_result["location"].target_other }}</p>
                   {% endif %}
-                  <p>{{ search_result.memo }}</p>
+                  <p>{{ search_result["location"].memo }}</p>
                 </td>
+                <td>{{ search_result["distance"] }}km</td>
               </tr>
               {% endfor %}
             </tbody>
           </table>
         </div>
+        <p class="card-text mt-3">距離は現在地からの直線距離で算出しているため、実際の道路状況によっては結果が異なりますのでご注意ください。</p>
       </section>
     </div>
   </div>
   <div class="card mt-3">
     <div class="card-body">
-      <section id="areaMap">
-        <h2 class="h5 card-title mb-3">{{ area }}の医療機関（5歳から11歳接種）の地図</h2>
-        <p class="card-text">地図の表示は目安となっています。正確な場所の情報は各医療機関のホームページ等でご確認ください。</p>
+      <section id="gpsMap">
+        <h2 class="h5 card-title mb-3">現在地から近い医療機関（生後6か月から4歳接種）の地図</h2>
+        <p class="card-text">地図は目安となっています。正確な場所の情報は各医療機関のホームページ等でご確認ください。</p>
         <table class="table table-borderless table-sm">
           <tbody>
             <tr>
@@ -97,8 +103,8 @@
   <div class="card mt-3">
     <div class="card-body">
       <section>
-        <h3 class="h5 card-title mb-3">他の条件で医療機関（5歳から11歳接種）を探す</h3>
-        <p class="card-text"><a href="/child_reservation_statuses" title="コロナワクチンマップ（5歳から11歳接種）へ">コロナワクチンマップ（5歳から11歳接種）へ</a></p>
+        <h3 class="h5 card-title mb-3">他の条件で医療機関（生後6か月から4歳接種）を探す</h3>
+        <p class="card-text"><a href="/baby_reservation_statuses" title="コロナワクチンマップ（生後6か月から4歳接種）へ">コロナワクチンマップ（生後6か月から4歳接種）へ</a></p>
       </section>
     </div>
   </div>

@@ -172,7 +172,7 @@ class ScrapeReservationStatus(Scraper):
         if not isinstance(target_string, str):
             return {"available": False, "text": ""}
 
-        ok_match = re.search("^(.*)○(.*)$", target_string)
+        ok_match = re.search("^(.*)[○|〇](.*)$", target_string)
         ng_match = re.search("^(.*)×(.*)$", target_string)
         family_text = ""
         if ok_match:
