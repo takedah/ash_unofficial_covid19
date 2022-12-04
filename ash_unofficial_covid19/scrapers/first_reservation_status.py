@@ -102,6 +102,8 @@ class ScrapeFirstReservationStatus(ScrapeReservationStatus):
         """
         medical_institution_list = list()
         for reservation_status in self.lists:
-            medical_institution_list.append(reservation_status["medical_institution_name"])
+            medical_institution_list.append(
+                (reservation_status["medical_institution_name"], reservation_status["vaccine"])
+            )
 
         return medical_institution_list

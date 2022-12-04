@@ -95,14 +95,14 @@ def import_first_reservation_statuses(html_url: str) -> None:
     added_names = list()
     for new_name in new_name_list:
         if new_name not in current_name_list:
-            added_names.append(new_name)
+            added_names.append(new_name[0])
 
     added_names = list(set(added_names))
 
     deleted_names = list()
     for current_name in current_name_list:
         if current_name not in new_name_list:
-            deleted_names.append(current_name)
+            deleted_names.append((current_name[0], current_name[1]))
 
     try:
         service.create(factory)

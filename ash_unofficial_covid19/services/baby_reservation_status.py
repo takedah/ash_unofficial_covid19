@@ -79,7 +79,7 @@ class BabyReservationStatusService(Service):
         """指定した主キーの値を持つデータを削除する
 
         Args:
-            target_value (str): 削除対象の医療機関名
+            target_value (tuple): 削除対象の医療機関名とワクチン種類のタプル
 
         Returns:
             result (bool): 削除に成功したら真を返す
@@ -96,7 +96,9 @@ class BabyReservationStatusService(Service):
                 raise ServiceError("キーの指定の指定の配列の要素数が正しくありません。")
 
         state = "DELETE FROM " + self.table_name + " " + "WHERE medical_institution_name=%s" + " " + "AND vaccine=%s;"
-        log_message = self.table_name + "テーブルから " + str(target_values[0]) + ", " + str(target_values[1]) + " " + "を"
+        log_message = (
+            self.table_name + "テーブルから" + " " + str(target_values[0]) + ", " + str(target_values[1]) + " " + "を"
+        )
         try:
             with self.get_connection() as cur:
                 cur.execute(state, target_values)
@@ -127,7 +129,7 @@ class BabyReservationStatusService(Service):
         state = (
             "SELECT DISTINCT ON (medical_institution_name,vaccine)"
             + " "
-            + "medical_institution_name,vaccine,address"
+            + "medical_institution_name,vaccine"
             + " "
             + "FROM"
             + " "

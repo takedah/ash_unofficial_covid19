@@ -47,7 +47,7 @@ def service():
             "medical_institution_name": "市立旭川病院",
             "address": "金星町1丁目",
             "phone_number": "29-0202予約専用",
-            "vaccine": None,
+            "vaccine": "",
             "status": "",
             "inoculation_time": "",
             "target_age": "",
@@ -62,7 +62,7 @@ def service():
             "medical_institution_name": "森山病院",
             "address": "宮前2条1丁目",
             "phone_number": "45-2026予約専用",
-            "vaccine": None,
+            "vaccine": "",
             "status": "受付中",
             "inoculation_time": "2月28日～8月",
             "target_age": "18歳以上",
@@ -86,13 +86,13 @@ def service():
 
 
 def test_delete(service):
-    results = service.delete("市立旭川病院")
+    results = service.delete(("市立旭川病院", ""))
     assert results
 
 
 def test_get_medical_institution_list(service):
     results = service.get_medical_institution_list()
-    expect = ["市立旭川病院", "森山病院"]
+    expect = [("市立旭川病院", ""), ("森山病院", "")]
     assert results == expect
 
 
@@ -104,7 +104,7 @@ def test_get_dicts(service):
             "medical_institution_name": "森山病院",
             "address": "宮前2条1丁目",
             "phone_number": "45-2026予約専用",
-            "vaccine": None,
+            "vaccine": "",
             "status": "受付中",
             "inoculation_time": "2月28日～8月",
             "target_age": "18歳以上",
@@ -119,7 +119,7 @@ def test_get_dicts(service):
             "medical_institution_name": "市立旭川病院",
             "address": "金星町1丁目",
             "phone_number": "29-0202予約専用",
-            "vaccine": None,
+            "vaccine": "",
             "status": "",
             "inoculation_time": "",
             "target_age": "",

@@ -87,10 +87,10 @@ DROP TABLE IF EXISTS first_reservation_statuses;
 CREATE TABLE first_reservation_statuses(
     id SERIAL NOT NULL,
     area TEXT,
-    medical_institution_name VARCHAR(256) NOT NULL PRIMARY KEY,
+    medical_institution_name VARCHAR(256) NOT NULL,
     address TEXT,
     phone_number TEXT,
-    vaccine VARCHAR(256),
+    vaccine VARCHAR(256) NOT NULL,
     status TEXT,
     inoculation_time TEXT,
     target_age TEXT,
@@ -99,7 +99,8 @@ CREATE TABLE first_reservation_statuses(
     is_target_suberb BOOLEAN,
     target_other TEXT,
     memo TEXT,
-    updated_at TIMESTAMPTZ NOT NULL
+    updated_at TIMESTAMPTZ NOT NULL,
+    PRIMARY KEY(medical_institution_name, vaccine)
 );
 DROP TABLE IF EXISTS child_reservation_statuses;
 CREATE TABLE child_reservation_statuses(

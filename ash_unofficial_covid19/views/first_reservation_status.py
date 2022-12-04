@@ -86,7 +86,13 @@ class FirstReservationStatusView(View):
             medical_institution_list (list of dict): 医療機関名・URLパース文字列一覧データ
 
         """
-        medical_institution_names = self.__service.get_medical_institution_list()
+        medical_institution_name_vaccine_list = self.__service.get_medical_institution_list()
+        medical_institution_names = list()
+        for medical_institution_name in medical_institution_name_vaccine_list:
+            medical_institution_names.append(medical_institution_name[0])
+
+        medical_institution_names = sorted(set(medical_institution_names), key=medical_institution_names.index)
+
         medical_institution_list = list()
         for medical_institution_name in medical_institution_names:
             medical_institution_list.append(

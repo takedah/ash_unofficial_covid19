@@ -75,28 +75,37 @@ class FirstReservationStatusService(Service):
         # データベースへ登録処理
         self.upsert(
             items=items,
-            primary_key="medical_institution_name",
+            primary_key="medical_institution_name,vaccine",
             data_lists=data_lists,
         )
 
-    def delete(self, target_value: str) -> bool:
+    def delete(self, target_values: tuple) -> bool:
         """指定した主キーの値を持つデータを削除する
 
         Args:
-            target_value (str): 削除対象の医療機関名
+            target_values (tuple): 削除対象の医療機関名とワクチン種類のタプル
 
         Returns:
             result (bool): 削除に成功したら真を返す
 
         """
-        if not isinstance(target_value, str):
-            raise TypeError("キーの指定が文字列になっていません。")
+        if not isinstance(target_values, tuple):
+            raise TypeError("キーの指定がタプルになっていません。")
+        else:
+            if len(target_values) == 2:
+                for target_value in target_values:
+                    if not isinstance(target_value, str):
+                        raise TypeError("キーの指定が文字列ではありません。")
+            else:
+                raise ServiceError("キーの指定の指定の配列の要素数が正しくありません。")
 
-        state = "DELETE FROM " + self.table_name + " " + "WHERE medical_institution_name=%s;"
-        log_message = self.table_name + "テーブルから" + " " + target_value + " " + "を"
+        state = "DELETE FROM " + self.table_name + " " + "WHERE medical_institution_name=%s" + " " + "AND vaccine=%s;"
+        log_message = (
+            self.table_name + "テーブルから" + " " + str(target_values[0]) + ", " + str(target_values[1]) + " " + "を"
+        )
         try:
             with self.get_connection() as cur:
-                cur.execute(state, (target_value,))
+                cur.execute(state, target_values)
                 result = cur.rowcount
             if result:
                 self.info_log(log_message + "削除しました。")
@@ -117,23 +126,25 @@ class FirstReservationStatusService(Service):
 
         Returns:
             medical_institution_list (list of tuple): 医療機関の一覧リスト
-                新型コロナワクチン1・2回目接種医療機関の名称をリストで返す。
+                新型コロナワクチン1・2回目接種医療機関の名称、ワクチン種類のタプルをリストで返す。
 
         """
         state = (
-            "SELECT DISTINCT(medical_institution_name)"
+            "SELECT DISTINCT ON (medical_institution_name,vaccine)"
+            + " "
+            + "medical_institution_name,vaccine"
             + " "
             + "FROM"
             + " "
             + self.table_name
             + " "
-            + "ORDER BY medical_institution_name;"
+            + "ORDER BY medical_institution_name,vaccine;"
         )
         medical_institution_list = list()
         with self.get_connection() as cur:
             cur.execute(state)
             for row in cur.fetchall():
-                medical_institution_list.append(row["medical_institution_name"])
+                medical_institution_list.append((row["medical_institution_name"], row["vaccine"]))
 
         return medical_institution_list
 
