@@ -183,7 +183,7 @@ def reservation_statuses():
     reservation_statuses = get_reservation_statuses()
     search_results = reservation_statuses.find()
     areas = reservation_statuses.get_area_list()
-    last_updated = reservation_statuses.get_last_updated().strftime("%Y/%m/%d %H:%M")
+    last_updated = reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
 
     search_lengths = len(search_results.items)
     if search_lengths == 0:
@@ -204,7 +204,7 @@ def reservation_statuses():
 @app.route("/reservation_statuses/search_by_gps", methods=["GET", "POST"])
 def reservation_statuses_search_by_gps():
     reservation_statuses = get_reservation_statuses()
-    last_updated = reservation_statuses.get_last_updated().strftime("%Y/%m/%d %H:%M")
+    last_updated = reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
     if request.method == "GET":
         abort(404)
 
@@ -248,7 +248,7 @@ def reservation_status_area(area):
 
     reservation_statuses = get_reservation_statuses()
     search_results = reservation_statuses.find(area=area)
-    last_updated = reservation_statuses.get_last_updated().strftime("%Y/%m/%d %H:%M")
+    last_updated = reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
 
     search_lengths = len(search_results.items)
     if search_lengths == 0:
@@ -275,7 +275,7 @@ def reservation_status_medical_institution(medical_institution):
 
     reservation_statuses = get_reservation_statuses()
     search_results = reservation_statuses.find(medical_institution_name=medical_institution)
-    last_updated = reservation_statuses.get_last_updated().strftime("%Y/%m/%d %H:%M")
+    last_updated = reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
 
     search_lengths = len(search_results.items)
     if search_lengths == 0:
@@ -298,7 +298,7 @@ def first_reservation_statuses():
     first_reservation_statuses = get_first_reservation_statuses()
     search_results = first_reservation_statuses.find()
     areas = first_reservation_statuses.get_area_list()
-    last_updated = first_reservation_statuses.get_last_updated().strftime("%Y/%m/%d %H:%M")
+    last_updated = first_reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
 
     search_lengths = len(search_results.items)
     if search_lengths == 0:
@@ -319,7 +319,7 @@ def first_reservation_statuses():
 @app.route("/first_reservation_statuses/search_by_gps", methods=["GET", "POST"])
 def first_reservation_statuses_search_by_gps():
     first_reservation_statuses = get_first_reservation_statuses()
-    last_updated = first_reservation_statuses.get_last_updated().strftime("%Y/%m/%d %H:%M")
+    last_updated = first_reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
     if request.method == "GET":
         abort(404)
 
@@ -365,7 +365,7 @@ def first_reservation_status_area(area):
 
     first_reservation_statuses = get_first_reservation_statuses()
     search_results = first_reservation_statuses.find(area=area)
-    last_updated = first_reservation_statuses.get_last_updated().strftime("%Y/%m/%d %H:%M")
+    last_updated = first_reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
 
     search_lengths = len(search_results.items)
     if search_lengths == 0:
@@ -392,7 +392,7 @@ def first_reservation_status_medical_institution(medical_institution):
 
     first_reservation_statuses = get_first_reservation_statuses()
     search_results = first_reservation_statuses.find(medical_institution_name=medical_institution)
-    last_updated = first_reservation_statuses.get_last_updated().strftime("%Y/%m/%d %H:%M")
+    last_updated = first_reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
 
     search_lengths = len(search_results.items)
     if search_lengths == 0:
@@ -415,7 +415,7 @@ def child_reservation_statuses():
     child_reservation_statuses = get_child_reservation_statuses()
     search_results = child_reservation_statuses.find()
     areas = child_reservation_statuses.get_area_list()
-    last_updated = child_reservation_statuses.get_last_updated().strftime("%Y/%m/%d %H:%M")
+    last_updated = child_reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
 
     search_lengths = len(search_results.items)
     if search_lengths == 0:
@@ -436,7 +436,7 @@ def child_reservation_statuses():
 @app.route("/child_reservation_statuses/search_by_gps", methods=["GET", "POST"])
 def child_reservation_statuses_search_by_gps():
     child_reservation_statuses = get_child_reservation_statuses()
-    last_updated = child_reservation_statuses.get_last_updated().strftime("%Y/%m/%d %H:%M")
+    last_updated = child_reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
     if request.method == "GET":
         abort(404)
 
@@ -482,7 +482,7 @@ def child_reservation_status_area(area):
 
     child_reservation_statuses = get_child_reservation_statuses()
     search_results = child_reservation_statuses.find(area=area)
-    last_updated = child_reservation_statuses.get_last_updated().strftime("%Y/%m/%d %H:%M")
+    last_updated = child_reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
 
     search_lengths = len(search_results.items)
     if search_lengths == 0:
@@ -509,7 +509,7 @@ def child_reservation_status_medical_institution(medical_institution):
 
     child_reservation_statuses = get_child_reservation_statuses()
     search_results = child_reservation_statuses.find(medical_institution_name=medical_institution)
-    last_updated = child_reservation_statuses.get_last_updated().strftime("%Y/%m/%d %H:%M")
+    last_updated = child_reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
 
     search_lengths = len(search_results.items)
     if search_lengths == 0:
@@ -532,7 +532,7 @@ def baby_reservation_statuses():
     baby_reservation_statuses = get_baby_reservation_statuses()
     search_results = baby_reservation_statuses.find()
     areas = baby_reservation_statuses.get_area_list()
-    last_updated = baby_reservation_statuses.get_last_updated().strftime("%Y/%m/%d %H:%M")
+    last_updated = baby_reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
 
     search_lengths = len(search_results.items)
     if search_lengths == 0:
@@ -553,7 +553,7 @@ def baby_reservation_statuses():
 @app.route("/baby_reservation_statuses/search_by_gps", methods=["GET", "POST"])
 def baby_reservation_statuses_search_by_gps():
     baby_reservation_statuses = get_baby_reservation_statuses()
-    last_updated = baby_reservation_statuses.get_last_updated().strftime("%Y/%m/%d %H:%M")
+    last_updated = baby_reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
     if request.method == "GET":
         abort(404)
 
@@ -599,7 +599,7 @@ def baby_reservation_status_area(area):
 
     baby_reservation_statuses = get_baby_reservation_statuses()
     search_results = baby_reservation_statuses.find(area=area)
-    last_updated = baby_reservation_statuses.get_last_updated().strftime("%Y/%m/%d %H:%M")
+    last_updated = baby_reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
 
     search_lengths = len(search_results.items)
     if search_lengths == 0:
@@ -626,7 +626,7 @@ def baby_reservation_status_medical_institution(medical_institution):
 
     baby_reservation_statuses = get_baby_reservation_statuses()
     search_results = baby_reservation_statuses.find(medical_institution_name=medical_institution)
-    last_updated = baby_reservation_statuses.get_last_updated().strftime("%Y/%m/%d %H:%M")
+    last_updated = baby_reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
 
     search_lengths = len(search_results.items)
     if search_lengths == 0:

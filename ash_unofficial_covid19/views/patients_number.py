@@ -31,7 +31,7 @@ class PatientsNumberView(View):
         self._service = PatientsNumberService(pool)
         self._today = today
         last_updated = self._service.get_last_updated()
-        self.__last_updated = last_updated.strftime("%Y/%m/%d %H:%M")
+        self.__last_updated = last_updated.strftime("%Y年%m月%d日%H時%M分")
 
     @property
     def last_updated(self):
@@ -54,15 +54,17 @@ class PatientsNumberView(View):
             return ""
 
         search_strings = re.match(
-            "^([0-9]{4}/[0-9]{2}/[0-9]{2}) ([A-Z][a-z]{2})$",
+            "^([0-9]{4})/([0-9]{2})/([0-9]{2}) ([A-Z][a-z]{2})$",
             target_date_to_string,
         )
 
         if search_strings is None:
             return ""
         else:
-            date_string = search_strings.group(1)
-            day_of_week = search_strings.group(2)
+            date_year = search_strings.group(1)
+            date_month = search_strings.group(2)
+            date_day = search_strings.group(3)
+            day_of_week = search_strings.group(4)
 
         if day_of_week == "Mon":
             day_of_week_kanji = "月"
@@ -81,7 +83,7 @@ class PatientsNumberView(View):
         else:
             day_of_week_kanji = ""
 
-        return date_string + " (" + day_of_week_kanji + ") "
+        return date_year + "年" + date_month + "月" + date_day + "日" + "（" + day_of_week_kanji + "）"
 
     def get_daily_total_csv(self) -> str:
         """陽性患者日計CSVファイルの文字列データを返す

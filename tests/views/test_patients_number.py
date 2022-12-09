@@ -200,7 +200,7 @@ class TestDailyTotalView:
         conn.close_connection()
 
     def test_daily_total_property(self, view):
-        assert view.reference_date == "2020/02/24 (月) "
+        assert view.reference_date == "2020年02月24日（月）"
         assert view.most_recent == "102"
         assert view.seven_days_before_most_recent == "0"
         assert view.increase_from_seven_days_before == "+102"
@@ -223,7 +223,7 @@ class TestMonthTotalView:
         conn.close_connection()
 
     def test_month_total_property(self, view):
-        assert view.reference_date == "2020/02/24 (月) "
+        assert view.reference_date == "2020年02月24日（月）"
         assert view.this_month == "199"
         assert view.last_month == "0"
         assert view.increase_from_last_month == "+199"
