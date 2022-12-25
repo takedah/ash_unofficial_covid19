@@ -25,7 +25,6 @@
                 </th>
                 <th class="text-nowrap">予約受付開始時期</th>
                 <th class="text-nowrap">接種可能時期</th>
-                <th class="text-nowrap">年齢</th>
                 <th class="text-nowrap">かかりつけ以外</th>
                 <th class="text-nowrap">市外の方</th>
                 <th class="text-nowrap">その他条件・備考など</th>
@@ -43,7 +42,6 @@
                 </td>
                 <td>{{ search_result["location"].status }}</td>
                 <td>{{ search_result["location"].inoculation_time }}</td>
-                <td>{{ search_result["location"].target_age }}</td>
                 {% if search_result["location"].is_target_not_family is none %}
                   <td></td>
                 {% elif search_result["location"].is_target_not_family %}
