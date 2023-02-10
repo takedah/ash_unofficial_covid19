@@ -231,7 +231,7 @@ class TestPatientsNumberService:
         result = service.get_per_hundred_thousand_population_per_week(from_date=from_date, to_date=to_date)
         expect = [
             (date(2022, 1, 20), 0),
-            (date(2022, 1, 27), 60.68),
+            (date(2022, 1, 27), 61.38),
         ]
         assert result == expect
 

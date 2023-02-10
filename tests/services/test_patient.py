@@ -404,11 +404,11 @@ class TestAsahikawaPatientService:
         to_date = date(2021, 2, 28)
         result = service.get_per_hundred_thousand_population_per_week(from_date=from_date, to_date=to_date)
         expect = [
-            (date(2021, 1, 25), 0.30),
+            (date(2021, 1, 25), 0.31),
             (date(2021, 2, 1), 0),
             (date(2021, 2, 8), 0),
             (date(2021, 2, 15), 0),
-            (date(2021, 2, 22), 1.22),
+            (date(2021, 2, 22), 1.23),
         ]
         assert result == expect
 

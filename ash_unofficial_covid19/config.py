@@ -8,19 +8,20 @@ load_dotenv()
 class Config:
     """パッケージ全体で使用する定数をまとめる"""
 
-    # 旭川市の人口（2022年1月1日現在）
+    # 旭川市の人口（2023年1月1日現在）
     # https://www.city.asahikawa.hokkaido.jp/700/701/705/d055301.html
-    POPULATION = 327960
+    POPULATION = 324186
 
-    # 札幌市の人口（2022年1月1日現在）
+    # 札幌市の人口（2023年1月1日現在）
     # https://www.city.sapporo.jp/toukei/jinko/juuki/juuki.html
-    SAPPORO_POPULATION = 1960668
+    SAPPORO_POPULATION = 1959512
 
     # 旭川市公式ホームページと北海道オープンデータポータルの設定
     DATABASE_URL = os.environ.get("DATABASE_URL")
     BASE_URL = "https://www.city.asahikawa.hokkaido.jp/"
     OVERVIEW_URL = BASE_URL + "kurashi/135/136/150/d076150.html"
-    LATEST_DATA_URL = BASE_URL + "kurashi/135/136/150/d076703.html"
+    LATEST_DATA_URL = BASE_URL + "kurashi/135/136/150/d076835.html"
+    JAN2023_DATA_URL = BASE_URL + "kurashi/135/136/150/d076703.html"
     DEC2022_DATA_URL = BASE_URL + "kurashi/135/136/150/d076556.html"
     NOV2022_DATA_URL = BASE_URL + "kurashi/135/136/150/d076391.html"
     OCT2022_DATA_URL = BASE_URL + "kurashi/135/136/150/d076189.html"

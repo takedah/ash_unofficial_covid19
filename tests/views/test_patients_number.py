@@ -258,10 +258,10 @@ class TestPerHundredThousandPopulationView:
         conn.close_connection()
 
     def test_per_hundred_thousand_population_property(self, view):
-        assert view.this_week == "60.68"
+        assert view.this_week == "61.38"
         assert view.last_week == "0.0"
-        assert view.increase_from_last_week == "+60.68"
-        assert view.graph_alt == "2020年02月09日 0.0人, 2020年02月16日 0.0人, 2020年02月23日 60.68人"
+        assert view.increase_from_last_week == "+61.38"
+        assert view.graph_alt == "2020年02月09日 0.0人, 2020年02月16日 0.0人, 2020年02月23日 61.38人"
 
 
 class TestWeeklyPerAgeView:

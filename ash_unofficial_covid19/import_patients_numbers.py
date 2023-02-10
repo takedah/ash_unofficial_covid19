@@ -199,12 +199,11 @@ def import_latest():
     press_release_links = _get_press_release_links()
     for press_release_link in press_release_links.items:
         publication_date = press_release_link.publication_date
-        if date(2022, 1, 27) < publication_date:
-            if publication_date.year == 2023 and publication_date.month == 1:
-                _import_asahikawa_data_from_press_release(
-                    pdf_url=press_release_link.url,
-                    publication_date=press_release_link.publication_date,
-                )
+        if publication_date.year == 2023 and publication_date.month == 2:
+            _import_asahikawa_data_from_press_release(
+                pdf_url=press_release_link.url,
+                publication_date=press_release_link.publication_date,
+            )
 
     # データの訂正を反映
     # _fix_asahikawa_data()

@@ -163,7 +163,7 @@ class DailyTotalView(PatientsNumberView):
 
         """
         PatientsNumberView.__init__(self, today, pool)
-        from_date = today - relativedelta(months=3)
+        from_date = today - relativedelta(months=12)
         # 起算日が2020年2月23日の一週間より前の日付になってしまう場合は調整する。
         if from_date < date(2020, 2, 16):
             from_date = date(2020, 2, 16)
