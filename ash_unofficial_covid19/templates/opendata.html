@@ -69,38 +69,49 @@
               <td>公表日</td>
               <td>報道発表日</td>
             </tr>
-            <td>10歳未満</td>
-            <td>その日の10歳未満の陽性患者数</td>
+            <tr>
+              <td>10歳未満</td>
+              <td>その日の10歳未満の陽性患者数</td>
             </tr>
-            <td>10代</td>
-            <td>その日の10代の陽性患者数</td>
+            <tr>
+              <td>10代</td>
+              <td>その日の10代の陽性患者数</td>
             </tr>
-            <td>20代</td>
-            <td>その日の20代の陽性患者数</td>
+            <tr>
+              <td>20代</td>
+              <td>その日の20代の陽性患者数</td>
             </tr>
-            <td>30代</td>
-            <td>その日の30代の陽性患者数</td>
+            <tr>
+              <td>30代</td>
+              <td>その日の30代の陽性患者数</td>
             </tr>
-            <td>40代</td>
-            <td>その日の40代の陽性患者数</td>
+            <tr>
+              <td>40代</td>
+              <td>その日の40代の陽性患者数</td>
             </tr>
-            <td>50代</td>
-            <td>その日の50代の陽性患者数</td>
+            <tr>
+              <td>50代</td>
+              <td>その日の50代の陽性患者数</td>
             </tr>
-            <td>60代</td>
-            <td>その日の60代の陽性患者数</td>
+            <tr>
+              <td>60代</td>
+              <td>その日の60代の陽性患者数</td>
             </tr>
-            <td>70代</td>
-            <td>その日の70代の陽性患者数</td>
+            <tr>
+              <td>70代</td>
+              <td>その日の70代の陽性患者数</td>
             </tr>
-            <td>80代</td>
-            <td>その日の80代の陽性患者数</td>
+            <tr>
+              <td>80代</td>
+              <td>その日の80代の陽性患者数</td>
             </tr>
-            <td>90歳以上</td>
-            <td>その日の90歳以上の陽性患者数</td>
+            <tr>
+              <td>90歳以上</td>
+              <td>その日の90歳以上の陽性患者数</td>
             </tr>
-            <td>調査中等</td>
-            <td>その日の調査中等の陽性患者数</td>
+            <tr>
+              <td>調査中等</td>
+              <td>その日の調査中等の陽性患者数</td>
             </tr>
           </tbody>
         </table>
@@ -231,24 +242,113 @@
   </div>
   <div class="card mt-3">
     <div class="card-body">
-      <section>
-        <h2 class="h5 card-title">データのライセンス</h2>
-        <p class="card-text"><a rel="license" href="http://creativecommons.org/licenses/by/4.0/" target="_blank"><img alt="クリエイティブ・コモンズ・ライセンス" border=0 src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />この サイトのデータ は <a rel="license" href="http://creativecommons.org/licenses/by/4.0/" target="_blank">クリエイティブ・コモンズ 表示 4.0 国際 ライセンス</a>の下に提供されています。</p>
-      </section>
+      <h3 class="h5 card-title">陽性患者属性CSV</h3>
+      <p class="card-text">2022年1月27日発表分をもって旭川市が感染者ごとの情報の公表をやめたため、同日をもって陽性患者属性CSVの更新を停止しました。引き続き日別陽性患者数CSVは更新しますので、そちらをお使いください。</p>
+      <table class="table table-bordered table-striped table-sm">
+        <thead>
+          <tr>
+            <th>Header</th>
+            <th>Body</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>No</td>
+            <td>患者を識別できるように、データセット内で一意に定まる番号を設定し記載。</td>
+          </tr>
+          <tr>
+            <td>全国地方公共団体コード</td>
+            <td>総務省の定める全国地方公共団体コード（6桁コード）を記載。</td>
+          </tr>
+          <tr>
+            <td>都道府県名</td>
+            <td>都道府県名を記載。</td>
+          </tr>
+          <tr>
+            <td>市町村名</td>
+            <td>市町村名を記載。</td>
+          </tr>
+          <tr>
+            <td>公表_年月日</td>
+            <td>患者情報が公表された年月日を記載。</td>
+          </tr>
+          <tr>
+            <td>発症_年月日</td>
+            <td>発症が確認された年月日を記載。</td>
+          </tr>
+          <tr>
+            <td>患者_居住地</td>
+            <td>患者の居住地を記載。</td>
+          </tr>
+          <tr>
+            <td>患者_年代</td>
+            <td>患者の年代を次のいずれかの値で記載。{10歳未満, 10代, 20代, 30代, 40代, 50代, 60代, 70代, 80代, 90歳以上}</td>
+          </tr>
+          <tr>
+            <td>患者_性別</td>
+            <td>患者の性別。次のいずれかの文字列で記載。{男性, 女性, その他}</td>
+          </tr>
+          <tr>
+            <td>患者_職業</td>
+            <td>患者の職業を記載。</td>
+          </tr>
+          <tr>
+            <td>患者_状態</td>
+            <td>患者の状態を記載。</td>
+          </tr>
+          <tr>
+            <td>患者_症状</td>
+            <td>患者の症状を記載。</td>
+          </tr>
+          <tr>
+            <td>患者_渡航歴の有無フラグ</td>
+            <td>以下のいずれかの値を記載（数字は半角） 海外渡航歴あり：1 海外渡航歴なし：0 不明：（空のまま）</td>
+          </tr>
+          <tr>
+            <td>患者_退院済フラグ</td>
+            <td>以下のいずれかの値を記載（数字は半角） 退院済：1 入院中：0 不明：（空のまま）</td>
+          </tr>
+          <tr>
+            <td>備考</td>
+            <td>北海道発表No（道内番号）、周囲の患者の発生、濃厚接触者の状況をセミコロン区切りで記載。</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="card-text mt-3"><a href="/012041_asahikawa_covid19_patients.csv" title="旭川市新型コロナ陽性患者属性CSVをダウンロード" class="btn btn-primary">陽性患者属性CSVをダウンロード</a></p>
+    </div>
+  </div>
+  <div class="card mt-3">
+    <div class="card-body">
+      <h2 class="h5 card-title">陽性患者属性CSVの留意点</h2>
+      <p>次の理由から、道内番号7354, 9147, 9182, 11058, <strong>30809</strong>のデータを重複事例として削除しています。</p>
+      <ul>
+        <li><a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d072504_d/fil/shusei0126.pdf" title="本市報道発表資料の修正について">2021年1月26日の旭川市報道発表資料の訂正</a>により、道内番号7354, 9147, 11058が重複により削除されている。</li>
+        <li><a href="" title="令和 2 年 12 月 2 日発表「新型コロナウイルスに関連した患者の発生」について">2021年1月31日の旭川市報道発表資料の訂正</a>により、市内番号527（道内番号9182）が重複により削除されている。</li>
+        <li><a href="https://www.pref.hokkaido.lg.jp/fs/4/5/3/1/0/3/7/_/hokkaido_z0519.pdf" title="新型コロナウイルスに関連した患者（31，367～31，533例目）の発生について（報道発表資料:PDF)">2021年5月20日の北海道報道発表資料</a>から、新たに1例旭川市が重複事例を欠番にしていることが分かる。</li>
+        <li><a href="https://www.harp.lg.jp/opendata/dataset/1852/resource/4749/010006_hokkaido_covid19_patients.csv" title="010006_hokkaido_covid19_patients.csv">北海道のオープンデータ</a>から、道内番号7354, 9147, 9182, 11058, <strong>30909</strong>の5件が重複削除とされている。</li>
+        <li>道内番号7354, 9147, 9182, 11058の4件は旭川市ホームページから旭川市の重複事例である。2021年5月18日発表の道内番号30909も旭川市の重複事例に思えるが、旭川市ホームページから、同日の旭川市の事例の道内番号は30799から30819であり、一致する道内番号がない。また、旭川市ホームページから、2021年5月19日の旭川市の事例は道内番号31334からとなっていることから、道内番号30909は旭川市の事例の番号ではない。</li>
+        <li>2021年5月20日の北海道報道発表資料から、旭川市で重複が起きたのは2021年5月18日発表分で間違いない。この日の旭川市の事例の道内番号は30799から30819であることから、重複事例の番号も道内番号30799から30819の範囲内で間違いなく、怪しいのは道内番号<strong>30809</strong>である。</li>
+        <li>以上のことから、北海道のオープンデータが道内番号30809が重複事例であるものを、道内番号30909を重複事例としてしまっている可能性が極めて高いというかほぼ間違いないため、道内番号30809を削除する。</li>
+      </ul>
+      <p>また、2021年9月22日発表の内容に<a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d073824_d/fil/09232.pdf" title="訂正文">訂正があった</a>ため、市内番号3401（道内番号59820）も削除しています。</p>
+      <p>逆に、<a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d072337_d/fil/1212-2.pdf" title="令和２年１２月１１日発表「新型コロナウイルスに関連した患者の発生」について">2020年12月12日の旭川市報道発表の訂正</a>から、道内番号10919から10930までの間に1例削除すべきデータがあることが分かっていますが、どの番号が削除対象なのか、報道発表から分からないため、陽性患者属性CSVからは削除はしていません。</p>
+    </div>
+  </div>
+  <div class="card mt-3">
+    <div class="card-body">
+      <h2 class="h5 card-title">日別陽性患者数CSV・日別年代別陽性患者数CSVの留意点</h2>
+      <ul>
+        <li>2020年12月11日発表分の感染者数の<a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d072337_d/fil/1212-2.pdf" title="令和２年１２月１１日発表「新型コロナウイルスに関連した患者の発生」について">訂正があった</a>ため、同日の感染者数を訂正。（訂正の発表内容からどの年代の感染者数に訂正があったか不明なため、最も人数の多い40歳代の人数を1名減としました。）</li>
+        <li>2022年3月26日発表分の感染者数の<a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d074860_d/fil/0327-2.pdf" title="報道発表資料の訂正について">訂正があった</a>ため、同日の感染者数を訂正。（訂正の発表内容からどの年代の感染者数に訂正があったか不明なため、最も人数の多い10歳未満の人数を1名減としました。）</li>
+        <li>2022年2月20日発表分の感染者数の<a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d074697_d/fil/0220-2.pdf" title="患者数の訂正について（2月21日）">訂正があった</a>ため、同日の感染者数を訂正。（訂正の発表内容からどの年代の感染者数に訂正があったか不明なため、調査中の人数を1名減としました。）</li>
+      </ul>
     </div>
   </div>
   <div class="card mt-3">
     <div class="card-body">
       <section>
-        <h2 class="h5 card-title">更新履歴</h2>
-        <ul>
-          <li><ins datetime="2022-03-28T09:00:00+09:00" cite="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d074860_d/fil/0327-2.pdf">2022年3月26日発表分の感染者数の<a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d074860_d/fil/0327-2.pdf" title="報道発表資料の訂正について">訂正があった</a>ため、同日の感染者数を訂正しました。（訂正の発表内容からどの年代の感染者数に訂正があったか不明なため、最も人数の多い10歳未満の人数を1名減としました。）（2022年3月28日追記）</ins></li>
-          <li><ins datetime="2021-09-27T09:00:00+09:00" cite="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d074697_d/fil/0220-2.pdf">2022年2月20日発表分の感染者数の<a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d074697_d/fil/0220-2.pdf" title="患者数の訂正について（2月21日）">訂正があった</a>ため、同日の感染者数を訂正しました。（訂正の発表内容からどの年代の感染者数に訂正があったか不明なため、調査中の人数を1名減としました。）（2022年2月27日追記）</ins></li>
-          <li><ins cite="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d074504.html" datetime="2022-01-28T16:00:00+09:00">2022年1月27日発表分をもって旭川市が感染者ごとの情報の公表をやめたため、同日をもって陽性患者属性CSVの更新を停止しました。引き続き日別陽性患者数CSVは更新しますので、そちらをお使いください。</ins></li>
-          <li><ins datetime="2021-09-25T09:00:00+09:00" cite="https://www.pref.hokkaido.lg.jp/fs/4/0/4/0/0/1/8/_/hokkaido_z0519.pdf">過去の重複事例（道内番号7354, 9147, 9182, 11058, 30809）を削除しました。（2021年9月25日追記）</ins></li>
-          <li><ins datetime="2021-09-23T16:00:00+09:00" cite="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d073824_d/fil/09232.pdf">2021年9月22日報道発表の内容に<a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d073824_d/fil/09232.pdf" title="訂正文">訂正があった</a>ため、市内番号3401を削除しました。（2021年9月23日追記）</ins></li>
-          <li><ins datetime="2021-09-01T22:00:00+09:00">公表日について、これまで旭川市公式ホームページの判明日を公表日にセットしていましたが、今後は報道発表日をセットするよう変更しました。（2021年9月1日追記）</ins></li>
-        </ul>
+        <h2 class="h5 card-title">データのライセンス</h2>
+        <p class="card-text"><a rel="license" href="http://creativecommons.org/licenses/by/4.0/" target="_blank"><img alt="クリエイティブ・コモンズ・ライセンス" border=0 src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />この サイトのデータ は <a rel="license" href="http://creativecommons.org/licenses/by/4.0/" target="_blank">クリエイティブ・コモンズ 表示 4.0 国際 ライセンス</a>の下に提供されています。</p>
       </section>
     </div>
   </div>

@@ -8,6 +8,7 @@ from .services.database import ConnectionPool
 from .views.baby_reservation_status import BabyReservationStatusView
 from .views.child_reservation_status import ChildReservationStatusView
 from .views.first_reservation_status import FirstReservationStatusView
+from .views.patient import AsahikawaPatientView
 from .views.patients_number import (
     ByAgeView,
     DailyTotalView,
@@ -71,6 +72,11 @@ def get_today():
         press_release = PressReleaseView(conn)
         g.today = press_release.latest_date
     return g.today
+
+
+def get_patients():
+    conn = get_connection()
+    return AsahikawaPatientView(conn)
 
 
 def get_patients_numbers():
@@ -642,6 +648,17 @@ def baby_reservation_status_medical_institution(medical_institution):
         search_lengths=search_lengths,
         leaflet=True,
     )
+
+
+@app.route("/012041_asahikawa_covid19_patients.csv")
+def patients_csv():
+    patients = get_patients()
+    csv_data = patients.get_csv()
+    res = make_response()
+    res.data = csv_data
+    res.headers["Content-Type"] = "text/csv"
+    res.headers["Content-Disposition"] = "attachment: filename=" + "012041_asahikawa_covid19_patients.csv"
+    return res
 
 
 @app.route("/012041_asahikawa_covid19_daily_total.csv")

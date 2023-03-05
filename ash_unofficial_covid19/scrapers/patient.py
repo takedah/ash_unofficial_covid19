@@ -1,7 +1,7 @@
 import csv
 import re
 from datetime import date, datetime
-from typing import Optional
+from typing import Optional, Union
 
 import tabula
 from bs4 import BeautifulSoup
@@ -295,14 +295,14 @@ class ScrapeAsahikawaPatientsPDF(Scraper):
         self.__lists = self._get_patients_data(pdf_df)
 
     @property
-    def lists(self) -> list:
+    def lists(self) -> Union[list, dict]:
         return self.__lists
 
     @property
     def publication_date(self) -> date:
         return self.__publication_date
 
-    def _get_dataframe(self, downloaded_pdf: DownloadedPDF) -> list:
+    def _get_dataframe(self, downloaded_pdf: DownloadedPDF) -> Union[list, dict]:
         """
         Args:
             downloaded_pdf (BytesIO): PDFファイルデータ
@@ -316,7 +316,7 @@ class ScrapeAsahikawaPatientsPDF(Scraper):
         """
         return tabula.read_pdf(downloaded_pdf.content, lattice=True, pages="all")
 
-    def _get_patients_data(self, pdf_df: list) -> list:
+    def _get_patients_data(self, pdf_df: Union[list, dict]) -> Union[list, dict]:
         """
         Args:
             pdf_df (list of :obj:`pd.DataFrame`): PDFファイルから抽出した表データ

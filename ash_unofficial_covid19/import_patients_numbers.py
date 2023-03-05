@@ -137,6 +137,25 @@ def _fix_asahikawa_data() -> None:
     """
     factory = PatientsNumberFactory()
 
+    # 令和2年12月11日発表分の訂正
+    # 発表資料ではどの年代を1名取り下げたのか不明なため、調査中から1名減とした。
+    # https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d072337_d/fil/1212-2.pdf
+    fix_20201211 = {
+        "publication_date": date(2020, 12, 11),
+        "age_under_10": 0,
+        "age_10s": 1,
+        "age_20s": 1,
+        "age_30s": 1,
+        "age_40s": 2,
+        "age_50s": 2,
+        "age_60s": 1,
+        "age_70s": 0,
+        "age_80s": 2,
+        "age_over_90": 1,
+        "investigating": 0,
+    }
+    factory.create(**fix_20201211)
+
     # 令和4年2月20日発表分の訂正
     # 発表資料ではどの年代を1名取り下げたのか不明なため、調査中から1名減とした。
     # https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d074697_d/fil/0220-2.pdf
@@ -206,7 +225,7 @@ def import_latest():
             )
 
     # データの訂正を反映
-    # _fix_asahikawa_data()
+    _fix_asahikawa_data()
 
     # 札幌市の日別新規陽性患者数データをデータベースへ登録
     _import_sapporo_patients_number(Config.SAPPORO_URL)
