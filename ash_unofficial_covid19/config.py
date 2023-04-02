@@ -20,7 +20,8 @@ class Config:
     DATABASE_URL = os.environ.get("DATABASE_URL")
     BASE_URL = "https://www.city.asahikawa.hokkaido.jp/"
     OVERVIEW_URL = BASE_URL + "kurashi/135/136/150/d076150.html"
-    LATEST_DATA_URL = BASE_URL + "kurashi/135/136/150/d076989.html"
+    LATEST_DATA_URL = BASE_URL + "kurashi/135/136/150/d077216.html"
+    MAR2023_DATA_URL = BASE_URL + "kurashi/135/136/150/d076989.html"
     FEB2023_DATA_URL = BASE_URL + "kurashi/135/136/150/d076835.html"
     JAN2023_DATA_URL = BASE_URL + "kurashi/135/136/150/d076703.html"
     DEC2022_DATA_URL = BASE_URL + "kurashi/135/136/150/d076556.html"
