@@ -125,7 +125,7 @@ class MonthTotalGraphView(GraphView):
         month_total_x = [row[0].strftime("%Y-%m") for row in month_total_data]
         month_total_y = [row[1] for row in month_total_data]
         ax.bar(month_total_x, month_total_y, facecolor="#4979F5")
-        ax.yaxis.set_major_locator(MultipleLocator(3000))
+        ax.yaxis.set_major_locator(MultipleLocator(5000))
         ax.tick_params(labelsize=8)
         ax.tick_params(axis="x", rotation=45)
         fig.tight_layout()
