@@ -29,7 +29,7 @@ class ScrapeReservationStatus(Scraper):
         Scraper.__init__(self)
         self.__lists = list()
         downloaded_html = self.get_html(html_url)
-        table_data = self.get_table_data(downloaded_html, "tablepress-17-no-2")
+        table_data = self.get_table_data(downloaded_html, "tablepress-26-no-2")
         for row in table_data:
             extracted_data = self._extract_status_data(row)
             if extracted_data:
@@ -61,35 +61,7 @@ class ScrapeReservationStatus(Scraper):
         for tr in target_tbody.find_all("tr"):
             row = list()
             for td in tr.find_all("td"):
-                # 一つの列に医療機関名、住所、電話番号が改行で区切られて
-                # まとめられてしまっているため分解する。
-                if td.has_attr("class"):
-                    if "column-2" in td.get("class"):
-                        key_col = td.get_text(",", strip=True).split(",")
-                        # 分割した要素数が少ない場合、空文字列で埋める。
-                        if len(key_col) < 3:
-                            i = 0
-                            while i < 3 - len(key_col):
-                                key_col.append("")
-                                i += 1
-                        # 分割した要素数が多い場合、先頭の要素を結合して切り詰める。
-                        elif 3 < len(key_col):
-                            tmp_phone_number = key_col[-1]
-                            tmp_address = key_col[-2]
-                            i = 0
-                            tmp_medical_institution_name = ""
-                            while i < len(key_col) - 2:
-                                if tmp_medical_institution_name == "":
-                                    tmp_medical_institution_name = key_col[i]
-                                else:
-                                    tmp_medical_institution_name += " " + key_col[i]
-                                i += 1
-                            key_col = [tmp_medical_institution_name, tmp_address, tmp_phone_number]
-                        row.extend(key_col)
-                    else:
-                        row.append(td.get_text(" ", strip=True))
-                else:
-                    row.append(td.get_text(" ", strip=True))
+                row.append(td.get_text(" ", strip=True))
 
             status_data.append(row)
 
@@ -109,44 +81,35 @@ class ScrapeReservationStatus(Scraper):
         status_data = dict()
         row = list(map(lambda x: self.format_string(x), row))
         try:
-            area = row[0].replace(" ", "")
-            # 地区の文字列が正しくない箇所があるので正しい文字列に置換する。
-            if (
-                area == "各条１７～２７丁目・宮前・南地区"
-                or area == "各条１７～２８丁目・宮前・南地区"
-                or area == "各条１７～２９丁目・宮前・南地区"
-                or area == "各条１７～３０丁目・宮前・南地区"
-                or area == "各条１７～３１丁目・宮前・南地区"
-            ):
-                area = "各条１７～２６丁目・宮前・南地区"
-
-            family = self.get_available(row[8])
-            not_family = self.get_available(row[9])
-            suberb = self.get_available(row[10])
+            family = self.get_available(row[9])
+            not_family = self.get_available(row[10])
+            suberb = self.get_available(row[11])
             is_target_family = family["available"]
             is_target_not_family = not_family["available"]
             is_target_suberb = suberb["available"]
-            memo = family["text"] + " " + not_family["text"] + " " + row[11]
-            memo = memo.strip()
-            status = row[5].replace("―", "")
-            # 予約受付状況が空欄の場合、備考の値をセットする。
-            if status == "":
-                status = memo
-                memo = ""
+            if family["text"] != "":
+                family["text"] = "かかりつけ患者は" + family["text"]
 
+            if not_family["text"] != "":
+                not_family["text"] = "かかりつけ患者以外は" + not_family["text"]
+
+            if suberb["text"] != "":
+                suberb["text"] = "市外は" + suberb["text"]
+
+            memo = family["text"] + " " + not_family["text"] + " " + suberb["text"] + row[12]
+            memo = memo.strip()
             status_data = {
-                "area": area,
-                "medical_institution_name": row[1].replace(" ", ""),
+                "area": row[0],
+                "medical_institution_name": row[1],
                 "address": row[2],
-                "phone_number": row[3],
-                "vaccine": row[4],
-                "status": status,
-                "inoculation_time": row[6].replace("―", ""),
-                "target_age": row[7].replace("―", ""),
+                "phone_number": row[4],
+                "division": row[5],
+                "vaccine": row[6],
+                "status": row[7],
+                "inoculation_time": row[8],
                 "is_target_family": is_target_family,
                 "is_target_not_family": is_target_not_family,
                 "is_target_suberb": is_target_suberb,
-                "target_other": "",
                 "memo": memo,
             }
             return status_data
@@ -189,7 +152,7 @@ class ScrapeReservationStatus(Scraper):
 
         Returns:
             medical_institutione_list (list of tuple): 医療機関名のリスト
-                スクレイピングした医療機関名とワクチン種類のタプルをリストで返す。
+                スクレイピングした医療機関名と接種区分のタプルをリストで返す。
 
         """
         medical_institution_list = list()
@@ -197,7 +160,7 @@ class ScrapeReservationStatus(Scraper):
             medical_institution_list.append(
                 (
                     reservation_status["medical_institution_name"],
-                    reservation_status["vaccine"],
+                    reservation_status["division"],
                 )
             )
         return medical_institution_list
