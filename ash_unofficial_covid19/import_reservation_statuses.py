@@ -46,7 +46,7 @@ def import_reservation_statuses(html_url: str) -> None:
     deleted_names = list()
     for current_name in current_name_list:
         if current_name not in new_name_list:
-            deleted_names.append((current_name[0], current_name[1]))
+            deleted_names.append((current_name[0], current_name[1], current_name[2]))
 
     try:
         service.create(factory)
@@ -188,6 +188,21 @@ def import_locations(medical_institution_name_list: list) -> None:
             "medical_institution_name": "みうら小児科クリニック",
             "longitude": 142.33471821314035,
             "latitude": 43.75955680467453,
+        },
+        {
+            "medical_institution_name": "にしうら循環器内科クリニック",
+            "longitude": 142.41012536995134,
+            "latitude": 43.786499953349406,
+        },
+        {
+            "medical_institution_name": "内科循環器科はやしクリニック",
+            "longitude": 142.3315437699506,
+            "latitude": 43.76518076741971,
+        },
+        {
+            "medical_institution_name": "中根耳鼻咽喉科医院",
+            "longitude": 142.38597486810855,
+            "latitude": 43.80290137109948,
         },
     ]
     for add_data in add_data_list:

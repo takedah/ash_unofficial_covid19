@@ -11,33 +11,31 @@ class ReservationStatus:
 
     Attributes:
         medical_institution_name (str): 医療機関の名称
+        division (str): 接種種類
         vaccine (str): ワクチンの種類
         area (str): 地区
         address (str): 住所
         phone_number (str): 電話番号
-        status (str): 予約受付状況または受付開始時期
-        inoculation_time (str): 接種期間・時期
-        target_age (str): 対象年齢
+        status (str): 受付開始時期
+        inoculation_time (str): 接種開始時期
         is_target_family (bool): かかりつけの方が対象か
         is_target_not_family (bool): かかりつけ以外の方が対象か
         is_target_suberb (bool): 市外の方が対象か
-        target_other (str): その他
         memo (str): 備考
 
     """
 
     medical_institution_name: str
+    division: str
     vaccine: str
     area: str = ""
     address: str = ""
     phone_number: str = ""
     status: str = ""
     inoculation_time: str = ""
-    target_age: str = ""
     is_target_family: Optional[bool] = None
     is_target_not_family: Optional[bool] = None
     is_target_suberb: Optional[bool] = None
-    target_other: str = ""
     memo: str = ""
 
 
@@ -90,20 +88,20 @@ class ReservationStatusLocation(ReservationStatus):
 
     Attributes:
         medical_institution_name (str): 医療機関の名称
+        division (str): 接種種類
         vaccine (str): ワクチンの種類
         latitude (float): 医療機関のある緯度
         longitude (float): 医療機関のある経度
         area (str): 地区
         address (str): 住所
         phone_number (str): 電話番号
-        status (str): 予約受付状況または受付開始時期
-        inoculation_time (str): 接種期間・時期
-        target_age (str): 対象年齢
+        status (str): 予約受付開始時期
+        inoculation_time (str): 接種開始時期
         is_target_family (bool): かかりつけの方が対象か
         is_target_not_family (bool): かかりつけ以外の方が対象か
         is_target_suberb (bool): 市外の方が対象か
-        target_other (str): その他
         memo (str): 備考
+        division_url (str): 接種種類をURLパースした文字列
         medical_institution_name_url (str): 医療機関の名称をURLパースした文字列
         area_url (str): 地区をURLパースした文字列
 
@@ -111,10 +109,12 @@ class ReservationStatusLocation(ReservationStatus):
 
     latitude: float = 0
     longitude: float = 0
+    division_url: str = field(init=False)
     medical_institution_name_url: str = field(init=False)
     area_url: str = field(init=False)
 
     def __post_init__(self):
+        self.division_url = urllib.parse.quote(self.division)
         self.medical_institution_name_url = urllib.parse.quote(self.medical_institution_name)
         self.area_url = urllib.parse.quote(self.area)
 

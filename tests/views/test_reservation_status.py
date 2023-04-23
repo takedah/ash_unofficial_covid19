@@ -43,13 +43,13 @@ def view():
             "medical_institution_name": "旭川赤十字病院",
             "address": "曙1条1丁目",
             "phone_number": "76-9838(予約専用）",
+            "division": "春開始接種（12歳以上）",
             "vaccine": "モデルナ",
             "status": "受付中",
             "inoculation_time": "2/12～",
-            "target_age": "",
-            "is_target_family": False,
+            "is_target_family": None,
             "is_target_not_family": False,
-            "target_other": "当院の患者IDをお持ちの方",
+            "is_target_suberb": False,
             "memo": "当院ホームページをご確認ください",
         },
         {
@@ -57,14 +57,28 @@ def view():
             "medical_institution_name": "独立行政法人国立病院機構旭川医療センター",
             "address": "花咲町7丁目",
             "phone_number": "51-3910予約専用",
+            "division": "小児接種（３回目以降）",
             "vaccine": "ファイザー モデルナ",
             "status": "受付中",
             "inoculation_time": "2/1～",
-            "target_age": "18歳以上",
             "is_target_family": True,
             "is_target_not_family": False,
-            "target_other": "",
+            "is_target_suberb": None,
             "memo": "",
+        },
+        {
+            "area": "西地区",
+            "medical_institution_name": "旭川赤十字病院",
+            "address": "曙1条1丁目",
+            "phone_number": "76-9838(予約専用）",
+            "division": "小児接種（３回目以降）",
+            "vaccine": "モデルナ",
+            "status": "受付中",
+            "inoculation_time": "2/12～",
+            "is_target_family": None,
+            "is_target_not_family": False,
+            "is_target_suberb": False,
+            "memo": "かかりつけ患者以外は※条件あり 当院ホームページをご確認ください",
         },
     ]
     factory = ReservationStatusFactory()
@@ -108,6 +122,15 @@ def test_get_area_list(view):
     results = view.get_area_list()
     assert results[0]["name"] == "花咲町・末広・末広東・東鷹栖地区"
     assert results[1]["url"] == "%E8%A5%BF%E5%9C%B0%E5%8C%BA"
+
+
+def test_get_division_list(view):
+    results = view.get_division_list()
+    assert results[0]["name"] == "小児接種（３回目以降）"
+    assert (
+        results[1]["url"]
+        == "%E6%98%A5%E9%96%8B%E5%A7%8B%E6%8E%A5%E7%A8%AE%EF%BC%8812%E6%AD%B3%E4%BB%A5%E4%B8%8A%EF%BC%89"
+    )
 
 
 def test_get_medical_institution_list(view):

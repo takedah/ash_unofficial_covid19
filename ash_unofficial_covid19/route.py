@@ -5,9 +5,6 @@ from flask import Flask, abort, escape, g, make_response, render_template, reque
 from .config import Config
 from .errors import ViewError
 from .services.database import ConnectionPool
-from .views.baby_reservation_status import BabyReservationStatusView
-from .views.child_reservation_status import ChildReservationStatusView
-from .views.first_reservation_status import FirstReservationStatusView
 from .views.patient import AsahikawaPatientView
 from .views.patients_number import (
     ByAgeView,
@@ -88,21 +85,6 @@ def get_patients_numbers():
 def get_reservation_statuses():
     conn = get_connection()
     return ReservationStatusView(conn)
-
-
-def get_first_reservation_statuses():
-    conn = get_connection()
-    return FirstReservationStatusView(conn)
-
-
-def get_child_reservation_statuses():
-    conn = get_connection()
-    return ChildReservationStatusView(conn)
-
-
-def get_baby_reservation_statuses():
-    conn = get_connection()
-    return BabyReservationStatusView(conn)
 
 
 def get_daily_total():
@@ -189,6 +171,7 @@ def reservation_statuses():
     reservation_statuses = get_reservation_statuses()
     search_results = reservation_statuses.find()
     areas = reservation_statuses.get_area_list()
+    divisions = reservation_statuses.get_division_list()
     last_updated = reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
 
     search_lengths = len(search_results.items)
@@ -197,12 +180,13 @@ def reservation_statuses():
 
     return render_template(
         "reservation_statuses.html",
-        title="旭川市のコロナワクチンマップ（オミクロン株対応追加接種）",
+        title="旭川市のコロナワクチン接種医療機関マップ",
         gtag_id=Config.GTAG_ID,
         last_updated=last_updated,
         search_results=search_results.items,
         search_lengths=search_lengths,
         areas=areas,
+        divisions=divisions,
         leaflet=True,
     )
 
@@ -214,17 +198,20 @@ def reservation_statuses_search_by_gps():
     if request.method == "GET":
         abort(404)
 
-    title = "現在地から近い新型コロナワクチン接種医療機関（オミクロン株対応追加接種）の検索結果"
     try:
         current_latitude = escape(request.form["current_latitude"])
         current_longitude = escape(request.form["current_longitude"])
         current_latitude = float(current_latitude)
         current_longitude = float(current_longitude)
+        division = escape(request.form["division"])
     except (KeyError, ValueError):
         abort(400)
 
+    title = "現在地から近い新型コロナワクチン接種医療機関（" + division + "）の検索結果"
     try:
-        search_results = reservation_statuses.search_by_gps(longitude=current_longitude, latitude=current_latitude)
+        search_results = reservation_statuses.search_by_gps(
+            longitude=current_longitude, latitude=current_latitude, division=division
+        )
     except ViewError:
         abort(500)
 
@@ -241,6 +228,7 @@ def reservation_statuses_search_by_gps():
         search_lengths=search_lengths,
         current_longitude=current_longitude,
         current_latitude=current_latitude,
+        division=division,
         leaflet=True,
     )
 
@@ -252,6 +240,7 @@ def reservation_status_area(area):
     except ValueError:
         abort(400)
 
+    title = area + "の新型コロナワクチン接種医療機関の検索結果"
     reservation_statuses = get_reservation_statuses()
     search_results = reservation_statuses.find(area=area)
     last_updated = reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
@@ -262,10 +251,38 @@ def reservation_status_area(area):
 
     return render_template(
         "reservation_status_area.html",
-        title=area + "の新型コロナワクチン接種医療機関（オミクロン株対応追加接種）の検索結果",
+        title=title,
         gtag_id=Config.GTAG_ID,
         last_updated=last_updated,
         area=area,
+        search_results=search_results.items,
+        search_lengths=search_lengths,
+        leaflet=True,
+    )
+
+
+@app.route("/reservation_status/division/<division>")
+def reservation_status_division(division):
+    try:
+        division = escape(division)
+    except ValueError:
+        abort(400)
+
+    title = "新型コロナワクチン接種医療機関（" + division + "）の検索結果"
+    reservation_statuses = get_reservation_statuses()
+    search_results = reservation_statuses.find(division=division)
+    last_updated = reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
+
+    search_lengths = len(search_results.items)
+    if search_lengths == 0:
+        abort(404)
+
+    return render_template(
+        "reservation_status_division.html",
+        title=title,
+        gtag_id=Config.GTAG_ID,
+        last_updated=last_updated,
+        division=division,
         search_results=search_results.items,
         search_lengths=search_lengths,
         leaflet=True,
@@ -279,6 +296,7 @@ def reservation_status_medical_institution(medical_institution):
     except ValueError:
         abort(400)
 
+    title = medical_institution + "の新型コロナワクチン接種予約受付状況"
     reservation_statuses = get_reservation_statuses()
     search_results = reservation_statuses.find(medical_institution_name=medical_institution)
     last_updated = reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
@@ -289,358 +307,7 @@ def reservation_status_medical_institution(medical_institution):
 
     return render_template(
         "reservation_status_medical_institution.html",
-        title=medical_institution + "の新型コロナワクチン接種予約受付状況（オミクロン株対応追加接種）",
-        gtag_id=Config.GTAG_ID,
-        last_updated=last_updated,
-        medical_institution=medical_institution,
-        search_results=search_results.items,
-        search_lengths=search_lengths,
-        leaflet=True,
-    )
-
-
-@app.route("/first_reservation_statuses")
-def first_reservation_statuses():
-    first_reservation_statuses = get_first_reservation_statuses()
-    search_results = first_reservation_statuses.find()
-    areas = first_reservation_statuses.get_area_list()
-    last_updated = first_reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
-
-    search_lengths = len(search_results.items)
-    if search_lengths == 0:
-        abort(404)
-
-    return render_template(
-        "first_reservation_statuses.html",
-        title="旭川市のコロナワクチンマップ（1・2回目接種）",
-        gtag_id=Config.GTAG_ID,
-        last_updated=last_updated,
-        search_results=search_results.items,
-        search_lengths=search_lengths,
-        areas=areas,
-        leaflet=True,
-    )
-
-
-@app.route("/first_reservation_statuses/search_by_gps", methods=["GET", "POST"])
-def first_reservation_statuses_search_by_gps():
-    first_reservation_statuses = get_first_reservation_statuses()
-    last_updated = first_reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
-    if request.method == "GET":
-        abort(404)
-
-    title = "現在地から近い新型コロナワクチン接種医療機関（1・2回目接種）の検索結果"
-    try:
-        current_latitude = escape(request.form["current_latitude"])
-        current_longitude = escape(request.form["current_longitude"])
-        current_latitude = float(current_latitude)
-        current_longitude = float(current_longitude)
-    except (KeyError, ValueError):
-        abort(400)
-
-    try:
-        search_results = first_reservation_statuses.search_by_gps(
-            longitude=current_longitude, latitude=current_latitude
-        )
-    except ViewError:
-        abort(500)
-
-    search_lengths = len(search_results)
-    if search_lengths == 0:
-        abort(404)
-
-    return render_template(
-        "first_reservation_status_search_by_gps.html",
         title=title,
-        gtag_id=Config.GTAG_ID,
-        last_updated=last_updated,
-        search_results=search_results,
-        search_lengths=search_lengths,
-        current_longitude=current_longitude,
-        current_latitude=current_latitude,
-        leaflet=True,
-    )
-
-
-@app.route("/first_reservation_status/area/<area>")
-def first_reservation_status_area(area):
-    try:
-        area = escape(area)
-    except ValueError:
-        abort(400)
-
-    first_reservation_statuses = get_first_reservation_statuses()
-    search_results = first_reservation_statuses.find(area=area)
-    last_updated = first_reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
-
-    search_lengths = len(search_results.items)
-    if search_lengths == 0:
-        abort(404)
-
-    return render_template(
-        "first_reservation_status_area.html",
-        title=area + "の新型コロナワクチン接種医療機関（1・2回目接種）の検索結果",
-        gtag_id=Config.GTAG_ID,
-        last_updated=last_updated,
-        area=area,
-        search_results=search_results.items,
-        search_lengths=search_lengths,
-        leaflet=True,
-    )
-
-
-@app.route("/first_reservation_status/medical_institution/<medical_institution>")
-def first_reservation_status_medical_institution(medical_institution):
-    try:
-        medical_institution = escape(medical_institution)
-    except ValueError:
-        abort(400)
-
-    first_reservation_statuses = get_first_reservation_statuses()
-    search_results = first_reservation_statuses.find(medical_institution_name=medical_institution)
-    last_updated = first_reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
-
-    search_lengths = len(search_results.items)
-    if search_lengths == 0:
-        abort(404)
-
-    return render_template(
-        "first_reservation_status_medical_institution.html",
-        title=medical_institution + "の新型コロナワクチン接種予約受付状況（1・2回目接種）",
-        gtag_id=Config.GTAG_ID,
-        last_updated=last_updated,
-        medical_institution=medical_institution,
-        search_results=search_results.items,
-        search_lengths=search_lengths,
-        leaflet=True,
-    )
-
-
-@app.route("/child_reservation_statuses")
-def child_reservation_statuses():
-    child_reservation_statuses = get_child_reservation_statuses()
-    search_results = child_reservation_statuses.find()
-    areas = child_reservation_statuses.get_area_list()
-    last_updated = child_reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
-
-    search_lengths = len(search_results.items)
-    if search_lengths == 0:
-        abort(404)
-
-    return render_template(
-        "child_reservation_statuses.html",
-        title="旭川市のコロナワクチンマップ（5歳から11歳接種）",
-        gtag_id=Config.GTAG_ID,
-        last_updated=last_updated,
-        search_results=search_results.items,
-        search_lengths=search_lengths,
-        areas=areas,
-        leaflet=True,
-    )
-
-
-@app.route("/child_reservation_statuses/search_by_gps", methods=["GET", "POST"])
-def child_reservation_statuses_search_by_gps():
-    child_reservation_statuses = get_child_reservation_statuses()
-    last_updated = child_reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
-    if request.method == "GET":
-        abort(404)
-
-    title = "現在地から近い新型コロナワクチン接種医療機関（5歳から11歳接種）の検索結果"
-    try:
-        current_latitude = escape(request.form["current_latitude"])
-        current_longitude = escape(request.form["current_longitude"])
-        current_latitude = float(current_latitude)
-        current_longitude = float(current_longitude)
-    except (KeyError, ValueError):
-        abort(400)
-
-    try:
-        search_results = child_reservation_statuses.search_by_gps(
-            longitude=current_longitude, latitude=current_latitude
-        )
-    except ViewError:
-        abort(500)
-
-    search_lengths = len(search_results)
-    if search_lengths == 0:
-        abort(404)
-
-    return render_template(
-        "child_reservation_status_search_by_gps.html",
-        title=title,
-        gtag_id=Config.GTAG_ID,
-        last_updated=last_updated,
-        search_results=search_results,
-        search_lengths=search_lengths,
-        current_longitude=current_longitude,
-        current_latitude=current_latitude,
-        leaflet=True,
-    )
-
-
-@app.route("/child_reservation_status/area/<area>")
-def child_reservation_status_area(area):
-    try:
-        area = escape(area)
-    except ValueError:
-        abort(400)
-
-    child_reservation_statuses = get_child_reservation_statuses()
-    search_results = child_reservation_statuses.find(area=area)
-    last_updated = child_reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
-
-    search_lengths = len(search_results.items)
-    if search_lengths == 0:
-        abort(404)
-
-    return render_template(
-        "child_reservation_status_area.html",
-        title=area + "の新型コロナワクチン接種医療機関（5歳から11歳接種）の検索結果",
-        gtag_id=Config.GTAG_ID,
-        last_updated=last_updated,
-        area=area,
-        search_results=search_results.items,
-        search_lengths=search_lengths,
-        leaflet=True,
-    )
-
-
-@app.route("/child_reservation_status/medical_institution/<medical_institution>")
-def child_reservation_status_medical_institution(medical_institution):
-    try:
-        medical_institution = escape(medical_institution)
-    except ValueError:
-        abort(400)
-
-    child_reservation_statuses = get_child_reservation_statuses()
-    search_results = child_reservation_statuses.find(medical_institution_name=medical_institution)
-    last_updated = child_reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
-
-    search_lengths = len(search_results.items)
-    if search_lengths == 0:
-        abort(404)
-
-    return render_template(
-        "child_reservation_status_medical_institution.html",
-        title=medical_institution + "の新型コロナワクチン接種予約受付状況（5歳から11歳接種）",
-        gtag_id=Config.GTAG_ID,
-        last_updated=last_updated,
-        medical_institution=medical_institution,
-        search_results=search_results.items,
-        search_lengths=search_lengths,
-        leaflet=True,
-    )
-
-
-@app.route("/baby_reservation_statuses")
-def baby_reservation_statuses():
-    baby_reservation_statuses = get_baby_reservation_statuses()
-    search_results = baby_reservation_statuses.find()
-    areas = baby_reservation_statuses.get_area_list()
-    last_updated = baby_reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
-
-    search_lengths = len(search_results.items)
-    if search_lengths == 0:
-        abort(404)
-
-    return render_template(
-        "baby_reservation_statuses.html",
-        title="旭川市のコロナワクチンマップ（生後6か月から4歳接種）",
-        gtag_id=Config.GTAG_ID,
-        last_updated=last_updated,
-        search_results=search_results.items,
-        search_lengths=search_lengths,
-        areas=areas,
-        leaflet=True,
-    )
-
-
-@app.route("/baby_reservation_statuses/search_by_gps", methods=["GET", "POST"])
-def baby_reservation_statuses_search_by_gps():
-    baby_reservation_statuses = get_baby_reservation_statuses()
-    last_updated = baby_reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
-    if request.method == "GET":
-        abort(404)
-
-    title = "現在地から近い新型コロナワクチン接種医療機関（生後6か月から4歳接種）の検索結果"
-    try:
-        current_latitude = escape(request.form["current_latitude"])
-        current_longitude = escape(request.form["current_longitude"])
-        current_latitude = float(current_latitude)
-        current_longitude = float(current_longitude)
-    except (KeyError, ValueError):
-        abort(400)
-
-    try:
-        search_results = baby_reservation_statuses.search_by_gps(
-            longitude=current_longitude, latitude=current_latitude
-        )
-    except ViewError:
-        abort(500)
-
-    search_lengths = len(search_results)
-    if search_lengths == 0:
-        abort(404)
-
-    return render_template(
-        "baby_reservation_status_search_by_gps.html",
-        title=title,
-        gtag_id=Config.GTAG_ID,
-        last_updated=last_updated,
-        search_results=search_results,
-        search_lengths=search_lengths,
-        current_longitude=current_longitude,
-        current_latitude=current_latitude,
-        leaflet=True,
-    )
-
-
-@app.route("/baby_reservation_status/area/<area>")
-def baby_reservation_status_area(area):
-    try:
-        area = escape(area)
-    except ValueError:
-        abort(400)
-
-    baby_reservation_statuses = get_baby_reservation_statuses()
-    search_results = baby_reservation_statuses.find(area=area)
-    last_updated = baby_reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
-
-    search_lengths = len(search_results.items)
-    if search_lengths == 0:
-        abort(404)
-
-    return render_template(
-        "baby_reservation_status_area.html",
-        title=area + "の新型コロナワクチン接種医療機関（生後6か月から4歳接種）の検索結果",
-        gtag_id=Config.GTAG_ID,
-        last_updated=last_updated,
-        area=area,
-        search_results=search_results.items,
-        search_lengths=search_lengths,
-        leaflet=True,
-    )
-
-
-@app.route("/baby_reservation_status/medical_institution/<medical_institution>")
-def baby_reservation_status_medical_institution(medical_institution):
-    try:
-        medical_institution = escape(medical_institution)
-    except ValueError:
-        abort(400)
-
-    baby_reservation_statuses = get_baby_reservation_statuses()
-    search_results = baby_reservation_statuses.find(medical_institution_name=medical_institution)
-    last_updated = baby_reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
-
-    search_lengths = len(search_results.items)
-    if search_lengths == 0:
-        abort(404)
-
-    return render_template(
-        "baby_reservation_status_medical_institution.html",
-        title=medical_institution + "の新型コロナワクチン接種予約受付状況（生後6か月から4歳接種）",
         gtag_id=Config.GTAG_ID,
         last_updated=last_updated,
         medical_institution=medical_institution,
@@ -707,36 +374,6 @@ def daily_total_per_age_json():
 def reservation_status_json():
     reservation_statuses = get_reservation_statuses()
     json_data = reservation_statuses.get_reservation_status_json()
-    res = make_response()
-    res.data = json_data
-    res.headers["Content-Type"] = "application/json; charset=UTF-8"
-    return res
-
-
-@app.route("/api/first_reservation_status.json")
-def first_reservation_status_json():
-    first_reservation_statuses = get_first_reservation_statuses()
-    json_data = first_reservation_statuses.get_reservation_status_json()
-    res = make_response()
-    res.data = json_data
-    res.headers["Content-Type"] = "application/json; charset=UTF-8"
-    return res
-
-
-@app.route("/api/child_reservation_status.json")
-def child_reservation_status_json():
-    child_reservation_statuses = get_child_reservation_statuses()
-    json_data = child_reservation_statuses.get_reservation_status_json()
-    res = make_response()
-    res.data = json_data
-    res.headers["Content-Type"] = "application/json; charset=UTF-8"
-    return res
-
-
-@app.route("/api/baby_reservation_status.json")
-def baby_reservation_status_json():
-    baby_reservation_statuses = get_baby_reservation_statuses()
-    json_data = baby_reservation_statuses.get_reservation_status_json()
     res = make_response()
     res.data = json_data
     res.headers["Content-Type"] = "application/json; charset=UTF-8"

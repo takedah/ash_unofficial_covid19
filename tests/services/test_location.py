@@ -63,19 +63,19 @@ def test_get_distance(service):
 
 
 def test_get_near_locations(service):
-    test_data_list = [
+    test_data = [
         {
             "area": "神楽・神楽岡・緑が丘",
             "medical_institution_name": "旭川リハビリテーション病院",
+            "division": "春開始接種（12歳以上）",
             "address": "緑が丘東1条1丁目",
             "phone_number": "65-6014 予約専用",
             "vaccine": "ファイザー・モデルナの両方",
             "status": "受付中",
             "inoculation_time": "2/21",
-            "target_age": "",
             "is_target_family": True,
             "is_target_not_family": False,
-            "target_other": "",
+            "is_target_suberb": True,
             "longitude": 142.3871075983558,
             "latitude": 43.73051097382853,
             "memo": "",
@@ -83,15 +83,15 @@ def test_get_near_locations(service):
         {
             "area": "神楽・神楽岡・緑が丘",
             "medical_institution_name": "旭川医科大学病院",
+            "division": "春開始接種（12歳以上）",
             "address": "緑が丘東2条1丁目",
             "phone_number": "65-2111",
             "vaccine": "モデルナのみ",
             "status": "受付停止中",
             "inoculation_time": "",
-            "target_age": "",
             "is_target_family": None,
             "is_target_not_family": None,
-            "target_other": "",
+            "is_target_suberb": True,
             "longitude": 142.38382199835564,
             "latitude": 43.73007572101459,
             "memo": "",
@@ -99,15 +99,15 @@ def test_get_near_locations(service):
         {
             "area": "西地区",
             "medical_institution_name": "旭川赤十字病院",
+            "division": "春開始接種（12歳以上）",
             "address": "曙1条1丁目",
             "phone_number": "76-9838(予約専用）",
             "vaccine": "モデルナのみ",
             "status": "受付中",
             "inoculation_time": "2/12～",
-            "target_age": "",
-            "is_target_family": False,
+            "is_target_family": None,
             "is_target_not_family": False,
-            "target_other": "当院の患者IDをお持ちの方",
+            "is_target_suberb": False,
             "longitude": 142.348303888889,
             "latitude": 43.769628888889,
             "memo": "当院ホームページをご確認ください",
@@ -115,15 +115,15 @@ def test_get_near_locations(service):
         {
             "area": "花咲町・末広・末広東・東鷹栖地区",
             "medical_institution_name": "独立行政法人国立病院機構旭川医療センター",
+            "division": "春開始接種（12歳以上）",
             "address": "花咲町7丁目",
             "phone_number": "51-3910予約専用",
             "vaccine": "ファイザー・モデルナの両方",
             "status": "受付中",
             "inoculation_time": "2/1～",
-            "target_age": "18歳以上",
             "is_target_family": True,
             "is_target_not_family": False,
-            "target_other": "",
+            "is_target_suberb": True,
             "longitude": 142.3815237271935,
             "latitude": 43.798826491523464,
             "memo": "",
@@ -131,15 +131,15 @@ def test_get_near_locations(service):
         {
             "area": "各条１７～２６丁目・宮前・南地区",
             "medical_institution_name": "森山病院",
+            "division": "春開始接種（12歳以上）",
             "address": "宮前2条1丁目",
             "phone_number": "45-2026予約専用",
             "vaccine": "ファイザーのみ",
             "status": "受付中",
             "inoculation_time": "2月28日～8月",
-            "target_age": "18歳以上",
             "is_target_family": True,
             "is_target_not_family": False,
-            "target_other": "",
+            "is_target_suberb": True,
             "longitude": 142.362565555556,
             "latitude": 43.781208333333,
             "memo": "月・水14:00～15:00",
@@ -147,23 +147,23 @@ def test_get_near_locations(service):
         {
             "area": "新富・東・金星町地区",
             "medical_institution_name": "市立旭川病院",
+            "division": "春開始接種（12歳以上）",
             "address": "金星町1丁目",
             "phone_number": "29-0202予約専用",
             "vaccine": "",
             "status": "",
             "inoculation_time": "",
-            "target_age": "",
             "is_target_family": None,
             "is_target_not_family": None,
-            "target_other": "",
+            "is_target_suberb": True,
             "longitude": 142.365976388889,
             "latitude": 43.778422777778,
             "memo": "",
         },
     ]
     locations = ReservationStatusLocationFactory()
-    for test_data in test_data_list:
-        locations.create(**test_data)
+    for d in test_data:
+        locations.create(**d)
 
     current_point_factory = PointFactory()
     current_point = current_point_factory.create(latitude=43.77082378, longitude=142.3650193)

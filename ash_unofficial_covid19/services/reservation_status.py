@@ -33,16 +33,15 @@ class ReservationStatusService(Service):
         items = (
             "area",
             "medical_institution_name",
+            "division",
             "address",
             "phone_number",
             "vaccine",
             "status",
             "inoculation_time",
-            "target_age",
             "is_target_family",
             "is_target_not_family",
             "is_target_suberb",
-            "target_other",
             "memo",
             "updated_at",
         )
@@ -53,16 +52,15 @@ class ReservationStatusService(Service):
                 [
                     reservation_status.area,
                     reservation_status.medical_institution_name,
+                    reservation_status.division,
                     reservation_status.address,
                     reservation_status.phone_number,
                     reservation_status.vaccine,
                     reservation_status.status,
                     reservation_status.inoculation_time,
-                    reservation_status.target_age,
                     reservation_status.is_target_family,
                     reservation_status.is_target_not_family,
                     reservation_status.is_target_suberb,
-                    reservation_status.target_other,
                     reservation_status.memo,
                     datetime.now(timezone(timedelta(hours=+9))),
                 ]
@@ -71,7 +69,7 @@ class ReservationStatusService(Service):
         # データベースへ登録処理
         self.upsert(
             items=items,
-            primary_key="medical_institution_name,vaccine",
+            primary_key="medical_institution_name,vaccine,division",
             data_lists=data_lists,
         )
 
@@ -79,7 +77,7 @@ class ReservationStatusService(Service):
         """指定した主キーの値を持つデータを削除する
 
         Args:
-            target_values (tuple): 削除対象の医療機関名とワクチン種類のタプル
+            target_values (tuple): 削除対象の医療機関名と接種種別、ワクチンのタプル
 
         Returns:
             result (bool): 削除に成功したら真を返す
@@ -88,16 +86,34 @@ class ReservationStatusService(Service):
         if not isinstance(target_values, tuple):
             raise TypeError("キーの指定がタプルになっていません。")
         else:
-            if len(target_values) == 2:
+            if len(target_values) == 3:
                 for target_value in target_values:
                     if not isinstance(target_value, str):
                         raise TypeError("キーの指定が文字列ではありません。")
             else:
                 raise ServiceError("キーの指定の指定の配列の要素数が正しくありません。")
 
-        state = "DELETE FROM " + self.table_name + " " + "WHERE medical_institution_name=%s" + " " + "AND vaccine=%s;"
+        state = (
+            "DELETE FROM "
+            + self.table_name
+            + " "
+            + "WHERE medical_institution_name=%s"
+            + " "
+            + "AND division=%s"
+            + " "
+            + "AND vaccine=%s;"
+        )
         log_message = (
-            self.table_name + "テーブルから" + " " + str(target_values[0]) + ", " + str(target_values[1]) + " " + "を"
+            self.table_name
+            + "テーブルから"
+            + " "
+            + str(target_values[0])
+            + ", "
+            + str(target_values[1])
+            + ", "
+            + str(target_values[2])
+            + " "
+            + "を"
         )
         try:
             with self.get_connection() as cur:
@@ -122,26 +138,26 @@ class ReservationStatusService(Service):
 
         Returns:
             medical_institution_list (list of tuple): 医療機関の一覧リスト
-                新型コロナワクチン接種医療機関の名称、ワクチン種類のタプルを
+                新型コロナワクチン接種医療機関の名称、接種種別、ワクチンのタプルを
                 リストで返す。
 
         """
         state = (
-            "SELECT DISTINCT ON (medical_institution_name,vaccine)"
+            "SELECT DISTINCT ON (medical_institution_name,division,vaccine)"
             + " "
-            + "medical_institution_name,vaccine"
+            + "medical_institution_name,division,vaccine"
             + " "
             + "FROM"
             + " "
             + self.table_name
             + " "
-            + "ORDER BY medical_institution_name,vaccine;"
+            + "ORDER BY medical_institution_name,division,vaccine;"
         )
         medical_institution_list = list()
         with self.get_connection() as cur:
             cur.execute(state)
             for row in cur.fetchall():
-                medical_institution_list.append((row["medical_institution_name"], row["vaccine"]))
+                medical_institution_list.append((row["medical_institution_name"], row["division"], row["vaccine"]))
 
         return medical_institution_list
 
@@ -154,21 +170,21 @@ class ReservationStatusService(Service):
         """
         state = (
             "SELECT "
-            + "area,medical_institution_name,"
-            + "address,phone_number,vaccine,status,inoculation_time,target_age,"
-            + "is_target_family,is_target_not_family,is_target_suberb,target_other,memo "
+            + "area,medical_institution_name,division,"
+            + "address,phone_number,vaccine,status,inoculation_time,"
+            + "is_target_family,is_target_not_family,is_target_suberb,memo "
             + "FROM"
             + " "
             + self.table_name
             + " "
-            + "ORDER BY area,address,vaccine;"
+            + "ORDER BY area,address,division,vaccine;"
         )
         dicts = dict()
         with self.get_connection() as cur:
             cur.execute(state)
             i = 0
             for row in cur.fetchall():
-                # 医療機関名とワクチンの種類で複合キーとなっているが分かりにくいので
+                # 医療機関名と接種種別、ワクチンで複合キーとなっているが分かりにくいので
                 # 仮の連番をキーに採用する。
                 key = "row" + str(i)
                 value = dict(row)
@@ -178,7 +194,10 @@ class ReservationStatusService(Service):
         return dicts
 
     def find(
-        self, medical_institution_name: Optional[str] = None, area: Optional[str] = None
+        self,
+        medical_institution_name: Optional[str] = None,
+        area: Optional[str] = None,
+        division: Optional[str] = None,
     ) -> ReservationStatusLocationFactory:
         """新型コロナワクチン接種医療機関予約状況と位置情報の検索
 
@@ -187,6 +206,7 @@ class ReservationStatusService(Service):
         Args:
             medical_institution_name (str): 医療機関の名称
             area (str): 地区
+            division (str): 接種種別
 
         Returns:
             results (list of :obj:`ReservationStatusLocation`): 予約受付状況詳細データ
@@ -214,11 +234,22 @@ class ReservationStatusService(Service):
             else:
                 raise TypeError("地区の指定に誤りがあります。")
 
+        if division is not None:
+            if isinstance(division, str):
+                if len(search_args) == 0:
+                    where_sentence += " " + "WHERE"
+                else:
+                    where_sentence += " " + "AND"
+                where_sentence += " " + "division=%s"
+                search_args.append(division)
+            else:
+                raise TypeError("接種種別の指定に誤りがあります。")
+
         state = (
             "SELECT "
-            + "area,reserve.medical_institution_name,"
-            + "address,phone_number,vaccine,status,inoculation_time,target_age,"
-            + "is_target_family,is_target_not_family,is_target_suberb,target_other,"
+            + "area,reserve.medical_institution_name,division,"
+            + "address,phone_number,vaccine,status,inoculation_time,"
+            + "is_target_family,is_target_not_family,is_target_suberb,"
             + "latitude,longitude,memo "
             + "FROM "
             + self.table_name
@@ -228,7 +259,7 @@ class ReservationStatusService(Service):
             + "LEFT JOIN locations AS loc ON reserve.medical_institution_name="
             + "loc.medical_institution_name"
         )
-        order_sentence = " " + "ORDER BY area,address,vaccine;"
+        order_sentence = " " + "ORDER BY area,address,division,vaccine;"
         factory = ReservationStatusLocationFactory()
         with self.get_connection() as cur:
             if len(search_args) == 0:
@@ -255,3 +286,19 @@ class ReservationStatusService(Service):
                 area_list.append(row["area"])
 
         return area_list
+
+    def get_division_list(self) -> list:
+        """新型コロナワクチン接種医療機関の接種種別一覧を取得
+
+        Returns:
+            division_list (list): 医療機関の接種種別一覧リスト
+
+        """
+        state = "SELECT DISTINCT(division)" + " " + "FROM" + " " + self.table_name + " " + "ORDER BY division;"
+        division_list = list()
+        with self.get_connection() as cur:
+            cur.execute(state)
+            for row in cur.fetchall():
+                division_list.append(row["division"])
+
+        return division_list

@@ -8,88 +8,11 @@
         target="_blank">旭川市 新型コロナワクチン接種特設サイト <i class="fas fa-external-link-alt"></i></a>を確認してください。</p>
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
   </div>
-  <div class="card">
-    <div class="card-body">
-      <section>
-        <h2 class="h5 card-title mb-3">現在地から近い医療機関（オミクロン株対応追加接種）の予約受付状況一覧</h2>
-        <p class="card-text d-block d-sm-none"><i class="far fa-hand-point-right"></i> 横にスクロールできます。</p>
-        <div class="table-responsive">
-          <table class="table table-bordered">
-            <thead>
-              <tr>
-                <th>近い順</th>
-                <th class="text-nowrap">
-                    医療機関名<br>
-                    接種するワクチン<br>
-                    住所<br>
-                    電話番号<br>
-                </th>
-                <th class="text-nowrap">予約受付開始時期</th>
-                <th class="text-nowrap">接種可能時期</th>
-                <th class="text-nowrap">年齢</th>
-                <th class="text-nowrap">かかりつけ以外</th>
-                <th class="text-nowrap">市外の方</th>
-                <th class="text-nowrap">その他条件・備考など</th>
-                <th>距離</th>
-              </tr>
-            </thead>
-            <tbody id="results" data-length="{{ search_lengths|tojson }}" data-currentlatitude="{{ current_latitude|tojson }}" data-currentlongitude="{{ current_longitude|tojson }}">
-              {% for search_result in search_results %}
-              <tr id="order{{ loop.index }}" data-latitude="{{ search_result["location"].latitude|tojson }}" data-longitude="{{ search_result["location"].longitude|tojson }}" data-name="{{ search_result["location"].medical_institution_name|safe }}" data-url="{{ search_result["location"].medical_institution_name_url|safe }}" data-vaccine="{{ search_result["location"].vaccine|safe }}" data-istargetnotfamily="{{ search_result["location"].is_target_not_family|safe }}" data-status="{{ search_result["location"].status|safe }}">
-                <td>{{ search_result["order"] }}</td>
-                <td>
-                  <strong><a href="/reservation_status/medical_institution/{{ search_result["location"].medical_institution_name_url }}" title="{{ search_result["location"].medical_institution_name }}">{{ search_result["location"].medical_institution_name }}</a></strong><br>
-                    {{ search_result["location"].vaccine }}<br>
-                    {{ search_result["location"].address }}<br>
-                    {{ search_result["location"].phone_number }}<br>
-                </td>
-                <td>{{ search_result["location"].status }}</td>
-                <td>{{ search_result["location"].inoculation_time }}</td>
-                <td>{{ search_result["location"].target_age }}</td>
-                {% if search_result["location"].is_target_not_family is none %}
-                  <td></td>
-                {% elif search_result["location"].is_target_not_family %}
-                  <td>OK</td>
-                {% else %}
-                  <td>NG</td>
-                {% endif %}
-                {% if search_result["location"].is_target_suberb is none %}
-                  <td></td>
-                {% elif search_result["location"].is_target_suberb %}
-                  <td>OK</td>
-                {% else %}
-                  <td>NG</td>
-                {% endif %}
-                <td>
-                  {% if not search_result["location"].target_other == "" %}
-                    <p>{{ search_result["location"].target_other }}</p>
-                  {% endif %}
-                  <p>{{ search_result["location"].memo }}</p>
-                </td>
-                <td>{{ search_result["distance"] }}km</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        <p class="card-text mt-3">距離は現在地からの直線距離で算出しているため、実際の道路状況によっては結果が異なりますのでご注意ください。</p>
-      </section>
-    </div>
-  </div>
   <div class="card mt-3">
     <div class="card-body">
       <section id="gpsMap">
-        <h2 class="h5 card-title mb-3">現在地から近い医療機関（オミクロン株対応追加接種）の地図</h2>
+        <h2 class="h5 card-title mb-3">現在地から近い{{ division }}のコロナワクチンマップ</h2>
         <p class="card-text">地図は目安となっています。正確な場所の情報は各医療機関のホームページ等でご確認ください。</p>
-        <table class="table table-borderless table-sm">
-          <tbody>
-            <tr>
-              <td class="map_primary_icon text-center align-middle"><i class='fas fa-map-marker-alt'></i></td><td class="small align-middle">受付中</td>
-              <td class="map_danger_icon text-center align-middle"><i class='fas fa-map-marker-alt'></i></td><td class="small align-middle">受付停止中</td>
-              <td class="map_warning_icon text-center align-middle"><i class='fas fa-map-marker-alt'></i></td><td class="small align-middle">その他（病院に直接問い合わせる必要ありなど）</td>
-            </tr>
-          </tbody>
-        </table>
         <div id="mapid" class="mb-3"></div>
         <p class="card-text small">医療機関の位置情報は、<a href="https://developer.yahoo.co.jp/webapi/map/"
             title="Yahoo! Open Local Platform" target="_blank">Yahoo! Open Local Platform (YOLP)
@@ -106,8 +29,73 @@
   <div class="card mt-3">
     <div class="card-body">
       <section>
-        <h3 class="h5 card-title mb-3">他の条件で医療機関（オミクロン株対応追加接種）を探す</h3>
-        <p class="card-text"><a href="/reservation_statuses" title="コロナワクチンマップ（オミクロン株対応追加接種）へ">コロナワクチンマップ（オミクロン株対応追加接種）へ</a></p>
+        <h2 class="h5 card-title mb-3">現在地から近い{{ division }}医療機関の一覧</h2>
+        <p class="card-text d-block d-sm-none"><i class="far fa-hand-point-right"></i> 横にスクロールできます。</p>
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>近い順</th>
+                <th class="text-nowrap">
+                    医療機関名<br>
+                    接種種別<br>
+                    使用ワクチン<br>
+                    住所<br>
+                    電話番号<br>
+                </th>
+                <th class="text-nowrap">予約開始時期</th>
+                <th class="text-nowrap">接種開始時期</th>
+                <th class="text-nowrap">かかりつけ以外</th>
+                <th class="text-nowrap">市外の方</th>
+                <th class="text-nowrap">備考</th>
+                <th>距離</th>
+              </tr>
+            </thead>
+            <tbody id="results" data-length="{{ search_lengths|tojson }}" data-currentlatitude="{{ current_latitude|tojson }}" data-currentlongitude="{{ current_longitude|tojson }}">
+              {% for search_result in search_results %}
+              <tr id="order{{ loop.index }}" data-latitude="{{ search_result["location"].latitude|tojson }}" data-longitude="{{ search_result["location"].longitude|tojson }}" data-name="{{ search_result["location"].medical_institution_name|safe }}" data-url="{{ search_result["location"].medical_institution_name_url|safe }}" data-division="{{ search_result["location"].division|safe }}" data-vaccine="{{ search_result["location"].vaccine|safe }}" data-istargetnotfamily="{{ search_result["location"].is_target_not_family|safe }}" data-status="{{ search_result["location"].status|safe }}">
+                <td class="text-nowrap">{{ search_result["order"] }}</td>
+                <td class="text-nowrap">
+                  <strong><a href="/reservation_status/medical_institution/{{ search_result["location"].medical_institution_name_url }}" title="{{ search_result["location"].medical_institution_name }}">{{ search_result["location"].medical_institution_name }}</a></strong><br>
+                    <strong class="text-danger">{{ search_result["location"].division }}</strong><br>
+                    {{ search_result["location"].vaccine }}<br>
+                    {{ search_result["location"].address }}<br>
+                    {{ search_result["location"].phone_number }}<br>
+                </td>
+                <td class="text-nowrap">{{ search_result["location"].status }}</td>
+                <td class="text-nowrap">{{ search_result["location"].inoculation_time }}</td>
+                {% if search_result["location"].is_target_not_family is none %}
+                  <td></td>
+                {% elif search_result["location"].is_target_not_family %}
+                  <td class="text-nowrap">OK</td>
+                {% else %}
+                  <td class="text-nowrap">NG</td>
+                {% endif %}
+                {% if search_result["location"].is_target_suberb is none %}
+                  <td></td>
+                {% elif search_result["location"].is_target_suberb %}
+                  <td class="text-nowrap">OK</td>
+                {% else %}
+                  <td class="text-nowrap">NG</td>
+                {% endif %}
+                <td class="text-nowrap">
+                  <p>{{ search_result["location"].memo }}</p>
+                </td>
+                <td class="text-nowrap">{{ search_result["distance"] }}km</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <p class="card-text mt-3">距離は現在地からの直線距離で算出しているため、実際の道路状況によっては結果が異なりますのでご注意ください。</p>
+      </section>
+    </div>
+  </div>
+  <div class="card mt-3">
+    <div class="card-body">
+      <section>
+        <h3 class="h6 card-title mb-3">他の条件で新型コロナワクチン接種医療機関を探す</h3>
+        <p class="card-text"><a href="/reservation_statuses" title="コロナワクチン接種医療機関マップへ">コロナワクチン接種医療機関マップへ</a></p>
       </section>
     </div>
   </div>

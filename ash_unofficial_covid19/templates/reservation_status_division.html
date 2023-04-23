@@ -10,8 +10,8 @@
   </div>
   <div class="card mt-3">
     <div class="card-body">
-      <section id="areaMap">
-        <h2 class="h5 card-title mb-3">{{ area }}地区の医療機関の地図</h2>
+      <section id="divisionMap">
+        <h2 class="h5 card-title mb-3">{{ division }}のコロナワクチンマップ</h2>
         <p class="card-text">地図の表示は目安となっています。正確な場所の情報は各医療機関のホームページ等でご確認ください。</p>
         <div id="mapid" class="mb-3"></div>
         <p class="card-text small">医療機関の位置情報は、<a href="https://developer.yahoo.co.jp/webapi/map/"
@@ -29,7 +29,7 @@
   <div class="card mt-3">
     <div class="card-body">
       <section>
-        <h2 class="h5 card-title mb-3">{{ area }}地区の医療機関の一覧</h2>
+        <h2 class="h5 card-title mb-3">{{ division }}医療機関の一覧</h2>
         <p class="card-text d-block d-sm-none"><i class="far fa-hand-point-right"></i> 横にスクロールできます。</p>
         <div class="table-responsive">
           <table class="table table-bordered">
@@ -44,6 +44,7 @@
                 </th>
                 <th class="text-nowrap">予約開始時期</th>
                 <th class="text-nowrap">接種開始時期</th>
+                <th class="text-nowrap">年齢</th>
                 <th class="text-nowrap">かかりつけ以外</th>
                 <th class="text-nowrap">市外の方</th>
                 <th class="text-nowrap">備考</th>
@@ -61,6 +62,7 @@
                 </td>
                 <td class="text-nowrap">{{ search_result.status }}</td>
                 <td class="text-nowrap">{{ search_result.inoculation_time }}</td>
+                <td class="text-nowrap">{{ search_result.target_age }}</td>
                 {% if search_result.is_target_not_family is none %}
                   <td></td>
                 {% elif search_result.is_target_not_family %}

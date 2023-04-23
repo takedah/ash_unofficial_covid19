@@ -1,12 +1,9 @@
 from datetime import datetime, timedelta, timezone
 from decimal import ROUND_HALF_UP, Decimal
-from typing import TypedDict, Union
+from typing import TypedDict
 
 import numpy as np
 
-from ..models.baby_reservation_status import BabyReservationStatusLocationFactory
-from ..models.child_reservation_status import ChildReservationStatusLocationFactory
-from ..models.first_reservation_status import FirstReservationStatusLocationFactory
 from ..models.location import LocationFactory
 from ..models.point import Point
 from ..models.reservation_status import ReservationStatusLocation, ReservationStatusLocationFactory
@@ -114,12 +111,7 @@ class LocationService(Service):
     @classmethod
     def get_near_locations(
         self,
-        locations: Union[
-            ReservationStatusLocationFactory,
-            FirstReservationStatusLocationFactory,
-            ChildReservationStatusLocationFactory,
-            BabyReservationStatusLocationFactory,
-        ],
+        locations: ReservationStatusLocationFactory,
         current_point: Point,
     ) -> list:
         """

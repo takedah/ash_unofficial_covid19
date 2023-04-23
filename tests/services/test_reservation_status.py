@@ -42,14 +42,13 @@ def service():
             "medical_institution_name": "旭川赤十字病院",
             "address": "曙1条1丁目",
             "phone_number": "76-9838(予約専用）",
+            "division": "春開始接種（12歳以上）",
             "vaccine": "モデルナ",
             "status": "受付中",
             "inoculation_time": "2/12～",
-            "target_age": "",
-            "is_target_family": False,
+            "is_target_family": None,
             "is_target_not_family": False,
-            "is_target_suberb": None,
-            "target_other": "当院の患者IDをお持ちの方",
+            "is_target_suberb": False,
             "memo": "当院ホームページをご確認ください",
         },
         {
@@ -57,15 +56,28 @@ def service():
             "medical_institution_name": "独立行政法人国立病院機構旭川医療センター",
             "address": "花咲町7丁目",
             "phone_number": "51-3910予約専用",
+            "division": "小児接種（３回目以降）",
             "vaccine": "ファイザー モデルナ",
             "status": "受付中",
             "inoculation_time": "2/1～",
-            "target_age": "18歳以上",
             "is_target_family": True,
             "is_target_not_family": False,
             "is_target_suberb": None,
-            "target_other": "",
             "memo": "",
+        },
+        {
+            "area": "西地区",
+            "medical_institution_name": "旭川赤十字病院",
+            "address": "曙1条1丁目",
+            "phone_number": "76-9838(予約専用）",
+            "division": "小児接種（３回目以降）",
+            "vaccine": "モデルナ",
+            "status": "受付中",
+            "inoculation_time": "2/12～",
+            "is_target_family": None,
+            "is_target_not_family": False,
+            "is_target_suberb": False,
+            "memo": "かかりつけ患者以外は※条件あり 当院ホームページをご確認ください",
         },
     ]
     factory = ReservationStatusFactory()
@@ -81,15 +93,16 @@ def service():
 
 
 def test_delete(service):
-    results = service.delete(("旭川赤十字病院", "モデルナ"))
+    results = service.delete(("旭川赤十字病院", "春開始接種（12歳以上）", "モデルナ"))
     assert results
 
 
 def test_get_medical_institution_list(service):
     results = service.get_medical_institution_list()
     expect = [
-        ("旭川赤十字病院", "モデルナ"),
-        ("独立行政法人国立病院機構旭川医療センター", "ファイザー モデルナ"),
+        ("旭川赤十字病院", "小児接種（３回目以降）", "モデルナ"),
+        ("旭川赤十字病院", "春開始接種（12歳以上）", "モデルナ"),
+        ("独立行政法人国立病院機構旭川医療センター", "小児接種（３回目以降）", "ファイザー モデルナ"),
     ]
     assert results == expect
 
@@ -100,31 +113,43 @@ def test_get_dicts(service):
         "row0": {
             "area": "花咲町・末広・末広東・東鷹栖地区",
             "medical_institution_name": "独立行政法人国立病院機構旭川医療センター",
+            "division": "小児接種（３回目以降）",
             "address": "花咲町7丁目",
             "phone_number": "51-3910予約専用",
             "vaccine": "ファイザー モデルナ",
             "status": "受付中",
             "inoculation_time": "2/1～",
-            "target_age": "18歳以上",
             "is_target_family": True,
             "is_target_not_family": False,
             "is_target_suberb": None,
-            "target_other": "",
             "memo": "",
         },
         "row1": {
             "area": "西地区",
             "medical_institution_name": "旭川赤十字病院",
+            "division": "小児接種（３回目以降）",
             "address": "曙1条1丁目",
             "phone_number": "76-9838(予約専用）",
             "vaccine": "モデルナ",
             "status": "受付中",
             "inoculation_time": "2/12～",
-            "target_age": "",
-            "is_target_family": False,
+            "is_target_family": None,
             "is_target_not_family": False,
-            "target_other": "当院の患者IDをお持ちの方",
-            "is_target_suberb": None,
+            "is_target_suberb": False,
+            "memo": "かかりつけ患者以外は※条件あり 当院ホームページをご確認ください",
+        },
+        "row2": {
+            "area": "西地区",
+            "medical_institution_name": "旭川赤十字病院",
+            "division": "春開始接種（12歳以上）",
+            "address": "曙1条1丁目",
+            "phone_number": "76-9838(予約専用）",
+            "vaccine": "モデルナ",
+            "status": "受付中",
+            "inoculation_time": "2/12～",
+            "is_target_family": None,
+            "is_target_not_family": False,
+            "is_target_suberb": False,
             "memo": "当院ホームページをご確認ください",
         },
     }
@@ -147,6 +172,14 @@ def test_find_by_area(service):
     assert result.latitude == 43.798826491523464
 
 
+def test_find_by_division(service):
+    results = service.find(division="春開始接種（12歳以上）")
+    result = results.items[0]
+    assert result.medical_institution_name == "旭川赤十字病院"
+    assert result.longitude == 142.348303888889
+    assert result.latitude == 43.769628888889
+
+
 def test_find_all(service):
     results = service.find()
     result = results.items[1]
@@ -159,3 +192,9 @@ def test_get_area_list(service):
     results = service.get_area_list()
     assert results[0] == "花咲町・末広・末広東・東鷹栖地区"
     assert results[1] == "西地区"
+
+
+def test_get_division_list(service):
+    results = service.get_division_list()
+    assert results[0] == "小児接種（３回目以降）"
+    assert results[1] == "春開始接種（12歳以上）"

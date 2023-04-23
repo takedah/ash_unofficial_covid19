@@ -152,7 +152,7 @@ class ScrapeReservationStatus(Scraper):
 
         Returns:
             medical_institutione_list (list of tuple): 医療機関名のリスト
-                スクレイピングした医療機関名と接種区分のタプルをリストで返す。
+                スクレイピングした医療機関名と接種種類、ワクチンのタプルをリストで返す。
 
         """
         medical_institution_list = list()
@@ -161,6 +161,7 @@ class ScrapeReservationStatus(Scraper):
                 (
                     reservation_status["medical_institution_name"],
                     reservation_status["division"],
+                    reservation_status["vaccine"],
                 )
             )
         return medical_institution_list

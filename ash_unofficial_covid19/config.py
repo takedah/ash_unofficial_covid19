@@ -50,7 +50,7 @@ class Config:
     JAN2021_DATA_URL = BASE_URL + "kurashi/135/136/150/d072504.html"
     DEC2020_DATA_URL = BASE_URL + "kurashi/135/136/150/d072337.html"
     NOV2020_OR_EARLIER_URL = BASE_URL + "kurashi/135/136/150/d072303.html"
-    RESERVATION_STATUSES_URL = "https://asahikawa-vaccine.jp/reservation/status/"
+    RESERVATION_STATUSES_URL = "https://asahikawa-vaccine.jp/reservation/about/#section-c"
 
     # 北海道オープンデータポータルの設定
     HOKKAIDO_URL = (

@@ -32,6 +32,11 @@ document.addEventListener(
           document.getElementById("order" + currentOrder).dataset.url
         )
       );
+      var division = JSON.parse(
+        JSON.stringify(
+          document.getElementById("order" + currentOrder).dataset.division
+        )
+      );
       var vaccine = JSON.parse(
         JSON.stringify(
           document.getElementById("order" + currentOrder).dataset.vaccine
@@ -48,16 +53,7 @@ document.addEventListener(
           document.getElementById("order" + currentOrder).dataset.status
         )
       );
-      var parentPath = "";
-      if (document.getElementById("firstReservationStatus")) {
-        parentPath = "first_reservation_status";
-      } else if (document.getElementById("childReservationStatus")) {
-        parentPath = "child_reservation_status";
-      } else if (document.getElementById("babyReservationStatus")) {
-        parentPath = "baby_reservation_status";
-      } else {
-        parentPath = "reservation_status";
-      }
+      var parentPath = "reservation_status";
       var nameLink =
         "<a href='/" +
         parentPath +
@@ -77,44 +73,100 @@ document.addEventListener(
       }
       var statusMessage = "";
       if (locationDataList[locationName] === undefined) {
-        if (vaccine === "") {
-          statusMessage =
-            "<div class='mb-1'>" +
-            "予約受付状況: " +
-            status +
-            "</div>" +
-            isTargetNotFamily;
+        if (division === "") {
+          if (vaccine === "") {
+            statusMessage =
+              "<div class='mb-1'>" +
+              "予約開始時期: " +
+              status +
+              "</div>" +
+              isTargetNotFamily;
+          } else {
+            statusMessage =
+              "<div class='mb-1'>" +
+              vaccine +
+              "</div>" +
+              "<div class='mb-1'>" +
+              "予約開始時期: " +
+              status +
+              "</div>" +
+              isTargetNotFamily;
+          }
         } else {
-          statusMessage =
-            "<div class='mb-1'>" +
-            vaccine +
-            "</div>" +
-            "<div class='mb-1'>" +
-            "予約受付状況: " +
-            status +
-            "</div>" +
-            isTargetNotFamily;
+          if (vaccine === "") {
+            statusMessage =
+              "<div class='mb-1 h6'>" +
+              division +
+              "</div>" +
+              "<div class='mb-1'>" +
+              "予約開始時期: " +
+              status +
+              "</div>" +
+              isTargetNotFamily;
+          } else {
+            statusMessage =
+              "<div class='mb-1 h6'>" +
+              division +
+              "</div>" +
+              "<div class='mb-1'>" +
+              vaccine +
+              "</div>" +
+              "<div class='mb-1'>" +
+              "予約開始時期: " +
+              status +
+              "</div>" +
+              isTargetNotFamily;
+          }
         }
       } else {
-        if (vaccine === "") {
-          statusMessage =
-            locationDataList[locationName]["statusMessage"] +
-            "<div class='mb-1'>" +
-            "予約受付状況: " +
-            status +
-            "</div>" +
-            isTargetNotFamily;
+        if (division === "") {
+          if (vaccine === "") {
+            statusMessage =
+              locationDataList[locationName]["statusMessage"] +
+              "<div class='mb-1'>" +
+              "予約開始時期: " +
+              status +
+              "</div>" +
+              isTargetNotFamily;
+          } else {
+            statusMessage =
+              locationDataList[locationName]["statusMessage"] +
+              "<div class='mb-1'>" +
+              vaccine +
+              "</div>" +
+              "<div class='mb-1'>" +
+              "予約開始時期: " +
+              status +
+              "</div>" +
+              isTargetNotFamily;
+          }
         } else {
-          statusMessage =
-            locationDataList[locationName]["statusMessage"] +
-            "<div class='mb-1'>" +
-            vaccine +
-            "</div>" +
-            "<div class='mb-1'>" +
-            "予約受付状況: " +
-            status +
-            "</div>" +
-            isTargetNotFamily;
+          if (vaccine === "") {
+            statusMessage =
+              locationDataList[locationName]["statusMessage"] +
+              "<div class='mb-1 h6'>" +
+              division +
+              "</div>" +
+              "<div class='mb-1'>" +
+              "予約開始時期: " +
+              status +
+              "</div>" +
+              isTargetNotFamily;
+          } else {
+            statusMessage =
+              locationDataList[locationName]["statusMessage"] +
+              "<div class='mb-1 h6'>" +
+              division +
+              "</div>" +
+              "<div class='mb-1'>" +
+              vaccine +
+              "</div>" +
+              "<div class='mb-1'>" +
+              "予約開始時期: " +
+              status +
+              "</div>" +
+              isTargetNotFamily;
+          }
         }
       }
       locationDataList[locationName] = {
@@ -136,19 +188,15 @@ document.addEventListener(
       centerLongitude = longitudeSum / resultsLength;
     }
 
-    var zoomLevel = 0;
+    var zoomLevel = 13;
     if (document.getElementById("areaMap")) {
       zoomLevel = 15;
     } else if (document.getElementById("gpsMap")) {
       zoomLevel = 14;
-    } else if (document.getElementById("medicalInstitutionMap")) {
+    } else if (document.getElementById("medicalInstitutionMap")){
       zoomLevel = 16;
-    } else {
-      if (document.getElementById("childReservationStatus") || document.getElementById("babyReservationStatus")) {
-        zoomLevel = 12;
-      } else {
-        zoomLevel = 14;
-      }
+    } else if (document.getElementById("divisionMap")){
+      zoomLevel = 12;
     }
 
     if (document.getElementById("gpsMap")) {
@@ -193,13 +241,7 @@ document.addEventListener(
 
     for (var prop in locationDataList) {
       var locationData = locationDataList[prop];
-      if (/.*受付中.*/.test(locationData["statusMessage"])) {
-        mapIcon = mapPrimaryIcon;
-      } else if (/.*受付停止中.*/.test(locationData["statusMessage"])) {
-        mapIcon = mapDangerIcon;
-      } else {
-        mapIcon = mapWarningIcon;
-      }
+      var mapIcon = mapPrimaryIcon;
       var popupText = "";
       if (document.getElementById("medicalInstitutionMap")) {
         popupText =
