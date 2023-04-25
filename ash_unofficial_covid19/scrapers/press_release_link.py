@@ -66,7 +66,7 @@ class ScrapePressReleaseLink(Scraper):
                 press_release_link.append(values)
                 continue
 
-            search_press_release = re.match("新型コロナウイルス感染症の発生状況.*令和[0-9]+年([0-9]+月[0-9]+日)発表分.*", anker_text)
+            search_press_release = re.match("新型コロナウイルス感染症の発生状況.*([0-9]+月[0-9]+日)発表分.*", anker_text)
             if search_press_release is not None:
                 public_date_string = search_press_release.group(1)
                 values = {
