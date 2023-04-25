@@ -44,7 +44,6 @@
                 </th>
                 <th class="text-nowrap">予約開始時期</th>
                 <th class="text-nowrap">接種開始時期</th>
-                <th class="text-nowrap">年齢</th>
                 <th class="text-nowrap">かかりつけ以外</th>
                 <th class="text-nowrap">市外の方</th>
                 <th class="text-nowrap">備考</th>
@@ -62,7 +61,6 @@
                 </td>
                 <td class="text-nowrap">{{ search_result.status }}</td>
                 <td class="text-nowrap">{{ search_result.inoculation_time }}</td>
-                <td class="text-nowrap">{{ search_result.target_age }}</td>
                 {% if search_result.is_target_not_family is none %}
                   <td></td>
                 {% elif search_result.is_target_not_family %}
