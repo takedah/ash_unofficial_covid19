@@ -257,7 +257,7 @@ def _save_graph_images(graph_view: GraphView, file_name: str, twitter_card: bool
     if twitter_card:
         graph_image = graph_view.get_graph_image(figsize=(6.0, 3.15))
     else:
-        graph_image = graph_view.get_graph_image()
+        graph_image = graph_view.get_graph_image(figsize=(9.6, 4.8))
     save_path = Path(__file__).resolve().parent.joinpath("static", "images", "graph", file_name)
     with open(save_path, mode="wb") as f:
         f.write(graph_image.getvalue())

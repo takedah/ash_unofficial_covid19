@@ -163,7 +163,7 @@ class DailyTotalView(PatientsNumberView):
 
         """
         PatientsNumberView.__init__(self, today, pool)
-        from_date = today - relativedelta(months=3)
+        from_date = today - relativedelta(months=38)
         # 起算日が2020年2月23日の一週間より前の日付になってしまう場合は調整する。
         if from_date < date(2020, 2, 16):
             from_date = date(2020, 2, 16)
@@ -279,10 +279,11 @@ class ByAgeView(PatientsNumberView):
 
         """
         PatientsNumberView.__init__(self, today, pool)
-        from_date = today - relativedelta(months=1, days=-1)
+        # from_date = today - relativedelta(months=1, days=-1)
         # 起算日が2020年2月23日より前の日付になってしまう場合は調整する。
-        if from_date < date(2020, 2, 23):
-            from_date = date(2020, 2, 23)
+        # if from_date < date(2020, 2, 23):
+        #    from_date = date(2020, 2, 23)
+        from_date = date(2020, 2, 23)
         self.__by_age_data = self._service.get_patients_number_by_age(from_date=from_date, to_date=today)
         self.__graph_alt = ", ".join(["{0} {1}人".format(row[0], row[1]) for row in self.__by_age_data])
 
@@ -317,7 +318,7 @@ class PerHundredThousandPopulationView(PatientsNumberView):
         """
         PatientsNumberView.__init__(self, today, pool)
         sapporo_service = SapporoPatientsNumberService(pool)
-        from_date = today - relativedelta(weeks=16, days=-1)
+        from_date = today - relativedelta(weeks=168, days=-1)
         # 起算日が2020年2月23日の二週間前より前の日付になってしまう場合は調整する。
         if from_date < date(2020, 2, 9):
             from_date = date(2020, 2, 9)
@@ -391,7 +392,7 @@ class WeeklyPerAgeView(PatientsNumberView):
 
         """
         PatientsNumberView.__init__(self, today, pool)
-        from_date = today - relativedelta(weeks=4, days=-1)
+        from_date = today - relativedelta(weeks=168, days=-1)
         # 起算日が2020年2月23日より前の日付になってしまう場合は調整する。
         if from_date < date(2020, 2, 23):
             from_date = date(2020, 2, 23)

@@ -7,7 +7,7 @@ from matplotlib import dates as mdates
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.font_manager import FontProperties
-from matplotlib.ticker import MultipleLocator
+from matplotlib.ticker import MultipleLocator, PercentFormatter
 from PIL import Image
 
 from ..services.database import ConnectionPool
@@ -78,7 +78,7 @@ class DailyTotalGraphView(GraphView):
         ax.bar(day_x, day_y, color="#4979F5")
         ax.yaxis.set_major_locator(MultipleLocator(50))
         ax.xaxis.set_major_locator(mdates.MonthLocator())
-        ax.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d"))
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%y-%m-%d"))
         ax.grid(axis="y", color="lightgray")
         ax.tick_params(labelsize=8)
         ax.tick_params(axis="x", rotation=45)
@@ -116,7 +116,8 @@ class MonthTotalGraphView(GraphView):
 
         """
         # グラフの描画は直近12か月分のみとする
-        month_total_data = self._patients_numbers.month_total_data[-12:]
+        # month_total_data = self._patients_numbers.month_total_data[-12:]
+        month_total_data = self._patients_numbers.month_total_data
         if figsize:
             fig = plt.figure(figsize=figsize)
         else:
@@ -126,6 +127,7 @@ class MonthTotalGraphView(GraphView):
         month_total_y = [row[1] for row in month_total_data]
         ax.bar(month_total_x, month_total_y, facecolor="#4979F5")
         ax.yaxis.set_major_locator(MultipleLocator(5000))
+        ax.grid(axis="y", color="lightgray")
         ax.tick_params(labelsize=8)
         ax.tick_params(axis="x", rotation=45)
         fig.tight_layout()
@@ -163,7 +165,7 @@ class ByAgeGraphView(GraphView):
         """
         font = FontProperties(
             fname="./ash_unofficial_covid19/static/fonts/NotoSansJP-Regular.otf",
-            size=12,
+            size=16,
         )
         if figsize:
             fig = plt.figure(figsize=figsize)
@@ -231,14 +233,14 @@ class PerHundredThousandPopulationGraphView(GraphView):
 
         """
         font_file = "./ash_unofficial_covid19/static/fonts/NotoSansJP-Regular.otf"
-        legend_font = FontProperties(fname=font_file, size=10)
+        legend_font = FontProperties(fname=font_file, size=16)
         if figsize:
             fig = plt.figure(figsize=figsize)
         else:
             fig = plt.figure()
         ax = fig.add_subplot()
         per_hundred_thousand_population_x = [
-            row[0].strftime("%m-%d") + "~" for row in self._patients_numbers.per_hundred_thousand_population_data
+            row[0] for row in self._patients_numbers.per_hundred_thousand_population_data
         ]
         per_hundred_thousand_population_y = [
             row[1] for row in self._patients_numbers.per_hundred_thousand_population_data
@@ -250,8 +252,7 @@ class PerHundredThousandPopulationGraphView(GraphView):
             label="旭川市",
         )
         sapporo_per_hundred_thousand_population_x = [
-            row[0].strftime("%m-%d") + "~"
-            for row in self._patients_numbers.sapporo_per_hundred_thousand_population_data
+            row[0] for row in self._patients_numbers.sapporo_per_hundred_thousand_population_data
         ]
         sapporo_per_hundred_thousand_population_y = [
             row[1] for row in self._patients_numbers.sapporo_per_hundred_thousand_population_data
@@ -263,6 +264,8 @@ class PerHundredThousandPopulationGraphView(GraphView):
             label="札幌市",
         )
         ax.yaxis.set_major_locator(MultipleLocator(50))
+        ax.xaxis.set_major_locator(mdates.MonthLocator())
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%y-%m-%d"))
         ax.grid(axis="y", color="lightgray")
         ax.tick_params(labelsize=8)
         ax.tick_params(axis="x", rotation=45)
@@ -301,6 +304,7 @@ class WeeklyPerAgeGraphView(GraphView):
 
         """
         df = self._patients_numbers.weekly_per_age_data.transpose()
+        df = df / df.sum()
         font_file = "./ash_unofficial_covid19/static/fonts/NotoSansJP-Regular.otf"
         legend_font = FontProperties(fname=font_file, size=10)
         if figsize:
@@ -321,24 +325,18 @@ class WeeklyPerAgeGraphView(GraphView):
             "#949497",
             "#626264",
         ]
-        cols = list(map(lambda x: x.strftime("%m-%d") + "~", df.columns.tolist()))
+        cols = list(map(lambda x: x.strftime("%m-%d"), df.columns.tolist()))
         for i in range(len(df)):
-            ax.barh(
+            ax.bar(
                 cols,
                 df.iloc[i],
-                left=df.iloc[:i].sum(),
+                bottom=df.iloc[:i].sum(),
                 color=colors[i],
             )
 
-        min_x, max_x = ax.get_xlim()
-        for rect in ax.patches:
-            if 0.05 < rect.get_width() / max_x:
-                cx = rect.get_x() + rect.get_width() / 2
-                cy = rect.get_y() + rect.get_height() / 2
-                label_value = f"{rect.get_width():.0f}"
-                ax.text(cx, cy, label_value, ha="center", va="center", fontproperties=legend_font)
-
-        ax.tick_params(labelsize=8)
+        ax.tick_params(labelsize=4)
+        ax.tick_params(axis="x", rotation=90)
+        ax.yaxis.set_major_formatter(PercentFormatter(1.0))
         ax.legend(df.index.tolist(), prop=legend_font, loc=4)
         fig.tight_layout()
         canvas = FigureCanvasAgg(fig)

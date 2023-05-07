@@ -133,7 +133,7 @@ def get_rss():
 def index():
     return render_template(
         "index.html",
-        title="旭川市内感染状況の最新動向",
+        title="旭川市感染者数の推移",
         gtag_id=Config.GTAG_ID,
         patients_numbers=get_patients_numbers(),
         daily_total=get_daily_total(),
