@@ -8,6 +8,7 @@ from ash_unofficial_covid19.services.patients_number import PatientsNumberServic
 from ash_unofficial_covid19.views.patients_number import (
     ByAgeView,
     DailyTotalView,
+    MonthlyPerAgeView,
     MonthTotalView,
     PatientsNumberView,
     PerHundredThousandPopulationView,
@@ -275,6 +276,25 @@ class TestWeeklyPerAgeView:
         conn.close_connection()
 
     def test_weekly_per_age_property(self, view):
+        assert (
+            view.graph_alt
+            == "02月23日以降 10歳未満: 30人,10代: 38人,20代: 26人,30代: 28人,40代: 29人,"
+            + "50代: 23人,60代: 8人,70代: 4人,80代: 3人,"
+            + "90歳以上: 0人,調査中等: 10人,"
+        )
+
+
+class TestMonthlyPerAgeView:
+    @pytest.fixture()
+    def view(self):
+        conn = ConnectionPool()
+        view = MonthlyPerAgeView(date(2020, 2, 24), conn)
+
+        yield view
+
+        conn.close_connection()
+
+    def test_monthly_per_age_property(self, view):
         assert (
             view.graph_alt
             == "02月23日以降 10歳未満: 30人,10代: 38人,20代: 26人,30代: 28人,40代: 29人,"

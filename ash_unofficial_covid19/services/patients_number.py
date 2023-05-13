@@ -457,6 +457,69 @@ class PatientsNumberService(Service):
         df.fillna(0, inplace=True)
         return df.fillna(0)
 
+    def get_aggregate_by_months_per_age(self, from_date: date, to_date: date) -> pd.DataFrame:
+        """指定した期間の1月ごとの年代別の陽性患者数の集計結果を返す
+
+        Args:
+            from_date (obj:`date`): 集計の始期
+            to_date (obj:`date`): 集計の終期
+
+        Returns:
+            aggregate_by_months (:obj:`pd.DataFrame`): 集計結果
+                1月ごとの日付とその週の年代別新規陽性患者数をpandasのDataFrameで返す
+
+        """
+        self._date_range_validator(from_date, to_date)
+        state = (
+            "SELECT date(from_month) AS months, "
+            + "SUM(age_under_10) AS age_under_10, SUM(age_10s) AS age_10s, "
+            + "SUM(age_20s) AS age_20s, SUM(age_30s) AS age_30s, "
+            + "SUM(age_40s) AS age_40s, SUM(age_50s) AS age_50s, "
+            + "SUM(age_60s) AS age_60s, SUM(age_70s) AS age_70s, "
+            + "SUM(age_80s) AS age_80s, SUM(age_over_90) AS age_over_90, "
+            + "SUM(investigating) AS investigating "
+            + "FROM "
+            + "(SELECT generate_series AS from_month, "
+            + "generate_series + '1 month'::interval AS to_month FROM "
+            + "generate_series(%s::DATE, %s::DATE, '1 month')) "
+            + "AS month_ranges LEFT JOIN patients_numbers ON "
+            + "from_month <= patients_numbers.publication_date AND "
+            + "patients_numbers.publication_date < to_month GROUP BY from_month "
+            + "ORDER BY months;"
+        )
+        df = pd.DataFrame(
+            columns=[
+                "10歳未満",
+                "10代",
+                "20代",
+                "30代",
+                "40代",
+                "50代",
+                "60代",
+                "70代",
+                "80代",
+                "90歳以上",
+                "調査中等",
+            ]
+        )
+        with self.get_connection() as cur:
+            cur.execute(state, (from_date.strftime("%Y-%m-%d"), to_date.strftime("%Y-%m-%d")))
+            for row in cur.fetchall():
+                df.at[row["months"], "10歳未満"] = row["age_under_10"]
+                df.at[row["months"], "10代"] = row["age_10s"]
+                df.at[row["months"], "20代"] = row["age_20s"]
+                df.at[row["months"], "30代"] = row["age_30s"]
+                df.at[row["months"], "40代"] = row["age_40s"]
+                df.at[row["months"], "50代"] = row["age_50s"]
+                df.at[row["months"], "60代"] = row["age_60s"]
+                df.at[row["months"], "70代"] = row["age_70s"]
+                df.at[row["months"], "80代"] = row["age_80s"]
+                df.at[row["months"], "90歳以上"] = row["age_over_90"]
+                df.at[row["months"], "調査中等"] = row["investigating"]
+
+        df.fillna(0, inplace=True)
+        return df.fillna(0)
+
     def get_patients_number_by_age(self, from_date: date, to_date: date) -> list:
         """年代別の陽性患者数を返す
 

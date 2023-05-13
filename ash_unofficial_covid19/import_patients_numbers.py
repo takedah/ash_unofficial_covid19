@@ -21,6 +21,7 @@ from .views.graph import (
     ByAgeGraphView,
     DailyTotalGraphView,
     GraphView,
+    MonthlyPerAgeGraphView,
     MonthTotalGraphView,
     PerHundredThousandPopulationGraphView,
     WeeklyPerAgeGraphView,
@@ -312,12 +313,13 @@ def create_graph_data() -> None:
     _save_graph_images(per_hundred_thousand_population, "per_hundred_thousand_population.webp")
     weekly_per_age = WeeklyPerAgeGraphView(today, conn)
     _save_graph_images(weekly_per_age, "weekly_per_age.webp")
+    monthly_per_age = MonthlyPerAgeGraphView(today, conn)
+    _save_graph_images(monthly_per_age, "monthly_per_age.webp")
 
 
 if __name__ == "__main__":
     try:
-        # import_latest()
-        _import_tokyo_patients_number(Config.TOKYO_URL)
+        import_latest()
         create_graph_data()
     finally:
         conn.close_connection()

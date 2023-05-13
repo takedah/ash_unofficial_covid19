@@ -14,6 +14,7 @@ from ..services.database import ConnectionPool
 from ..views.patients_number import (
     ByAgeView,
     DailyTotalView,
+    MonthlyPerAgeView,
     MonthTotalView,
     PerHundredThousandPopulationView,
     WeeklyPerAgeView,
@@ -285,7 +286,7 @@ class PerHundredThousandPopulationGraphView(GraphView):
         ax.grid(axis="y", color="lightgray")
         ax.tick_params(labelsize=8)
         ax.tick_params(axis="x", rotation=45)
-        ax.legend(prop=legend_font, loc=0)
+        ax.legend(prop=legend_font, loc="upper left")
         fig.tight_layout()
         canvas = FigureCanvasAgg(fig)
         png_data = BytesIO()
@@ -354,6 +355,73 @@ class WeeklyPerAgeGraphView(GraphView):
         ax.tick_params(axis="x", rotation=90)
         ax.yaxis.set_major_formatter(PercentFormatter(1.0))
         ax.legend(df.index.tolist(), prop=legend_font, loc=4)
+        fig.tight_layout()
+        canvas = FigureCanvasAgg(fig)
+        png_data = BytesIO()
+        canvas.print_png(png_data)
+        plt.cla()
+        plt.clf()
+        plt.close()
+        return self._png_to_webp(png_data)
+
+
+class MonthlyPerAgeGraphView(GraphView):
+    """1月ごとの年代別新規陽性患者数グラフ"""
+
+    def __init__(self, today: date, pool: ConnectionPool):
+        """
+        Args:
+            today (date): グラフを作成する基準日
+            pool (:obj:`ConnectionPool`): SimpleConnectionPoolを要素に持つオブジェクト
+
+        """
+        patients_numbers = MonthlyPerAgeView(today, pool)
+        self._patients_numbers = patients_numbers
+
+    def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
+        """グラフの画像を生成
+
+        Args:
+            figsize (tuple): グラフ画像データの縦横サイズを要素に持つタプル
+
+        Returns:
+            graph_image (BytesIO): グラフの画像データ
+
+        """
+        df = self._patients_numbers.monthly_per_age_data.transpose()
+        df = df / df.sum()
+        font_file = "./ash_unofficial_covid19/static/fonts/NotoSansJP-Regular.otf"
+        legend_font = FontProperties(fname=font_file, size=12)
+        if figsize:
+            fig = plt.figure(figsize=figsize)
+        else:
+            fig = plt.figure()
+        ax = fig.add_subplot()
+        colors = [
+            "#0946F1",
+            "#4979F5",
+            "#7096F8",
+            "#9DB7F9",
+            "#FF5838",
+            "#FFA28B",
+            "#FFE7E6",
+            "#F1F1F4",
+            "#D8D8DB",
+            "#949497",
+            "#626264",
+        ]
+        cols = list(map(lambda x: x.strftime("%y-%m"), df.columns.tolist()))
+        for i in range(len(df)):
+            ax.bar(
+                cols,
+                df.iloc[i],
+                bottom=df.iloc[:i].sum(),
+                color=colors[i],
+            )
+
+        ax.tick_params(axis="x", rotation=45)
+        ax.yaxis.set_major_formatter(PercentFormatter(1.0))
+        ax.legend(df.index.tolist(), prop=legend_font, loc="lower left")
         fig.tight_layout()
         canvas = FigureCanvasAgg(fig)
         png_data = BytesIO()

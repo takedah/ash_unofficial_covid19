@@ -70,6 +70,20 @@ class TestPatientsNumberService:
                 "age_over_90": 0,
                 "investigating": 5,
             },
+            {
+                "publication_date": date(2022, 3, 10),
+                "age_under_10": 28,
+                "age_10s": 25,
+                "age_20s": 20,
+                "age_30s": 28,
+                "age_40s": 25,
+                "age_50s": 16,
+                "age_60s": 12,
+                "age_70s": 4,
+                "age_80s": 0,
+                "age_over_90": 1,
+                "investigating": 1,
+            },
         ]
         factory = PatientsNumberFactory()
         for row in test_data:
@@ -264,6 +278,35 @@ class TestPatientsNumberService:
         )
         assert_frame_equal(result, expect)
 
+    def test_get_aggregate_by_months_per_age(self, service):
+        from_date = date(2022, 1, 10)
+        to_date = date(2022, 2, 10)
+        result = service.get_aggregate_by_months_per_age(from_date=from_date, to_date=to_date)
+        expect = pd.DataFrame(
+            [
+                [30, 38, 26, 28, 29, 23, 8, 4, 3, 0, 10],
+                [28, 25, 20, 28, 25, 16, 12, 4, 0, 1, 1],
+            ],
+            columns=[
+                "10歳未満",
+                "10代",
+                "20代",
+                "30代",
+                "40代",
+                "50代",
+                "60代",
+                "70代",
+                "80代",
+                "90歳以上",
+                "調査中等",
+            ],
+            index=[
+                date(2022, 1, 10),
+                date(2022, 2, 10),
+            ],
+        )
+        assert_frame_equal(result, expect)
+
     def test_get_patients_number_by_age(self, service):
         from_date = date(2022, 1, 20)
         to_date = date(2022, 1, 29)
@@ -283,11 +326,11 @@ class TestPatientsNumberService:
         assert result == expect
 
     def test_get_total_by_months(self, service):
-        from_date = date(2021, 12, 28)
-        to_date = date(2022, 1, 29)
+        from_date = date(2021, 12, 1)
+        to_date = date(2022, 1, 31)
         result = service.get_total_by_months(from_date=from_date, to_date=to_date)
         expect = [
-            (date(2021, 12, 28), 0),
-            (date(2022, 1, 28), 199),
+            (date(2021, 12, 1), 0),
+            (date(2022, 1, 1), 199),
         ]
         assert result == expect

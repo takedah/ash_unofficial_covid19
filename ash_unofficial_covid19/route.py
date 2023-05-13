@@ -9,6 +9,7 @@ from .views.patient import AsahikawaPatientView
 from .views.patients_number import (
     ByAgeView,
     DailyTotalView,
+    MonthlyPerAgeView,
     MonthTotalView,
     PatientsNumberView,
     PerHundredThousandPopulationView,
@@ -117,6 +118,12 @@ def get_weekly_per_age():
     return WeeklyPerAgeView(today, conn)
 
 
+def get_monthly_per_age():
+    conn = get_connection()
+    today = get_today()
+    return MonthlyPerAgeView(today, conn)
+
+
 def get_atom():
     conn = get_connection()
     today = get_today()
@@ -137,7 +144,7 @@ def index():
         gtag_id=Config.GTAG_ID,
         patients_numbers=get_patients_numbers(),
         daily_total=get_daily_total(),
-        weekly_per_age=get_weekly_per_age(),
+        monthly_per_age=get_monthly_per_age(),
         per_hundred_thousand_population=get_per_hundred_thousand_population(),
         month_total=get_month_total(),
         by_age=get_by_age(),

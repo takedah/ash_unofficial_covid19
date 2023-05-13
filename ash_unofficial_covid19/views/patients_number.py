@@ -164,7 +164,7 @@ class DailyTotalView(PatientsNumberView):
 
         """
         PatientsNumberView.__init__(self, today, pool)
-        from_date = today - relativedelta(months=38)
+        from_date = today - relativedelta(months=39)
         # 起算日が2020年2月23日の一週間より前の日付になってしまう場合は調整する。
         if from_date < date(2020, 2, 16):
             from_date = date(2020, 2, 16)
@@ -280,10 +280,10 @@ class ByAgeView(PatientsNumberView):
 
         """
         PatientsNumberView.__init__(self, today, pool)
-        # from_date = today - relativedelta(months=1, days=-1)
+        from_date = today - relativedelta(months=39)
         # 起算日が2020年2月23日より前の日付になってしまう場合は調整する。
-        # if from_date < date(2020, 2, 23):
-        #    from_date = date(2020, 2, 23)
+        if from_date < date(2020, 2, 23):
+            from_date = date(2020, 2, 23)
         from_date = date(2020, 2, 23)
         self.__by_age_data = self._service.get_patients_number_by_age(from_date=from_date, to_date=today)
         self.__graph_alt = ", ".join(["{0} {1}人".format(row[0], row[1]) for row in self.__by_age_data])
@@ -324,7 +324,6 @@ class PerHundredThousandPopulationView(PatientsNumberView):
         # 起算日が2020年2月23日の二週間前より前の日付になってしまう場合は調整する。
         if from_date < date(2020, 2, 9):
             from_date = date(2020, 2, 9)
-
         self.__per_hundred_thousand_population_data = self._service.get_per_hundred_thousand_population_per_week(
             from_date=from_date,
             to_date=today,
@@ -442,6 +441,62 @@ class WeeklyPerAgeView(PatientsNumberView):
         alt_text = ""
         cols = self.weekly_per_age_data.columns.tolist()
         for index, row in self.weekly_per_age_data.iterrows():
+            i = 0
+            alt_text = alt_text + index.strftime("%m月%d日以降") + " "
+            for value in row:
+                alt_text = alt_text + cols[i] + ": " + str(value) + "人,"
+                i += 1
+        return alt_text
+
+
+class MonthlyPerAgeView(PatientsNumberView):
+    """1月ごとの年代別新規陽性患者数グラフ
+
+    Attributes:
+        graph_alt (str): グラフ画像の代替テキスト
+        monthly_per_age_data (list): グラフ用に集計したデータ
+
+    """
+
+    def __init__(self, today: date, pool: ConnectionPool):
+        """
+        Args:
+            today (date): グラフを作成する基準日
+            pool (:obj:`ConnectionPool`): SimpleConnectionPoolを要素に持つオブジェクト
+
+        """
+        PatientsNumberView.__init__(self, today, pool)
+        from_date = today - relativedelta(months=39)
+        # 起算日が2020年2月23日より前の日付になってしまう場合は調整する。
+        if from_date < date(2020, 2, 23):
+            from_date = date(2020, 2, 23)
+        df = self._service.get_aggregate_by_months_per_age(from_date=from_date, to_date=today)
+        self.__monthly_per_age_data = df
+        self.__from_date = self.format_date_style(from_date)
+        self.__graph_alt = self._get_graph_alt()
+
+    @property
+    def from_date(self):
+        return self.__from_date
+
+    @property
+    def graph_alt(self):
+        return self.__graph_alt
+
+    @property
+    def monthly_per_age_data(self):
+        return self.__monthly_per_age_data
+
+    def _get_graph_alt(self) -> str:
+        """グラフの代替テキストを生成
+
+        Returns:
+            graph_alt (str): グラフの代替テキスト
+
+        """
+        alt_text = ""
+        cols = self.monthly_per_age_data.columns.tolist()
+        for index, row in self.monthly_per_age_data.iterrows():
             i = 0
             alt_text = alt_text + index.strftime("%m月%d日以降") + " "
             for value in row:
