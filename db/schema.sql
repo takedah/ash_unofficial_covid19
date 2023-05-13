@@ -98,3 +98,10 @@ CREATE TABLE patients_numbers(
     investigating INTEGER NOT NULL,
     updated_at TIMESTAMPTZ NOT NULL
 );
+DROP TABLE IF EXISTS tokyo_patients_numbers;
+CREATE TABLE tokyo_patients_numbers(
+    id SERIAL NOT NULL,
+    publication_date DATE NOT NULL PRIMARY KEY,
+    patients_number INTEGER NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL
+);

@@ -56,7 +56,7 @@ class SapporoPatientsNumberFactory(Factory):
                 作成するための引数
 
         Returns:
-            sapporo_patients_number (:obj:`SapporoPatientsNumber`): 医療機関データ
+            sapporo_patients_number (:obj:`SapporoPatientsNumber`): 日別新規感染者数データ
                 SapporoPatientsNumberクラスのオブジェクト
 
         """

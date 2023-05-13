@@ -165,7 +165,7 @@ class ByAgeGraphView(GraphView):
         """
         font = FontProperties(
             fname="./ash_unofficial_covid19/static/fonts/NotoSansJP-Regular.otf",
-            size=16,
+            size=14,
         )
         if figsize:
             fig = plt.figure(figsize=figsize)
@@ -233,12 +233,39 @@ class PerHundredThousandPopulationGraphView(GraphView):
 
         """
         font_file = "./ash_unofficial_covid19/static/fonts/NotoSansJP-Regular.otf"
-        legend_font = FontProperties(fname=font_file, size=16)
+        legend_font = FontProperties(fname=font_file, size=14)
         if figsize:
             fig = plt.figure(figsize=figsize)
         else:
             fig = plt.figure()
         ax = fig.add_subplot()
+
+        tokyo_per_hundred_thousand_population_x = [
+            row[0] for row in self._patients_numbers.tokyo_per_hundred_thousand_population_data
+        ]
+        tokyo_per_hundred_thousand_population_y = [
+            row[1] for row in self._patients_numbers.tokyo_per_hundred_thousand_population_data
+        ]
+        ax.plot(
+            tokyo_per_hundred_thousand_population_x,
+            tokyo_per_hundred_thousand_population_y,
+            color="#949497",
+            label="東京都",
+        )
+
+        sapporo_per_hundred_thousand_population_x = [
+            row[0] for row in self._patients_numbers.sapporo_per_hundred_thousand_population_data
+        ]
+        sapporo_per_hundred_thousand_population_y = [
+            row[1] for row in self._patients_numbers.sapporo_per_hundred_thousand_population_data
+        ]
+        ax.plot(
+            sapporo_per_hundred_thousand_population_x,
+            sapporo_per_hundred_thousand_population_y,
+            color="#FF5838",
+            label="札幌市",
+        )
+
         per_hundred_thousand_population_x = [
             row[0] for row in self._patients_numbers.per_hundred_thousand_population_data
         ]
@@ -251,19 +278,8 @@ class PerHundredThousandPopulationGraphView(GraphView):
             color="#4979F5",
             label="旭川市",
         )
-        sapporo_per_hundred_thousand_population_x = [
-            row[0] for row in self._patients_numbers.sapporo_per_hundred_thousand_population_data
-        ]
-        sapporo_per_hundred_thousand_population_y = [
-            row[1] for row in self._patients_numbers.sapporo_per_hundred_thousand_population_data
-        ]
-        ax.plot(
-            sapporo_per_hundred_thousand_population_x,
-            sapporo_per_hundred_thousand_population_y,
-            color="#949497",
-            label="札幌市",
-        )
-        ax.yaxis.set_major_locator(MultipleLocator(50))
+
+        ax.yaxis.set_major_locator(MultipleLocator(100))
         ax.xaxis.set_major_locator(mdates.MonthLocator())
         ax.xaxis.set_major_formatter(mdates.DateFormatter("%y-%m-%d"))
         ax.grid(axis="y", color="lightgray")

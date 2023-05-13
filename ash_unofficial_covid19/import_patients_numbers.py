@@ -6,14 +6,17 @@ from .errors import DatabaseConnectionError, HTTPDownloadError, ScrapeError, Ser
 from .models.patients_number import PatientsNumberFactory
 from .models.press_release_link import PressReleaseLinkFactory
 from .models.sapporo_patients_number import SapporoPatientsNumberFactory
+from .models.tokyo_patients_number import TokyoPatientsNumberFactory
 from .scrapers.patients_number import ScrapePatientsNumber
 from .scrapers.press_release_link import ScrapePressReleaseLink
 from .scrapers.sapporo_patients_number import ScrapeSapporoPatientsNumber
+from .scrapers.tokyo_patients_number import ScrapeTokyoPatientsNumber
 from .services.database import ConnectionPool
 from .services.patient import AsahikawaPatientService
 from .services.patients_number import PatientsNumberService
 from .services.press_release_link import PressReleaseLinkService
 from .services.sapporo_patients_number import SapporoPatientsNumberService
+from .services.tokyo_patients_number import TokyoPatientsNumberService
 from .views.graph import (
     ByAgeGraphView,
     DailyTotalGraphView,
@@ -130,6 +133,31 @@ def _import_sapporo_patients_number(url: str) -> None:
         return
 
 
+def _import_tokyo_patients_number(url: str) -> None:
+    """東京都オープンデータカタログサイトから東京都の1日の新規陽性患者数をインポートする
+
+    Args:
+        url (str): 東京都オープンデータカタログサイトのCSVファイルのパス
+
+    """
+    try:
+        scraped_data = ScrapeTokyoPatientsNumber(url)
+    except (HTTPDownloadError, ScrapeError) as e:
+        print(e.message)
+        return
+
+    service = TokyoPatientsNumberService(conn)
+    factory = TokyoPatientsNumberFactory()
+    for row in scraped_data.lists:
+        factory.create(**row)
+
+    try:
+        service.create(factory)
+    except (DatabaseConnectionError, ServiceError) as e:
+        print(e.message)
+        return
+
+
 def _fix_asahikawa_data() -> None:
     """
     報道発表資料に後日訂正があった分のデータを修正する。
@@ -230,6 +258,9 @@ def import_latest():
     # 札幌市の日別新規陽性患者数データをデータベースへ登録
     _import_sapporo_patients_number(Config.SAPPORO_URL)
 
+    # 東京都の日別新規陽性患者数データをデータベースへ登録
+    _import_tokyo_patients_number(Config.TOKYO_URL)
+
 
 def import_past_from_patients():
     # 過去の陽性患者属性データベースから日別年代別陽性患者数データをデータベースへ登録
@@ -285,7 +316,8 @@ def create_graph_data() -> None:
 
 if __name__ == "__main__":
     try:
-        import_latest()
+        # import_latest()
+        _import_tokyo_patients_number(Config.TOKYO_URL)
         create_graph_data()
     finally:
         conn.close_connection()

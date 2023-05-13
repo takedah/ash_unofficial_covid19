@@ -7,6 +7,7 @@ from dateutil.relativedelta import relativedelta
 from ..services.database import ConnectionPool
 from ..services.patients_number import PatientsNumberService
 from ..services.sapporo_patients_number import SapporoPatientsNumberService
+from ..services.tokyo_patients_number import TokyoPatientsNumberService
 from ..views.view import View
 
 
@@ -318,15 +319,18 @@ class PerHundredThousandPopulationView(PatientsNumberView):
         """
         PatientsNumberView.__init__(self, today, pool)
         sapporo_service = SapporoPatientsNumberService(pool)
+        tokyo_service = TokyoPatientsNumberService(pool)
         from_date = today - relativedelta(weeks=168, days=-1)
         # 起算日が2020年2月23日の二週間前より前の日付になってしまう場合は調整する。
         if from_date < date(2020, 2, 9):
             from_date = date(2020, 2, 9)
-        sapporo_last_update_date = sapporo_service.get_last_update_date()
+
         self.__per_hundred_thousand_population_data = self._service.get_per_hundred_thousand_population_per_week(
             from_date=from_date,
             to_date=today,
         )
+
+        sapporo_last_update_date = sapporo_service.get_last_update_date()
         sapporo_per_hundred_thousand_population_data = sapporo_service.get_per_hundred_thousand_population_per_week(
             from_date=from_date,
             to_date=sapporo_last_update_date,
@@ -335,6 +339,17 @@ class PerHundredThousandPopulationView(PatientsNumberView):
             del sapporo_per_hundred_thousand_population_data[-1:]
 
         self.__sapporo_per_hundred_thousand_population_data = sapporo_per_hundred_thousand_population_data
+
+        tokyo_last_update_date = tokyo_service.get_last_update_date()
+        tokyo_per_hundred_thousand_population_data = tokyo_service.get_per_hundred_thousand_population_per_week(
+            from_date=from_date,
+            to_date=tokyo_last_update_date,
+        )
+        if tokyo_last_update_date < today:
+            del tokyo_per_hundred_thousand_population_data[-1:]
+
+        self.__tokyo_per_hundred_thousand_population_data = tokyo_per_hundred_thousand_population_data
+
         this_week = self.__per_hundred_thousand_population_data[-1][1]
         last_week = self.__per_hundred_thousand_population_data[-2][1]
         increase_from_last_week = float(
@@ -373,6 +388,10 @@ class PerHundredThousandPopulationView(PatientsNumberView):
     @property
     def sapporo_per_hundred_thousand_population_data(self):
         return self.__sapporo_per_hundred_thousand_population_data
+
+    @property
+    def tokyo_per_hundred_thousand_population_data(self):
+        return self.__tokyo_per_hundred_thousand_population_data
 
 
 class WeeklyPerAgeView(PatientsNumberView):

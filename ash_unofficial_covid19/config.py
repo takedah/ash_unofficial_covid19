@@ -16,6 +16,10 @@ class Config:
     # https://www.city.sapporo.jp/toukei/jinko/juuki/juuki.html
     SAPPORO_POPULATION = 1959512
 
+    # 東京都の人口（2023年1月1日現在）
+    # https://www.toukei.metro.tokyo.lg.jp/jsuikei/js-index.htm
+    TOKYO_POPULATION = 14034861
+
     # 旭川市公式ホームページと北海道オープンデータポータルの設定
     DATABASE_URL = os.environ.get("DATABASE_URL")
     BASE_URL = "https://www.city.asahikawa.hokkaido.jp/"
@@ -64,6 +68,9 @@ class Config:
         + "c89f65e7-45a8-4ab2-b94d-494ae192c70f/resource/"
         + "b83606f6-3aa2-4e0c-8a1a-509dd36be2ae/download/patients_summary.csv"
     )
+
+    # 東京都オープンデータカタログサイトの設定
+    TOKYO_URL = "https://data.stopcovid19.metro.tokyo.lg.jp/" + "130001_tokyo_covid19_patients_per_report_date.csv"
 
     # Yahoo! Open Local Platformの設定
     YOLP_BASE_URL = "https://map.yahooapis.jp/search/local/V1/localSearch"
