@@ -3,7 +3,7 @@
   <head>
     {% if gtag_id is not none %}
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ gtag_id }}"></script>
-    <script async src="./gtag.js"></script>
+    <script async src="/gtag.js"></script>
     {% endif %}
     <script defer src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
     <script defer src="https://kit.fontawesome.com/af6896cda7.js" crossorigin="anonymous"></script>
