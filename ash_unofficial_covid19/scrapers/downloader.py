@@ -202,7 +202,7 @@ class DownloadedPDF(Downloader):
         return self.__url
 
     def _get_pdf_content(self, url: str) -> BytesIO:
-        """WebサイトからCSVファイルのBytesIOデータを取得
+        """WebサイトからPDFファイルのBytesIOデータを取得
 
         Args:
             url (str): PDFファイルのURL
