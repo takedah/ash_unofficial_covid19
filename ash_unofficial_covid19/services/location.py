@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta, timezone
 from decimal import ROUND_HALF_UP, Decimal
-from typing import TypedDict
+from typing import TypedDict, Union
 
 import numpy as np
 
 from ..models.location import LocationFactory
+from ..models.outpatient import OutpatientLocation, OutpatientLocationFactory
 from ..models.point import Point
 from ..models.reservation_status import ReservationStatusLocation, ReservationStatusLocationFactory
 from ..services.database import ConnectionPool
@@ -111,15 +112,15 @@ class LocationService(Service):
     @classmethod
     def get_near_locations(
         self,
-        locations: ReservationStatusLocationFactory,
+        locations: Union[ReservationStatusLocationFactory, OutpatientLocationFactory],
         current_point: Point,
     ) -> list:
         """
         現在地から直線距離で最も近い医療機関データのリストを返す。
 
         Args:
-            locations (obj:`ReservationStatusLocationFactory`): 医療機関一覧データ
-                緯度経度を持つ医療機関予約受付状況データオブジェクトのリストを要素に持つオブジェクト
+            locations (obj:`Factory`): 医療機関一覧データ
+                緯度経度を持つデータオブジェクトのリストを要素に持つオブジェクト
             current_point (obj:`Point`): 現在地の緯度経度情報を持つオブジェクト
 
         Returns:
@@ -130,7 +131,8 @@ class LocationService(Service):
         """
         tmp_locations = list()
         OrderedLocation = TypedDict(
-            "OrderedLocation", {"order": int, "location": ReservationStatusLocation, "distance": float}
+            "OrderedLocation",
+            {"order": int, "location": Union[ReservationStatusLocation, OutpatientLocation], "distance": float},
         )
         for location in locations.items:
             ordered_location: OrderedLocation = {

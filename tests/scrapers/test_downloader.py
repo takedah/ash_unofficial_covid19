@@ -5,7 +5,13 @@ import requests
 from requests import HTTPError, Timeout
 
 from ash_unofficial_covid19.errors import HTTPDownloadError
-from ash_unofficial_covid19.scrapers.downloader import DownloadedCSV, DownloadedHTML, DownloadedJSON, DownloadedPDF
+from ash_unofficial_covid19.scrapers.downloader import (
+    DownloadedCSV,
+    DownloadedExcel,
+    DownloadedHTML,
+    DownloadedJSON,
+    DownloadedPDF,
+)
 
 
 class TestDownloadedHTML:
@@ -268,3 +274,25 @@ class TestDownloadedJSON:
         mocker.patch.object(requests, "get", side_effect=exception)
         with pytest.raises(HTTPDownloadError, match=expected):
             DownloadedJSON("http://dummy.local")
+
+
+class TestDownloadedExcel:
+    def test_not_found_error(self, mocker):
+        responce_mock = mocker.Mock()
+        responce_mock.status_code = 404
+        mocker.patch.object(requests, "get", return_value=responce_mock)
+        with pytest.raises(HTTPDownloadError, match="cannot get Excel contents."):
+            DownloadedExcel("http://dummy.local")
+
+    @pytest.mark.parametrize(
+        "exception,expected",
+        [
+            (Timeout("Dummy Error."), "cannot connect to web server."),
+            (HTTPError("Dummy Error."), "cannot connect to web server."),
+            (ConnectionError("Dummy Error."), "cannot connect to web server."),
+        ],
+    )
+    def test_network_error(self, exception, expected, mocker):
+        mocker.patch.object(requests, "get", side_effect=exception)
+        with pytest.raises(HTTPDownloadError, match=expected):
+            DownloadedExcel("http://dummy.local")

@@ -3,7 +3,7 @@ from abc import ABCMeta, abstractmethod
 from datetime import date
 from typing import Optional
 
-from ..scrapers.downloader import DownloadedCSV, DownloadedHTML, DownloadedJSON, DownloadedPDF
+from ..scrapers.downloader import DownloadedCSV, DownloadedExcel, DownloadedHTML, DownloadedJSON, DownloadedPDF
 
 
 class Scraper(metaclass=ABCMeta):
@@ -66,6 +66,19 @@ class Scraper(metaclass=ABCMeta):
 
         """
         return DownloadedJSON(json_url)
+
+    @staticmethod
+    def get_excel(excel_url: str) -> DownloadedExcel:
+        """ExcelファイルのBytesIOデータを要素に持つオブジェクトを返す
+
+        Args:
+            excel_url (url): ExcelファイルのURL
+
+        Returns:
+            downloaded_excel (:obj:`DownloadedExcel`): Excelデータを要素に持つオブジェクト
+
+        """
+        return DownloadedExcel(excel_url)
 
     @staticmethod
     def format_string(value: str) -> str:

@@ -289,3 +289,58 @@ class DownloadedJSON(Downloader):
             message = "cannot decode json response."
             self.error_log(message)
             raise HTTPDownloadError(message)
+
+
+class DownloadedExcel(Downloader):
+    """ExcelファイルのBytesIOデータの取得
+
+    WebサイトからExcelファイルをダウンロードしてBytesIOで返す
+
+    Attributes:
+        content (BytesIO): ダウンロードしたExcelファイルのBytesIOデータ
+        url (str): ダウンロードしたExcelファイルのURL
+
+    """
+
+    def __init__(self, url: str):
+        """
+        Args:
+            url (str): WebサイトのExcelファイルのURL
+
+        """
+        Downloader.__init__(self)
+        self.__url = url
+        self.__content = self._get_excel_content(self.__url)
+
+    @property
+    def content(self) -> BytesIO:
+        return self.__content
+
+    @property
+    def url(self) -> str:
+        return self.__url
+
+    def _get_excel_content(self, url: str) -> BytesIO:
+        """WebサイトからExcelファイルのBytesIOデータを取得
+
+        Args:
+            url (str): ExcelファイルのURL
+
+        Returns:
+            excel_io (BytesIO): 発熱外来一覧Excelデータから抽出したデータ
+
+        """
+        try:
+            response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
+            self.info_log("Excelファイルのダウンロードに成功しました。")
+        except (ConnectionError, MaxRetryError, Timeout, HTTPError):
+            message = "cannot connect to web server."
+            self.error_log(message)
+            raise HTTPDownloadError(message)
+
+        if response.status_code != 200:
+            message = "cannot get Excel contents."
+            self.error_log(message)
+            raise HTTPDownloadError(message)
+
+        return BytesIO(response.content)

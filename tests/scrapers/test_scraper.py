@@ -3,7 +3,13 @@ from datetime import date
 import pytest
 import requests
 
-from ash_unofficial_covid19.scrapers.downloader import DownloadedCSV, DownloadedHTML, DownloadedJSON, DownloadedPDF
+from ash_unofficial_covid19.scrapers.downloader import (
+    DownloadedCSV,
+    DownloadedExcel,
+    DownloadedHTML,
+    DownloadedJSON,
+    DownloadedPDF,
+)
 from ash_unofficial_covid19.scrapers.scraper import Scraper
 
 
@@ -42,6 +48,15 @@ def test_get_json(mocker):
     mocker.patch.object(requests, "get", return_value=responce_mock)
     json_file = DownloadedJSON("http://dummy.local")
     assert isinstance(json_file, DownloadedJSON)
+
+
+def test_get_excel(mocker):
+    responce_mock = mocker.Mock()
+    responce_mock.status_code = 200
+    responce_mock.content = "".encode("utf-8")
+    mocker.patch.object(requests, "get", return_value=responce_mock)
+    excel_file = DownloadedExcel("http://dummy.local")
+    assert isinstance(excel_file, DownloadedExcel)
 
 
 @pytest.mark.parametrize(

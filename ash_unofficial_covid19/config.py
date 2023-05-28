@@ -20,7 +20,7 @@ class Config:
     # https://www.toukei.metro.tokyo.lg.jp/jsuikei/js-index.htm
     TOKYO_POPULATION = 14034861
 
-    # 旭川市公式ホームページと北海道オープンデータポータルの設定
+    # 旭川市公式ホームページの設定
     DATABASE_URL = os.environ.get("DATABASE_URL")
     BASE_URL = "https://www.city.asahikawa.hokkaido.jp/"
     OVERVIEW_URL = BASE_URL + "kurashi/135/136/150/d076150.html"
@@ -57,9 +57,24 @@ class Config:
     NOV2020_OR_EARLIER_URL = BASE_URL + "kurashi/135/136/150/d072303.html"
     RESERVATION_STATUSES_URL = "https://asahikawa-vaccine.jp/reservation/about/#section-c"
 
+    # 北海道公式ホームページの設定
+    OUTPATIENTS_URL = (
+        "https://www.pref.hokkaido.lg.jp/"
+        + "fs/8/5/4/0/3/3/1/_/"
+        + "%E3%80%90%E6%97%AD%E5%B7%9D%E5%B8%82%E3%80%91%E8%A8%BA%E7%99%82%E3%83%BB%E6%A4%9C%E6%9F%BB%E5%8C%BB%E7%99%82%E6%A9%9F%E9%96%A2(R5.5.24).xlsx"
+    )
+
     # 北海道オープンデータポータルの設定
     HOKKAIDO_URL = (
         "https://www.harp.lg.jp/opendata/dataset/" + "1369/resource/3132/010006_hokkaido_covid19_patients.csv"
+    )
+    HOSPITAL_OPENDATA_URL = (
+        "https://www.harp.lg.jp/opendata/dataset/1243/resource/4967/"
+        + "01_%E7%97%85%E9%99%A2_%E5%8C%97%E6%B5%B7%E9%81%93_%E7%B7%AF%E5%BA%A6%E7%B5%8C%E5%BA%A6%E4%BB%98%E3%81%8D.csv"
+    )
+    CLINIC_OPENDATA_URL = (
+        "https://www.harp.lg.jp/opendata/dataset/1243/resource/4968/"
+        + "02_%E8%A8%BA%E7%99%82%E6%89%80_%E5%8C%97%E6%B5%B7%E9%81%93_%E7%B7%AF%E5%BA%A6%E7%B5%8C%E5%BA%A6%E4%BB%98%E3%81%8D.csv"
     )
 
     # DATA-SMART CITY SAPPOROの設定

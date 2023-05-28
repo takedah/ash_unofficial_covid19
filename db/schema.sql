@@ -105,3 +105,29 @@ CREATE TABLE tokyo_patients_numbers(
     patients_number INTEGER NOT NULL,
     updated_at TIMESTAMPTZ NOT NULL
 );
+DROP TABLE IF EXISTS outpatients;
+CREATE TABLE outpatients(
+    id SERIAL NOT NULL,
+    is_outpatient BOOLEAN,
+    is_positive_patients BOOLEAN,
+    public_health_care_center TEXT,
+    medical_institution_name VARCHAR(256) NOT NULL,
+    city TEXT,
+    address TEXT,
+    phone_number TEXT,
+    is_target_family BOOLEAN,
+    is_pediatrics BOOLEAN,
+    mon TEXT,
+    tue TEXT,
+    wed TEXT,
+    thu TEXT,
+    fri TEXT,
+    sat TEXT,
+    sun TEXT,
+    is_face_to_face_for_positive_patients BOOLEAN,
+    is_online_for_positive_patients BOOLEAN,
+    is_home_visitation_for_positive_patients BOOLEAN,
+    memo TEXT,
+    updated_at TIMESTAMPTZ NOT NULL,
+    PRIMARY KEY(medical_institution_name)
+);
