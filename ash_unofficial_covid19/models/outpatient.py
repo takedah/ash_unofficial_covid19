@@ -17,7 +17,7 @@ class Outpatient:
         city (str): 市町村
         address (str): 住所
         phone_number (str): 電話番号（予約URL）
-        is_target_family (str): かかりつけ患者以外の診療の可否
+        is_target_not_family (bool): かかりつけ患者以外の診療の可否
         is_pediatrics (str): 小児対応の可否
         mon (str): 月曜日の診療時間
         tue (str): 火曜日の診療時間
@@ -40,7 +40,7 @@ class Outpatient:
     city: str
     address: str
     phone_number: str
-    is_target_family: Optional[bool]
+    is_target_not_family: Optional[bool]
     is_pediatrics: Optional[bool]
     mon: str
     tue: str
@@ -110,7 +110,7 @@ class OutpatientLocation(Outpatient):
         city (str): 市町村
         address (str): 住所
         phone_number (str): 電話番号（予約URL）
-        is_target_family (str): かかりつけ患者以外の診療の可否
+        is_target_not_family (bool): かかりつけ患者以外の診療の可否
         is_pediatrics (str): 小児対応の可否
         mon (str): 月曜日の診療時間
         tue (str): 火曜日の診療時間

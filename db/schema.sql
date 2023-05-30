@@ -115,7 +115,7 @@ CREATE TABLE outpatients(
     city TEXT,
     address TEXT,
     phone_number TEXT,
-    is_target_family BOOLEAN,
+    is_target_not_family BOOLEAN,
     is_pediatrics BOOLEAN,
     mon TEXT,
     tue TEXT,

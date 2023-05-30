@@ -168,7 +168,7 @@ class ScrapeOpendataLocation(Scraper):
 
         try:
             location_data = {
-                "medical_institution_name": row[5],
+                "medical_institution_name": row[5].replace(" ", ""),
                 "longitude": float(row[12]),
                 "latitude": float(row[11]),
             }

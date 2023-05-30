@@ -207,7 +207,7 @@ class TestScrapeOutpatient:
                 "city": "旭川市",
                 "address": "旭川市金星町1丁目1番65号",
                 "phone_number": "0166-24-3181",
-                "is_target_family": False,
+                "is_target_not_family": False,
                 "is_pediatrics": True,
                 "mon": "08:30～17:00",
                 "tue": "08:30～17:00",
@@ -225,11 +225,11 @@ class TestScrapeOutpatient:
                 "is_outpatient": True,
                 "is_positive_patients": False,
                 "public_health_care_center": "旭川",
-                "medical_institution_name": "JA北海道厚生連 旭川厚生病院",
+                "medical_institution_name": "JA北海道厚生連旭川厚生病院",
                 "city": "旭川市",
                 "address": "旭川市1条通24丁目111番地",
                 "phone_number": "0166-33-7171",
-                "is_target_family": True,
+                "is_target_not_family": True,
                 "is_pediatrics": False,
                 "mon": "08:30～11:30",
                 "tue": "08:30～11:30",
@@ -251,7 +251,7 @@ class TestScrapeOutpatient:
                 "city": "旭川市",
                 "address": "旭川市曙1条1丁目1番1号",
                 "phone_number": "0166-22-8111",
-                "is_target_family": False,
+                "is_target_not_family": False,
                 "is_pediatrics": False,
                 "mon": "",
                 "tue": "",
@@ -275,6 +275,6 @@ class TestScrapeOutpatient:
         mocker.patch.object(requests, "get", return_value=responce_mock)
         mocker.patch.object(ScrapeOutpatient, "_get_excel_lists", return_value=excel_lists)
         scraper = ScrapeOutpatient(excel_url="http://dummy.local")
-        expect = ["市立旭川病院", "JA北海道厚生連 旭川厚生病院", "旭川赤十字病院"]
+        expect = ["市立旭川病院", "JA北海道厚生連旭川厚生病院", "旭川赤十字病院"]
         name_lists = scraper.get_medical_institution_list()
         assert name_lists == expect

@@ -79,9 +79,9 @@ class ScrapeOutpatient(Scraper):
 
         excel_row = list(map(lambda x: self._normalize(x), excel_row))
         outpatient: dict[str, Union[str, bool]] = dict()
-        is_target_family = False
+        is_target_not_family = False
         if excel_row[7] == "かかりつけ患者以外の診療も可":
-            is_target_family = True
+            is_target_not_family = True
 
         is_positive_patients = self._get_available(excel_row[1])
         is_face_to_face_for_positive_patients = False
@@ -92,15 +92,16 @@ class ScrapeOutpatient(Scraper):
             is_online_for_positive_patients = self._get_available(excel_row[52])
             is_home_visitation_for_positive_patients = self._get_available(excel_row[53])
 
+        address = excel_row[5].replace("北海道", "")
         outpatient = {
             "is_outpatient": self._get_available(excel_row[0]),
             "is_positive_patients": is_positive_patients,
             "public_health_care_center": excel_row[2],
-            "medical_institution_name": excel_row[3],
+            "medical_institution_name": excel_row[3].replace(" ", ""),
             "city": excel_row[4],
-            "address": excel_row[5],
+            "address": address,
             "phone_number": excel_row[6],
-            "is_target_family": is_target_family,
+            "is_target_not_family": is_target_not_family,
             "is_pediatrics": self._get_available(excel_row[8]),
             "mon": self._get_opening_hours(excel_row[9:15]),
             "tue": self._get_opening_hours(excel_row[15:21]),
@@ -197,7 +198,7 @@ class ScrapeOutpatient(Scraper):
         if not isinstance(target_text, str):
             return None
 
-        time_format_match = re.search("^([0-9]{2}):([0-9]{2}):([0-9]{2})$", target_text)
+        time_format_match = re.search("^.*([0-9]{2}):([0-9]{2}):([0-9]{2})$", target_text)
         if time_format_match:
             return time_format_match.group(1) + ":" + time_format_match.group(2)
         else:

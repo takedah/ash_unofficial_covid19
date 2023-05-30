@@ -1,0 +1,142 @@
+{% extends 'layout.html' %}
+{% block content %}
+<article>
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <p class="mb-0">北海道公式ホームページからダウンロードした外来対応医療機関（発熱外来）データを検索できるようにしたシステムです。正確な情報や受診方法等は、必ず<a class="alert-link" href="https://www.pref.hokkaido.lg.jp/hf/kst/youkou.html" title="北海道公式ホームページ" target="_blank">北海道公式ホームページ <i class="fas fa-external-link-alt"></i></a>、<a class="alert-link" href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d075831.html" title="旭川市公式ホームページ" target="_blank">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a>を確認してください。（{{ last_updated }}更新）</p>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
+  </div>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <figure class="mb-0">
+      <blockquote cite="https://www.pref.hokkaido.lg.jp/fs/8/5/4/0/3/3/1/_/%E3%80%90%E6%97%AD%E5%B7%9D%E5%B8%82%E3%80%91%E8%A8%BA%E7%99%82%E3%83%BB%E6%A4%9C%E6%9F%BB%E5%8C%BB%E7%99%82%E6%A9%9F%E9%96%A2(R5.5.24).xlsx" class="blockquote">
+        <p class="mb-0 h6">院内感染を防止するため、必ず、事前に電話またはWeb上で予約してください。</p>
+        <p class="mb-0 h6">本表にかかりつけ医療機関が掲載されていない（又はかかりつけ医がいない）場合は、「かかりつけ患者の診療に限る」としている医療機関への連絡はご遠慮いただき、相談窓口へ連絡してください。</p>
+      </blockquote>
+      <figcaption class="blockquote-footer mb-0">
+        <cite title="北海道公式ホームページ">北海道公式ホームページより</cite>
+      </figcaption>
+    </figure>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      {% for search_result in search_results %}
+      <section>
+        <h1 class="h5 card-title pb-3">{{ title }}</h1>
+        <table class="table table-bordered mb-3" id="results" data-length="{{ search_lengths|tojson }}">
+          <tbody>
+              <tr id="order{{ loop.index }}" data-latitude="{{ search_result.latitude|tojson }}" data-longitude="{{ search_result.longitude|tojson }}" data-name="{{ search_result.medical_institution_name|safe }}" data-url="{{ search_result.medical_institution_name_url|safe }}" data-address="{{ search_result.address|safe }}" data-istargetnotfamily="{{ search_result.is_target_not_family|safe }}" data-ispediatrics="{{ search_result.is_pediatrics|safe }}" data-mon="{{ search_result.mon|safe }}" data-tue="{{ search_result.tue|safe }}" data-wed="{{ search_result.wed|safe }}" data-thu="{{ search_result.thu|safe }}" data-fri="{{ search_result.fri|safe }}" data-sat="{{ search_result.sat|safe }}" data-sun="{{ search_result.sun|safe }}">
+              <th>かかりつけ患者以外の診療</th>
+              {% if search_result.is_target_not_family is none %}
+              <td></td>
+              {% elif search_result.is_target_not_family %}
+              <td>OK</td>
+              {% else %}
+              <td>NG</td>
+              {% endif %}
+            </tr>
+            <tr>
+              <th>小児対応</th>
+              {% if search_result.is_pediatrics is none %}
+              <td></td>
+              {% elif search_result.is_pediatrics %}
+              <td>OK</td>
+              {% else %}
+              <td>NG</td>
+              {% endif %}
+            </tr>
+            <tr>
+              <th>所在地</th><td>{{ search_result.address }}</td>
+            </tr>
+            <tr>
+              <th>電話番号</th><td>{{ search_result.phone_number }}</td>
+            </tr>
+            <tr>
+              <th>診療時間</th>
+              <td>
+                <table class="table table-striped">
+                  <tr><th>月曜日</th><td>{{ search_result.mon }}</td></tr>
+                  <tr><th>火曜日</th><td>{{ search_result.tue }}</td></tr>
+                  <tr><th>水曜日</th><td>{{ search_result.wed }}</td></tr>
+                  <tr><th>木曜日</th><td>{{ search_result.thu }}</td></tr>
+                  <tr><th>金曜日</th><td>{{ search_result.fri }}</td></tr>
+                  <tr><th>土曜日</th><td>{{ search_result.sat }}</td></tr>
+                  <tr><th>日曜日</th><td>{{ search_result.sun }}</td></tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <th>備考</th>
+              <td>{{ search_result.memo }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+      <section>
+        {% if search_result.is_positive_patients %}
+          <h3 class="h6 mb-3">陽性者（療養者）の治療に関与する医療機関の情報</h3>
+        <table class="table table-bordered mb-3">
+          <tbody>
+            <tr>
+              <th>外来対応（対面）</th>
+              {% if search_result.is_face_to_face_for_positive_patients is none %}
+              <td></td>
+              {% elif search_result.is_face_to_face_for_positive_patients %}
+              <td>OK</td>
+              {% else %}
+              <td>NG</td>
+              {% endif %}
+            </tr>
+            <tr>
+              <th>オンライン診療（電話診療を含む）</th>
+              {% if search_result.is_online_for_positive_patients is none %}
+              <td></td>
+              {% elif search_result.is_online_for_positive_patients %}
+              <td>OK</td>
+              {% else %}
+              <td>NG</td>
+              {% endif %}
+            </tr>
+            <tr>
+              <th>訪問診療</th>
+              {% if search_result.is_home_visitation_for_positive_patients is none %}
+              <td></td>
+              {% elif search_result.is_home_visitation_for_positive_patients %}
+              <td>OK</td>
+              {% else %}
+              <td>NG</td>
+              {% endif %}
+            </tr>
+          </tbody>
+        </table>
+        {% endif %}
+      </section>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="card mt-3">
+    <div class="card-body">
+      <section id="medicalInstitutionMap">
+        <h2 class="h5 card-title mb-3">地図</h2>
+        <p class="card-text">地図の表示は目安となっています。正確な場所の情報は各医療機関のホームページ等でご確認ください。</p>
+        <div id="mapid" class="mb-3"></div>
+        <p class="card-text small">医療機関の位置情報は、<a href="https://developer.yahoo.co.jp/webapi/map/" title="Yahoo! Open Local Platform" target="_blank">Yahoo! Open Local Platform (YOLP)</a>のYahoo!ローカルサーチAPI及び<a href="https://www.harp.lg.jp/opendata/dataset/1243.html" title="北海道オープンデータポータル">北海道オープンデータポータルの道内医療機関一覧（位置情報付き）</a>を使用して取得しています。
+        <!-- Begin Yahoo! JAPAN Web Services Attribution Snippet -->
+        <a href="https://developer.yahoo.co.jp/sitemap/">
+          <img src="https://s.yimg.jp/images/yjdn/yjdn_attbtn1_125_17.gif" title="Webサービス by Yahoo! JAPAN" alt="Web Services by Yahoo! JAPAN" width="125" height="17" border="0">
+        </a>
+        <!-- End Yahoo! JAPAN Web Services Attribution Snippet -->
+        </p>
+      </section>
+    </div>
+  </div>
+  <div class="card mt-3">
+    <div class="card-body">
+      <section>
+        <h3 class="h5 card-title mb-3">他の条件で新型コロナ発熱外来を探す</h3>
+        <p class="card-text"><a href="/outpatients" title="コロナ発熱外来検索アプリへ" class="btn btn-primary">コロナ発熱外来検索アプリへ</a></p>
+      </section>
+    </div>
+  </div>
+</article>
+<script charset="utf-8" src="{{ url_for('static', filename='js/show_map_outpatient.js') }}"></script>
+{% endblock %}

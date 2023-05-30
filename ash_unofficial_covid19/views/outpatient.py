@@ -38,6 +38,8 @@ class OutpatientView(View):
     def find(
         self,
         medical_institution_name: Optional[str] = None,
+        is_pediatrics: Optional[bool] = None,
+        is_target_not_family: Optional[bool] = None,
     ) -> OutpatientLocationFactory:
         """新型コロナ発熱外来と位置情報の検索
 
@@ -45,6 +47,8 @@ class OutpatientView(View):
 
         Args:
             medical_institution_name (str): 医療機関の名称
+            is_pediatrics (bool): 小児対応かどうか
+            is_target_not_family (bool): かかりつけ患者以外の診療の可否
 
         Returns:
             results (:obj:`OutpatientLocationFactory`): 発熱外来詳細データ
@@ -52,7 +56,7 @@ class OutpatientView(View):
                 データオブジェクトのリストを要素に持つオブジェクト。
 
         """
-        return self.__service.find(medical_institution_name)
+        return self.__service.find(medical_institution_name, is_pediatrics, is_target_not_family)
 
     def get_medical_institution_list(self) -> list:
         """新型コロナワクチン接種医療機関名とこれをURLパースした文字列一覧を取得

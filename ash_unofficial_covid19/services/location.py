@@ -142,7 +142,7 @@ class LocationService(Service):
             }
             tmp_locations.append(ordered_location)
 
-        near_locations = sorted(tmp_locations, key=lambda x: x["distance"])[:5]
+        near_locations = sorted(tmp_locations, key=lambda x: x["distance"])[:10]
         for i in range(len(near_locations)):
             # 現在地から近い順で連番を付与する。
             near_locations[i]["order"] = i + 1

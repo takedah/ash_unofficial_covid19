@@ -5,6 +5,7 @@ from flask import Flask, abort, escape, g, make_response, render_template, reque
 from .config import Config
 from .errors import ViewError
 from .services.database import ConnectionPool
+from .views.outpatient import OutpatientView
 from .views.patient import AsahikawaPatientView
 from .views.patients_number import (
     ByAgeView,
@@ -86,6 +87,11 @@ def get_patients_numbers():
 def get_reservation_statuses():
     conn = get_connection()
     return ReservationStatusView(conn)
+
+
+def get_outpatients():
+    conn = get_connection()
+    return OutpatientView(conn)
 
 
 def get_daily_total():
@@ -314,6 +320,93 @@ def reservation_status_medical_institution(medical_institution):
 
     return render_template(
         "reservation_status_medical_institution.html",
+        title=title,
+        gtag_id=Config.GTAG_ID,
+        last_updated=last_updated,
+        medical_institution=medical_institution,
+        search_results=search_results.items,
+        search_lengths=search_lengths,
+        leaflet=True,
+    )
+
+
+@app.route("/outpatients")
+def outpatients():
+    outpatients = get_outpatients()
+    search_results = outpatients.find()
+    last_updated = outpatients.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
+
+    search_lengths = len(search_results.items)
+    if search_lengths == 0:
+        abort(404)
+
+    return render_template(
+        "outpatients.html",
+        title="旭川市のコロナ発熱外来マップ",
+        gtag_id=Config.GTAG_ID,
+        last_updated=last_updated,
+        search_results=search_results.items,
+        search_lengths=search_lengths,
+        leaflet=True,
+    )
+
+
+@app.route("/outpatients/search_by_gps", methods=["GET", "POST"])
+def outpatients_search_by_gps():
+    outpatients = get_outpatients()
+    last_updated = outpatients.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
+    if request.method == "GET":
+        abort(404)
+
+    try:
+        current_latitude = escape(request.form["current_latitude"])
+        current_longitude = escape(request.form["current_longitude"])
+        current_latitude = float(current_latitude)
+        current_longitude = float(current_longitude)
+    except (KeyError, ValueError):
+        abort(400)
+
+    title = "現在地から近い新型コロナ発熱外来の検索結果"
+    try:
+        search_results = outpatients.search_by_gps(longitude=current_longitude, latitude=current_latitude)
+    except ViewError:
+        abort(500)
+
+    search_lengths = len(search_results)
+    if search_lengths == 0:
+        abort(404)
+
+    return render_template(
+        "outpatient_search_by_gps.html",
+        title=title,
+        gtag_id=Config.GTAG_ID,
+        last_updated=last_updated,
+        search_results=search_results,
+        search_lengths=search_lengths,
+        current_longitude=current_longitude,
+        current_latitude=current_latitude,
+        leaflet=True,
+    )
+
+
+@app.route("/outpatient/medical_institution/<medical_institution>")
+def outpatient_medical_institution(medical_institution):
+    try:
+        medical_institution = escape(medical_institution)
+    except ValueError:
+        abort(400)
+
+    title = medical_institution + "の新型コロナ発熱外来情報"
+    outpatients = get_outpatients()
+    search_results = outpatients.find(medical_institution_name=medical_institution)
+    last_updated = outpatients.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
+
+    search_lengths = len(search_results.items)
+    if search_lengths == 0:
+        abort(404)
+
+    return render_template(
+        "outpatient_medical_institution.html",
         title=title,
         gtag_id=Config.GTAG_ID,
         last_updated=last_updated,

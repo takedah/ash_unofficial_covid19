@@ -38,7 +38,7 @@ class OutpatientService(Service):
             "city",
             "address",
             "phone_number",
-            "is_target_family",
+            "is_target_not_family",
             "is_pediatrics",
             "mon",
             "tue",
@@ -65,7 +65,7 @@ class OutpatientService(Service):
                     outpatient.city,
                     outpatient.address,
                     outpatient.phone_number,
-                    outpatient.is_target_family,
+                    outpatient.is_target_not_family,
                     outpatient.is_pediatrics,
                     outpatient.mon,
                     outpatient.tue,
@@ -152,6 +152,8 @@ class OutpatientService(Service):
     def find(
         self,
         medical_institution_name: Optional[str] = None,
+        is_pediatrics: Optional[bool] = None,
+        is_target_not_family: Optional[bool] = None,
     ) -> OutpatientLocationFactory:
         """新型コロナ発熱外来と位置情報の検索
 
@@ -159,6 +161,8 @@ class OutpatientService(Service):
 
         Args:
             medical_institution_name (str): 医療機関の名称
+            is_pediatrics (bool): 小児対応の可否
+            is_target_not_family (bool): かかりつけ患者以外の診療の可否
 
         Returns:
             results (list of :obj:`OutpatientLocation`): 発熱外来詳細データ
@@ -166,18 +170,33 @@ class OutpatientService(Service):
 
         """
         search_args = list()
-        where_sentence = ""
+        # 外来対応医療機関列が空欄の医療機関を除外する
+        where_sentence = " " + "WHERE is_outpatient IS TRUE"
         if medical_institution_name is not None:
             if isinstance(medical_institution_name, str):
-                where_sentence += " " + "WHERE reserve.medical_institution_name=%s"
+                where_sentence += " " + "AND reserve.medical_institution_name=%s"
                 search_args.append(medical_institution_name)
             else:
                 raise TypeError("医療機関名の指定に誤りがあります。")
 
+        if is_pediatrics is not None:
+            if isinstance(is_pediatrics, bool):
+                where_sentence += " " + "AND reserve.is_pediatrics=%s"
+                search_args.append(str(is_pediatrics))
+            else:
+                raise TypeError("小児対応の可否の指定に誤りがあります。")
+
+        if is_target_not_family is not None:
+            if isinstance(is_target_not_family, bool):
+                where_sentence += " " + "AND reserve.is_target_not_family=%s"
+                search_args.append(str(is_target_not_family))
+            else:
+                raise TypeError("かかりつけ患者以外の診療の可否の指定に誤りがあります。")
+
         state = (
             "SELECT "
             + "is_outpatient,is_positive_patients,public_health_care_center,"
-            + "reserve.medical_institution_name,city,address,phone_number,is_target_family,"
+            + "reserve.medical_institution_name,city,address,phone_number,is_target_not_family,"
             + "is_pediatrics,mon,tue,wed,thu,fri,sat,sun,"
             + "is_face_to_face_for_positive_patients,is_online_for_positive_patients,"
             + "is_home_visitation_for_positive_patients,memo,longitude,latitude "
@@ -193,7 +212,7 @@ class OutpatientService(Service):
         factory = OutpatientLocationFactory()
         with self.get_connection() as cur:
             if len(search_args) == 0:
-                cur.execute(state + order_sentence)
+                cur.execute(state + where_sentence + order_sentence)
             else:
                 cur.execute(state + where_sentence + order_sentence, search_args)
             for row in cur.fetchall():

@@ -78,7 +78,7 @@ class TestScrapeOpendataLocation:
                 "latitude": 43.769637,
             },
             {
-                "medical_institution_name": "JA北海道厚生連 旭川厚生病院",
+                "medical_institution_name": "JA北海道厚生連旭川厚生病院",
                 "longitude": 142.384931,
                 "latitude": 43.758732,
             },
