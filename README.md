@@ -4,9 +4,13 @@
 
 [旭川市新型コロナウイルスまとめサイト](https://covid19.asahikawa-opendata.morori.jp/)
 
-北海道全体の新型コロナウイルス感染症の情報については、 [北海道新型コロナウイルスまとめサイト](https://stopcovid19.hokkaido.dev/) や [北海道オープンデータポータル](https://www.harp.lg.jp/opendata/) でCSV形式のテキストファイルやJSON形式のWeb APIといった再利用しやすい形式で取得できますが、旭川市単独のデータは [旭川市公式ホームページ](https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html) に掲載はあるものの、再利用しやすい形式とはなっていないのが現状です。
+北海道全体の新型コロナウイルス感染症の情報については、[北海道オープンデータポータル](https://www.harp.lg.jp/opendata/) でCSV形式のテキストファイルといった再利用しやすい形式で取得できますが、旭川市単独のデータは [旭川市公式ホームページ](https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d068529.html) に掲載はあるものの、再利用しやすい形式とはなっていないのが現状です。
 
-そこで、旭川市公式ホームページからスクレイピングして新型コロナウイルス感染症の情報を取得し、非公式のオープンデータとしてダウンロードできるようにしたWebアプリです。Flaskで動作します。
+そこで、旭川市公式ホームページからスクレイピングして新型コロナウイルス感染症の情報を取得し、非公式のオープンデータとしてダウンロードできるようにしたWebアプリです。（2023年5月8日発表分をもって新規感染者数データの取得は停止しています。）
+
+また、新型コロナワクチン接種医療機関を検索したり、北海道公式ホームページからダウンロードしたデータを元に外来対応医療機関（発熱外来）を検索できるようになっています。
+
+Flaskで動作します。
 
 ## Requirement
 
@@ -64,6 +68,12 @@ $ python -m ash_unofficial_covid19.import_patients_numbers
 $ python -m ash_unofficial_covid19.import_reservation_statuses
 ```
 
+### 発熱外来の情報の取得
+
+```bash
+$ python -m ash_unofficial_covid19.import_outpatients
+```
+
 ### Dockerでのサービス起動
 
 Dockerでも使用できるようにしています。
@@ -80,6 +90,7 @@ Dockerでも使用できるようにしています。
 ```bash
 # docker-compose exec app python -m ash_unofficial_covid19.import_patients_numbers
 # docker-compose exec app python -m ash_unofficial_covid19.import_reservation_statuses
+# docker-compose exec app python -m ash_unofficial_covid19.import_outpatients
 ```
 
 #### サービス停止
@@ -90,5 +101,5 @@ Dockerでも使用できるようにしています。
 
 ## Lisence
 
-Copyright (c) 2022 Hiroki Takeda
+Copyright (c) 2023 Hiroki Takeda
 [MIT](http://opensource.org/licenses/mit-license.php)
