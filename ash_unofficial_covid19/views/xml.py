@@ -24,7 +24,7 @@ class XmlView(View):
         self.__link = "https://" + Config.MY_DOMAIN + "/"
         self.__description = (
             "旭川市が公式ホームページで公表している新型コロナウイルスの情報を、機械判読しやすい形に変換したものを公開しています。"
-            + "また、旭川市の新型コロナワクチン接種医療機関の情報を、地図から探すことができる旭川市コロナワクチンマップも公開していますので、"
+            + "また、旭川市の新型コロナワクチン接種医療機関、新型コロナ発熱外来の情報を、地図から探すことができる検索アプリも公開していますので、"
             + "旭川の方はもとより、お引越しで新たに旭川に来られた方にぜひ使っていただきたいです。"
         )
         self.__index_feed = self._get_index_feed()
@@ -104,7 +104,7 @@ class XmlView(View):
             feed_data (dict): トップページのFeed用データ
 
         """
-        title = self.__today.strftime("%Y/%m/%d (%a)") + " の旭川市内感染状況の最新動向"
+        title = self.__today.strftime("%Y/%m/%d (%a)") + " の旭川市新型コロナウイルス感染者数の推移"
         link = "https://" + self.my_domain + "/"
         daily_total = DailyTotalView(self.__today, self.__pool)
         most_recent = daily_total.most_recent
@@ -156,15 +156,15 @@ class XmlView(View):
         }
 
     def _get_reservation_status_feed(self) -> dict:
-        """コロナワクチンマップ（追加接種（オミクロン対応ワクチン））のFeed用データを返す
+        """新型コロナワクチン接種医療機関検索アプリのFeed用データを返す
 
         Returns:
-            feed_data (dict): コロナワクチンマップ（追加接種（オミクロン対応ワクチン））のFeed用データ
+            feed_data (dict): 新型コロナワクチン接種医療機関検索アプリのFeed用データ
 
         """
-        title = "旭川市のコロナワクチンマップ（追加接種（オミクロン対応ワクチン））"
+        title = "旭川市の新型コロナワクチン接種医療機関検索アプリ"
         link = "https://" + self.my_domain + "/reservation_statuses"
-        description = "旭川市の新型コロナワクチン接種医療機関（追加接種（オミクロン対応ワクチン））の予約受付状況などの情報を、地図から探すことができます。"
+        description = "旭川市の新型コロナワクチン接種医療機関の予約受付状況などの情報を、地図から探すことができます。"
         view = ReservationStatusView(self.__pool)
         pub_date = view.get_last_updated()
         pub_date = pub_date.astimezone(timezone.utc)
@@ -202,17 +202,17 @@ class XmlView(View):
         pass
 
     def get_reservation_status_area_feed_list(self) -> list:
-        """コロナワクチンマップ（追加接種（オミクロン対応ワクチン））の地区一覧Feed用データを返す
+        """新型コロナワクチン接種医療機関検索アプリの地区一覧Feed用データを返す
 
         Returns:
-            feed_data_list (list): コロナワクチンマップ（追加接種（オミクロン対応ワクチン））の地区一覧Feed用データのリスト
+            feed_data_list (list): 新型コロナワクチン接種医療機関検索アプリの地区一覧Feed用データのリスト
 
         """
         view = ReservationStatusView(self.__pool)
         area_list = view.get_area_list()
         feed_data_list = list()
         for area in area_list:
-            title = area["name"] + "の新型コロナワクチン接種医療機関（追加接種（オミクロン対応ワクチン））の検索結果"
+            title = area["name"] + "の新型コロナワクチン接種医療機関の検索結果"
             link = "https://" + self.my_domain + "/reservation_status/area/" + area["url"]
             description = title + "です。"
             pub_date = view.get_last_updated()
@@ -231,17 +231,17 @@ class XmlView(View):
         return feed_data_list
 
     def get_reservation_status_medical_institution_feed_list(self) -> list:
-        """コロナワクチンマップ（追加接種（オミクロン対応ワクチン））の医療機関一覧Feed用データを返す
+        """新型コロナワクチン接種医療機関検索アプリの医療機関一覧Feed用データを返す
 
         Returns:
-            feed_data_list (list): コロナワクチンマップ（追加接種（オミクロン対応ワクチン））の医療機関一覧Feed用データのリスト
+            feed_data_list (list): 新型コロナワクチン接種医療機関検索アプリの医療機関一覧Feed用データのリスト
 
         """
         view = ReservationStatusView(self.__pool)
         medical_institution_list = view.get_medical_institution_list()
         feed_data_list = list()
         for medical_institution in medical_institution_list:
-            title = medical_institution["name"] + "の新型コロナワクチン接種予約受付状況（追加接種（オミクロン対応ワクチン））"
+            title = medical_institution["name"] + "の新型コロナワクチン接種予約受付状況"
             link = (
                 "https://" + self.my_domain + "/reservation_status/medical_institution/" + medical_institution["url"]
             )
