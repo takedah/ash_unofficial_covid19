@@ -146,7 +146,7 @@ def get_rss():
 def index():
     return render_template(
         "index.html",
-        title="旭川市感染者数の推移",
+        title="トップページ",
         gtag_id=Config.GTAG_ID,
         patients_numbers=get_patients_numbers(),
         daily_total=get_daily_total(),
@@ -193,7 +193,7 @@ def reservation_statuses():
 
     return render_template(
         "reservation_statuses.html",
-        title="旭川市のコロナワクチン接種医療機関マップ",
+        title="旭川市のコロナワクチン接種医療機関検索アプリ",
         gtag_id=Config.GTAG_ID,
         last_updated=last_updated,
         search_results=search_results.items,
@@ -342,7 +342,7 @@ def outpatients():
 
     return render_template(
         "outpatients.html",
-        title="旭川市のコロナ発熱外来マップ",
+        title="旭川市のコロナ発熱外来検索アプリ",
         gtag_id=Config.GTAG_ID,
         last_updated=last_updated,
         search_results=search_results.items,

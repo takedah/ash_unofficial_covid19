@@ -85,6 +85,12 @@ document.addEventListener(
             .sat
         )
       );
+      var memo = JSON.parse(
+        JSON.stringify(
+          document.getElementById("order" + currentOrder).dataset
+            .memo
+        )
+      );
       var parentPath = "outpatient";
       var nameLink =
         "<a href='/" +
@@ -118,6 +124,7 @@ document.addEventListener(
         "<div>木曜日: " + thu + "</div>" +
         "<div>金曜日: " + fri + "</div>" +
         "<div>土曜日: " + sat + "</div>" +
+        "<div>" + memo + "</div>" +
         "</div>" +
         "<div class='py-2'>" +
         isTargetNotFamilySign +
