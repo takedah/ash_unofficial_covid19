@@ -2,6 +2,7 @@ from datetime import date, datetime, time, timezone
 
 from ..config import Config
 from ..services.database import ConnectionPool
+from ..views.outpatient import OutpatientView
 from ..views.patients_number import DailyTotalView, PerHundredThousandPopulationView
 from ..views.reservation_status import ReservationStatusView
 from ..views.view import View
@@ -30,6 +31,7 @@ class XmlView(View):
         self.__index_feed = self._get_index_feed()
         self.__about_feed = self._get_about_feed()
         self.__reservation_status_feed = self._get_reservation_status_feed()
+        self.__outpatient_feed = self._get_outpatient_feed()
         self.__opendata_feed = self._get_opendata_feed()
 
     @property
@@ -63,6 +65,10 @@ class XmlView(View):
     @property
     def reservation_status_feed(self):
         return self.__reservation_status_feed
+
+    @property
+    def outpatient_feed(self):
+        return self.__outpatient_feed
 
     @property
     def opendata_feed(self):
@@ -177,6 +183,28 @@ class XmlView(View):
             "guid": guid,
         }
 
+    def _get_outpatient_feed(self) -> dict:
+        """新型コロナ発熱外来検索アプリのFeed用データを返す
+
+        Returns:
+            feed_data (dict): 新型コロナ発熱外来検索アプリのFeed用データ
+
+        """
+        title = "旭川市の新型コロナ発熱外来検索アプリ"
+        link = "https://" + self.my_domain + "/outpatients"
+        description = "旭川市の新型コロナ発熱外来の情報を、地図から探すことができます。"
+        view = OutpatientView(self.__pool)
+        pub_date = view.get_last_updated()
+        pub_date = pub_date.astimezone(timezone.utc)
+        guid = "tag:" + self.my_domain + "," + pub_date.strftime("%Y-%m-%d") + ":/outpatients"
+        return {
+            "title": title,
+            "link": link,
+            "description": description,
+            "pub_date": pub_date,
+            "guid": guid,
+        }
+
     def _get_opendata_feed(self) -> dict:
         """非公式オープンデータのFeed用データを返す
 
@@ -261,6 +289,35 @@ class XmlView(View):
 
         return feed_data_list
 
+    def get_outpatient_medical_institution_feed_list(self) -> list:
+        """新型コロナ発熱外来検索アプリの医療機関一覧Feed用データを返す
+
+        Returns:
+            feed_data_list (list): 新型コロナ発熱外来検索アプリの医療機関一覧Feed用データのリスト
+
+        """
+        view = OutpatientView(self.__pool)
+        medical_institution_list = view.get_medical_institution_list()
+        feed_data_list = list()
+        for medical_institution in medical_institution_list:
+            title = medical_institution["name"] + "の新型コロナ発熱外来の情報"
+            link = "https://" + self.my_domain + "/outpatient/medical_institution/" + medical_institution["url"]
+            description = title + "です。"
+            pub_date = view.get_last_updated()
+            pub_date = pub_date.astimezone(timezone.utc)
+            guid = link
+            feed_data_list.append(
+                {
+                    "title": title,
+                    "link": link,
+                    "description": description,
+                    "pub_date": pub_date,
+                    "guid": guid,
+                }
+            )
+
+        return feed_data_list
+
 
 class RssView(XmlView):
     def __init__(self, today: date, pool: ConnectionPool):
@@ -283,6 +340,7 @@ class RssView(XmlView):
         items = [
             self._get_item(self.index_feed),
             self._get_item(self.about_feed),
+            self._get_item(self.outpatient_feed),
             self._get_item(self.reservation_status_feed),
             self._get_item(self.opendata_feed),
         ]
@@ -292,9 +350,14 @@ class RssView(XmlView):
         for area_feed in area_feed_list:
             items.append(self._get_item(area_feed))
 
-        # 医療機関一覧を追加
-        medical_institution_feed_list = self.get_reservation_status_medical_institution_feed_list()
-        for medical_institution_feed in medical_institution_feed_list:
+        # 新型コロナワクチン接種医療機関一覧を追加
+        reservation_status_medical_institution_feed_list = self.get_reservation_status_medical_institution_feed_list()
+        for medical_institution_feed in reservation_status_medical_institution_feed_list:
+            items.append(self._get_item(medical_institution_feed))
+
+        # 新型コロナ発熱外来一覧を追加
+        outpatient_medical_institution_feed_list = self.get_outpatient_medical_institution_feed_list()
+        for medical_institution_feed in outpatient_medical_institution_feed_list:
             items.append(self._get_item(medical_institution_feed))
 
         return {
@@ -348,6 +411,7 @@ class AtomView(XmlView):
         entries = [
             self._get_item(self.index_feed),
             self._get_item(self.about_feed),
+            self._get_item(self.outpatient_feed),
             self._get_item(self.reservation_status_feed),
             self._get_item(self.opendata_feed),
         ]
@@ -357,9 +421,14 @@ class AtomView(XmlView):
         for area_feed in area_feed_list:
             entries.append(self._get_item(area_feed))
 
-        # 医療機関一覧を追加
-        medical_institution_feed_list = self.get_reservation_status_medical_institution_feed_list()
-        for medical_institution_feed in medical_institution_feed_list:
+        # 新型コロナワクチン接種医療機関覧を追加
+        reservation_status_medical_institution_feed_list = self.get_reservation_status_medical_institution_feed_list()
+        for medical_institution_feed in reservation_status_medical_institution_feed_list:
+            entries.append(self._get_item(medical_institution_feed))
+
+        # 新型コロナ発熱外来一覧を追加
+        outpatient_medical_institution_feed_list = self.get_outpatient_medical_institution_feed_list()
+        for medical_institution_feed in outpatient_medical_institution_feed_list:
             entries.append(self._get_item(medical_institution_feed))
 
         return {
