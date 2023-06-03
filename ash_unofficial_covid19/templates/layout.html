@@ -21,7 +21,7 @@
     <meta property="og:title" content="旭川市新型コロナウイルスまとめサイト">
     <meta property="og:description" content="旭川市の新型コロナウイルス感染症感染者数などの情報を集計してグラフとデータで公開しています。また、旭川市の新型コロナワクチン接種医療機関、新型コロナ発熱外来情報を検索できるページもありますので、ぜひご活用ください。">
     <meta property="og:image" content="{{ url_for('static', filename='images/graph/month_total_for_card.webp') }}">
-    <title>{{ title }} | 旭川市新型コロナウイルスまとめサイト</title>
+    <title>{{ title }} | 旭川市非公式新型コロナウイルスまとめサイト</title>
     <link rel="alternate" type="application/atom+xml" title="旭川市内感染状況の最新動向 | 旭川市新型コロナウイルスまとめサイト" href="/atom.xml">
     <link rel="alternate" type="application/rss+xml" title="旭川市内感染状況の最新動向 | 旭川市新型コロナウイルスまとめサイト" href="/rss.xml">
     <link rel="manifest" href="/site.webmanifest">
@@ -39,10 +39,10 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarToggler">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 small">
-              <li class="nav-item"><a href="/" title="旭川市新型コロナウイルス感染症感染者数の推移へ" class="nav-link">旭川市感染者数の推移</a></li>
+              <li class="nav-item"><a href="/" title="トップページへ" class="nav-link">トップページ</a></li>
               <li class="nav-item"><a href="/about" title="旭川市新型コロナウイルスまとめサイトについてへ" class="nav-link">このサイトについて</a></li>
-              <li class="nav-item"><a href="/outpatients" title="旭川市新型コロナ発熱外来検索アプリへ" class="nav-link">発熱外来検索</a></li>
-              <li class="nav-item"><a href="/reservation_statuses" title="旭川市コロナワクチン接種医療機関検索アプリへ" class="nav-link">ワクチン接種医療機関検索</a></li>
+              <li class="nav-item"><a href="/outpatients" title="旭川市新型コロナ発熱外来検索アプリへ" class="nav-link">発熱外来検索アプリ</a></li>
+              <li class="nav-item"><a href="/reservation_statuses" title="旭川市コロナワクチン接種医療機関検索アプリへ" class="nav-link">ワクチン接種医療機関検索アプリ</a></li>
               <li class="nav-item"><a href="/opendata" title="旭川市新型コロナウイルス感染症非公式オープンデータへ" class="nav-link">非公式オープンデータ</a></li>
             </ul>
           </div>
@@ -60,13 +60,14 @@
           <div class="col-md-3 order-md-1">
             <nav>
               <div class="list-group list-group-flush small">
-                <a href="/" title="旭川市新型コロナウイルス感染症感染者数の推移へ" class="list-group-item list-group-item-action"><i class="fas fa-chart-bar"></i> 旭川市感染者数の推移</a>
+                <a href="/" title="トップページへ" class="list-group-item list-group-item-action">トップページ</a>
                 <a href="/about" title="このサイトについてへ" class="list-group-item list-group-item-action">このサイトについて</a>
-                <a href="/outpatients" title="旭川市新型コロナ発熱外来検索アプリへ" class="list-group-item list-group-item-action">発熱外来検索</a>
-                <a href="/reservation_statuses" title="旭川市コロナワクチン接種医療機関検索アプリへ" class="list-group-item list-group-item-action">ワクチン接種医療機関検索</a>
+                <a href="/outpatients" title="旭川市新型コロナ発熱外来検索アプリへ" class="list-group-item list-group-item-action">発熱外来検索アプリ</a>
+                <a href="/reservation_statuses" title="旭川市コロナワクチン接種医療機関検索アプリへ" class="list-group-item list-group-item-action">ワクチン接種医療機関検索アプリ</a>
                 <a href="/opendata" title="旭川市新型コロナウイルス感染症非公式オープンデータへ" class="list-group-item list-group-item-action">非公式オープンデータ</a>
                 <a href="https://www.city.asahikawa.hokkaido.jp/10013/10014/070236.html" title="新型コロナウイルス感染症関連情報（旭川市公式ホームページ）へ" class="list-group-item list-group-item-action" target="_blank">新型コロナウイルス感染症関連情報（旭川市公式ホームページ） <i class="fas fa-external-link-alt"></i></a>
                 <a href="https://asahikawa-vaccine.jp/" title="旭川市新型コロナワクチン接種特設サイト（旭川市公式ホームページ）へ" class="list-group-item list-group-item-action" target="_blank">旭川市新型コロナワクチン接種特設サイト（旭川市公式ホームページ） <i class="fas fa-external-link-alt"></i></a>
+                <a href="https://www.pref.hokkaido.lg.jp/hf/kst/youkou.html" title="外来対応医療機関（発熱外来）について（北海道公式ホームページ）" class="list-group-item list-group-item-action" target="_blank">外来対応医療機関（発熱外来）について（北海道公式ホームページ） <i class="fas fa-external-link-alt"></i></a>
               </div>
             </nav>
             <div class="d-flex flex-row justify-content-center mt-2">
