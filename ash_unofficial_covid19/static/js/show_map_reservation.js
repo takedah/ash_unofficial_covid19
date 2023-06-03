@@ -10,6 +10,7 @@ document.addEventListener(
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(map);
+    L.control.scale({ position: 'bottomright', imperial: false }).addTo(map);
 
     var locationDataList = {};
     var latitudeSum = 0;

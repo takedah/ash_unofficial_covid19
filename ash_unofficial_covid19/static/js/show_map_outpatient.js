@@ -10,6 +10,7 @@ document.addEventListener(
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(map);
+    L.control.scale({ position: 'bottomright', imperial: false }).addTo(map);
 
     var locationDataList = {};
     var latitudeSum = 0;
@@ -115,9 +116,9 @@ document.addEventListener(
         isPediatricsSign = "";
       }
       var statusMessage =
-        "<div class='pb-2'>" + address + "</div>" +
-        "<div class='pb-2'>" +
-        "<div class='h6'>診療時間</div>" +
+        "<div class='pb-1'>" + address + "</div>" +
+        "<div class='pb-1'>" +
+        "<div>診療時間</div>" +
         "<div>月曜日: " + mon + "</div>" +
         "<div>火曜日: " + tue + "</div>" +
         "<div>水曜日: " + wed + "</div>" +

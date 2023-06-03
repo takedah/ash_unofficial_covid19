@@ -12,10 +12,10 @@ body {
   font-family: 'Noto Sans JP', sans-serif;
 }
 #mapid {
-  height: 320px;
+  height: 360px;
 }
 #pediatrics_mapid {
-  height: 480px;
+  height: 360;
 }
 .patients-table {
   max-height: 420px;
@@ -35,6 +35,7 @@ body {
   background-color: transparent;
   font-size: 32px;
 }
-.leaflet-popup-content {
+.leaflet-popup-content-wrapper {
   font-family: 'Noto Sans JP', sans-serif;
+  max-width: 240px;
 }

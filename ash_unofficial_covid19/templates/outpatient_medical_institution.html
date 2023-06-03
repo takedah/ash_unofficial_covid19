@@ -22,7 +22,7 @@
       {% for search_result in search_results %}
       <section>
         <h1 class="h5 card-title pb-3">{{ title }}</h1>
-        <table class="table table-bordered mb-3" id="results" data-length="{{ search_lengths|tojson }}">
+        <table class="table mb-3" id="results" data-length="{{ search_lengths|tojson }}">
           <tbody>
               <tr id="order{{ loop.index }}" data-latitude="{{ search_result.latitude|tojson }}" data-longitude="{{ search_result.longitude|tojson }}" data-name="{{ search_result.medical_institution_name|safe }}" data-url="{{ search_result.medical_institution_name_url|safe }}" data-address="{{ search_result.address|safe }}" data-istargetnotfamily="{{ search_result.is_target_not_family|safe }}" data-ispediatrics="{{ search_result.is_pediatrics|safe }}" data-mon="{{ search_result.mon|safe }}" data-tue="{{ search_result.tue|safe }}" data-wed="{{ search_result.wed|safe }}" data-thu="{{ search_result.thu|safe }}" data-fri="{{ search_result.fri|safe }}" data-sat="{{ search_result.sat|safe }}" data-sun="{{ search_result.sun|safe }}" data-memo="{{ search_result.memo|safe }}">
               <th>かかりつけ患者以外の診療</th>
@@ -53,14 +53,16 @@
             <tr>
               <th>診療時間</th>
               <td>
-                <table class="table table-striped">
-                  <tr><th>月曜日</th><td>{{ search_result.mon }}</td></tr>
-                  <tr><th>火曜日</th><td>{{ search_result.tue }}</td></tr>
-                  <tr><th>水曜日</th><td>{{ search_result.wed }}</td></tr>
-                  <tr><th>木曜日</th><td>{{ search_result.thu }}</td></tr>
-                  <tr><th>金曜日</th><td>{{ search_result.fri }}</td></tr>
-                  <tr><th>土曜日</th><td>{{ search_result.sat }}</td></tr>
-                  <tr><th>日曜日</th><td>{{ search_result.sun }}</td></tr>
+                <table class="table table-striped p-0 mb-0">
+                  <tbody>
+                    <tr><th>月曜日</th><td>{{ search_result.mon }}</td></tr>
+                    <tr><th>火曜日</th><td>{{ search_result.tue }}</td></tr>
+                    <tr><th>水曜日</th><td>{{ search_result.wed }}</td></tr>
+                    <tr><th>木曜日</th><td>{{ search_result.thu }}</td></tr>
+                    <tr><th>金曜日</th><td>{{ search_result.fri }}</td></tr>
+                    <tr><th>土曜日</th><td>{{ search_result.sat }}</td></tr>
+                    <tr><th>日曜日</th><td>{{ search_result.sun }}</td></tr>
+                  </tbody>
                 </table>
               </td>
             </tr>
@@ -74,7 +76,7 @@
       <section>
         {% if search_result.is_positive_patients %}
           <h3 class="h6 mb-3">陽性者（療養者）の治療に関与する医療機関の情報</h3>
-        <table class="table table-bordered mb-3">
+        <table class="table mb-3">
           <tbody>
             <tr>
               <th>外来対応（対面）</th>
