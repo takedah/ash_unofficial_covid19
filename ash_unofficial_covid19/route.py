@@ -351,6 +351,27 @@ def outpatients():
     )
 
 
+@app.route("/outpatient/pediatrics")
+def outpatient_pediatrics():
+    outpatients = get_outpatients()
+    search_results = outpatients.find(is_pediatrics=True)
+    last_updated = outpatients.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
+
+    search_lengths = len(search_results.items)
+    if search_lengths == 0:
+        abort(404)
+
+    return render_template(
+        "outpatient_pediatrics.html",
+        title="旭川市のコロナ発熱外来一覧（小児対応可の医療機関のみ）",
+        gtag_id=Config.GTAG_ID,
+        last_updated=last_updated,
+        search_results=search_results.items,
+        search_lengths=search_lengths,
+        leaflet=True,
+    )
+
+
 @app.route("/outpatients/search_by_gps", methods=["GET", "POST"])
 def outpatients_search_by_gps():
     outpatients = get_outpatients()
@@ -363,12 +384,20 @@ def outpatients_search_by_gps():
         current_longitude = escape(request.form["current_longitude"])
         current_latitude = float(current_latitude)
         current_longitude = float(current_longitude)
+        is_pediatrics = bool(int(request.form["is_pediatrics"]))
     except (KeyError, ValueError):
         abort(400)
 
     title = "現在地から近い新型コロナ発熱外来の検索結果"
     try:
-        search_results = outpatients.search_by_gps(longitude=current_longitude, latitude=current_latitude)
+        if is_pediatrics:
+            title += "（小児対応可の医療機関のみ）"
+            search_results = outpatients.search_by_gps(
+                longitude=current_longitude, latitude=current_latitude, is_pediatrics=is_pediatrics
+            )
+        else:
+            search_results = outpatients.search_by_gps(longitude=current_longitude, latitude=current_latitude)
+
     except ViewError:
         abort(500)
 
@@ -385,6 +414,7 @@ def outpatients_search_by_gps():
         search_lengths=search_lengths,
         current_longitude=current_longitude,
         current_latitude=current_latitude,
+        is_pediatrics=is_pediatrics,
         leaflet=True,
     )
 

@@ -125,11 +125,11 @@ class OutpatientService(Service):
             raise ServiceError(e.args[0])
 
     def get_medical_institution_list(self) -> list:
-        """新型コロナワクチン接種医療機関一覧を取得
+        """新型コロナ発熱外来一覧を取得
 
         Returns:
             medical_institution_list (list): 医療機関の一覧リスト
-                新型コロナワクチン接種医療機関名をリストで返す。
+                新型コロナ発熱外来名をリストで返す。
 
         """
         state = (

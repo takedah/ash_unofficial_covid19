@@ -59,6 +59,15 @@
         <div id="searchByGps">
           <form action="/outpatients/search_by_gps" method="POST">
             <div>
+              <p class="form-floating">
+              <select id="is_pediatrics" name="is_pediatrics" class="form-select" aria-label="検索方法を選択してください">
+                <option value="0" selected>全ての医療機関を表示</option>
+                <option value="1">小児対応可の医療機関のみ表示</option>
+              </select>
+              <label for="division">検索方法を選択してください</label>
+              </p>
+            </div>
+            <div>
               <p>
                 <input type="hidden" id="currentLatitude" name="current_latitude" value="">
                 <input type="hidden" id="currentLongitude" name="current_longitude" value="">
@@ -67,6 +76,14 @@
             </div>
           </form>
         </div>
+      </section>
+    </div>
+  </div>
+  <div class="card mt-3">
+    <div class="card-body">
+      <section>
+        <h2 class="h5 card-title mb-3">小児対応可の発熱外来を探す</h2>
+        <p class="card-text mb-2"><a href="/outpatient/pediatrics" title="旭川市の新型コロナ発熱外来一覧（小児対応可の医療機関のみ）">発熱外来一覧（小児対応可の医療機関のみ）へ</a></p>
       </section>
     </div>
   </div>

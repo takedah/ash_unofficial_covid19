@@ -56,12 +56,16 @@ class OutpatientView(View):
                 データオブジェクトのリストを要素に持つオブジェクト。
 
         """
-        return self.__service.find(medical_institution_name, is_pediatrics, is_target_not_family)
+        return self.__service.find(
+            medical_institution_name=medical_institution_name,
+            is_pediatrics=is_pediatrics,
+            is_target_not_family=is_target_not_family,
+        )
 
     def get_medical_institution_list(self) -> list:
-        """新型コロナワクチン接種医療機関名とこれをURLパースした文字列一覧を取得
+        """新型コロナ発熱外来名とこれをURLパースした文字列一覧を取得
 
-        新型コロナワクチン接種医療機関名とこれをURLパースした文字列を要素に持つ
+        新型コロナ発熱外来名とこれをURLパースした文字列を要素に持つ
         辞書のリストを返す。
 
         Returns:
@@ -79,13 +83,13 @@ class OutpatientView(View):
             )
         return medical_institution_list
 
-    def search_by_gps(self, longitude: float, latitude: float) -> list:
+    def search_by_gps(self, longitude: float, latitude: float, is_pediatrics: Optional[bool] = None) -> list:
         """指定した緯度経度から直線距離が近い上位5件の発熱外来データを返す
 
         Args:
             longitude (float): 経度
             latitude (float): 緯度
-            division (str): 接種種別
+            is_pediatrics (bool): 小児対応かどうか
 
         Returns:
             near_locations (list of dicts): 現在地から最も近い上位5件の
@@ -99,5 +103,5 @@ class OutpatientView(View):
         except DataModelError as e:
             raise ViewError(e.message)
 
-        outpatients = self.__service.find()
+        outpatients = self.__service.find(is_pediatrics=is_pediatrics)
         return LocationService.get_near_locations(locations=outpatients, current_point=current_point)
