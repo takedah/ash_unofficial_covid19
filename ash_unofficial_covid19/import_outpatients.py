@@ -6,6 +6,7 @@ from .models.location import LocationFactory
 from .models.outpatient import OutpatientFactory
 from .scrapers.location import ScrapeOpendataLocation, ScrapeYOLPLocation
 from .scrapers.outpatient import ScrapeOutpatient
+from .scrapers.outpatient_link import ScrapeOutpatientLink
 from .services.database import ConnectionPool
 from .services.location import LocationService
 from .services.outpatient import OutpatientService
@@ -13,19 +14,20 @@ from .services.outpatient import OutpatientService
 conn = ConnectionPool()
 
 
-def import_outpatients(excel_url: str) -> None:
+def import_outpatients(html_url: str) -> None:
     """
     北海道公式ホームページから新型コロナ発熱外来一覧を取得し、
     データベースへ格納する。
 
     Args:
-        excel_url (str): 発熱外来ExcelファイルのURL
+        html_url (str): 北海道ホームページのURL
 
     """
     factory = OutpatientFactory()
+    source = ScrapeOutpatientLink(html_url)
 
     try:
-        scraped_data = ScrapeOutpatient(excel_url)
+        scraped_data = ScrapeOutpatient(source.lists[0]["url"])
         new_name_list = scraped_data.get_medical_institution_list()
     except HTTPDownloadError as e:
         print(e.message)

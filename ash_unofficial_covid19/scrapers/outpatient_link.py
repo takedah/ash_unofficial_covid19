@@ -2,6 +2,7 @@ import re
 
 from bs4 import BeautifulSoup
 
+from ..config import Config
 from ..scrapers.downloader import DownloadedHTML
 from ..scrapers.scraper import Scraper
 
@@ -55,12 +56,13 @@ class ScrapeOutpatientLink(Scraper):
                 a = div.find("a")
                 if a:
                     href = a.get("href")
-                    if re.match(r"^.*.xlsx$", href):
-                        img = div.find("img")
-                        if img:
-                            alt = img.get("alt")
-                            if alt:
-                                if re.match("^.*旭川.*$", alt):
-                                    source_excel_link["url"] = href
+                    if href:
+                        if re.match(r"^.*.xlsx$", href):
+                            img = div.find("img")
+                            if img:
+                                alt = img.get("alt")
+                                if alt:
+                                    if re.match("^.*旭川.*$", alt):
+                                        source_excel_link["url"] = Config.OUTPATIENTS_BASE_URL + href
 
         return source_excel_link

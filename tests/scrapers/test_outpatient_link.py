@@ -70,7 +70,8 @@ class TestScrapeOutpatientLink:
         scraper = ScrapeOutpatientLink(html_url="http://dummy.local")
         expect = [
             {
-                "url": "/fs/8/6/1/1/7/8/8/_/%E3%80%90%E6%97%AD%E5%B7%9D%E5%B8%82%E3%80%91%E5%A4%96%E6%9D%A5%E5%AF%BE%E5%BF%9C%E5%8C%BB%E7%99%82%E6%A9%9F%E9%96%A2(R5.6.7).xlsx",
+                "url": "https://www.pref.hokkaido.lg.jp/"
+                + "fs/8/6/1/1/7/8/8/_/%E3%80%90%E6%97%AD%E5%B7%9D%E5%B8%82%E3%80%91%E5%A4%96%E6%9D%A5%E5%AF%BE%E5%BF%9C%E5%8C%BB%E7%99%82%E6%A9%9F%E9%96%A2(R5.6.7).xlsx",
             },
         ]
         assert scraper.lists == expect
