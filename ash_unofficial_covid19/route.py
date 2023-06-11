@@ -209,7 +209,7 @@ def reservation_statuses():
 
     return render_template(
         "reservation_statuses.html",
-        title="旭川市のコロナワクチン接種医療機関検索アプリ",
+        title="旭川市のコロナワクチン接種医療機関検索",
         gtag_id=Config.GTAG_ID,
         last_updated=last_updated,
         search_results=search_results.items,
@@ -358,7 +358,7 @@ def outpatients():
 
     return render_template(
         "outpatients.html",
-        title="旭川市のコロナ発熱外来検索アプリ",
+        title="旭川市のコロナ発熱外来検索",
         gtag_id=Config.GTAG_ID,
         last_updated=last_updated,
         search_results=search_results.items,
