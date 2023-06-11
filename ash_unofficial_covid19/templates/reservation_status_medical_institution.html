@@ -1,104 +1,89 @@
 {% extends 'layout.html' %}
 {% block content %}
-<article>
-  <h1 class="h4 py-2">{{ title }}</h1>
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <p class="mb-0">{{ last_updated }}にダウンロードしたデータを元に表示しています。最新の情報は<a class="alert-link"
-        href="https://asahikawa-vaccine.jp/" title="旭川市 新型コロナワクチン接種特設サイト"
-        target="_blank">旭川市 新型コロナワクチン接種特設サイト <i class="fas fa-external-link-alt"></i></a>を確認してください。</p>
+<article id="medicalInstitutionMap">
+  <div class="alert alert-success alert-dismissible fade show m-4" role="alert">
+    <p class="small mb-0">{{ last_updated }}にダウンロードしたデータを元に表示しています。最新の情報は<a class="alert-link" href="https://asahikawa-vaccine.jp/" title="旭川市 新型コロナワクチン接種特設サイト" target="_blank">旭川市 新型コロナワクチン接種特設サイト <i class="fas fa-external-link-alt"></i></a>を確認してください。</p>
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
   </div>
-  <div class="card">
-    <div class="card-body">
+  <div class="card m-4">
+    <div class="card-body p-4">
       {% for search_result in search_results %}
-        {% if loop.index == 1 %}
-          <section>
-            <h2 class="h5 card-title mb-3">予約受付状況</h2>
-            <table class="table table-bordered" id="results" data-length="{{ search_lengths|tojson }}">
-              <tbody>
-                <tr>
-                  <th class="text-nowrap">医療機関名</th><td>{{ medical_institution }}</td>
-                </tr>
-                <tr>
-                  <th class="text-nowrap">所在地</th><td>{{ search_result.address }}</td>
-                </tr>
-                <tr>
-                  <th class="text-nowrap">電話番号</th><td>{{ search_result.phone_number }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </section>
-        {% endif %}
-        <section>
-          <h3 class="h6 card-title mb-3">{{ search_result.division }}</h3>
-          <table class="table table-bordered table-striped">
-            <tbody>
-              <tr id="order{{ loop.index }}" data-latitude="{{ search_result.latitude|tojson }}" data-longitude="{{ search_result.longitude|tojson }}" data-name="{{ search_result.medical_institution_name|safe }}" data-url="{{ search_result.medical_institution_name_url|safe }}" data-division="{{ search_result.division|safe }}" data-vaccine="{{ search_result.vaccine|safe }}" data-istargetnotfamily="{{ search_result.is_target_not_family|safe }}" data-status="{{ search_result.status|safe }}">
-                <th class="text-nowrap">接種種別</th><td>{{ search_result.division }}</td>
-              </tr>
-              <tr>
-                <th class="text-nowrap">使用ワクチン</th><td>{{ search_result.vaccine }}</td>
-              </tr>
-              <tr>
-                <th class="text-nowrap">予約開始時期</th><td>{{ search_result.status }}</td>
-              </tr>
-              <tr>
-                <th class="text-nowrap">接種開始時期</th><td>{{ search_result.inoculation_time }}</td>
-              </tr>
-              <tr>
-                <th class="text-nowrap">かかりつけ以外</th>
-                {% if search_result.is_target_not_family is none %}
-                  <td></td>
-                {% elif search_result.is_target_not_family %}
-                  <td>OK</td>
-                {% else %}
-                  <td>NG</td>
-                {% endif %}
-              </tr>
-              <tr>
-                <th class="text-nowrap">市外の方</th>
-                {% if search_result.is_target_suberb is none %}
-                  <td></td>
-                {% elif search_result.is_target_suberb %}
-                  <td>OK</td>
-                {% else %}
-                  <td>NG</td>
-                {% endif %}
-              </tr>
-              <tr>
-                <th class="text-nowrap">備考</th>
-                <td>{{ search_result.memo }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
-      {% endfor %}
-    </div>
-  </div>
-  <div class="card mt-3">
-    <div class="card-body">
-      <section id="medicalInstitutionMap">
-        <h2 class="h5 card-title mb-3">地図</h2>
-        <p class="card-text">地図の表示は目安となっています。正確な場所の情報は各医療機関のホームページ等でご確認ください。</p>
-        <div id="mapid" class="m-3"></div>
-        <p class="card-text small">医療機関の位置情報は、<a href="https://developer.yahoo.co.jp/webapi/map/"
-            title="Yahoo! Open Local Platform" target="_blank">Yahoo! Open Local Platform (YOLP)
-          </a>のYahoo!ローカルサーチAPIを使用して取得しています。
-          <!-- Begin Yahoo! JAPAN Web Services Attribution Snippet -->
-          <a href="https://developer.yahoo.co.jp/sitemap/">
-            <img src="https://s.yimg.jp/images/yjdn/yjdn_attbtn1_125_17.gif" title="Webサービス by Yahoo! JAPAN"
-              alt="Web Services by Yahoo! JAPAN" width="125" height="17" border="0"></a>
-          <!-- End Yahoo! JAPAN Web Services Attribution Snippet -->
-        </p>
-      </section>
-    </div>
-  </div>
-  <div class="card mt-3">
-    <div class="card-body">
+      {% if loop.index == 1 %}
       <section>
-        <h3 class="h6 card-title mb-3">他の条件で新型コロナワクチン接種医療機関を探す</h3>
-        <p class="display-5 p-3 text-center"><a href="/reservation_statuses" title="旭川市コロナワクチン接種医療機関検索アプリへ" class="link-secondary"><i class="fas fa-syringe fa-lg"></i></a></p>
-        <p class="text-center"><a href="/reservation_statuses" title="旭川市コロナワクチン接種医療機関検索アプリへ" class="btn btn-light">ワクチン接種医療機関検索アプリへ</a></p>
+        <h1 class="h6 card-title mb-4">{{ title }}</h1>
+        <table class="table table-bordered table-sm small my-4" id="results" data-length="{{ search_lengths|tojson }}">
+          <tbody>
+            <tr>
+              <th class="text-nowrap">所在地</th><td>{{ search_result.address }}</td>
+            </tr>
+            <tr>
+              <th class="text-nowrap">電話番号</th><td>{{ search_result.phone_number }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+      {% endif %}
+      <section>
+        <h2 class="h6 card-title mb-4">{{ search_result.division }}</h3>
+        <table class="table table-bordered table-striped table-sm small mb-4">
+          <tbody>
+            <tr id="order{{ loop.index }}" data-latitude="{{ search_result.latitude|tojson }}" data-longitude="{{ search_result.longitude|tojson }}" data-name="{{ search_result.medical_institution_name|safe }}" data-url="{{ search_result.medical_institution_name_url|safe }}" data-division="{{ search_result.division|safe }}" data-vaccine="{{ search_result.vaccine|safe }}" data-istargetnotfamily="{{ search_result.is_target_not_family|safe }}" data-status="{{ search_result.status|safe }}">
+              <th class="text-nowrap">接種種別</th><td>{{ search_result.division }}</td>
+            </tr>
+            <tr>
+              <th class="text-nowrap">使用ワクチン</th><td>{{ search_result.vaccine }}</td>
+            </tr>
+            <tr>
+              <th class="text-nowrap">予約開始時期</th><td>{{ search_result.status }}</td>
+            </tr>
+            <tr>
+              <th class="text-nowrap">接種開始時期</th><td>{{ search_result.inoculation_time }}</td>
+            </tr>
+            <tr>
+              <th class="text-nowrap">かかりつけ以外</th>
+              {% if search_result.is_target_not_family is none %}
+              <td></td>
+              {% elif search_result.is_target_not_family %}
+              <td>OK</td>
+              {% else %}
+              <td>NG</td>
+              {% endif %}
+            </tr>
+            <tr>
+              <th class="text-nowrap">市外の方</th>
+              {% if search_result.is_target_suberb is none %}
+              <td></td>
+              {% elif search_result.is_target_suberb %}
+              <td>OK</td>
+              {% else %}
+              <td>NG</td>
+              {% endif %}
+            </tr>
+            <tr>
+              <th class="text-nowrap">備考</th>
+              <td>{{ search_result.memo }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+      {% endfor %}
+      <div id="mapid" class="mb-4"></div>
+      <p class="card-text small">
+      医療機関の位置情報は、<a href="https://developer.yahoo.co.jp/webapi/map/" title="Yahoo! Open Local Platform" target="_blank">Yahoo! Open Local Platform (YOLP)</a>のYahoo!ローカルサーチAPIを使用して取得しています。（地図の表示は目安となっています。正確な場所の情報は各医療機関のホームページ等でご確認ください。）
+      <!-- Begin Yahoo! JAPAN Web Services Attribution Snippet -->
+      <a href="https://developer.yahoo.co.jp/sitemap/">
+        <img src="https://s.yimg.jp/images/yjdn/yjdn_attbtn1_125_17.gif" title="Webサービス by Yahoo! JAPAN" alt="Web Services by Yahoo! JAPAN" width="125" height="17" border="0">
+      </a>
+      <!-- End Yahoo! JAPAN Web Services Attribution Snippet -->
+      </p>
+    </div>
+  </div>
+  <div class="card m-4">
+    <div class="card-body p-4">
+      <section>
+        <h3 class="h6 card-title mb-4">他の条件で新型コロナワクチン接種医療機関を探す</h3>
+        <p class="display-5 text-center mb-4"><a href="/reservation_statuses" title="旭川市コロナワクチン接種医療機関検索へ" class="link-secondary"><i class="fas fa-syringe fa-lg"></i></a></p>
+        <p class="text-center mb-0"><a href="/reservation_statuses" title="旭川市コロナワクチン接種医療機関検索へ" class="btn btn-light">ワクチン接種医療機関検索へ</a></p>
       </section>
     </div>
   </div>

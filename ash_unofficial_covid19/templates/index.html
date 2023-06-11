@@ -1,100 +1,46 @@
 {% extends 'layout.html' %}
 {% block content %}
-<article>
-  <h1 class="h5 py-2">旭川市非公式新型コロナウイルスまとめサイト</h1>
-  <div class="card-group">
-    <div class="card mb-3">
-      <div class="card-header">
-        <h2 class="card-title h6 mb-0 py-1">旭川市内の発熱外来を探す</h2>
-      </div>
-      <div class="card-body">
-        <p class="card-text">北海道公式ホームページからダウンロードした外来対応医療機関（発熱外来）データを検索できます。</p>
-        <p class="display-5 p-3 text-center"><a href="/outpatients" title="旭川市新型コロナ発熱外来検索アプリへ" class="link-secondary"><i class="fas fa-hospital-user fa-lg"></i></a></p>
-        <p class="text-center"><a href="/outpatients" title="旭川市新型コロナ発熱外来検索アプリへ" class="btn btn-light">発熱外来検索アプリへ</a></p>
-      </div>
-    </div>
-    <div class="card mb-3">
-      <div class="card-header">
-        <h2 class="card-title h6 mb-0 py-1">旭川市内のワクチン接種医療機関を探す</h2>
-      </div>
-      <div class="card-body">
-        <p class="card-text">旭川市新型コロナワクチン接種特設サイトからダウンロードしたワクチン接種医療機関データを検索できます。</p>
-        <p class="display-5 p-3 text-center"><a href="/reservation_statuses" title="旭川市コロナワクチン接種医療機関検索アプリへ" class="link-secondary"><i class="fas fa-syringe fa-lg"></i></a></p>
-        <p class="text-center"><a href="/reservation_statuses" title="旭川市コロナワクチン接種医療機関検索アプリへ" class="btn btn-light">ワクチン接種医療機関検索アプリへ</a></p>
-      </div>
-    </div>
-  </div>
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <p class="mb-0">2023年5月8日（月）発表分をもって新規感染者数の更新を停止します。これまでのデータは<a href="/opendata" class="alert-link" title="旭川市新型コロナウイルス感染症非公式オープンデータへ">非公式オープンデータ</a>からダウンロード可能です。</p>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
-  </div>
-  <div class="card-group mb-2">
-    <div class="card mb-3">
-      <div class="card-header">
-        <h2 class="h6 mb-0 py-1">月別累計感染者数</h2>
-      </div>
-      <div class="card-body">
-        <p><img src="{{ url_for('static', filename='images/graph/month_total.webp') }}" alt="{{ month_total.graph_alt }}" title="累計感染者数（月別）の推移" class="img-fluid" width="960" height="480" decoding="async"></p>
-        <p class="card-text text-end mb-0">{{ month_total.reference_date }} までの累計患者数</p>
-        <p class="card-text text-end mb-0"><strong class="h1">{{ month_total.this_month }}</strong>人</p>
-        <p class="card-text text-end">（先月 {{ month_total.increase_from_last_month }}人）</p>
-      </div>
-      <div class="card-footer text-end bg-white">
-        <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d076150.html" title="旭川市公式ホームページ" target="_blank">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a></p>
-      </div>
-    </div>
-    <div class="card mb-3">
-      <div class="card-header">
-        <h2 class="h6 mb-0 py-1">日別新規感染者数</h2>
-      </div>
-      <div class="card-body">
-        <p><img src="{{ url_for('static', filename='images/graph/daily_total.webp') }}" alt="{{ daily_total.graph_alt }}" title="新規感染者数（日別）の推移" class="img-fluid" width="960" height="480" decoding="async"></p>
-        <p class="card-text text-end mb-0">{{ daily_total.reference_date }}発表の新規感染者数</p>
-        <p class="card-text text-end mb-0"><strong class="h1">{{ daily_total.most_recent }}</strong>人</p>
-        <p class="card-text text-end">（先週の同じ曜日と比べて {{ daily_total.increase_from_seven_days_before }}人）</p>
-      </div>
-      <div class="card-footer text-end bg-white">
-        <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d076150.html" title="旭川市公式ホームページ" target="_blank">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a></p>
-      </div>
-    </div>
-  </div>
-  <div class="card mb-3">
+<h1 class="h5 text-center m-4 p-4">旭川市非公式新型コロナウイルスまとめサイト</h1>
+<div class="card-group m-4">
+  <div class="card mb-4">
     <div class="card-header">
-      <h2 class="h6 mb-0 py-1">1週間の人口10万人あたり新規感染者数</h2>
+      <h2 class="card-title h6 mb-0 py-1">旭川市内の発熱外来を探す</h2>
     </div>
     <div class="card-body">
-      <p><img src="{{ url_for('static', filename='images/graph/per_hundred_thousand_population.webp') }}" alt="{{ per_hundred_thousand_population.graph_alt }}" title="1日あたり新規患者数の7日間移動平均の推移" class="img-fluid" width="960" height="480" decoding="async"></p>
-      <p class="card-text text-end mb-0">1週間の人口10万人あたり新規感染者数</p>
-      <p class="card-text text-end mb-0"><strong class="h1">{{ per_hundred_thousand_population.this_week }}</strong>人</p>
-      <p class="card-text text-end">（先週 {{ per_hundred_thousand_population.increase_from_last_week }}人）</p>
-    </div>
-    <div class="card-footer text-end bg-white">
-      <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d076150.html" title="旭川市公式ホームページ" target="_blank">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a> <a href="https://ckan.pf-sapporo.jp/dataset/covid_19_patients" title="DATA-SMART CITY SAPPORO" target="_blank">DATA-SMART CITY SAPPORO <i class="fas fa-external-link-alt"></i></a> <a href="" title="東京都オープンデータカタログサイト" target="_blank">東京都オープンデータカタログサイト <i class="fas fa-external-link-alt"></i></a></p>
+      <p class="card-text">北海道公式ホームページからダウンロードした外来対応医療機関（発熱外来）データを検索できます。</p>
+      <p class="display-5 p-3 text-center"><a href="/outpatients" title="旭川市新型コロナ発熱外来検索へ" class="link-secondary"><i class="fas fa-hospital-user fa-lg"></i></a></p>
+      <p class="text-center"><a href="/outpatients" title="旭川市新型コロナ発熱外来検索へ" class="btn btn-light">発熱外来検索へ</a></p>
     </div>
   </div>
-  <div class="card-group mb-2">
-    <div class="card mb-3">
-      <div class="card-header">
-        <h2 class="h6 mb-0 py-1">全期間の年代別感染者数の割合</h2>
-      </div>
-      <div class="card-body">
-        <p><img src="{{ url_for('static', filename='images/graph/by_age.webp') }}" alt="{{ by_age.graph_alt }}" title="年代別感染者数の割合" class="img-fluid" width="960" height="480" decoding="async"></p>
-      </div>
-      <div class="card-footer text-end bg-white">
-        <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d076150.html" title="旭川市公式ホームページ" target="_blank">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a></p>
-      </div>
+  <div class="card mb-4">
+    <div class="card-header">
+      <h2 class="card-title h6 mb-0 py-1">旭川市内のワクチン接種医療機関を探す</h2>
     </div>
-    <div class="card mb-3">
-      <div class="card-header">
-        <h2 class="h6 mb-0 py-1">月ごとの年代別感染者数の割合の推移</h2>
-      </div>
-      <div class="card-body">
-        <p><img src="{{ url_for('static', filename='images/graph/monthly_per_age.webp')  }}" alt="{{ monthly_per_age.graph_alt  }}" title="1月ごとの年代別新規感染者数の推移" class="img-fluid" width="960" height="480" decoding="async"></p>
-      </div>
-      <div class="card-footer text-end bg-white">
-        <p class="card-text small">出典: <a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d076150.html" title="旭川市公式ホームページ" target="_blank">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a></p>
-      </div>
+    <div class="card-body">
+      <p class="card-text">旭川市新型コロナワクチン接種特設サイトからダウンロードしたワクチン接種医療機関データを検索できます。</p>
+      <p class="display-5 p-3 text-center"><a href="/reservation_statuses" title="旭川市コロナワクチン接種医療機関検索へ" class="link-secondary"><i class="fas fa-syringe fa-lg"></i></a></p>
+      <p class="text-center"><a href="/reservation_statuses" title="旭川市コロナワクチン接種医療機関検索へ" class="btn btn-light">ワクチン接種医療機関検索へ</a></p>
     </div>
   </div>
-</article>
+  <div class="card mb-4">
+    <div class="card-header">
+      <h2 class="card-title h6 mb-0 py-1">非公式オープンデータを見る</h2>
+    </div>
+    <div class="card-body">
+      <p class="card-text">2023年5月8日発表分までの旭川市内の新型コロナウイルス感染症の新規感染者数データをダウンロードできます。</p>
+      <p class="display-5 p-3 text-center"><a href="/opendata" title="非公式オープンデータへ" class="link-secondary"><i class="fas fa-database fa-lg"></i></a></p>
+      <p class="text-center"><a href="/outpatients" title="非公式オープンデータへ" class="btn btn-light">非公式オープンデータへ</a></p>
+    </div>
+  </div>
+  <div class="card mb-4">
+    <div class="card-header">
+      <h2 class="card-title h6 mb-0 py-1">これまでの感染動向をグラフで見る</h2>
+    </div>
+    <div class="card-body">
+      <p class="card-text">これまでの旭川市内の新型コロナウイルス感染症の感染動向をグラフで一覧できます。</p>
+      <p class="display-5 p-3 text-center"><a href="/past" title="旭川市内新型コロナウイルス感染症のこれまでの感染動向へ" class="link-secondary"><i class="far fa-chart-bar fa-lg"></i></a></p>
+      <p class="text-center"><a href="/past" title="旭川市内新型コロナウイルス感染症のこれまでの感染動向へ" class="btn btn-light">これまでの感染動向へ</a></p>
+    </div>
+  </div>
+</div>
 {% endblock %}

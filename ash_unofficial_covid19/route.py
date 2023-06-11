@@ -158,6 +158,22 @@ def index():
     )
 
 
+@app.route("/past")
+def past():
+    return render_template(
+        "past.html",
+        title="旭川市内新型コロナウイルス感染症のこれまでの感染動向",
+        gtag_id=Config.GTAG_ID,
+        patients_numbers=get_patients_numbers(),
+        daily_total=get_daily_total(),
+        monthly_per_age=get_monthly_per_age(),
+        per_hundred_thousand_population=get_per_hundred_thousand_population(),
+        month_total=get_month_total(),
+        by_age=get_by_age(),
+        leaflet=False,
+    )
+
+
 @app.route("/about")
 def about():
     return render_template(

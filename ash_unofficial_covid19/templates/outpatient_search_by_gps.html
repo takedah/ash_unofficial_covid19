@@ -1,16 +1,15 @@
 {% extends 'layout.html' %}
 {% block content %}
-<article>
-  <h1 class="h4 py-2">{{ title }}</h1>
-  <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
-    <p class="mb-0">北海道公式ホームページからダウンロードした外来対応医療機関（発熱外来）データを検索できるようにしたシステムです。正確な情報や受診方法等は、必ず<a class="alert-link" href="https://www.pref.hokkaido.lg.jp/hf/kst/youkou.html" title="北海道公式ホームページ" target="_blank">北海道公式ホームページ <i class="fas fa-external-link-alt"></i></a>、<a class="alert-link" href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d075831.html" title="旭川市公式ホームページ" target="_blank">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a>を確認してください。（{{ last_updated }}更新）</p>
+<article id="gpsMap">
+  <h1 class="h5 m-4">{{ title }}</h1>
+  <div class="alert alert-success alert-dismissible fade show m-4" role="alert">
+    <p class="small mb-0">北海道公式ホームページからダウンロードした外来対応医療機関（発熱外来）データを検索できるようにしたシステムです。正確な情報や受診方法等は、必ず<a class="alert-link" href="https://www.pref.hokkaido.lg.jp/hf/kst/youkou.html" title="北海道公式ホームページ" target="_blank">北海道公式ホームページ <i class="fas fa-external-link-alt"></i></a>、<a class="alert-link" href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d075831.html" title="旭川市公式ホームページ" target="_blank">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a>を確認してください。（{{ last_updated }}更新）</p>
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
   </div>
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+  <div class="alert alert-danger alert-dismissible fade show m-4" role="alert">
     <figure class="mb-0">
       <blockquote cite="https://www.pref.hokkaido.lg.jp/fs/8/5/4/0/3/3/1/_/%E3%80%90%E6%97%AD%E5%B7%9D%E5%B8%82%E3%80%91%E8%A8%BA%E7%99%82%E3%83%BB%E6%A4%9C%E6%9F%BB%E5%8C%BB%E7%99%82%E6%A9%9F%E9%96%A2(R5.5.24).xlsx" class="blockquote">
-        <p class="mb-0 h6">院内感染を防止するため、必ず、事前に電話またはWeb上で予約してください。</p>
-        <p class="mb-0 h6">本表にかかりつけ医療機関が掲載されていない（又はかかりつけ医がいない）場合は、「かかりつけ患者の診療に限る」としている医療機関への連絡はご遠慮いただき、相談窓口へ連絡してください。</p>
+        <p class="mb-0 h6">院内感染を防止するため、必ず、事前に電話またはWeb上で予約してください。本表にかかりつけ医療機関が掲載されていない（又はかかりつけ医がいない）場合は、「かかりつけ患者の診療に限る」としている医療機関への連絡はご遠慮いただき、相談窓口へ連絡してください。</p>
       </blockquote>
       <figcaption class="blockquote-footer mb-0">
         <cite title="北海道公式ホームページ">北海道公式ホームページより</cite>
@@ -18,48 +17,37 @@
     </figure>
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
   </div>
-  <div class="card mt-3">
-    <div class="card-body">
-      <section id="gpsMap">
-        {% if is_pediatrics %}
-        <h2 class="h5 card-title mb-3">現在地から近い新型コロナ発熱外来（小児対応可の医療機関のみ）の地図</h2>
-        {% else %}
-        <h2 class="h5 card-title mb-3">現在地から近い新型コロナ発熱外来の地図</h2>
-        {% endif %}
-        <p class="card-text">地図は目安となっています。正確な場所の情報は各医療機関のホームページ等でご確認ください。</p>
-        <table class="table table-bordered table-sm small caption-top">
-          <caption>地図の凡例</caption>
-          <tbody>
-            <tr>
-              <td class="map_primary_icon align-middle text-center"><i class='fas fa-map-marker-alt'></i></td>
-              <th class="align-middle">かかりつけ患者以外の診療可</th>
-            </tr>
-            <tr>
-              <td class="map_warning_icon align-middle text-center"><i class='fas fa-map-marker-alt'></i></td>
-              <th class="align-middle">かかりつけ患者の診療に限る</th>
-            </tr>
-          </tbody>
-        </table>
-        <div id="mapid" class="m-3"></div>
-        <p class="card-text small">医療機関の位置情報は、<a href="https://developer.yahoo.co.jp/webapi/map/" title="Yahoo! Open Local Platform" target="_blank">Yahoo! Open Local Platform (YOLP)</a>のYahoo!ローカルサーチAPI及び<a href="https://www.harp.lg.jp/opendata/dataset/1243.html" title="北海道オープンデータポータル">北海道オープンデータポータルの道内医療機関一覧（位置情報付き）</a>を使用して取得しています。
-          <!-- Begin Yahoo! JAPAN Web Services Attribution Snippet -->
-          <a href="https://developer.yahoo.co.jp/sitemap/"><img src="https://s.yimg.jp/images/yjdn/yjdn_attbtn1_125_17.gif" title="Webサービス by Yahoo! JAPAN" alt="Web Services by Yahoo! JAPAN" width="125" height="17" border="0"></a>
-          <!-- End Yahoo! JAPAN Web Services Attribution Snippet -->
-        </p>
-      </section>
-    </div>
+  <div class="m-4">
+    <table class="table table-bordered table-sm small caption-top">
+      <tbody>
+        <tr>
+          <td class="map_primary_icon align-middle text-center"><i class='fas fa-map-marker-alt'></i></td>
+          <td class="align-middle">かかりつけ患者以外の診療可</td>
+        </tr>
+        <tr>
+          <td class="map_warning_icon align-middle text-center"><i class='fas fa-map-marker-alt'></i></td>
+          <td class="align-middle">かかりつけ患者の診療に限る</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
-  <div class="card mt-3">
-    <div class="card-body">
+  <div id="mapid"></div>
+  <p class="small m-4">医療機関の位置情報は、<a href="https://developer.yahoo.co.jp/webapi/map/" title="Yahoo! Open Local Platform" target="_blank">Yahoo! Open Local Platform (YOLP)</a>のYahoo!ローカルサーチAPI及び<a href="https://www.harp.lg.jp/opendata/dataset/1243.html" title="北海道オープンデータポータル">北海道オープンデータポータルの道内医療機関一覧（位置情報付き）</a>を使用して取得しています。（地図は目安となっています。正確な場所の情報は各医療機関のホームページ等でご確認ください。）
+  <!-- Begin Yahoo! JAPAN Web Services Attribution Snippet -->
+  <a href="https://developer.yahoo.co.jp/sitemap/"><img src="https://s.yimg.jp/images/yjdn/yjdn_attbtn1_125_17.gif" title="Webサービス by Yahoo! JAPAN" alt="Web Services by Yahoo! JAPAN" width="125" height="17" border="0"></a>
+  <!-- End Yahoo! JAPAN Web Services Attribution Snippet -->
+  </p>
+  <div class="card m-4">
+    <div class="card-body p-4">
       <section>
         {% if is_pediatrics %}
-        <h2 class="h5 card-title mb-3">現在地から近い新型コロナ発熱外来（小児対応可の医療機関のみ）の一覧</h2>
+        <h2 class="h6 card-title mb-4">現在地から近い新型コロナ発熱外来（小児対応可の医療機関のみ）の一覧</h2>
         {% else %}
-        <h2 class="h5 card-title mb-3">現在地から近い新型コロナ発熱外来の一覧</h2>
+        <h2 class="h6 card-title mb-4">現在地から近い新型コロナ発熱外来の一覧</h2>
         {% endif %}
         <p class="card-text d-block d-sm-none"><i class="far fa-hand-point-right"></i> 横にスクロールできます。</p>
-        <div class="table-responsive">
-          <table class="table table-bordered">
+        <div class="table-responsive mb-4">
+          <table class="table table-striped table-bordered table-sm small">
             <thead>
               <tr>
                 <th class="text-nowrap">近い順</th>
@@ -78,18 +66,18 @@
                   <a href="/outpatient/medical_institution/{{ search_result["location"].medical_institution_name_url }}" title="{{ search_result["location"].medical_institution_name }}">{{ search_result["location"].medical_institution_name }}</a>
                 </td>
                 {% if search_result["location"].is_target_not_family is none %}
-                  <td></td>
+                <td></td>
                 {% elif search_result["location"].is_target_not_family %}
-                  <td class="text-nowrap">OK</td>
+                <td class="text-nowrap">OK</td>
                 {% else %}
-                  <td class="text-nowrap">NG</td>
+                <td class="text-nowrap">NG</td>
                 {% endif %}
                 {% if search_result["location"].is_pediatrics is none %}
-                  <td></td>
+                <td></td>
                 {% elif search_result["location"].is_pediatrics %}
-                  <td class="text-nowrap">OK</td>
+                <td class="text-nowrap">OK</td>
                 {% else %}
-                  <td class="text-nowrap">NG</td>
+                <td class="text-nowrap">NG</td>
                 {% endif %}
                 <td class="text-nowrap">
                   {{ search_result["location"].address }}<br>
@@ -102,16 +90,16 @@
             </tbody>
           </table>
         </div>
-        <p class="card-text mt-3">距離は現在地からの直線距離で算出しているため、実際の道路状況によっては結果が異なりますのでご注意ください。</p>
+        <p class="card-text small mb-0">距離は現在地からの直線距離で算出しているため、実際の道路状況によっては結果が異なりますのでご注意ください。</p>
       </section>
     </div>
   </div>
-  <div class="card mt-3">
-    <div class="card-body">
+  <div class="card m-4">
+    <div class="card-body p-4">
       <section>
-        <h3 class="h5 card-title mb-3">他の条件で新型コロナ発熱外来を探す</h3>
-        <p class="display-5 p-3 text-center"><a href="/outpatients" title="旭川市新型コロナ発熱外来検索アプリへ" class="link-secondary"><i class="fas fa-hospital-user fa-lg"></i></a></p>
-        <p class="text-center"><a href="/outpatients" title="旭川市新型コロナ発熱外来検索アプリへ" class="btn btn-light">発熱外来検索アプリへ</a></p>
+        <h3 class="h6 card-title mb-4">他の条件で新型コロナ発熱外来を探す</h3>
+        <p class="display-5 text-center mb-4"><a href="/outpatients" title="旭川市新型コロナ発熱外来検索へ" class="link-secondary"><i class="fas fa-hospital-user fa-lg"></i></a></p>
+        <p class="text-center mb-0"><a href="/outpatients" title="旭川市新型コロナ発熱外来検索へ" class="btn btn-light">発熱外来検索へ</a></p>
       </section>
     </div>
   </div>

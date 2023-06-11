@@ -1,17 +1,17 @@
 {% extends 'layout.html' %}
 {% block content %}
 <article>
-  <h1 class="h4 py-2">旭川市新型コロナウイルス感染症非公式オープンデータ</h1>
-  <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+  <h1 class="h5 text-center m-4">旭川市新型コロナウイルス感染症非公式オープンデータ</h1>
+  <div class="alert alert-success alert-dismissible fade show m-4" role="alert">
     <p class="mb-0">2023年5月8日（月）発表分をもって新規感染者数の更新を停止しました。今後も新型コロナワクチン接種医療機関予約受付状況は引き続き更新しますのでよろしければご活用ください。</p>
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
   </div>
-  <div class="card-group mt-3">
-    <div class="card">
+  <div class="card-group m-4">
+    <div class="card mb-4">
       <div class="card-header">
         <h2 class="h6 card-title mb-0">日別陽性患者数CSV</h2>
       </div>
-      <div class="card-body">
+      <div class="card-body p-4">
         <p class="card-text">日ごとの新規感染者数です。（2023年5月8日発表分まで）</p>
         <h3 class="h6 card-title">データレイアウト</h3>
         <table class="table table-bordered table-striped table-sm">
@@ -35,29 +35,29 @@
         <p class="card-text mt-3"><a href="/012041_asahikawa_covid19_daily_total.csv" title="旭川市新型コロナ日別陽性患者数CSVをダウンロード" class="btn btn-primary">日別陽性患者数CSVをダウンロード</a></p>
       </div>
     </div>
-    <div class="card">
+    <div class="card mb-4">
       <div class="card-header">
         <h2 class="h6 card-title mb-0">日別陽性患者数JSON</h2>
       </div>
-      <div class="card-body">
+      <div class="card-body p-4">
         <p class="card-text">日ごとの新規感染者数のJSONです。（2023年5月8日発表分まで）</p>
         <h3 class="h6 card-title">データレイアウト</h3>
-        <pre class="border text-light bg-dark pre-scrollable p-3"><code>{
+        <pre class="border text-light bg-dark pre-scrollable p-4 mb-4"><code>{
   "公表日 (YYYY-mm-dd)": 陽性患者数
 }</code></pre>
-        <p class="card-text mt-3"><a href="/api/daily_total.json" title="旭川市新型コロナ日別陽性患者数JSONをダウンロード" class="btn btn-primary">日別陽性患者数JSONをダウンロード</a></p>
+        <p class="card-text"><a href="/api/daily_total.json" title="旭川市新型コロナ日別陽性患者数JSONをダウンロード" class="btn btn-primary">日別陽性患者数JSONをダウンロード</a></p>
       </div>
     </div>
   </div>
-  <div class="card-group mt-3">
-    <div class="card">
+  <div class="card-group m-4">
+    <div class="card mb-4">
       <div class="card-header">
         <h2 class="h6 card-title mb-0">日別年代別陽性患者数CSV</h2>
       </div>
-      <div class="card-body">
+      <div class="card-body p-4">
         <p class="card-text">日ごとの年代別新規感染者数です。（2023年5月8日発表分まで）</p>
         <h3 class="h6 card-title">データレイアウト</h3>
-        <table class="table table-bordered table-striped table-sm">
+        <table class="table table-bordered table-striped table-sm mb-4">
           <thead>
             <tr>
               <th>Header</th>
@@ -115,17 +115,17 @@
             </tr>
           </tbody>
         </table>
-        <p class="card-text mt-3"><a href="/012041_asahikawa_covid19_daily_total_per_age.csv" title="旭川市新型コロナ日別年代別陽性患者数CSVをダウンロード" class="btn btn-primary">日別年代別陽性患者数CSVをダウンロード</a></p>
+        <p class="card-text"><a href="/012041_asahikawa_covid19_daily_total_per_age.csv" title="旭川市新型コロナ日別年代別陽性患者数CSVをダウンロード" class="btn btn-primary">日別年代別陽性患者数CSVをダウンロード</a></p>
       </div>
     </div>
-    <div class="card">
+    <div class="card mb-4">
       <div class="card-header">
         <h2 class="h6 card-title mb-0">日別年代別陽性患者数JSON</h2>
       </div>
-      <div class="card-body">
+      <div class="card-body p-4">
         <p class="card-text">日ごとの年代別新規感染者数のJSONです。（2023年5月8日発表分まで）</p>
         <h3 class="h6 card-title">データレイアウト</h3>
-        <pre class="border text-light bg-dark pre-scrollable p-3"><code>{
+        <pre class="border text-light bg-dark pre-scrollable p-4 m-4"><code>{
   "公表日 (YYYY-mm-dd)": {
     "age_under_10": 10歳未満の陽性患者数,
     "age_10s": 10代の陽性患者数,
@@ -140,15 +140,15 @@
     "investigating": 調査中等の陽性患者数
   }
 }</code></pre>
-        <p class="card-text mt-3"><a href="/api/daily_total_per_age.json" title="旭川市新型コロナ日別年代別陽性患者数JSONをダウンロード" class="btn btn-primary">日別年代別陽性患者数JSONをダウンロード</a></p>
+        <p class="card-text"><a href="/api/daily_total_per_age.json" title="旭川市新型コロナ日別年代別陽性患者数JSONをダウンロード" class="btn btn-primary">日別年代別陽性患者数JSONをダウンロード</a></p>
       </div>
     </div>
   </div>
-  <div class="card mt-3">
-    <div class="card-body">
-      <h3 class="h5 card-title">陽性患者属性CSV</h3>
+  <div class="card m-4">
+    <div class="card-body p-4">
+      <h3 class="h6 card-title mb-4">陽性患者属性CSV</h3>
       <p class="card-text">2022年1月27日発表分をもって旭川市が感染者ごとの情報の公表をやめたため、同日をもって陽性患者属性CSVの更新を停止しました。</p>
-      <table class="table table-bordered table-striped table-sm">
+      <table class="table table-bordered table-striped table-sm mb-4">
         <thead>
           <tr>
             <th>Header</th>
@@ -221,10 +221,10 @@
       <p class="card-text mt-3"><a href="/012041_asahikawa_covid19_patients.csv" title="旭川市新型コロナ陽性患者属性CSVをダウンロード" class="btn btn-primary">陽性患者属性CSVをダウンロード</a></p>
     </div>
   </div>
-  <div class="card mt-3">
-    <div class="card-body">
-      <h2 class="h5 card-title">陽性患者属性CSVの留意点</h2>
-      <p>次の理由から、道内番号7354, 9147, 9182, 11058, <strong>30809</strong>のデータを重複事例として削除しています。</p>
+  <div class="card m-4">
+    <div class="card-body p-4">
+      <h2 class="h6 card-title mb-4">陽性患者属性CSVの留意点</h2>
+      <p class="card-text">次の理由から、道内番号7354, 9147, 9182, 11058, <strong>30809</strong>のデータを重複事例として削除しています。</p>
       <ul>
         <li><a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d072504_d/fil/shusei0126.pdf" title="本市報道発表資料の修正について">2021年1月26日の旭川市報道発表資料の訂正</a>により、道内番号7354, 9147, 11058が重複により削除されている。</li>
         <li><a href="" title="令和 2 年 12 月 2 日発表「新型コロナウイルスに関連した患者の発生」について">2021年1月31日の旭川市報道発表資料の訂正</a>により、市内番号527（道内番号9182）が重複により削除されている。</li>
@@ -234,24 +234,24 @@
         <li>2021年5月20日の北海道報道発表資料から、旭川市で重複が起きたのは2021年5月18日発表分で間違いない。この日の旭川市の事例の道内番号は30799から30819であることから、重複事例の番号も道内番号30799から30819の範囲内で間違いなく、怪しいのは道内番号<strong>30809</strong>である。</li>
         <li>以上のことから、北海道のオープンデータが道内番号30809が重複事例であるものを、道内番号30909を重複事例としてしまっている可能性が極めて高いというかほぼ間違いないため、道内番号30809を削除する。</li>
       </ul>
-      <p>また、2021年9月22日発表の内容に<a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d073824_d/fil/09232.pdf" title="訂正文">訂正があった</a>ため、市内番号3401（道内番号59820）も削除しています。</p>
-      <p>逆に、<a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d072337_d/fil/1212-2.pdf" title="令和２年１２月１１日発表「新型コロナウイルスに関連した患者の発生」について">2020年12月12日の旭川市報道発表の訂正</a>から、道内番号10919から10930までの間に1例削除すべきデータがあることが分かっていますが、どの番号が削除対象なのか、報道発表から分からないため、陽性患者属性CSVからは削除はしていません。</p>
+      <p class="card-text">また、2021年9月22日発表の内容に<a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d073824_d/fil/09232.pdf" title="訂正文">訂正があった</a>ため、市内番号3401（道内番号59820）も削除しています。</p>
+      <p class="card-text">逆に、<a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d072337_d/fil/1212-2.pdf" title="令和２年１２月１１日発表「新型コロナウイルスに関連した患者の発生」について">2020年12月12日の旭川市報道発表の訂正</a>から、道内番号10919から10930までの間に1例削除すべきデータがあることが分かっていますが、どの番号が削除対象なのか、報道発表から分からないため、陽性患者属性CSVからは削除はしていません。</p>
     </div>
   </div>
-  <div class="card mt-3">
-    <div class="card-body">
-      <h2 class="h5 card-title">日別陽性患者数CSV・日別年代別陽性患者数CSVの留意点</h2>
-      <ul>
+  <div class="card m-4">
+    <div class="card-body p-4">
+      <h2 class="h6 card-title mb-4">日別陽性患者数CSV・日別年代別陽性患者数CSVの留意点</h2>
+      <ul class="mb-0">
         <li>2020年12月11日発表分の感染者数の<a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d072337_d/fil/1212-2.pdf" title="令和２年１２月１１日発表「新型コロナウイルスに関連した患者の発生」について">訂正があった</a>ため、同日の感染者数を訂正。（訂正の発表内容からどの年代の感染者数に訂正があったか不明なため、最も人数の多い40歳代の人数を1名減としました。）</li>
         <li>2022年3月26日発表分の感染者数の<a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d074860_d/fil/0327-2.pdf" title="報道発表資料の訂正について">訂正があった</a>ため、同日の感染者数を訂正。（訂正の発表内容からどの年代の感染者数に訂正があったか不明なため、最も人数の多い10歳未満の人数を1名減としました。）</li>
         <li>2022年2月20日発表分の感染者数の<a href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d074697_d/fil/0220-2.pdf" title="患者数の訂正について（2月21日）">訂正があった</a>ため、同日の感染者数を訂正。（訂正の発表内容からどの年代の感染者数に訂正があったか不明なため、調査中の人数を1名減としました。）</li>
       </ul>
     </div>
   </div>
-  <div class="card mt-3">
-    <div class="card-body">
+  <div class="card m-4">
+    <div class="card-body p-4">
       <section>
-        <h2 class="h5 card-title">データのライセンス</h2>
+        <h2 class="h6 card-title mb-4">データのライセンス</h2>
         <p class="card-text"><a rel="license" href="http://creativecommons.org/licenses/by/4.0/" target="_blank"><img alt="クリエイティブ・コモンズ・ライセンス" border=0 src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />この サイトのデータ は <a rel="license" href="http://creativecommons.org/licenses/by/4.0/" target="_blank">クリエイティブ・コモンズ 表示 4.0 国際 ライセンス</a>の下に提供されています。</p>
       </section>
     </div>
