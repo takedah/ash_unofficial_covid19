@@ -6,6 +6,9 @@
     <p class="small mb-0">{{ last_updated }}にダウンロードしたデータを元に表示しています。最新の情報は<a class="alert-link" href="https://asahikawa-vaccine.jp/" title="旭川市 新型コロナワクチン接種特設サイト" target="_blank">旭川市 新型コロナワクチン接種特設サイト <i class="fas fa-external-link-alt"></i></a>を確認してください。</p>
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
   </div>
+  <div class="m-4">
+    <p class="mb-4">旭川市{{ area }}地区のワクチン接種医療機関の一覧を表示しています。</p>
+  </div>
   <div id="mapid"></div>
   <p class="small m-4">
   医療機関の位置情報は、<a href="https://developer.yahoo.co.jp/webapi/map/" title="Yahoo! Open Local Platform" target="_blank">Yahoo! Open Local Platform (YOLP)</a>のYahoo!ローカルサーチAPIを使用して取得しています。（地図の表示は目安となっています。正確な場所の情報は各医療機関のホームページ等でご確認ください。）
@@ -15,65 +18,62 @@
   </a>
   <!-- End Yahoo! JAPAN Web Services Attribution Snippet -->
   </p>
-  <div class="card m-4">
-    <div class="card-body p-4">
-      <section>
-        <h2 class="h6 card-title mb-4">{{ area }}地区の医療機関の一覧</h2>
-        <p class="card-text d-block d-sm-none"><i class="far fa-hand-point-right"></i> 横にスクロールできます。</p>
-        <div class="table-responsive">
-          <table class="table table-bordered table-sm small mb-0">
-            <thead>
-              <tr>
-                <th class="text-nowrap">
-                  医療機関名<br>
-                  接種種別<br>
-                  使用ワクチン<br>
-                  住所<br>
-                  電話番号<br>
-                </th>
-                <th class="text-nowrap">予約開始時期</th>
-                <th class="text-nowrap">接種開始時期</th>
-                <th class="text-nowrap">かかりつけ以外</th>
-                <th class="text-nowrap">市外の方</th>
-                <th class="text-nowrap">備考</th>
-              </tr>
-            </thead>
-            <tbody id="results" data-length="{{ search_lengths|tojson }}">
-              {% for search_result in search_results %}
-              <tr id="order{{ loop.index }}" data-latitude="{{ search_result.latitude|tojson }}" data-longitude="{{ search_result.longitude|tojson }}" data-name="{{ search_result.medical_institution_name|safe }}" data-url="{{ search_result.medical_institution_name_url|safe }}" data-division="{{ search_result.division|safe }}" data-vaccine="{{ search_result.vaccine|safe }}" data-istargetnotfamily="{{ search_result.is_target_not_family|safe }}" data-status="{{ search_result.status|safe }}">
-                <td class="text-nowrap">
-                  <strong><a href="../medical_institution/{{ search_result.medical_institution_name_url }}" title="{{ search_result.medical_institution_name }}">{{ search_result.medical_institution_name }}</a></strong><br>
-                  <strong class="text-dark">{{ search_result.division }}</strong><br>
-                  {{ search_result.vaccine }}<br>
-                  {{ search_result.address }}<br>
-                  {{ search_result.phone_number }}<br>
-                </td>
-                <td class="text-nowrap">{{ search_result.status }}</td>
-                <td class="text-nowrap">{{ search_result.inoculation_time }}</td>
-                {% if search_result.is_target_not_family is none %}
-                <td></td>
-                {% elif search_result.is_target_not_family %}
-                <td class="text-nowrap">OK</td>
-                {% else %}
-                <td class="text-nowrap">NG</td>
-                {% endif %}
-                {% if search_result.is_target_suberb is none %}
-                <td></td>
-                {% elif search_result.is_target_suberb %}
-                <td class="text-nowrap">OK</td>
-                {% else %}
-                <td class="text-nowrap">NG</td>
-                {% endif %}
-                <td class="text-nowrap">
-                  <p>{{ search_result.memo }}</p>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    </div>
+  <div class="m-4">
+    <section>
+      <p class="d-block d-sm-none"><i class="far fa-hand-point-right"></i> 横にスクロールできます。</p>
+      <div class="table-responsive">
+        <table class="table table-bordered table-sm small mb-0">
+          <thead>
+            <tr>
+              <th class="text-nowrap">
+                医療機関名<br>
+                接種種別<br>
+                使用ワクチン<br>
+                住所<br>
+                電話番号<br>
+              </th>
+              <th class="text-nowrap">予約開始時期</th>
+              <th class="text-nowrap">接種開始時期</th>
+              <th class="text-nowrap">かかりつけ以外</th>
+              <th class="text-nowrap">市外の方</th>
+              <th class="text-nowrap">備考</th>
+            </tr>
+          </thead>
+          <tbody id="results" data-length="{{ search_lengths|tojson }}">
+            {% for search_result in search_results %}
+            <tr id="order{{ loop.index }}" data-latitude="{{ search_result.latitude|tojson }}" data-longitude="{{ search_result.longitude|tojson }}" data-name="{{ search_result.medical_institution_name|safe }}" data-url="{{ search_result.medical_institution_name_url|safe }}" data-division="{{ search_result.division|safe }}" data-vaccine="{{ search_result.vaccine|safe }}" data-istargetnotfamily="{{ search_result.is_target_not_family|safe }}" data-status="{{ search_result.status|safe }}">
+              <td class="text-nowrap">
+                <strong><a href="../medical_institution/{{ search_result.medical_institution_name_url }}" title="{{ search_result.medical_institution_name }}">{{ search_result.medical_institution_name }}</a></strong><br>
+                <strong class="text-dark">{{ search_result.division }}</strong><br>
+                {{ search_result.vaccine }}<br>
+                {{ search_result.address }}<br>
+                {{ search_result.phone_number }}<br>
+              </td>
+              <td class="text-nowrap">{{ search_result.status }}</td>
+              <td class="text-nowrap">{{ search_result.inoculation_time }}</td>
+              {% if search_result.is_target_not_family is none %}
+              <td></td>
+              {% elif search_result.is_target_not_family %}
+              <td class="text-nowrap">OK</td>
+              {% else %}
+              <td class="text-nowrap">NG</td>
+              {% endif %}
+              {% if search_result.is_target_suberb is none %}
+              <td></td>
+              {% elif search_result.is_target_suberb %}
+              <td class="text-nowrap">OK</td>
+              {% else %}
+              <td class="text-nowrap">NG</td>
+              {% endif %}
+              <td class="text-nowrap">
+                <p>{{ search_result.memo }}</p>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
   </div>
   <div class="card m-4">
     <div class="card-body p-4">
