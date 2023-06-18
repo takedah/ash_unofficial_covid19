@@ -1,0 +1,24 @@
+<head>
+  {% if gtag_id is not none %}
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{ gtag_id }}"></script>
+  <script async src="/gtag.js"></script>
+  {% endif %}
+  <script defer src="https://kit.fontawesome.com/af6896cda7.js" crossorigin="anonymous"></script>
+  <script defer src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }} | 旭川市非公式新型コロナウイルスまとめサイト</title>
+  <link rel="alternate" type="application/atom+xml" title="旭川市非公式新型コロナウイルスまとめサイト" href="/atom.xml">
+  <link rel="alternate" type="application/rss+xml" title="旭川市非公式新型コロナウイルスまとめサイト" href="/rss.xml">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/apple-touch-icon.png') }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon-32x32.png') }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon-16x16.png') }}">
+  {% if leaflet %}
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="anonymous">
+  <!-- Make sure you put this AFTER Leaflet's CSS -->
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin="anonymous"></script>
+  {% endif %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/add.css') }}">
+</head>

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ja">
+{% filter indent %}
+{% include 'head.html' %}
+{% endfilter %}
+  <body>
+{% filter indent %}
+{% include 'header.html' %}
+{% endfilter %}
+    <main>
+      <div class="alert alert-success alert-dismissible fade show m-4" role="alert">
+        <p class="small mb-0">北海道公式ホームページからダウンロードした外来対応医療機関（発熱外来）データを検索できるようにしたシステムです。正確な情報や受診方法等は、<a class="alert-link" href="https://www.pref.hokkaido.lg.jp/hf/kst/youkou.html" title="北海道公式ホームページ" target="_blank">北海道公式ホームページ <i class="fas fa-external-link-alt"></i></a>、<a class="alert-link" href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d075831.html" title="旭川市公式ホームページ" target="_blank">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a>を確認してください。（{{ last_updated }}更新）</p>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
+      </div>
+      <div class="alert alert-danger alert-dismissible fade show m-4" role="alert">
+        <blockquote cite="https://www.pref.hokkaido.lg.jp/fs/8/5/4/0/3/3/1/_/%E3%80%90%E6%97%AD%E5%B7%9D%E5%B8%82%E3%80%91%E8%A8%BA%E7%99%82%E3%83%BB%E6%A4%9C%E6%9F%BB%E5%8C%BB%E7%99%82%E6%A9%9F%E9%96%A2(R5.5.24).xlsx" class="mb-0">
+        <p class="small mb-0">院内感染を防止するため、必ず、事前に電話またはWeb上で予約してください。本表にかかりつけ医療機関が掲載されていない（又はかかりつけ医がいない）場合は、「かかりつけ患者の診療に限る」としている医療機関への連絡はご遠慮いただき、相談窓口へ連絡してください。</p>
+        </blockquote>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
+      </div>
+{% filter indent(6, True) %}
+{% block content %}<!-- contents -->{% endblock %}
+{% endfilter %}
+      <div class="card m-4">
+        <div class="card-body p-4">
+          <p class="display-6 text-center p-2"><a href="/outpatients" title="旭川市新型コロナ発熱外来検索へ" class="link-primary"><i class="fas fa-hospital-user fa-lg"></i></a></p>
+          <p class="small text-center mb-0"><a href="/outpatients" title="旭川市新型コロナ発熱外来検索へ" class="btn btn-primary">旭川市の発熱外来検索へ</a></p>
+        </div>
+      </div>
+    </main>
+{% filter indent %}
+{% include 'footer.html' %}
+{% endfilter %}
+    <script charset="utf-8" src="{{ url_for('static', filename='js/show_map_outpatient.js') }}"></script>
+  </body>
+</html>

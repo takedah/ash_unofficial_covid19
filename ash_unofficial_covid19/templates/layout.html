@@ -1,90 +1,19 @@
 <!doctype html>
 <html lang="ja">
-  <head>
-    {% if gtag_id is not none %}
-    <script async src="https://www.googletagmanager.com/gtag/js?id={{ gtag_id }}"></script>
-    <script async src="/gtag.js"></script>
-    {% endif %}
-    <script defer src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
-    <script defer src="https://kit.fontawesome.com/af6896cda7.js" crossorigin="anonymous"></script>
-    {% if leaflet %}
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="anonymous">
-    <!-- Make sure you put this AFTER Leaflet's CSS -->
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin="anonymous"></script>
-    {% endif %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/add.css') }}">
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ title }} | 旭川市非公式新型コロナウイルスまとめサイト</title>
-    <link rel="alternate" type="application/atom+xml" title="旭川市非公式新型コロナウイルスまとめサイト" href="/atom.xml">
-    <link rel="alternate" type="application/rss+xml" title="旭川市非公式新型コロナウイルスまとめサイト" href="/rss.xml">
-    <link rel="manifest" href="/site.webmanifest">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/apple-touch-icon.png') }}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon-32x32.png') }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon-16x16.png') }}">
-  </head>
+{% filter indent %}
+{% include 'head.html' %}
+{% endfilter %}
   <body>
-    <header>
-      <nav class="navbar fixed-top navbar-light bg-light">
-        <div class="container-fluid">
-          <a class="navbar-brand" href="/"><img src="{{ url_for('static', filename='images/title.webp') }}" alt="STOP COVID-19 ASAHIKAWA 非公式新型コロナウイルスまとめサイト" title="STOP COVID-19 ASAHIKAWA 非公式新型コロナウイルスまとめサイト" width="214" height="48"></a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarToggler">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0 small">
-              <li class="nav-item"><a href="/" title="トップページへ" class="nav-link">トップページ</a></li>
-              <li class="nav-item"><a href="/about" title="旭川市新型コロナウイルスまとめサイトについてへ" class="nav-link">このサイトについて</a></li>
-              <li class="nav-item"><a href="/outpatients" title="旭川市新型コロナ発熱外来検索へ" class="nav-link">発熱外来検索</a></li>
-              <li class="nav-item"><a href="/reservation_statuses" title="旭川市コロナワクチン接種医療機関検索へ" class="nav-link">ワクチン接種医療機関検索</a></li>
-              <li class="nav-item"><a href="/opendata" title="旭川市新型コロナウイルス感染症非公式オープンデータへ" class="nav-link">非公式オープンデータ</a></li>
-              <li class="nav-item"><a href="/past" title="旭川市内新型コロナウイルス感染症のこれまでの感染動向へ" class="nav-link">これまでの感染動向</a></li>
-            </ul>
-          </div>
-        </div>
-      </nav>
-    </header>
+{% filter indent %}
+{% include 'header.html' %}
+{% endfilter %}
     <main>
-      {% block content %}
-      <!-- contents -->
-      {% endblock %}
+{% filter indent(6, True) %}
+{% block content %}<!-- contents -->{% endblock %}
+{% endfilter %}
     </main>
-    <footer>
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-md-6 p-0">
-            <nav class="m-4">
-              <div class="h6">Contents</div>
-              <div class="list-group list-group-flush small">
-                <a href="/" title="トップページへ" class="list-group-item list-group-item-action">トップページ</a>
-                <a href="/about" title="このサイトについてへ" class="list-group-item list-group-item-action">このサイトについて</a>
-                <a href="/outpatients" title="旭川市新型コロナ発熱外来検索へ" class="list-group-item list-group-item-action">発熱外来検索</a>
-                <a href="/reservation_statuses" title="旭川市コロナワクチン接種医療機関検索へ" class="list-group-item list-group-item-action">ワクチン接種医療機関検索</a>
-                <a href="/opendata" title="旭川市新型コロナウイルス感染症非公式オープンデータへ" class="list-group-item list-group-item-action">非公式オープンデータ</a>
-                <a href="/past" title="旭川市内新型コロナウイルス感染症のこれまでの感染動向へ" class="list-group-item list-group-item-action">これまでの感染動向</a>
-              </div>
-            </nav>
-          </div>
-          <div class="col-md-6 p-0">
-            <nav class="m-4">
-              <div class="h6">Links</div>
-              <div class="list-group list-group-flush small">
-                <a href="https://www.city.asahikawa.hokkaido.jp/10013/10014/070236.html" title="新型コロナウイルス感染症関連情報（旭川市公式ホームページ）へ" class="list-group-item list-group-item-action" target="_blank">新型コロナウイルス感染症関連情報（旭川市公式ホームページ） <i class="fas fa-external-link-alt"></i></a>
-                <a href="https://asahikawa-vaccine.jp/" title="旭川市新型コロナワクチン接種特設サイト（旭川市公式ホームページ）へ" class="list-group-item list-group-item-action" target="_blank">旭川市新型コロナワクチン接種特設サイト（旭川市公式ホームページ） <i class="fas fa-external-link-alt"></i></a>
-                <a href="https://www.pref.hokkaido.lg.jp/hf/kst/youkou.html" title="外来対応医療機関（発熱外来）について（北海道公式ホームページ）" class="list-group-item list-group-item-action" target="_blank">外来対応医療機関（発熱外来）について（北海道公式ホームページ） <i class="fas fa-external-link-alt"></i></a>
-              </div>
-            </nav>
-          </div>
-        </div>
-        <div class="row">
-          <div class="d-flex flex-row justify-content-center p-4">
-            <div class="p-1"><a href="https://github.com/takedah/ash_unofficial_covid19" target="_blank" rel="nofollow" title="このサイトのGithubページへ"><img src="{{ url_for('static', filename='images/GitHub-Mark-32px.png') }}" alt="このサイトのGithubページへ" title="このサイトのGithubページへ" width="32" height="32"></a></div>
-            <div class="p-1"><a href="https://twitter.com/share?url=https://covid19.asahikawa-opendata.morori.jp/" target="_blank" rel="nofollow" title="このサイトをTwitterでシェア"><img src="{{ url_for('static', filename='images/Twittersocialicons-circle-blue.png') }}" alt="このサイトをTwitterでシェア" title="このサイトをTwitterでシェア" width="32" height="32"></a></div>
-            <div class="p-1"><a href="http://www.facebook.com/share.php?u=https://covid19.asahikawa-opendata.morori.jp/" target="_blank" rel="nofollow" title="このサイトをFacebookでシェア"><img src="{{ url_for('static', filename='images/f_logo_RGB-Blue_58.png') }}" alt="このサイトをFacebookでシェア" title="このサイトをFacebookでシェア" width="32" height="32"></a></div>
-          </div>
-        </div>
-      </div>
-    </footer>
+{% filter indent %}
+{% include 'footer.html' %}
+{% endfilter %}
   </body>
 </html>

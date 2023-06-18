@@ -1,21 +1,6 @@
-{% extends 'layout.html' %}
+{% extends 'layout_outpatient.html' %}
 {% block content %}
 <article id="medicalInstitutionMap">
-  <div class="alert alert-success alert-dismissible fade show m-4" role="alert">
-    <p class="small mb-0">北海道公式ホームページからダウンロードした外来対応医療機関（発熱外来）データを検索できるようにしたシステムです。正確な情報や受診方法等は、必ず<a class="alert-link" href="https://www.pref.hokkaido.lg.jp/hf/kst/youkou.html" title="北海道公式ホームページ" target="_blank">北海道公式ホームページ <i class="fas fa-external-link-alt"></i></a>、<a class="alert-link" href="https://www.city.asahikawa.hokkaido.jp/kurashi/135/136/150/d075831.html" title="旭川市公式ホームページ" target="_blank">旭川市公式ホームページ <i class="fas fa-external-link-alt"></i></a>を確認してください。（{{ last_updated }}更新）</p>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
-  </div>
-  <div class="alert alert-danger alert-dismissible fade show m-4" role="alert">
-    <figure class="mb-0">
-      <blockquote cite="https://www.pref.hokkaido.lg.jp/fs/8/5/4/0/3/3/1/_/%E3%80%90%E6%97%AD%E5%B7%9D%E5%B8%82%E3%80%91%E8%A8%BA%E7%99%82%E3%83%BB%E6%A4%9C%E6%9F%BB%E5%8C%BB%E7%99%82%E6%A9%9F%E9%96%A2(R5.5.24).xlsx" class="blockquote">
-        <p class="mb-0 h6">院内感染を防止するため、必ず、事前に電話またはWeb上で予約してください。本表にかかりつけ医療機関が掲載されていない（又はかかりつけ医がいない）場合は、「かかりつけ患者の診療に限る」としている医療機関への連絡はご遠慮いただき、相談窓口へ連絡してください。</p>
-      </blockquote>
-      <figcaption class="blockquote-footer mb-0">
-        <cite title="北海道公式ホームページ">北海道公式ホームページより</cite>
-      </figcaption>
-    </figure>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
-  </div>
   <div class="m-4">
     {% for search_result in search_results %}
     <section>
@@ -73,7 +58,7 @@
     </section>
     <section>
       {% if search_result.is_positive_patients %}
-      <h2 class="h6 mb-4">陽性者（療養者）の治療に関与する医療機関の情報</h2>
+      <h2 class="h6 mb-4">陽性者（療養者）の治療の情報</h2>
       <table class="table table-sm small mb-4">
         <tbody>
           <tr>
@@ -112,7 +97,7 @@
     </section>
     {% endfor %}
     <div id="mapid" class="mb-4"></div>
-    <p class="small">医療機関の位置情報は、<a href="https://developer.yahoo.co.jp/webapi/map/" title="Yahoo! Open Local Platform" target="_blank">Yahoo! Open Local Platform (YOLP)</a>のYahoo!ローカルサーチAPI及び<a href="https://www.harp.lg.jp/opendata/dataset/1243.html" title="北海道オープンデータポータル" target="_blank">北海道オープンデータポータルの道内医療機関一覧（位置情報付き）</a>を使用して取得しています。（地図の表示は目安となっています。正確な場所の情報は各医療機関のホームページ等でご確認ください。）
+    <p class="small">医療機関の位置情報は、<a href="https://developer.yahoo.co.jp/webapi/map/" title="Yahoo! Open Local Platform" target="_blank">Yahoo! Open Local Platform (YOLP)</a>のYahoo!ローカルサーチAPI及び<a href="https://www.harp.lg.jp/opendata/dataset/1243.html" title="北海道オープンデータポータル" target="_blank">北海道オープンデータポータルの道内医療機関一覧（位置情報付き）</a>を使用して取得しています。（正確な場所の情報は各医療機関のホームページ等でご確認ください。）
     <!-- Begin Yahoo! JAPAN Web Services Attribution Snippet -->
     <a href="https://developer.yahoo.co.jp/sitemap/">
       <img src="https://s.yimg.jp/images/yjdn/yjdn_attbtn1_125_17.gif" title="Webサービス by Yahoo! JAPAN" alt="Web Services by Yahoo! JAPAN" width="125" height="17" border="0">
@@ -120,15 +105,5 @@
     <!-- End Yahoo! JAPAN Web Services Attribution Snippet -->
     </p>
   </div>
-  <div class="card m-4">
-    <div class="card-body p-4">
-      <section>
-        <h3 class="h6 card-title mb-4">他の条件で新型コロナ発熱外来を探す</h3>
-        <p class="display-5 text-center mb-4"><a href="/outpatients" title="旭川市新型コロナ発熱外来検索へ" class="link-primary"><i class="fas fa-hospital-user fa-lg"></i></a></p>
-        <p class="text-center mb-0"><a href="/outpatients" title="旭川市新型コロナ発熱外来検索へ" class="btn btn-primary">発熱外来検索へ</a></p>
-      </section>
-    </div>
-  </div>
 </article>
-<script charset="utf-8" src="{{ url_for('static', filename='js/show_map_outpatient.js') }}"></script>
 {% endblock %}

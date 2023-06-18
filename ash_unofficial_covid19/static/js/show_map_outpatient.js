@@ -127,7 +127,7 @@ document.addEventListener(
         "<div>土曜日: " + sat + "</div>" +
         "<div>" + memo + "</div>" +
         "</div>" +
-        "<div class='py-2'>" +
+        "<div class='mt-2 py-2'>" +
         isTargetNotFamilySign +
         " " +
         isPediatricsSign +

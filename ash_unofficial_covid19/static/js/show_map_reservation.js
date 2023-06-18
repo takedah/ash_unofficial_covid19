@@ -63,14 +63,13 @@ document.addEventListener(
         "'>" +
         locationName +
         "</a>";
+      var isTargetNotFamilySign = ""
       if (/True/.test(isTargetNotFamily)) {
-        isTargetNotFamily =
-          "<div class='mb-1 py-2'><span class='text-white bg-success p-2 rounded'>かかりつけ以外OK</span></div>";
+        isTargetNotFamilySign =
+          "<div class='my-2 py-2'><span class='text-white bg-success p-2 rounded'>かかりつけ以外OK</span></div>";
       } else if (/False/.test(isTargetNotFamily)) {
-        isTargetNotFamily =
-          "<div class='mb-1 py-2'><span class='text-white bg-secondary p-2 rounded'>かかりつけ以外NG</span></div>";
-      } else {
-        isTargetNotFamily = "";
+        isTargetNotFamilySign =
+          "<div class='my-2 py-2'><span class='text-white bg-secondary p-2 rounded'>かかりつけ以外NG</span></div>";
       }
       var statusMessage = "";
       if (locationDataList[locationName] === undefined) {
@@ -81,7 +80,7 @@ document.addEventListener(
               "予約開始時期: " +
               status +
               "</div>" +
-              isTargetNotFamily;
+              isTargetNotFamilySign;
           } else {
             statusMessage =
               "<div class='mb-1'>" +
@@ -91,7 +90,7 @@ document.addEventListener(
               "予約開始時期: " +
               status +
               "</div>" +
-              isTargetNotFamily;
+              isTargetNotFamilySign;
           }
         } else {
           if (vaccine === "") {
@@ -103,7 +102,7 @@ document.addEventListener(
               "予約開始時期: " +
               status +
               "</div>" +
-              isTargetNotFamily;
+              isTargetNotFamilySign;
           } else {
             statusMessage =
               "<div class='mb-1 h6'>" +
@@ -116,7 +115,7 @@ document.addEventListener(
               "予約開始時期: " +
               status +
               "</div>" +
-              isTargetNotFamily;
+              isTargetNotFamilySign;
           }
         }
       } else {
@@ -128,7 +127,7 @@ document.addEventListener(
               "予約開始時期: " +
               status +
               "</div>" +
-              isTargetNotFamily;
+              isTargetNotFamilySign;
           } else {
             statusMessage =
               locationDataList[locationName]["statusMessage"] +
@@ -139,7 +138,7 @@ document.addEventListener(
               "予約開始時期: " +
               status +
               "</div>" +
-              isTargetNotFamily;
+              isTargetNotFamilySign;
           }
         } else {
           if (vaccine === "") {
@@ -152,7 +151,7 @@ document.addEventListener(
               "予約開始時期: " +
               status +
               "</div>" +
-              isTargetNotFamily;
+              isTargetNotFamilySign;
           } else {
             statusMessage =
               locationDataList[locationName]["statusMessage"] +
@@ -166,7 +165,7 @@ document.addEventListener(
               "予約開始時期: " +
               status +
               "</div>" +
-              isTargetNotFamily;
+              isTargetNotFamilySign;
           }
         }
       }
@@ -242,7 +241,10 @@ document.addEventListener(
 
     for (var prop in locationDataList) {
       var locationData = locationDataList[prop];
-      var mapIcon = mapPrimaryIcon;
+      var mapIcon = mapWarningIcon;
+      if (/True/.test(locationData["isTargetNotFamily"])) {
+        mapIcon = mapPrimaryIcon;
+      }
       var popupText = "";
       if (document.getElementById("medicalInstitutionMap")) {
         popupText =
