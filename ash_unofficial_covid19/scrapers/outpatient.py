@@ -56,7 +56,7 @@ class ScrapeOutpatient(Scraper):
             sheet_name="Sheet1",
             header=None,
             index_col=None,
-            skiprows=[0, 1, 2, 3],
+            skiprows=[0, 1, 2],
             dtype=str,
         )
         df.replace(np.nan, "", inplace=True)
