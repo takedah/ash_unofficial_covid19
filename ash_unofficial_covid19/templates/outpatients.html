@@ -55,7 +55,7 @@
   <div class="m-4">
     <section>
       <h2 class="h6 mb-4">一覧から探す</h2>
-      <p class="d-block d-sm-none"><i class="far fa-hand-point-right"></i> 横にスクロールできます。</p>
+      <p class="d-block d-sm-none"><img src="{{ url_for('static', filename='images/arrow_right_line.svg') }}" alt="右を差すアイコン" width="16" height="16"> 横にスクロールできます。</p>
       <div class="table-responsive">
         <table class="table table-striped table-bordered table-sm small mb-0">
           <thead>
@@ -92,11 +92,13 @@
       </div>
     </section>
   </div>
-  <div class="m-4">
-    <section>
-      <h2 class="h6 mb-4">小児対応可の医療機関のみの中から探す</h2>
-        <p><a href="/outpatient/pediatrics" title="旭川市の新型コロナ発熱外来一覧（小児対応可の医療機関のみ）">発熱外来一覧（小児対応可の医療機関のみ）へ</a></p>
-    </section>
+  <div class="card m-4">
+    <div class="text-center card-body p-4">
+      <section>
+        <h2 class="h6 mb-4">小児対応可の医療機関のみの中から探す</h2>
+        <p class="mb-0"><a href="/outpatient/pediatrics" title="旭川市の新型コロナ発熱外来一覧（小児対応可の医療機関のみ）">発熱外来一覧（小児対応可の医療機関のみ）へ</a></p>
+      </section>
+    </div>
   </div>
 </article>
 {% endblock %}

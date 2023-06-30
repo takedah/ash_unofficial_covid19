@@ -42,3 +42,10 @@ body {
 .leaflet-container a {
   color: #0017C1;
 }
+a.external-link::after {
+  content: url('/static/images/new_window_line.svg');
+  vertical-align: middle;
+  display: inline-block;
+  padding-left: 1px;
+  transform: scale(0.8);
+}
