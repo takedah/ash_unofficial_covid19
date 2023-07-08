@@ -231,14 +231,14 @@ class TestRssView:
                     "guid": "tag:covid19.asahikawa-opendata.morori.jp,2022-03-20:/outpatients",
                     "link": "https://covid19.asahikawa-opendata.morori.jp/outpatients",
                     "pub_date": "Sun, 20 Mar 2022 00:00:00 GMT",
-                    "title": "旭川市の新型コロナ発熱外来検索アプリ",
+                    "title": "旭川市の新型コロナ発熱外来検索",
                 },
                 {
                     "description": "旭川市の新型コロナワクチン接種医療機関の予約受付状況などの情報を、地図から探すことができます。",
                     "guid": "tag:covid19.asahikawa-opendata.morori.jp,2022-03-20:/reservation_statuses",
                     "link": "https://covid19.asahikawa-opendata.morori.jp/reservation_statuses",
                     "pub_date": "Sun, 20 Mar 2022 00:00:00 GMT",
-                    "title": "旭川市の新型コロナワクチン接種医療機関検索アプリ",
+                    "title": "旭川市の新型コロナワクチン接種医療機関検索",
                 },
                 {
                     "description": "旭川市が公式ホームページで公表している新型コロナウイルスに関する情報を、CSVやJSONといった機械判読しやすい形に変換したものを公開しています。",
@@ -393,14 +393,14 @@ class TestAtomView:
                     "id": "tag:covid19.asahikawa-opendata.morori.jp,2022-03-20:/outpatients",
                     "link": "https://covid19.asahikawa-opendata.morori.jp/outpatients",
                     "updated": "2022-03-20T00:00:00Z",
-                    "title": "旭川市の新型コロナ発熱外来検索アプリ",
+                    "title": "旭川市の新型コロナ発熱外来検索",
                 },
                 {
                     "summary": "旭川市の新型コロナワクチン接種医療機関の予約受付状況などの情報を、地図から探すことができます。",
                     "id": "tag:covid19.asahikawa-opendata.morori.jp,2022-03-20:/reservation_statuses",
                     "link": "https://covid19.asahikawa-opendata.morori.jp/reservation_statuses",
                     "updated": "2022-03-20T00:00:00Z",
-                    "title": "旭川市の新型コロナワクチン接種医療機関検索アプリ",
+                    "title": "旭川市の新型コロナワクチン接種医療機関検索",
                 },
                 {
                     "summary": "旭川市が公式ホームページで公表している新型コロナウイルスに関する情報を、CSVやJSONといった機械判読しやすい形に変換したものを公開しています。",

@@ -379,7 +379,7 @@ def outpatient_pediatrics():
 
     return render_template(
         "outpatient_pediatrics.html",
-        title="旭川市のコロナ発熱外来一覧（小児対応可の医療機関のみ）",
+        title="旭川市のコロナ発熱外来一覧（小児対応可の医療機関）",
         gtag_id=Config.GTAG_ID,
         last_updated=last_updated,
         search_results=search_results.items,
@@ -407,7 +407,7 @@ def outpatients_search_by_gps():
     title = "現在地から近い新型コロナ発熱外来の検索結果"
     try:
         if is_pediatrics:
-            title += "（小児対応可の医療機関のみ）"
+            title += "（小児対応可の医療機関）"
             search_results = outpatients.search_by_gps(
                 longitude=current_longitude, latitude=current_latitude, is_pediatrics=is_pediatrics
             )

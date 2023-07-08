@@ -162,13 +162,13 @@ class XmlView(View):
         }
 
     def _get_reservation_status_feed(self) -> dict:
-        """新型コロナワクチン接種医療機関検索アプリのFeed用データを返す
+        """新型コロナワクチン接種医療機関検索のFeed用データを返す
 
         Returns:
-            feed_data (dict): 新型コロナワクチン接種医療機関検索アプリのFeed用データ
+            feed_data (dict): 新型コロナワクチン接種医療機関検索のFeed用データ
 
         """
-        title = "旭川市の新型コロナワクチン接種医療機関検索アプリ"
+        title = "旭川市の新型コロナワクチン接種医療機関検索"
         link = "https://" + self.my_domain + "/reservation_statuses"
         description = "旭川市の新型コロナワクチン接種医療機関の予約受付状況などの情報を、地図から探すことができます。"
         view = ReservationStatusView(self.__pool)
@@ -184,13 +184,13 @@ class XmlView(View):
         }
 
     def _get_outpatient_feed(self) -> dict:
-        """新型コロナ発熱外来検索アプリのFeed用データを返す
+        """新型コロナ発熱外来検索のFeed用データを返す
 
         Returns:
-            feed_data (dict): 新型コロナ発熱外来検索アプリのFeed用データ
+            feed_data (dict): 新型コロナ発熱外来検索のFeed用データ
 
         """
-        title = "旭川市の新型コロナ発熱外来検索アプリ"
+        title = "旭川市の新型コロナ発熱外来検索"
         link = "https://" + self.my_domain + "/outpatients"
         description = "旭川市の新型コロナ発熱外来の情報を、地図から探すことができます。"
         view = OutpatientView(self.__pool)
@@ -230,10 +230,10 @@ class XmlView(View):
         pass
 
     def get_reservation_status_area_feed_list(self) -> list:
-        """新型コロナワクチン接種医療機関検索アプリの地区一覧Feed用データを返す
+        """新型コロナワクチン接種医療機関検索の地区一覧Feed用データを返す
 
         Returns:
-            feed_data_list (list): 新型コロナワクチン接種医療機関検索アプリの地区一覧Feed用データのリスト
+            feed_data_list (list): 新型コロナワクチン接種医療機関検索の地区一覧Feed用データのリスト
 
         """
         view = ReservationStatusView(self.__pool)
@@ -259,10 +259,10 @@ class XmlView(View):
         return feed_data_list
 
     def get_reservation_status_medical_institution_feed_list(self) -> list:
-        """新型コロナワクチン接種医療機関検索アプリの医療機関一覧Feed用データを返す
+        """新型コロナワクチン接種医療機関検索の医療機関一覧Feed用データを返す
 
         Returns:
-            feed_data_list (list): 新型コロナワクチン接種医療機関検索アプリの医療機関一覧Feed用データのリスト
+            feed_data_list (list): 新型コロナワクチン接種医療機関検索の医療機関一覧Feed用データのリスト
 
         """
         view = ReservationStatusView(self.__pool)
@@ -290,10 +290,10 @@ class XmlView(View):
         return feed_data_list
 
     def get_outpatient_medical_institution_feed_list(self) -> list:
-        """新型コロナ発熱外来検索アプリの医療機関一覧Feed用データを返す
+        """新型コロナ発熱外来検索の医療機関一覧Feed用データを返す
 
         Returns:
-            feed_data_list (list): 新型コロナ発熱外来検索アプリの医療機関一覧Feed用データのリスト
+            feed_data_list (list): 新型コロナ発熱外来検索の医療機関一覧Feed用データのリスト
 
         """
         view = OutpatientView(self.__pool)
