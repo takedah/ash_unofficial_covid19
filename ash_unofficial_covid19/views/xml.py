@@ -4,7 +4,6 @@ from ..config import Config
 from ..services.database import ConnectionPool
 from ..views.outpatient import OutpatientView
 from ..views.patients_number import DailyTotalView, PerHundredThousandPopulationView
-from ..views.reservation_status import ReservationStatusView
 from ..views.view import View
 
 
@@ -30,7 +29,6 @@ class XmlView(View):
         )
         self.__index_feed = self._get_index_feed()
         self.__about_feed = self._get_about_feed()
-        self.__reservation_status_feed = self._get_reservation_status_feed()
         self.__outpatient_feed = self._get_outpatient_feed()
         self.__opendata_feed = self._get_opendata_feed()
 
@@ -61,10 +59,6 @@ class XmlView(View):
     @property
     def about_feed(self):
         return self.__about_feed
-
-    @property
-    def reservation_status_feed(self):
-        return self.__reservation_status_feed
 
     @property
     def outpatient_feed(self):
@@ -161,28 +155,6 @@ class XmlView(View):
             "guid": guid,
         }
 
-    def _get_reservation_status_feed(self) -> dict:
-        """新型コロナワクチン接種医療機関検索のFeed用データを返す
-
-        Returns:
-            feed_data (dict): 新型コロナワクチン接種医療機関検索のFeed用データ
-
-        """
-        title = "旭川市の新型コロナワクチン接種医療機関検索"
-        link = "https://" + self.my_domain + "/reservation_statuses"
-        description = "旭川市の新型コロナワクチン接種医療機関の予約受付状況などの情報を、地図から探すことができます。"
-        view = ReservationStatusView(self.__pool)
-        pub_date = view.get_last_updated()
-        pub_date = pub_date.astimezone(timezone.utc)
-        guid = "tag:" + self.my_domain + "," + pub_date.strftime("%Y-%m-%d") + ":/reservation_statuses"
-        return {
-            "title": title,
-            "link": link,
-            "description": description,
-            "pub_date": pub_date,
-            "guid": guid,
-        }
-
     def _get_outpatient_feed(self) -> dict:
         """新型コロナ発熱外来検索のFeed用データを返す
 
@@ -228,66 +200,6 @@ class XmlView(View):
 
     def get_feed(self):
         pass
-
-    def get_reservation_status_area_feed_list(self) -> list:
-        """新型コロナワクチン接種医療機関検索の地区一覧Feed用データを返す
-
-        Returns:
-            feed_data_list (list): 新型コロナワクチン接種医療機関検索の地区一覧Feed用データのリスト
-
-        """
-        view = ReservationStatusView(self.__pool)
-        area_list = view.get_area_list()
-        feed_data_list = list()
-        for area in area_list:
-            title = area["name"] + "の新型コロナワクチン接種医療機関の検索結果"
-            link = "https://" + self.my_domain + "/reservation_status/area/" + area["url"]
-            description = title + "です。"
-            pub_date = view.get_last_updated()
-            pub_date = pub_date.astimezone(timezone.utc)
-            guid = link
-            feed_data_list.append(
-                {
-                    "title": title,
-                    "link": link,
-                    "description": description,
-                    "pub_date": pub_date,
-                    "guid": guid,
-                }
-            )
-
-        return feed_data_list
-
-    def get_reservation_status_medical_institution_feed_list(self) -> list:
-        """新型コロナワクチン接種医療機関検索の医療機関一覧Feed用データを返す
-
-        Returns:
-            feed_data_list (list): 新型コロナワクチン接種医療機関検索の医療機関一覧Feed用データのリスト
-
-        """
-        view = ReservationStatusView(self.__pool)
-        medical_institution_list = view.get_medical_institution_list()
-        feed_data_list = list()
-        for medical_institution in medical_institution_list:
-            title = medical_institution["name"] + "の新型コロナワクチン接種予約受付状況"
-            link = (
-                "https://" + self.my_domain + "/reservation_status/medical_institution/" + medical_institution["url"]
-            )
-            description = title + "です。"
-            pub_date = view.get_last_updated()
-            pub_date = pub_date.astimezone(timezone.utc)
-            guid = link
-            feed_data_list.append(
-                {
-                    "title": title,
-                    "link": link,
-                    "description": description,
-                    "pub_date": pub_date,
-                    "guid": guid,
-                }
-            )
-
-        return feed_data_list
 
     def get_outpatient_medical_institution_feed_list(self) -> list:
         """新型コロナ発熱外来検索の医療機関一覧Feed用データを返す
@@ -341,19 +253,8 @@ class RssView(XmlView):
             self._get_item(self.index_feed),
             self._get_item(self.about_feed),
             self._get_item(self.outpatient_feed),
-            self._get_item(self.reservation_status_feed),
             self._get_item(self.opendata_feed),
         ]
-
-        # 地区一覧を追加
-        area_feed_list = self.get_reservation_status_area_feed_list()
-        for area_feed in area_feed_list:
-            items.append(self._get_item(area_feed))
-
-        # 新型コロナワクチン接種医療機関一覧を追加
-        reservation_status_medical_institution_feed_list = self.get_reservation_status_medical_institution_feed_list()
-        for medical_institution_feed in reservation_status_medical_institution_feed_list:
-            items.append(self._get_item(medical_institution_feed))
 
         # 新型コロナ発熱外来一覧を追加
         outpatient_medical_institution_feed_list = self.get_outpatient_medical_institution_feed_list()
@@ -412,19 +313,8 @@ class AtomView(XmlView):
             self._get_item(self.index_feed),
             self._get_item(self.about_feed),
             self._get_item(self.outpatient_feed),
-            self._get_item(self.reservation_status_feed),
             self._get_item(self.opendata_feed),
         ]
-
-        # 地区一覧を追加
-        area_feed_list = self.get_reservation_status_area_feed_list()
-        for area_feed in area_feed_list:
-            entries.append(self._get_item(area_feed))
-
-        # 新型コロナワクチン接種医療機関覧を追加
-        reservation_status_medical_institution_feed_list = self.get_reservation_status_medical_institution_feed_list()
-        for medical_institution_feed in reservation_status_medical_institution_feed_list:
-            entries.append(self._get_item(medical_institution_feed))
 
         # 新型コロナ発熱外来一覧を追加
         outpatient_medical_institution_feed_list = self.get_outpatient_medical_institution_feed_list()

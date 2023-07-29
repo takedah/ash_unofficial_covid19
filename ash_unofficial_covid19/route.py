@@ -17,7 +17,6 @@ from .views.patients_number import (
     WeeklyPerAgeView,
 )
 from .views.press_release import PressReleaseView
-from .views.reservation_status import ReservationStatusView
 from .views.xml import AtomView, RssView
 
 mimetypes.add_type("image/webp", ".webp")
@@ -82,11 +81,6 @@ def get_patients_numbers():
     conn = get_connection()
     today = get_today()
     return PatientsNumberView(today, conn)
-
-
-def get_reservation_statuses():
-    conn = get_connection()
-    return ReservationStatusView(conn)
 
 
 def get_outpatients():
@@ -192,157 +186,6 @@ def opendata():
         gtag_id=Config.GTAG_ID,
         patients_numbers=get_patients_numbers(),
         leaflet=False,
-    )
-
-
-@app.route("/reservation_statuses")
-def reservation_statuses():
-    reservation_statuses = get_reservation_statuses()
-    search_results = reservation_statuses.find()
-    areas = reservation_statuses.get_area_list()
-    divisions = reservation_statuses.get_division_list()
-    last_updated = reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
-
-    search_lengths = len(search_results.items)
-    if search_lengths == 0:
-        abort(404)
-
-    return render_template(
-        "reservation_statuses.html",
-        title="旭川市のコロナワクチン接種医療機関検索",
-        gtag_id=Config.GTAG_ID,
-        last_updated=last_updated,
-        search_results=search_results.items,
-        search_lengths=search_lengths,
-        areas=areas,
-        divisions=divisions,
-        leaflet=True,
-    )
-
-
-@app.route("/reservation_statuses/search_by_gps", methods=["GET", "POST"])
-def reservation_statuses_search_by_gps():
-    reservation_statuses = get_reservation_statuses()
-    last_updated = reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
-    if request.method == "GET":
-        abort(404)
-
-    try:
-        current_latitude = escape(request.form["current_latitude"])
-        current_longitude = escape(request.form["current_longitude"])
-        current_latitude = float(current_latitude)
-        current_longitude = float(current_longitude)
-        division = escape(request.form["division"])
-    except (KeyError, ValueError):
-        abort(400)
-
-    title = "現在地から近い新型コロナワクチン接種医療機関（" + division + "）の検索結果"
-    try:
-        search_results = reservation_statuses.search_by_gps(
-            longitude=current_longitude, latitude=current_latitude, division=division
-        )
-    except ViewError:
-        abort(500)
-
-    search_lengths = len(search_results)
-    if search_lengths == 0:
-        abort(404)
-
-    return render_template(
-        "reservation_status_search_by_gps.html",
-        title=title,
-        gtag_id=Config.GTAG_ID,
-        last_updated=last_updated,
-        search_results=search_results,
-        search_lengths=search_lengths,
-        current_longitude=current_longitude,
-        current_latitude=current_latitude,
-        division=division,
-        leaflet=True,
-    )
-
-
-@app.route("/reservation_status/area/<area>")
-def reservation_status_area(area):
-    try:
-        area = escape(area)
-    except ValueError:
-        abort(400)
-
-    title = area + "の新型コロナワクチン接種医療機関の検索結果"
-    reservation_statuses = get_reservation_statuses()
-    search_results = reservation_statuses.find(area=area)
-    last_updated = reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
-
-    search_lengths = len(search_results.items)
-    if search_lengths == 0:
-        abort(404)
-
-    return render_template(
-        "reservation_status_area.html",
-        title=title,
-        gtag_id=Config.GTAG_ID,
-        last_updated=last_updated,
-        area=area,
-        search_results=search_results.items,
-        search_lengths=search_lengths,
-        leaflet=True,
-    )
-
-
-@app.route("/reservation_status/division/<division>")
-def reservation_status_division(division):
-    try:
-        division = escape(division)
-    except ValueError:
-        abort(400)
-
-    title = "新型コロナワクチン接種医療機関（" + division + "）の検索結果"
-    reservation_statuses = get_reservation_statuses()
-    search_results = reservation_statuses.find(division=division)
-    last_updated = reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
-
-    search_lengths = len(search_results.items)
-    if search_lengths == 0:
-        abort(404)
-
-    return render_template(
-        "reservation_status_division.html",
-        title=title,
-        gtag_id=Config.GTAG_ID,
-        last_updated=last_updated,
-        division=division,
-        search_results=search_results.items,
-        search_lengths=search_lengths,
-        leaflet=True,
-    )
-
-
-@app.route("/reservation_status/medical_institution/<medical_institution>")
-def reservation_status_medical_institution(medical_institution):
-    try:
-        medical_institution = escape(medical_institution)
-    except ValueError:
-        abort(400)
-
-    title = medical_institution + "の新型コロナワクチン接種予約受付状況"
-    reservation_statuses = get_reservation_statuses()
-    search_results = reservation_statuses.find(medical_institution_name=medical_institution)
-    last_updated = reservation_statuses.get_last_updated().strftime("%Y年%m月%d日%H時%M分")
-
-    search_lengths = len(search_results.items)
-    if search_lengths == 0:
-        abort(404)
-
-    return render_template(
-        "reservation_status_medical_institution.html",
-        title=title,
-        gtag_id=Config.GTAG_ID,
-        last_updated=last_updated,
-        medical_institution=medical_institution,
-        search_results=search_results.items,
-        search_lengths=search_lengths,
-        leaflet=True,
     )
 
 
@@ -510,16 +353,6 @@ def daily_total_per_age_csv():
 def daily_total_per_age_json():
     patients_numbers = get_patients_numbers()
     json_data = patients_numbers.get_daily_total_per_age_json()
-    res = make_response()
-    res.data = json_data
-    res.headers["Content-Type"] = "application/json; charset=UTF-8"
-    return res
-
-
-@app.route("/api/reservation_status.json")
-def reservation_status_json():
-    reservation_statuses = get_reservation_statuses()
-    json_data = reservation_statuses.get_reservation_status_json()
     res = make_response()
     res.data = json_data
     res.headers["Content-Type"] = "application/json; charset=UTF-8"
