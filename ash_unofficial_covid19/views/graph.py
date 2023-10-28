@@ -26,7 +26,7 @@ class GraphView(View):
     """グラフを出力するクラスの基底クラス"""
 
     @abstractmethod
-    def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
+    def get_graph_image(self, figsize: Optional[tuple[float, float]] = None) -> BytesIO:
         pass
 
     @staticmethod
@@ -59,7 +59,7 @@ class DailyTotalGraphView(GraphView):
         patients_numbers = DailyTotalView(today, pool)
         self._patients_numbers = patients_numbers
 
-    def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
+    def get_graph_image(self, figsize: Optional[tuple[float, float]] = None) -> BytesIO:
         """グラフの画像を生成
 
         Args:
@@ -106,7 +106,7 @@ class MonthTotalGraphView(GraphView):
         patients_numbers = MonthTotalView(today, pool)
         self._patients_numbers = patients_numbers
 
-    def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
+    def get_graph_image(self, figsize: Optional[tuple[float, float]] = None) -> BytesIO:
         """グラフの画像を生成
 
         Args:
@@ -154,7 +154,7 @@ class ByAgeGraphView(GraphView):
         patients_numbers = ByAgeView(today, pool)
         self._patients_numbers = patients_numbers
 
-    def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
+    def get_graph_image(self, figsize: Optional[tuple[float, float]] = None) -> BytesIO:
         """グラフの画像を生成
 
         Args:
@@ -223,7 +223,7 @@ class PerHundredThousandPopulationGraphView(GraphView):
         patients_numbers = PerHundredThousandPopulationView(today, pool)
         self._patients_numbers = patients_numbers
 
-    def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
+    def get_graph_image(self, figsize: Optional[tuple[float, float]] = None) -> BytesIO:
         """グラフの画像を生成
 
         Args:
@@ -310,7 +310,7 @@ class WeeklyPerAgeGraphView(GraphView):
         patients_numbers = WeeklyPerAgeView(today, pool)
         self._patients_numbers = patients_numbers
 
-    def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
+    def get_graph_image(self, figsize: Optional[tuple[float, float]] = None) -> BytesIO:
         """グラフの画像を生成
 
         Args:
@@ -378,7 +378,7 @@ class MonthlyPerAgeGraphView(GraphView):
         patients_numbers = MonthlyPerAgeView(today, pool)
         self._patients_numbers = patients_numbers
 
-    def get_graph_image(self, figsize: Optional[tuple] = None) -> BytesIO:
+    def get_graph_image(self, figsize: Optional[tuple[float, float]] = None) -> BytesIO:
         """グラフの画像を生成
 
         Args:

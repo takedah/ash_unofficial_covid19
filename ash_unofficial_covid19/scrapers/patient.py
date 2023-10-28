@@ -335,7 +335,7 @@ class ScrapeAsahikawaPatientsPDF(Scraper):
 
             df.dropna(how="all", inplace=True)
             df.drop_duplicates(inplace=True)
-            df.fillna("", inplace=True)
+            df.fillna(0, inplace=True)
             pdf_table = df.values.tolist()
             # リスト化した結果空リストだった場合スキップ
             if pdf_table == []:

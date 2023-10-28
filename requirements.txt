@@ -16,3 +16,5 @@ pytest
 pytest-mock
 python-dotenv
 pillow
+markupsafe
+exceptiongroup

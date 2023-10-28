@@ -8,7 +8,7 @@
 
 そこで、旭川市公式ホームページからスクレイピングして新型コロナウイルス感染症の情報を取得し、非公式のオープンデータとしてダウンロードできるようにしたものです。（2023年5月8日発表分をもって新規感染者数データの取得は停止しています。）
 
-また、新型コロナワクチン接種医療機関を検索したり、北海道公式ホームページからダウンロードしたデータを元に外来対応医療機関（発熱外来）を検索できるようになっています。
+また、北海道公式ホームページからダウンロードしたデータを元に外来対応医療機関（発熱外来）を検索できるようになっています。
 
 Flaskで動作します。
 
@@ -19,7 +19,7 @@ Flaskで動作します。
 - beautifulsoup4
 - flask
 - gunicorn
-- psycopg2
+- psycopg2-binary
 - requests
 - matplotlib
 - pandas
@@ -31,10 +31,12 @@ Flaskで動作します。
 - pillow
 - pytest
 - pytest-mock
+- markupsafe
+- exceptiongroup
 
 ## Install
 
-新型コロナワクチン接種医療機関の位置情報の取得に [Yahoo! Open Local Platform (YOLP)](https://developer.yahoo.co.jp/webapi/map/) を使用しています。
+医療機関の位置情報の取得に [Yahoo! Open Local Platform (YOLP)](https://developer.yahoo.co.jp/webapi/map/) を使用しています。
 
 ```bash
 $ export DATABASE_URL=postgresql://{user_name}:{password}@{host_name}/{db_name}
@@ -54,18 +56,6 @@ $ export GTAG_ID={google_analytics_id}
 
 ```bash
 $ gunicorn ash_unofficial_covid19.run:app
-```
-
-### 感染者情報の取得
-
-```bash
-$ python -m ash_unofficial_covid19.import_patients_numbers
-```
-
-### ワクチン接種予約状況の取得
-
-```bash
-$ python -m ash_unofficial_covid19.import_reservation_statuses
 ```
 
 ### 発熱外来の情報の取得
@@ -88,8 +78,6 @@ Dockerでも使用できるようにしています。
 #### データ取得
 
 ```bash
-# docker-compose exec app python -m ash_unofficial_covid19.import_patients_numbers
-# docker-compose exec app python -m ash_unofficial_covid19.import_reservation_statuses
 # docker-compose exec app python -m ash_unofficial_covid19.import_outpatients
 ```
 

@@ -3,7 +3,7 @@ import unicodedata
 import urllib.parse
 from typing import Optional
 
-from flask import escape
+from markupsafe import escape
 
 from ..config import Config
 from ..scrapers.downloader import DownloadedCSV, DownloadedJSON

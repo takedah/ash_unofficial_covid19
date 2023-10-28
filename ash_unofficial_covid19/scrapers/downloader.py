@@ -92,9 +92,6 @@ class DownloadedHTML(Downloader):
 
         """
         try:
-            # 旭川市ホームページのTLS証明書のDH鍵長に問題があるためセキュリティを下げて
-            # 回避する
-            requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += "HIGH:!DH"
             response = requests.get(url)
         except (ConnectionError, MaxRetryError, Timeout, HTTPError):
             message = "cannot connect to web server."
@@ -212,9 +209,6 @@ class DownloadedPDF(Downloader):
 
         """
         try:
-            # 旭川市ホームページのTLS証明書のDH鍵長に問題があるためセキュリティを下げて
-            # 回避する
-            requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += "HIGH:!DH"
             response = requests.get(url)
             self.info_log("PDFファイルのダウンロードに成功しました。")
         except (ConnectionError, MaxRetryError, Timeout, HTTPError):

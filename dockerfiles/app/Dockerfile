@@ -1,4 +1,4 @@
-FROM python:3.9.7
+FROM python:3.11.6
 
 RUN pip install --upgrade pip
 
@@ -17,7 +17,7 @@ ADD ./pyproject.toml $project_dir
 
 WORKDIR $project_dir
 
-RUN apt update && apt install -y openjdk-11-jdk curl libgl1-mesa-dev ghostscript
+RUN apt-get update && apt-get install -y default-jdk curl libgl1-mesa-dev ghostscript
 
 ENV PATH="$POETRY_HOME/bin:$PATH"
 
