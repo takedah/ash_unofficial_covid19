@@ -12,10 +12,10 @@ body {
   font-family: 'Noto Sans JP', sans-serif;
 }
 #mapid {
-  height: 400px;
+  height: 480px;
 }
 #pediatrics_mapid {
-  height: 400px;
+  height: 480px;
 }
 .patients-table {
   max-height: 400px;

@@ -92,6 +92,12 @@ document.addEventListener(
             .memo
         )
       );
+      var phonenumber = JSON.parse(
+        JSON.stringify(
+          document.getElementById("order" + currentOrder).dataset
+            .phonenumber
+        )
+      );
       var parentPath = "outpatient";
       var nameLink =
         "<a href='/" +
@@ -117,6 +123,7 @@ document.addEventListener(
       }
       var statusMessage =
         "<div class='pb-1'>" + address + "</div>" +
+        "<div class='pb-1'>" + phonenumber + "</div>" +
         "<div class='pb-1'>" +
         "<div>診療時間</div>" +
         "<div>月曜日: " + mon + "</div>" +
