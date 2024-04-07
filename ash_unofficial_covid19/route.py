@@ -152,6 +152,7 @@ def index():
     )
 
 
+"""
 @app.route("/past")
 def past():
     return render_template(
@@ -422,6 +423,7 @@ def gtag():
         200,
         {"Content-Type": "application/javascript; charset=UTF-8"},
     )
+"""
 
 
 @app.errorhandler(404)

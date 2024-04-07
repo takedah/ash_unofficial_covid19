@@ -1,36 +1,4 @@
 {% extends 'layout.html' %}
 {% block content %}
-<h1 class="h5 text-center m-4 p-4">旭川市非公式新型コロナウイルスまとめサイト</h1>
-<div class="card-group m-4">
-  <div class="card mb-4">
-    <div class="card-header">
-      <h2 class="card-title h6 mb-0 py-1">旭川市内の発熱外来を探す</h2>
-    </div>
-    <div class="card-body">
-      <p class="card-text">北海道公式ホームページからダウンロードした外来対応医療機関（発熱外来）データを検索できます。</p>
-      <p class="p-1 text-center"><a href="/outpatients" title="旭川市新型コロナ発熱外来検索へ"><img src="{{ url_for('static', filename='images/medicine_line.svg') }}" alt="薬を表すアイコン" width="48" height="48"></a></p>
-      <p class="text-center"><a href="/outpatients" title="旭川市新型コロナ発熱外来検索へ" class="link-primary">発熱外来検索へ</a></p>
-    </div>
-  </div>
-  <div class="card mb-4">
-    <div class="card-header">
-      <h2 class="card-title h6 mb-0 py-1">非公式オープンデータを見る</h2>
-    </div>
-    <div class="card-body">
-      <p class="card-text">2023年5月8日発表分までの旭川市内の新型コロナウイルス感染症の新規感染者数データをダウンロードできます。</p>
-      <p class="p-1 text-center"><a href="/opendata" title="非公式オープンデータへ"><img src="{{ url_for('static', filename='images/database_FILL0_wght400_GRAD0_opsz48.svg') }}" alt="データを表すアイコン" width="48" height="48"></a></p>
-      <p class="text-center"><a href="/opendata" title="非公式オープンデータへ" class="link-primary">非公式オープンデータへ</a></p>
-    </div>
-  </div>
-  <div class="card mb-4">
-    <div class="card-header">
-      <h2 class="card-title h6 mb-0 py-1">これまでの感染動向をグラフで見る</h2>
-    </div>
-    <div class="card-body">
-      <p class="card-text">これまでの旭川市内の新型コロナウイルス感染症の感染動向をグラフで一覧できます。</p>
-      <p class="p-1 text-center"><a href="/past" title="旭川市内新型コロナウイルス感染症のこれまでの感染動向へ"><img src="{{ url_for('static', filename='images/monitoring_FILL0_wght400_GRAD0_opsz48.svg') }}" alt="グラフを表すアイコン" width="48" height="48"></a></p>
-      <p class="text-center"><a href="/past" title="旭川市内新型コロナウイルス感染症のこれまでの感染動向へ" class="link-primary"> これまでの感染動向へ</a></p>
-    </div>
-  </div>
-</div>
+<p class="h5 m-4 p-4">令和6年3月31日で北海道公式ホームページで外来対応医療機関の公表が終了したことから、令和5年度をもって本サイトの更新を停止しました。</p>
 {% endblock %}
